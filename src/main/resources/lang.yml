@@ -1,0 +1,103 @@
+####################################################
+##                                                ##
+##              WildTools Messages                ##
+##              Developed by Ome_R                ##
+##                                                ##
+####################################################
+
+#If you want to disable a message, set it to '' (empty)
+
+# Called when a player doesn't have the required block.
+BUILDER_NO_BLOCK: '&b&lWildTools &7You must have at least x1 {0} for building a pillar.'
+
+# Called when a player runs a command not in the required usage
+COMMAND_USAGE: '&b&lWildTools &7Usage: /{0}'
+
+# Called when a player has a cool-down on a tool.
+COOLDOWN_TIME: '&b&lWildTools &7Please wait {0} before using this tool.'
+
+# Called when a player uses a crafting wand on a chest.
+CRAFT_SUCCESS: '&b&lWildTools &7Successfully crafted x{0} items.'
+
+# Called when a player successfully filled all dispensers with cannon-tool.
+FILLED_DISPENSERS: '&b&lWildTools &7Successfully filled {0} dispensers with {1} tnt.'
+
+# Called when a player successfully gave a tool to a player.
+GIVE_TOOL_SUCCESS: '&b&lWildTools &7Successfully gave x{0} {1} to {2}.'
+
+# Called when a player successfully sold harvested items with a harvester-tool.
+HARVESTER_SELL_SUCCEED: '&b&lWildTools &7Successfully sold {0} items for ${1}.'
+
+# Called when a player runs an invalid tool sub-command.
+HELP_COMMAND_HEADER: '&8&m---------------&b&l WildTools &8&m---------------'
+HELP_COMMAND_LINE: '&7- &b/{0} &8- &f{1}'
+HELP_COMMAND_FOOTER: '&8&m---------------&b&l WildTools &8&m---------------'
+
+# Called when a player clicked on a regular block with a crafting-tool.
+INVALID_CONTAINER_CRAFTING: '&b&lWildTools &7You can only craft items inside a chest.'
+
+# Called when a player clicked on a regular block with a sell-tool.
+INVALID_CONTAINER_SELL_WAND: '&b&lWildTools &7You can only sell items inside a chest.'
+
+# Called when a player clicked on a regular block with a sort-tool.
+INVALID_CONTAINER_SORT_WAND: '&b&lWildTools &7You can only sort items inside a chest.'
+
+# Called when a player runs a command with a player-parameter.
+INVALID_NUMBER: '&b&lWildTools &7Couldn''t find the number ''{0}''.'
+
+# Called when a player runs a command with a player-parameter.
+INVALID_PLAYER: '&b&lWildTools &7Couldn''t find the player ''{0}''.'
+
+# Called when a player runs a command with a tool-parameter.
+INVALID_TOOL: '&b&lWildTools &7Couldn''t find the tool ''{0}''.'
+
+# Called when a player tries to use super-breaker with a tool.
+MCMMO_TOOL_SUPER_BREAKER: '&b&lWildTools &7You cannot use super-breaker on this tool.'
+
+# Called when a player runs a command without the required permission.
+NO_PERMISSION: '&fUnknown command. Type "/help" for help.'
+
+# Called when a player successfully reloaded all configuration files.
+RELOAD_SUCCESS: '&b&lWildTools &7Successfully reloaded the configuration files.'
+
+# Called when a player selects an area with a cannon-tool.
+SELECTION_RIGHT_CLICK: '&b&lWildTools &7Selected position #2'
+SELECTION_LEFT_CLICK: '&b&lWildTools &7Selected position #1'
+
+# Called when a player tries to use cannon-tool not inside his selection.
+SELECTION_MUST_BE_INSIDE: '&b&lWildTools &7You must be inside the selection to fill it with dispensers.'
+
+# Called when a player tries to use cannon-tool without a valid selection.
+SELECTION_NOT_READY: '&b&lWildTools &7You must select an area to fill all dispensers.'
+
+# Called when a player toggles sell-mode on a harvester-tool.
+SELL_MODE_ENABLED: '&b&lWildTools &7Enabled sell-mode for this harvester.'
+SELL_MODE_DISABLED: '&b&lWildTools &7Disabled sell-mode for this harvester.'
+
+# Called when a player successfully sold a container with a sell-tool.
+SOLD_CHEST: '&b&lWildTools &7Successfully sold the container''s content for ${0}.'
+
+# Called when a player successfully sorted a container with a sort-tool.
+SORTED_CHEST: '&b&lWildTools &7Successfully sorted this container.'
+
+# Called when a player runs the info sub-command.
+# Optional sections will be seen only if it's applied for the tool.
+TOOL_INFO_HEADER: '&8&m---------------&b&l WildTools &8&m---------------'
+TOOL_INFO_NAME: '&b Tool&7: &f{0}'
+TOOL_INFO_MODE: '&b Tool-Mode&7: &f{0}'
+TOOL_INFO_TYPE: '&b Type&7: &f{0}'
+TOOL_INFO_WHITELISTED_BLOCKS: '&b Whitelisted Blocks&7: &f{0}'
+TOOL_INFO_WHITELISTED_DROPS: '&b Whitelisted Drops&7: &f{0}'
+TOOL_INFO_BLACKLISTED_BLOCKS: '&b Blacklisted Blocks&7: &f{0}'
+TOOL_INFO_BLACKLISTED_DROPS: '&b Blacklisted Drops&7: &f{0}'
+TOOL_INFO_UNBREAKABLE: '&b Unbreakable&7: &f{0}'
+TOOL_INFO_USES: '&b Uses&7: &f{0}'
+TOOL_INFO_COOLDOWN: '&b Cooldown&7: &f{0}'
+TOOL_INFO_AUTO_COLLECT: '&b Auto-Collect&7: &f{0}'
+TOOL_INFO_SILK_TOUCH: '&b Silk Touch&7: &f{0}'
+TOOL_INFO_SAME_TYPE: '&b Only Same Type&7: &f{0}'
+TOOL_INFO_INSIDE_CLAIM: '&b Only Inside Claim&7: &f{0}'
+TOOL_INFO_BREAK_LEVEL: '&b Break Level&7: &f{0}'
+TOOL_INFO_RADIUS: '&b Radius&7: &f{0}'
+TOOL_INFO_TNT_AMOUNT: '&b TNT-Amount&7: &f{0}'
+TOOL_INFO_FOOTER: '&8&m---------------&b&l WildTools &8&m---------------'
