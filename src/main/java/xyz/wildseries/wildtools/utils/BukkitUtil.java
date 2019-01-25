@@ -56,7 +56,11 @@ public final class BukkitUtil {
 
         boolean autoCollect = false;
         List<ItemStack> drops = getBlockDrops(player, block);
-        plugin.getNMSAdapter().setAirFast(block);
+
+        if(block.getRelative(BlockFace.UP).getType().name().contains("WATER"))
+            block.setType(Material.AIR);
+        else
+            plugin.getNMSAdapter().setAirFast(block);
 
         Tool tool;
 
