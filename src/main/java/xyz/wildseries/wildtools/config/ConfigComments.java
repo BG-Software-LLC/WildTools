@@ -9,12 +9,14 @@ public final class ConfigComments {
     @Comment("##               Developed by Ome_R               ##")
     @Comment("##                                                ##")
     @Comment("####################################################")
-    @Comment("")
     public static String HEADER = "";
 
-    @Comment("The plugin checks if ShopGUIPlus or Essentials is installed.")
-    @Comment("If both are not installed, it will use this list for the sell-wand")
-    @Comment("prices list. If both are installed, ShopGUIPlus's prices will be used.")
+    @Comment("")
+    @Comment("Choose which prices plugin to check for prices (ShopGUIPlus, Essentials, WildTools).")
+    public static String PRICES_PLUGIN = "prices-plugin";
+
+    @Comment("")
+    @Comment("A list of prices. Use \"TYPE\" and \"TYPE:DATA\" formats.")
     public static String PRICES_LIST = "prices-list";
 
     @Comment("")

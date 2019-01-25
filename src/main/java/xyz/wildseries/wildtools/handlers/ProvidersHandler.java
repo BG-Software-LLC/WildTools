@@ -28,6 +28,8 @@ import xyz.wildseries.wildtools.hooks.PricesProvider_ShopGUIPlus;
 
 public final class ProvidersHandler {
 
+    static String pricesPlugin;
+
     private boolean isVaultEnabled = false;
     private Economy economy;
 
@@ -46,9 +48,9 @@ public final class ProvidersHandler {
             antiCheatProvider = new AntiCheatProvider_AAC();
         else antiCheatProvider = new AntiCheatProvider_Default();
         //Prices Plugin Hookup
-        if(Bukkit.getPluginManager().isPluginEnabled("ShopGUIPlus"))
+        if(pricesPlugin.equalsIgnoreCase("ShopGUIPlus") && Bukkit.getPluginManager().isPluginEnabled("ShopGUIPlus"))
             pricesProvider = new PricesProvider_ShopGUIPlus();
-        else if(Bukkit.getPluginManager().isPluginEnabled("Essentials"))
+        else if(pricesPlugin.equalsIgnoreCase("Essentials") && Bukkit.getPluginManager().isPluginEnabled("Essentials"))
             pricesProvider = new PricesProvider_Essentials();
         else pricesProvider = new PricesProvider_Default();
         //Factions Hookup

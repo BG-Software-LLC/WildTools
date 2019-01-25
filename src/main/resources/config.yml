@@ -5,13 +5,13 @@
 ##                                                ##
 ####################################################
 
-# The plugin checks if ShopGUIPlus or Essentials is installed.
-# If both are not installed, it will use this list for the sell-wand
-# prices list. If both are installed, ShopGUIPlus's prices will be used.
+# Choose which prices plugin to check for prices (ShopGUIPlus, Essentials, WildTools).
+prices-plugin: 'ShopGUIPlus'
+
+# A list of prices. Use "TYPE" and "TYPE:DATA" formats.
 prices-list:
 - 'STONE:5' #Each stone will cost $5
 - 'LOG:0:5' #Only oak logs will cost $5
-
 
 # The plugin brings a lot of options and features for making tools easily with rich-configuration options.
 # The default config has basic trench-pickaxe, tray-pickaxe, sand-wand, sell-wand, lightning-wand, harvester-hoe

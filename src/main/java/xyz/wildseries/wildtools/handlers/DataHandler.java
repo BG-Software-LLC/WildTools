@@ -12,10 +12,11 @@ import xyz.wildseries.wildtools.api.objects.tools.PillarTool;
 import xyz.wildseries.wildtools.api.objects.tools.SellTool;
 import xyz.wildseries.wildtools.api.objects.tools.SortTool;
 import xyz.wildseries.wildtools.api.objects.tools.Tool;
+import xyz.wildseries.wildtools.config.CommentedConfiguration;
+import xyz.wildseries.wildtools.config.ConfigComments;
 import xyz.wildseries.wildtools.hooks.PricesProvider_Default;
 
 import org.bukkit.Material;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.enchantments.Enchantment;
 
 import java.io.File;
@@ -37,10 +38,12 @@ public final class DataHandler {
         if(!file.exists())
             plugin.saveResource("config.yml", false);
 
-        YamlConfiguration cfg = YamlConfiguration.loadConfiguration(file);
+        CommentedConfiguration cfg = new CommentedConfiguration(ConfigComments.class);
+        cfg.load(file);
 
-        //Converts old values into new ones
-        oldDataConvertor(cfg);
+        cfg.resetYamlFile(plugin, "config.yml");
+
+        ProvidersHandler.pricesPlugin = cfg.getString("prices-plugin", "ShopGUIPlus");
 
         Map<String, Double> prices = new HashMap<>();
 
@@ -217,40 +220,6 @@ public final class DataHandler {
 
         WildToolsPlugin.log(" - Found " + toolsAmount + " tools in config.yml.");
         WildToolsPlugin.log("Loading configuration done (Took " + (System.currentTimeMillis() - startTime) + "ms)");
-    }
-
-    private static void oldDataConvertor(YamlConfiguration cfg){
-        for(String name : cfg.getConfigurationSection("tools").getKeys(false)){
-            if(cfg.contains("tools." + name + ".tool-mode")){
-                String toolMode = cfg.getString("tools." + name + ".tool-mode");
-                if(toolMode.equals("CUBOID")){
-                    //Break Level Convert
-                    if(cfg.contains("tools." + name + ".break_level"))
-                        cfg.set("tools." + name + ".break-level", cfg.get("tools." + name + ".break_level"));
-                }
-                else if(toolMode.equals("HARVESTER")){
-                    //Radius Convert
-                    if(cfg.contains("tools." + name + ".break_level")) {
-                        WildToolsPlugin.log("The tool " + name + " is using break-level instead of radius...");
-                        WildToolsPlugin.log("The new radius variable is applied for both harvester and cannon tools,");
-                        WildToolsPlugin.log("and should be equals to break-level / 2. Please update this tool.");
-                        cfg.set("tools." + name + ".radius", (cfg.getInt("tools." + name + ".break_level") / 2));
-                    }
-                }
-            }
-            //Whitelisted Drops Convert
-            if(cfg.contains("tools." + name + ".whitelisted_drops"))
-                cfg.set("tools." + name + ".whitelisted-drops", cfg.get("tools." + name + ".whitelisted_drops"));
-            //Whitelisted Blocks Convert
-            if(cfg.contains("tools." + name + ".whitelisted_blocks"))
-                cfg.set("tools." + name + ".whitelisted-blocks", cfg.get("tools." + name + ".whitelisted_blocks"));
-            //Blacklisted Drops Convert
-            if(cfg.contains("tools." + name + ".blacklisted_drops"))
-                cfg.set("tools." + name + ".blacklisted-drops", cfg.get("tools." + name + ".blacklisted_drops"));
-            //Blacklisted Blocks Convert
-            if(cfg.contains("tools." + name + ".blacklisted_blocks"))
-                cfg.set("tools." + name + ".blacklisted-drops", cfg.get("tools." + name + ".blacklisted_blocks"));
-        }
     }
 
     public static void reload(){
