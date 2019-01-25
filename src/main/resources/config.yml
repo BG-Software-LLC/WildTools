@@ -27,6 +27,11 @@ prices-list:
 # Required sections:
 # break-level: How big the cuboid-area gonna be (3 will be 3x3x3 area) [INTEGER]
 #
+# *** Drain Tool-Mode ***
+# Tools in this mode will remove all ice blocks in the checking area.
+# Required sections:
+# radius: What is the radius of the checking area? (3 will check a 7x7 area) (INTEGER)
+#
 # *** Pillar Tool-Mode ***
 # Tools in this mode will dig a pillar of blocks with the same type. This mode is used for sand-wands.
 #
