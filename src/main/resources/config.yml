@@ -272,6 +272,21 @@ tools:
     - '&f   {}'
     - '&f'
     - '&8&m---------------------------------------'
+  drain_wand:
+    tool-mode: DRAIN
+    type: STICK
+    uses: 300
+    radius: 10
+    name: '&f --{ &3&lDrain Wand &f}-- '
+    lore:
+      - '&8&m---------------------------------------'
+      - '&7 Right click to remove all ice in a'
+      - '&7 radius of 10 blocks.'
+      - '&f'
+      - '&3&l Uses:'
+      - '&f   {}'
+      - '&f'
+      - '&8&m---------------------------------------'
   sort_wand:
     tool-mode: SORT
     type: STICK
