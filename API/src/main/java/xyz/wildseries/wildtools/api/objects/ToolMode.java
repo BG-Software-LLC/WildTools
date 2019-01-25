@@ -6,6 +6,7 @@ public enum ToolMode {
     CANNON,
     CRAFTING,
     CUBOID,
+    DRAIN,
     HARVESTER,
     ICE,
     LIGHTNING,

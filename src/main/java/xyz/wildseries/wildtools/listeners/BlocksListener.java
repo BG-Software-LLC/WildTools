@@ -15,6 +15,7 @@ import xyz.wildseries.wildtools.WildToolsPlugin;
 import xyz.wildseries.wildtools.api.objects.tools.BuilderTool;
 import xyz.wildseries.wildtools.api.objects.tools.CraftingTool;
 import xyz.wildseries.wildtools.api.objects.tools.CuboidTool;
+import xyz.wildseries.wildtools.api.objects.tools.DrainTool;
 import xyz.wildseries.wildtools.api.objects.tools.HarvesterTool;
 import xyz.wildseries.wildtools.api.objects.tools.IceTool;
 import xyz.wildseries.wildtools.api.objects.tools.LightningTool;
@@ -107,7 +108,7 @@ public final class BlocksListener implements Listener {
     }
 
     @EventHandler
-    public void onIceUse(PlayerInteractEvent e){
+    public void onIceAndDrainUse(PlayerInteractEvent e){
         if(WTool.toolBlockBreak.contains(e.getPlayer().getUniqueId()) ||
                 !e.getAction().name().contains("RIGHT_CLICK") || e.getItem() == null)
             return;
@@ -115,9 +116,9 @@ public final class BlocksListener implements Listener {
         if(!e.getPlayer().hasPermission("wildtools.use"))
             return;
 
-        IceTool tool = instance.getToolsManager().getIceTool(e.getItem());
+        Tool tool = instance.getToolsManager().getTool(e.getItem());
 
-        if(tool == null)
+        if(!(tool instanceof IceTool))
             return;
 
         e.setCancelled(true);

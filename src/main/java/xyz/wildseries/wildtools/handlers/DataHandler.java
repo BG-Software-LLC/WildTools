@@ -5,6 +5,7 @@ import xyz.wildseries.wildtools.api.objects.tools.BuilderTool;
 import xyz.wildseries.wildtools.api.objects.tools.CannonTool;
 import xyz.wildseries.wildtools.api.objects.tools.CraftingTool;
 import xyz.wildseries.wildtools.api.objects.tools.CuboidTool;
+import xyz.wildseries.wildtools.api.objects.tools.DrainTool;
 import xyz.wildseries.wildtools.api.objects.tools.HarvesterTool;
 import xyz.wildseries.wildtools.api.objects.tools.IceTool;
 import xyz.wildseries.wildtools.api.objects.tools.LightningTool;
@@ -112,6 +113,14 @@ public final class DataHandler {
                     }
 
                     tool = plugin.getToolsManager().registerTool(type, name, CuboidTool.class, cfg.getInt("tools." + name + ".break-level"));
+                    break;
+                case "DRAIN":
+                    if(!cfg.contains("tools." + name + ".radius")){
+                        WildToolsPlugin.log("Couldn't find a radius for tool " + name + ", skipping");
+                        continue;
+                    }
+
+                    tool = plugin.getToolsManager().registerTool(type, name, DrainTool.class, cfg.getInt("tools." + name + ".radius"));
                     break;
                 case "HARVESTER":
                     if(!cfg.contains("tools." + name + ".radius")){

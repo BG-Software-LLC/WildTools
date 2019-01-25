@@ -12,6 +12,7 @@ import xyz.wildseries.wildtools.api.objects.tools.BuilderTool;
 import xyz.wildseries.wildtools.api.objects.tools.CannonTool;
 import xyz.wildseries.wildtools.api.objects.tools.CraftingTool;
 import xyz.wildseries.wildtools.api.objects.tools.CuboidTool;
+import xyz.wildseries.wildtools.api.objects.tools.DrainTool;
 import xyz.wildseries.wildtools.api.objects.tools.HarvesterTool;
 import xyz.wildseries.wildtools.api.objects.tools.IceTool;
 import xyz.wildseries.wildtools.api.objects.tools.LightningTool;
@@ -23,6 +24,7 @@ import xyz.wildseries.wildtools.objects.tools.WBuilderTool;
 import xyz.wildseries.wildtools.objects.tools.WCannonTool;
 import xyz.wildseries.wildtools.objects.tools.WCraftingTool;
 import xyz.wildseries.wildtools.objects.tools.WCuboidTool;
+import xyz.wildseries.wildtools.objects.tools.WDrainTool;
 import xyz.wildseries.wildtools.objects.tools.WHarvesterTool;
 import xyz.wildseries.wildtools.objects.tools.WIceTool;
 import xyz.wildseries.wildtools.objects.tools.WLightningTool;
@@ -65,6 +67,11 @@ public final class ToolsHandler implements ToolsManager {
     @Override
     public CuboidTool getCuboidTool(ItemStack itemStack){
         return getTool(itemStack, ToolMode.CUBOID, CuboidTool.class);
+    }
+
+    @Override
+    public DrainTool getDrainTool(ItemStack itemStack) {
+        return getTool(itemStack, ToolMode.CUBOID, DrainTool.class);
     }
 
     @Override
@@ -141,6 +148,8 @@ public final class ToolsHandler implements ToolsManager {
             tool = new WCraftingTool(type, name, (List<String>) arg);
         }else if(toolClass.isAssignableFrom(CuboidTool.class)){
             tool = new WCuboidTool(type, name, (int) arg);
+        }else if(toolClass.isAssignableFrom(DrainTool.class)){
+            tool = new WDrainTool(type, name, (int) arg);
         }else if(toolClass.isAssignableFrom(HarvesterTool.class)){
             tool = new WHarvesterTool(type, name, (int) arg);
         }else if(toolClass.isAssignableFrom(IceTool.class)){

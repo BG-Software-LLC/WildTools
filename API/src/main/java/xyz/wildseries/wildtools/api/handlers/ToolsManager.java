@@ -9,6 +9,7 @@ import xyz.wildseries.wildtools.api.objects.tools.BuilderTool;
 import xyz.wildseries.wildtools.api.objects.tools.CannonTool;
 import xyz.wildseries.wildtools.api.objects.tools.CraftingTool;
 import xyz.wildseries.wildtools.api.objects.tools.CuboidTool;
+import xyz.wildseries.wildtools.api.objects.tools.DrainTool;
 import xyz.wildseries.wildtools.api.objects.tools.HarvesterTool;
 import xyz.wildseries.wildtools.api.objects.tools.IceTool;
 import xyz.wildseries.wildtools.api.objects.tools.LightningTool;
@@ -29,6 +30,8 @@ public interface ToolsManager {
     CraftingTool getCraftingTool(ItemStack itemStack);
 
     CuboidTool getCuboidTool(ItemStack itemStack);
+
+    DrainTool getDrainTool(ItemStack itemStack);
 
     HarvesterTool getHarvesterTool(ItemStack itemStack);
 
