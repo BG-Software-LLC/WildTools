@@ -10,11 +10,13 @@ import xyz.wildseries.wildtools.command.CommandsHandler;
 import xyz.wildseries.wildtools.handlers.EditorHandler;
 import xyz.wildseries.wildtools.handlers.ProvidersHandler;
 import xyz.wildseries.wildtools.handlers.DataHandler;
+import xyz.wildseries.wildtools.handlers.RecipesHandler;
 import xyz.wildseries.wildtools.handlers.ToolsHandler;
 import xyz.wildseries.wildtools.listeners.BlocksListener;
 import xyz.wildseries.wildtools.listeners.EditorListener;
 import xyz.wildseries.wildtools.listeners.McMMOListener;
 import xyz.wildseries.wildtools.listeners.PlayerListener;
+import xyz.wildseries.wildtools.listeners.RecipesListener;
 import xyz.wildseries.wildtools.nms.NMSAdapter;
 
 import net.milkbowl.vault.economy.Economy;
@@ -31,6 +33,7 @@ public final class WildToolsPlugin extends JavaPlugin implements WildTools {
     private ToolsManager toolsManager;
     private ProvidersHandler providersHandler;
     private EditorHandler editorHandler;
+    private RecipesHandler recipesHandler;
 
     private NMSAdapter nmsAdapter;
 
@@ -42,6 +45,7 @@ public final class WildToolsPlugin extends JavaPlugin implements WildTools {
         getServer().getPluginManager().registerEvents(new BlocksListener(this), this);
         getServer().getPluginManager().registerEvents(new PlayerListener(this), this);
         getServer().getPluginManager().registerEvents(new EditorListener(this), this);
+        getServer().getPluginManager().registerEvents(new RecipesListener(this), this);
         if(getServer().getPluginManager().isPluginEnabled("mcMMO"))
             getServer().getPluginManager().registerEvents(new McMMOListener(this), this);
 
@@ -59,6 +63,7 @@ public final class WildToolsPlugin extends JavaPlugin implements WildTools {
         loadAPI();
 
         editorHandler = new EditorHandler(this);
+        recipesHandler = new RecipesHandler(this);
 
         if (Updater.isOutdated()) {
             log("");
@@ -140,6 +145,10 @@ public final class WildToolsPlugin extends JavaPlugin implements WildTools {
 
     public EditorHandler getEditor() {
         return editorHandler;
+    }
+
+    public RecipesHandler getRecipes() {
+        return recipesHandler;
     }
 
     public NMSAdapter getNMSAdapter(){
