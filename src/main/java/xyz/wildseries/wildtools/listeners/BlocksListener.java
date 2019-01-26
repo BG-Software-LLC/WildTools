@@ -56,7 +56,7 @@ public final class BlocksListener implements Listener {
         tool.useOnBlock(e.getPlayer(), e.getBlock());
     }
 
-    @EventHandler
+    @EventHandler(ignoreCancelled = true)
     public void onToolUse(PlayerInteractEvent e){
         if(WTool.toolBlockBreak.contains(e.getPlayer().getUniqueId()) ||
                 e.getAction() != Action.RIGHT_CLICK_BLOCK || e.getItem() == null)
