@@ -3,6 +3,7 @@ package xyz.wildseries.wildtools.listeners;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.event.EventPriority;
 import org.bukkit.util.Vector;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -15,7 +16,6 @@ import xyz.wildseries.wildtools.WildToolsPlugin;
 import xyz.wildseries.wildtools.api.objects.tools.BuilderTool;
 import xyz.wildseries.wildtools.api.objects.tools.CraftingTool;
 import xyz.wildseries.wildtools.api.objects.tools.CuboidTool;
-import xyz.wildseries.wildtools.api.objects.tools.DrainTool;
 import xyz.wildseries.wildtools.api.objects.tools.HarvesterTool;
 import xyz.wildseries.wildtools.api.objects.tools.IceTool;
 import xyz.wildseries.wildtools.api.objects.tools.LightningTool;
@@ -56,7 +56,7 @@ public final class BlocksListener implements Listener {
         tool.useOnBlock(e.getPlayer(), e.getBlock());
     }
 
-    @EventHandler(ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onToolUse(PlayerInteractEvent e){
         if(WTool.toolBlockBreak.contains(e.getPlayer().getUniqueId()) ||
                 e.getAction() != Action.RIGHT_CLICK_BLOCK || e.getItem() == null)

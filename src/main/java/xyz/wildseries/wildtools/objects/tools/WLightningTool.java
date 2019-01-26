@@ -31,10 +31,6 @@ public final class WLightningTool extends WTool implements LightningTool {
             return;
         }
 
-        //Checks if the player has access to the block
-        if(!BukkitUtil.canBreak(pl, block))
-            return;
-
         setLastUse(pl.getUniqueId());
 
         if(pl.getGameMode() != GameMode.CREATIVE && !isUnbreakable())
