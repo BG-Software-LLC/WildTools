@@ -15,6 +15,7 @@ import org.bukkit.inventory.ShapelessRecipe;
 import xyz.wildseries.wildtools.Locale;
 import xyz.wildseries.wildtools.api.objects.tools.CraftingTool;
 import xyz.wildseries.wildtools.api.objects.ToolMode;
+import xyz.wildseries.wildtools.utils.BukkitUtil;
 import xyz.wildseries.wildtools.utils.ItemUtil;
 
 import java.util.ArrayList;
@@ -55,6 +56,9 @@ public final class WCraftingTool extends WTool implements CraftingTool {
         }
 
         if(isOnlyInsideClaim() && !plugin.getProviders().inClaim(pl, block.getLocation()))
+            return;
+
+        if(!BukkitUtil.canInteract(pl, block))
             return;
 
         setLastUse(pl.getUniqueId());
