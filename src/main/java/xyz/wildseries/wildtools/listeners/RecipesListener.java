@@ -26,37 +26,40 @@ public final class RecipesListener implements Listener {
         if(!(e.getInventory() instanceof CraftingInventory) || e.getRawSlot() > 9)
             return;
 
-        if(e.getRawSlot() != 0) {
-            new Thread(() -> {
-                Map<String, ItemStack[]> recipes = plugin.getRecipes().getRecipes();
-                ItemStack[] invRecipe = e.getInventory().getContents();
+        CraftingInventory craftingInventory = (CraftingInventory) e.getInventory();
 
-                outerLoop:
-                for (String name : recipes.keySet()) {
-                    ItemStack[] recipe = recipes.get(name);
-                    for (int i = 0; i < 9; i++) {
-                        if(!isSimilar(recipe[i], invRecipe[i + 1])){
-                            continue outerLoop;
-                        }
+        if(craftingInventory.getRecipe() != null)
+            return;
+
+        Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, () -> {
+            Map<String, ItemStack[]> recipes = plugin.getRecipes().getRecipes();
+            ItemStack[] invRecipe = e.getInventory().getContents();
+
+            outerLoop:
+            for (String name : recipes.keySet()) {
+                ItemStack[] recipe = recipes.get(name);
+                for (int i = 0; i < 9; i++) {
+                    if(!isSimilar(recipe[i], invRecipe[i + 1])){
+                        continue outerLoop;
                     }
+                }
 
+                if(e.getRawSlot() != 0) {
                     e.getWhoClicked().getOpenInventory().setItem(0, plugin.getToolsManager().getTool(name).getFormattedItemStack());
                     //noinspection deprecation
                     ((Player) e.getWhoClicked()).updateInventory();
-                    break;
                 }
-            }).start();
-        }
+                else{
+                    for (int i = 1; i < e.getInventory().getSize(); i++) {
+                        e.getInventory().setItem(i, new ItemStack(Material.AIR));
+                    }
+                    //noinspection deprecation
+                    ((Player) e.getWhoClicked()).updateInventory();
+                }
 
-        else if(e.getCurrentItem() != null && e.getCurrentItem().getType() != Material.AIR){
-            new Thread(() -> {
-                for (int i = 1; i < e.getInventory().getSize(); i++) {
-                    e.getInventory().setItem(i, new ItemStack(Material.AIR));
-                }
-                //noinspection deprecation
-                ((Player) e.getWhoClicked()).updateInventory();
-            }).start();
-        }
+                break;
+            }
+        }, 2L);
 
     }
 
