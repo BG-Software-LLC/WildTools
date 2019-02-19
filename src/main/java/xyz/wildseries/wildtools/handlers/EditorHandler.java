@@ -75,6 +75,9 @@ public final class EditorHandler {
 
     @SuppressWarnings("unchecked")
     public Inventory getToolEditor(String toolName){
+        if(toolName.isEmpty())
+            return getSettingsEditor();
+
         Inventory editor = Bukkit.createInventory(null, 9 * 6, "" + ChatColor.DARK_GRAY + ChatColor.BOLD + "Tool Editor");
 
         ItemStack bluePane = new ItemBuilder(WMaterial.getBlueGlassPane()).withName("&6").build();
