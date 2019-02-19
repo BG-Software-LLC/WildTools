@@ -5,7 +5,6 @@ import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import xyz.wildseries.wildtools.api.WildTools;
 import xyz.wildseries.wildtools.api.WildToolsAPI;
-import xyz.wildseries.wildtools.api.handlers.ToolsManager;
 import xyz.wildseries.wildtools.command.CommandsHandler;
 import xyz.wildseries.wildtools.handlers.EditorHandler;
 import xyz.wildseries.wildtools.handlers.ProvidersHandler;
@@ -23,6 +22,7 @@ import net.milkbowl.vault.economy.Economy;
 
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
+import xyz.wildseries.wildtools.utils.GlowEnchantment;
 
 import java.lang.reflect.Field;
 
@@ -30,7 +30,7 @@ public final class WildToolsPlugin extends JavaPlugin implements WildTools {
 
     private static WildToolsPlugin plugin;
 
-    private ToolsManager toolsManager;
+    private ToolsHandler toolsManager;
     private ProvidersHandler providersHandler;
     private EditorHandler editorHandler;
     private RecipesHandler recipesHandler;
@@ -54,7 +54,8 @@ public final class WildToolsPlugin extends JavaPlugin implements WildTools {
         getCommand("tools").setTabCompleter(commandsHandler);
 
         loadNMSAdapter();
-        nmsAdapter.registerGlowEnchant();
+        //nmsAdapter.registerGlowEnchant();
+        GlowEnchantment.register();
 
         toolsManager = new ToolsHandler(this);
 
@@ -135,7 +136,7 @@ public final class WildToolsPlugin extends JavaPlugin implements WildTools {
     }
 
     @Override
-    public ToolsManager getToolsManager() {
+    public ToolsHandler getToolsManager() {
         return toolsManager;
     }
 
