@@ -162,7 +162,7 @@ public final class ToolsHandler implements ToolsManager {
             tool = new WSellTool(type, name);
         }else if(toolClass.isAssignableFrom(SortTool.class)){
             tool = new WSortTool(type, name);
-        }else return null;
+        }else throw new IllegalArgumentException("Couldn't find tool class " + toolClass.getName());
 
         for(Tool _tool : new ArrayList<>(tools)){
             if(_tool.getName().equals(tool.getName()))
