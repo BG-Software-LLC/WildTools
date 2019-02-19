@@ -1,6 +1,5 @@
 package xyz.wildseries.wildtools.objects.tools;
 
-import com.google.common.collect.Iterators;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -24,7 +23,7 @@ import java.util.Map;
 
 public final class WCraftingTool extends WTool implements CraftingTool {
 
-    private final Iterator<Recipe> craftings;
+    private final List<Recipe> craftings;
 
     public WCraftingTool(Material type, String name, List<String> craftings){
         super(type, name, ToolMode.CRAFTING);
@@ -33,7 +32,7 @@ public final class WCraftingTool extends WTool implements CraftingTool {
 
     @Override
     public Iterator<Recipe> getCraftings(){
-        return craftings;
+        return craftings.iterator();
     }
 
     @Override
@@ -44,7 +43,7 @@ public final class WCraftingTool extends WTool implements CraftingTool {
         }
 
         Inventory inventory = ((InventoryHolder) e.getClickedBlock().getState()).getInventory();
-        Iterator<Recipe> craftings = Iterators.unmodifiableIterator(this.craftings);
+        Iterator<Recipe> craftings = getCraftings();
 
         new Thread(() -> {
             int craftedItemsAmount = 0;
@@ -94,7 +93,7 @@ public final class WCraftingTool extends WTool implements CraftingTool {
         return true;
     }
 
-    private Iterator<Recipe> parseCraftings(List<String> recipes){
+    private List<Recipe> parseCraftings(List<String> recipes){
         List<Recipe> recipeList = new ArrayList<>();
 
         Recipe current;
@@ -107,7 +106,7 @@ public final class WCraftingTool extends WTool implements CraftingTool {
                 recipeList.add(current);
         }
 
-        return recipeList.iterator();
+        return recipeList;
     }
 
     @SuppressWarnings("deprecation")
