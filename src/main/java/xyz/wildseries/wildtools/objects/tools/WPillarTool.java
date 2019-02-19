@@ -1,6 +1,6 @@
 package xyz.wildseries.wildtools.objects.tools;
 
-import xyz.wildseries.wildtools.Locale;
+import org.bukkit.event.player.PlayerInteractEvent;
 import xyz.wildseries.wildtools.api.objects.tools.PillarTool;
 import xyz.wildseries.wildtools.api.objects.ToolMode;
 
@@ -8,7 +8,6 @@ import org.bukkit.GameMode;
 import org.bukkit.block.Block;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.entity.Player;
 import xyz.wildseries.wildtools.utils.BukkitUtil;
 
 public final class WPillarTool extends WTool implements PillarTool {
@@ -18,41 +17,27 @@ public final class WPillarTool extends WTool implements PillarTool {
     }
 
     @Override
-    public void useOnBlock(Player pl, Block block) {
-        if(!canUse(pl.getUniqueId())){
-            Locale.COOLDOWN_TIME.send(pl, getTime(getTimeLeft(pl.getUniqueId())));
-            return;
-        }
-
-        int maxY = getPoint(block, true), minY = getPoint(block, false),
-                x = block.getLocation().getBlockX(), z = block.getLocation().getBlockZ();
-
-        setLastUse(pl.getUniqueId());
-
-        //Use is per player break, and not per each block...
-        if(!isUnbreakable() && !isUsingDurability() && pl.getGameMode() != GameMode.CREATIVE){
-            reduceDurablility(pl);
-        }
-
-        toolBlockBreak.add(pl.getUniqueId());
+    public boolean onBlockInteract(PlayerInteractEvent e) {
+        int maxY = getPoint(e.getClickedBlock(), true), minY = getPoint(e.getClickedBlock(), false),
+                x = e.getClickedBlock().getLocation().getBlockX(), z = e.getClickedBlock().getLocation().getBlockZ();
 
         for(int y = maxY; y >= minY; y--){
-            Block targetBlock = pl.getWorld().getBlockAt(x, y, z);
-            if(canBreakBlock(block, targetBlock)) {
-                if(isOnlyInsideClaim() && !plugin.getProviders().inClaim(pl, block.getLocation()))
+            Block targetBlock = e.getPlayer().getWorld().getBlockAt(x, y, z);
+            if(canBreakBlock(e.getClickedBlock(), targetBlock)) {
+                if(isOnlyInsideClaim() && !plugin.getProviders().inClaim(e.getPlayer(), e.getClickedBlock().getLocation()))
                     continue;
-                BukkitUtil.breakNaturally(pl, targetBlock);
+                BukkitUtil.breakNaturally(e.getPlayer(), targetBlock);
                 //Tool is using durability, reduces every block
-                if(!isUnbreakable() && isUsingDurability() && pl.getGameMode() != GameMode.CREATIVE){
-                    reduceDurablility(pl);
+                if(!isUnbreakable() && isUsingDurability() && e.getPlayer().getGameMode() != GameMode.CREATIVE){
+                    reduceDurablility(e.getPlayer());
                 }
-                if(plugin.getNMSAdapter().getItemInHand(pl) == null) {
+                if(plugin.getNMSAdapter().getItemInHand(e.getPlayer()) == null) {
                     break;
                 }
             }
         }
 
-        toolBlockBreak.remove(pl.getUniqueId());
+        return true;
     }
 
     private int getPoint(Block bl, boolean max){

@@ -1,10 +1,10 @@
 package xyz.wildseries.wildtools.objects.tools;
 
-import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.entity.Player;
+import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import xyz.wildseries.wildtools.Locale;
 import xyz.wildseries.wildtools.api.objects.ToolMode;
@@ -32,42 +32,30 @@ public final class WBuilderTool extends WTool implements BuilderTool {
     }
 
     @Override
-    public void useOnBlock(Player pl, Block bl) {
-        if(!canUse(pl.getUniqueId())){
-            Locale.COOLDOWN_TIME.send(pl, getTime(getTimeLeft(pl.getUniqueId())));
-            return;
-        }
+    public boolean onBlockInteract(PlayerInteractEvent e) {
+        BlockFace blockFace = e.getBlockFace();
 
-        setLastUse(pl.getUniqueId());
-
-        if(!isUnbreakable() && pl.getGameMode() != GameMode.CREATIVE){
-            reduceDurablility(pl);
-        }
-
-        toolBlockBreak.add(pl.getUniqueId());
-
-        Block nextBlock = bl;
+        Block nextBlock = e.getClickedBlock();
         for(int i = 0; i < length; i++){
-            nextBlock = nextBlock.getRelative(blockFaces.get(pl.getUniqueId()));
+            nextBlock = nextBlock.getRelative(blockFace);
 
-            if(nextBlock.getType() != Material.AIR || !BukkitUtil.canBreak(pl, nextBlock))
+            if(nextBlock.getType() != Material.AIR || !BukkitUtil.canBreak(e.getPlayer(), nextBlock))
                 break;
 
-            if(isOnlyInsideClaim() && !plugin.getProviders().inClaim(pl, nextBlock.getLocation()))
+            if(isOnlyInsideClaim() && !plugin.getProviders().inClaim(e.getPlayer(), nextBlock.getLocation()))
                 break;
 
-            ItemStack blockItemStack = bl.getState().getData().toItemStack(1);
+            ItemStack blockItemStack = e.getClickedBlock().getState().getData().toItemStack(1);
 
-            if(!pl.getInventory().containsAtLeast(blockItemStack, 1)){
-                Locale.BUILDER_NO_BLOCK.send(pl, bl.getType().name());
+            if(!e.getPlayer().getInventory().containsAtLeast(blockItemStack, 1)){
+                Locale.BUILDER_NO_BLOCK.send(e.getPlayer(), e.getClickedBlock().getType().name());
                 break;
             }
 
-            pl.getInventory().removeItem(blockItemStack);
-            plugin.getNMSAdapter().copyBlock(bl, nextBlock);
+            e.getPlayer().getInventory().removeItem(blockItemStack);
+            plugin.getNMSAdapter().copyBlock(e.getClickedBlock(), nextBlock);
         }
 
-        blockFaces.remove(pl.getUniqueId());
-        toolBlockBreak.remove(pl.getUniqueId());
+        return true;
     }
 }

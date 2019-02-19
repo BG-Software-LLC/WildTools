@@ -2,20 +2,17 @@ package xyz.wildseries.wildtools.objects.tools;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.GameMode;
-import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
+import org.bukkit.event.player.PlayerInteractEvent;
 import xyz.wildseries.wildtools.Locale;
 import xyz.wildseries.wildtools.api.events.SellWandUseEvent;
 import xyz.wildseries.wildtools.api.objects.tools.SellTool;
 import xyz.wildseries.wildtools.api.objects.ToolMode;
 
 import org.bukkit.Material;
-import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
-import xyz.wildseries.wildtools.utils.BukkitUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,39 +24,20 @@ public final class WSellTool extends WTool implements SellTool {
     }
 
     @Override
-    public void useOnBlock(Player pl, Block block){
+    public boolean onBlockInteract(PlayerInteractEvent e) {
         if(!plugin.getProviders().isVaultEnabled()){
-            pl.sendMessage(ChatColor.RED + "You tried to use a sell-wand, but the server doesn't have Vault installed. " +
+            e.getPlayer().sendMessage(ChatColor.RED + "You tried to use a sell-wand, but the server doesn't have Vault installed. " +
                     "Please contact the server administrators if you believe that this is an error.");
-            return;
+            return false;
         }
 
-        if(block.getType() != Material.CHEST && block.getType() != Material.TRAPPED_CHEST){
-            Locale.INVALID_CONTAINER_SELL_WAND.send(pl);
-            return;
+        if(e.getClickedBlock().getType() != Material.CHEST && e.getClickedBlock().getType() != Material.TRAPPED_CHEST){
+            Locale.INVALID_CONTAINER_SELL_WAND.send(e.getPlayer());
+            return false;
         }
-
-        if(isOnlyInsideClaim() && !plugin.getProviders().inClaim(pl, block.getLocation()))
-            return;
-
-        WTool.toolBlockBreak.add(pl.getUniqueId());
-
-        if(!BukkitUtil.canInteract(pl, block)) {
-            WTool.toolBlockBreak.remove(pl.getUniqueId());
-            return;
-        }
-
-        WTool.toolBlockBreak.remove(pl.getUniqueId());
 
         new Thread(() -> {
-            if(!canUse(pl.getUniqueId())){
-                Locale.COOLDOWN_TIME.send(pl, getTime(getTimeLeft(pl.getUniqueId())));
-                return;
-            }
-
-            setLastUse(pl.getUniqueId());
-
-            Inventory inventory = ((InventoryHolder) block.getState()).getInventory();
+            Inventory inventory = ((InventoryHolder) e.getClickedBlock().getState()).getInventory();
 
             double totalEarnings = 0.0;
 
@@ -67,13 +45,13 @@ public final class WSellTool extends WTool implements SellTool {
 
             for(int slot = 0; slot < inventory.getSize(); slot++){
                 ItemStack is = inventory.getItem(slot);
-                if(is != null && plugin.getProviders().canSellItem(pl, is)){
+                if(is != null && plugin.getProviders().canSellItem(e.getPlayer(), is)){
                     toSell.add(slot);
-                    totalEarnings += plugin.getProviders().getPrice(pl, is);
+                    totalEarnings += plugin.getProviders().getPrice(e.getPlayer(), is);
                 }
             }
 
-            SellWandUseEvent sellWandUseEvent = new SellWandUseEvent(pl, (Chest) block.getState(), totalEarnings, Locale.SOLD_CHEST.getMessage());
+            SellWandUseEvent sellWandUseEvent = new SellWandUseEvent(e.getPlayer(), (Chest) e.getClickedBlock().getState(), totalEarnings, Locale.SOLD_CHEST.getMessage());
             Bukkit.getPluginManager().callEvent(sellWandUseEvent);
 
             if(sellWandUseEvent.isCancelled())
@@ -82,17 +60,17 @@ public final class WSellTool extends WTool implements SellTool {
             totalEarnings = sellWandUseEvent.getPrice();
 
             for(int slot : toSell){
-                plugin.getProviders().trySellingItem(pl, inventory.getItem(slot));
+                plugin.getProviders().trySellingItem(e.getPlayer(), inventory.getItem(slot));
                 inventory.setItem(slot, new ItemStack(Material.AIR));
             }
-            if(!toSell.isEmpty() && pl.getGameMode() != GameMode.CREATIVE && !isUnbreakable())
-                reduceDurablility(pl);
 
             String message = sellWandUseEvent.getMessage().replace("{0}", totalEarnings + "");
 
             if(!message.isEmpty())
-                pl.sendMessage(message);
+                e.getPlayer().sendMessage(message);
         }).start();
+
+        return true;
     }
 
 }

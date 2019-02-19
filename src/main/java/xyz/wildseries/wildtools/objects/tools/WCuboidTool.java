@@ -1,6 +1,7 @@
 package xyz.wildseries.wildtools.objects.tools;
 
-import xyz.wildseries.wildtools.Locale;
+import org.bukkit.Bukkit;
+import org.bukkit.event.block.BlockBreakEvent;
 import xyz.wildseries.wildtools.api.objects.tools.CuboidTool;
 import xyz.wildseries.wildtools.api.objects.ToolMode;
 
@@ -8,7 +9,6 @@ import org.bukkit.block.Block;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.entity.Player;
 import xyz.wildseries.wildtools.utils.BukkitUtil;
 
 public final class WCuboidTool extends WTool implements CuboidTool {
@@ -25,46 +25,30 @@ public final class WCuboidTool extends WTool implements CuboidTool {
     }
 
     @Override
-    public void useOnBlock(Player pl, Block block) {
-        if(!canUse(pl.getUniqueId())){
-            Locale.COOLDOWN_TIME.send(pl, getTime(getTimeLeft(pl.getUniqueId())));
-            return;
-        }
-
+    public boolean onBlockBreak(BlockBreakEvent e) {
         int radius = breakLevel / 2;
 
-        Location max = block.getLocation().clone().add(radius, radius, radius),
-                min = block.getLocation().clone().subtract(radius, radius, radius);
-
-        setLastUse(pl.getUniqueId());
-
-        //Use is per player break, and not per each block...
-        if(!isUnbreakable() && !isUsingDurability() && pl.getGameMode() != GameMode.CREATIVE){
-            reduceDurablility(pl);
-        }
-
-        toolBlockBreak.add(pl.getUniqueId());
+        Location max = e.getBlock().getLocation().add(radius, radius, radius),
+                min = e.getBlock().getLocation().subtract(radius, radius, radius);
 
         for(int x = min.getBlockX(); x <= max.getBlockX(); x++){
             for(int z = min.getBlockZ(); z <= max.getBlockZ(); z++){
                 for(int y = min.getBlockY(); y <= max.getBlockY(); y++){
-                    Block targetBlock = pl.getWorld().getBlockAt(x, y, z);
-                    if(canBreakBlock(block, targetBlock)) {
-                        if(isOnlyInsideClaim() && !plugin.getProviders().inClaim(pl, targetBlock.getLocation()))
+                    Block targetBlock = e.getPlayer().getWorld().getBlockAt(x, y, z);
+                    if(canBreakBlock(e.getBlock(), targetBlock)) {
+                        if(isOnlyInsideClaim() && !plugin.getProviders().inClaim(e.getPlayer(), targetBlock.getLocation()))
                             continue;
-                        BukkitUtil.breakNaturally(pl, targetBlock);
+                        BukkitUtil.breakNaturally(e.getPlayer(), targetBlock);
                         //Tool is using durability, reduces every block
-                        if(!isUnbreakable() && isUsingDurability() && pl.getGameMode() != GameMode.CREATIVE)
-                            reduceDurablility(pl);
-                        if(plugin.getNMSAdapter().getItemInHand(pl) == null) {
+                        if(!isUnbreakable() && isUsingDurability() && e.getPlayer().getGameMode() != GameMode.CREATIVE)
+                            reduceDurablility(e.getPlayer());
+                        if(plugin.getNMSAdapter().getItemInHand(e.getPlayer()) == null)
                             break;
-                        }
                     }
                 }
             }
         }
 
-        toolBlockBreak.remove(pl.getUniqueId());
+        return true;
     }
-
 }

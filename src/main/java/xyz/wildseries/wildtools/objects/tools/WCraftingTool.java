@@ -1,10 +1,9 @@
 package xyz.wildseries.wildtools.objects.tools;
 
+import com.google.common.collect.Iterators;
 import org.bukkit.Bukkit;
-import org.bukkit.GameMode;
 import org.bukkit.Material;
-import org.bukkit.block.Block;
-import org.bukkit.entity.Player;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
@@ -15,7 +14,6 @@ import org.bukkit.inventory.ShapelessRecipe;
 import xyz.wildseries.wildtools.Locale;
 import xyz.wildseries.wildtools.api.objects.tools.CraftingTool;
 import xyz.wildseries.wildtools.api.objects.ToolMode;
-import xyz.wildseries.wildtools.utils.BukkitUtil;
 import xyz.wildseries.wildtools.utils.ItemUtil;
 
 import java.util.ArrayList;
@@ -26,100 +24,92 @@ import java.util.Map;
 
 public final class WCraftingTool extends WTool implements CraftingTool {
 
-    private final List<String> craftings;
+    private final Iterator<Recipe> craftings;
 
     public WCraftingTool(Material type, String name, List<String> craftings){
         super(type, name, ToolMode.CRAFTING);
-        this.craftings = new ArrayList<>(craftings);
+        this.craftings = parseCraftings(craftings);
     }
 
     @Override
-    public List<String> getCraftings(){
-        return new ArrayList<>(craftings);
+    public Iterator<Recipe> getCraftings(){
+        return craftings;
     }
 
     @Override
-    public void useOnBlock(Player pl, Block block) {
-        if(Bukkit.isPrimaryThread()){
-            Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> useOnBlock(pl, block));
-            return;
+    public boolean onBlockInteract(PlayerInteractEvent e) {
+        if(e.getClickedBlock().getType() != Material.CHEST && e.getClickedBlock().getType() != Material.TRAPPED_CHEST){
+            Locale.INVALID_CONTAINER_CRAFTING.send(e.getPlayer());
+            return false;
         }
 
-        if(block.getType() != Material.CHEST && block.getType() != Material.TRAPPED_CHEST){
-            Locale.INVALID_CONTAINER_CRAFTING.send(pl);
-            return;
-        }
+        Inventory inventory = ((InventoryHolder) e.getClickedBlock().getState()).getInventory();
+        Iterator<Recipe> craftings = Iterators.unmodifiableIterator(this.craftings);
 
-        if(!canUse(pl.getUniqueId())){
-            Locale.COOLDOWN_TIME.send(pl, getTime(getTimeLeft(pl.getUniqueId())));
-            return;
-        }
+        new Thread(() -> {
+            int craftedItemsAmount = 0;
 
-        if(isOnlyInsideClaim() && !plugin.getProviders().inClaim(pl, block.getLocation()))
-            return;
+            List<ItemStack> toAdd = new ArrayList<>();
 
-        if(!BukkitUtil.canInteract(pl, block))
-            return;
+            while(craftings.hasNext()){
+                Recipe recipe = craftings.next();
+                List<ItemStack> ingredients;
 
-        setLastUse(pl.getUniqueId());
+                //Get the ingredients for the recipe
+                if (recipe instanceof ShapedRecipe) {
+                    ingredients = getIngredients(new ArrayList<>(((ShapedRecipe) recipe).getIngredientMap().values()));
+                } else if (recipe instanceof ShapelessRecipe) {
+                    ingredients = getIngredients(((ShapelessRecipe) recipe).getIngredientList());
+                } else continue;
 
-        Inventory inventory = ((InventoryHolder) block.getState()).getInventory();
+                if (ingredients.isEmpty())
+                    continue;
 
-        int craftedItemsAmount = 0;
+                int amountOfRecipes = Integer.MAX_VALUE;
 
-        List<ItemStack> toAdd = new ArrayList<>();
-        Iterator<Recipe> recipeIterator = Bukkit.recipeIterator();
+                for(ItemStack ingredient : ingredients){
+                    amountOfRecipes = Math.min(amountOfRecipes, countItems(ingredient, inventory) / ingredient.getAmount());
+                }
 
-        while(recipeIterator.hasNext()){
-            Recipe recipe = recipeIterator.next();
-
-            if (!craftings.contains(recipe.getResult().getType().name()) &&
-                    !craftings.contains(recipe.getResult().getType().name() + ":" + recipe.getResult().getDurability()))
-                continue;
-
-            List<ItemStack> ingredients;
-
-            //Get the ingredients for the recipe
-            if (recipe instanceof ShapedRecipe) {
-                ingredients = getIngredients(new ArrayList<>(((ShapedRecipe) recipe).getIngredientMap().values()));
-            } else if (recipe instanceof ShapelessRecipe) {
-                ingredients = getIngredients(((ShapelessRecipe) recipe).getIngredientList());
-            } else continue;
-
-            if (ingredients.isEmpty())
-                continue;
-
-            boolean canCraft;
-            do {
-                canCraft = true;
-
-                //Check if all the ingredients exist
-                for (ItemStack ingredient : ingredients) {
-                    if (!inventory.containsAtLeast(ingredient, ingredient.getAmount())) {
-                        canCraft = false;
-                        break;
+                if(amountOfRecipes > 0) {
+                    for (ItemStack ingredient : ingredients) {
+                        ItemStack cloned = ingredient.clone();
+                        cloned.setAmount(ingredient.getAmount() * amountOfRecipes);
+                        inventory.removeItem(cloned);
                     }
-                }
+                    ItemStack result = recipe.getResult().clone();
+                    result.setAmount(result.getAmount() * amountOfRecipes);
+                    toAdd.add(result);
 
-                if (canCraft) {
-                    //Only if we can craft, we need to remove the items
-                    for(ItemStack ingredient : ingredients)
-                        inventory.removeItem(ingredient);
-
-                    //Add the recipe's result to the inventory
-                    toAdd.add(recipe.getResult());
-                    craftedItemsAmount += recipe.getResult().getAmount();
+                    craftedItemsAmount += amountOfRecipes;
                 }
-            }while(canCraft);
+            }
+
+            for(ItemStack itemStack : toAdd)
+                ItemUtil.addItem(itemStack, inventory, e.getClickedBlock().getLocation());
+
+            Locale.CRAFT_SUCCESS.send(e.getPlayer(), craftedItemsAmount);
+        }).start();
+
+        return true;
+    }
+
+    private Iterator<Recipe> parseCraftings(List<String> recipes){
+        List<Recipe> recipeList = new ArrayList<>();
+
+        Recipe current;
+        Iterator<Recipe> bukkitRecipes = Bukkit.recipeIterator();
+
+        while (bukkitRecipes.hasNext()){
+            current = bukkitRecipes.next();
+            if(recipes.contains(current.getResult().getType().name()) ||
+                    recipes.contains(current.getResult().getType() + ":" + current.getResult().getDurability()))
+                recipeList.add(current);
         }
 
-        for(ItemStack itemStack : toAdd)
-            ItemUtil.addItem(itemStack, inventory, block.getLocation());
+        System.out.println(recipeList);
 
-        if(craftedItemsAmount > 0 && pl.getGameMode() != GameMode.CREATIVE && !isUnbreakable())
-            reduceDurablility(pl);
-
-        Locale.CRAFT_SUCCESS.send(pl, craftedItemsAmount);
+        return recipeList.iterator();
     }
 
     @SuppressWarnings("deprecation")
@@ -139,6 +129,17 @@ public final class WCraftingTool extends WTool implements CraftingTool {
         }
 
         return ingredients;
+    }
+
+    private int countItems(ItemStack itemStack, Inventory inventory){
+        int amount = 0;
+
+        for(ItemStack _itemStack : inventory.getContents()){
+            if(_itemStack != null && _itemStack.isSimilar(itemStack))
+                amount += _itemStack.getAmount();
+        }
+
+        return amount;
     }
 
 }

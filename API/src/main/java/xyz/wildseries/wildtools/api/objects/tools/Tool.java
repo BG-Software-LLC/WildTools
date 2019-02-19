@@ -4,6 +4,8 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
+import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
 import xyz.wildseries.wildtools.api.objects.ToolMode;
@@ -94,8 +96,6 @@ public interface Tool {
 
     boolean isWhitelistedDrop(Material type, short data);
 
-    void useOnBlock(Player pl, Block bl);
-
     void reduceDurablility(Player pl);
 
     boolean canBreakBlock(Block firstBlock, Block targetBlock);
@@ -109,5 +109,13 @@ public interface Tool {
     boolean canUse(UUID uuid);
 
     long getTimeLeft(UUID uuid);
+
+    boolean onBlockBreak(BlockBreakEvent e);
+
+    boolean onBlockInteract(PlayerInteractEvent e);
+
+    boolean onBlockHit(PlayerInteractEvent e);
+
+    boolean onAirInteract(PlayerInteractEvent e);
 
 }

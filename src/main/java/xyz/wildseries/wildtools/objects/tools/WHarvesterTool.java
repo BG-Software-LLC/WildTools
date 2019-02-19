@@ -8,6 +8,8 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
+import org.bukkit.event.block.Action;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
 import xyz.wildseries.wildtools.objects.WMaterial;
@@ -40,7 +42,7 @@ public final class WHarvesterTool extends WTool implements HarvesterTool {
             "COCOA"
     };
 
-    public Set<UUID> sellModesPlayers;
+    private Set<UUID> sellModesPlayers;
 
     private int radius, farmlandRadius;
     private String activateAction;
@@ -79,21 +81,33 @@ public final class WHarvesterTool extends WTool implements HarvesterTool {
     }
 
     @Override
-    public void useOnBlock(Player pl, Block block) {
-        if(!canUse(pl.getUniqueId())){
-            Locale.COOLDOWN_TIME.send(pl, getTime(getTimeLeft(pl.getUniqueId())));
-            return;
+    public boolean onAirInteract(PlayerInteractEvent e) {
+        if(e.getAction() != Action.RIGHT_CLICK_AIR || !e.getPlayer().isSneaking() || !e.getPlayer().hasPermission("wildtools.sellmode"))
+            return false;
+
+        if(sellModesPlayers.contains(e.getPlayer().getUniqueId())){
+            sellModesPlayers.remove(e.getPlayer().getUniqueId());
+            Locale.SELL_MODE_DISABLED.send(e.getPlayer());
+        }
+        else{
+            sellModesPlayers.add(e.getPlayer().getUniqueId());
+            Locale.SELL_MODE_ENABLED.send(e.getPlayer());
         }
 
-        setLastUse(pl.getUniqueId());
+        return true;
+    }
 
-        //Use is per player break, and not per each block...
-        if(!isUnbreakable() && !isUsingDurability() && pl.getGameMode() != GameMode.CREATIVE){
-            reduceDurablility(pl);
-        }
+    @Override
+    public boolean onBlockInteract(PlayerInteractEvent e) {
+        return handleUse(e.getPlayer(), e.getClickedBlock());
+    }
 
-        toolBlockBreak.add(pl.getUniqueId());
+    @Override
+    public boolean onBlockHit(PlayerInteractEvent e) {
+        return handleUse(e.getPlayer(), e.getClickedBlock());
+    }
 
+    private boolean handleUse(Player player, Block block){
         Location max = block.getLocation().clone().add(farmlandRadius, farmlandRadius, farmlandRadius),
                 min = block.getLocation().clone().subtract(farmlandRadius, farmlandRadius, farmlandRadius);
 
@@ -101,12 +115,12 @@ public final class WHarvesterTool extends WTool implements HarvesterTool {
             for (int y = max.getBlockY(); y >= min.getBlockY(); y--) {
                 for (int x = min.getBlockX(); x <= max.getBlockX(); x++) {
                     for (int z = min.getBlockZ(); z <= max.getBlockZ(); z++) {
-                        Block targetBlock = pl.getWorld().getBlockAt(x, y, z);
+                        Block targetBlock = player.getWorld().getBlockAt(x, y, z);
                         if ((targetBlock.getType() == Material.DIRT || targetBlock.getType() == WMaterial.GRASS_BLOCK.parseMaterial()) &&
-                            targetBlock.getRelative(BlockFace.UP).getType() == Material.AIR) {
-                            if(isOnlyInsideClaim() && !plugin.getProviders().inClaim(pl, targetBlock.getLocation()))
+                                targetBlock.getRelative(BlockFace.UP).getType() == Material.AIR) {
+                            if(isOnlyInsideClaim() && !plugin.getProviders().inClaim(player, targetBlock.getLocation()))
                                 continue;
-                            if (BukkitUtil.canBreak(pl, targetBlock) && canBreakBlock(block, targetBlock)) {
+                            if (BukkitUtil.canBreak(player, targetBlock) && canBreakBlock(block, targetBlock)) {
                                 targetBlock.setType(WMaterial.FARMLAND.parseMaterial());
                             }
                         }
@@ -124,7 +138,7 @@ public final class WHarvesterTool extends WTool implements HarvesterTool {
         for(int y = max.getBlockY(); y >= min.getBlockY(); y--) {
             for (int x = min.getBlockX(); x <= max.getBlockX(); x++) {
                 for (int z = min.getBlockZ(); z <= max.getBlockZ(); z++) {
-                    Block targetBlock = pl.getWorld().getBlockAt(x, y, z);
+                    Block targetBlock = player.getWorld().getBlockAt(x, y, z);
                     if (Arrays.asList(crops).contains(targetBlock.getType().name())) {
                         if (targetBlock.getType() == Material.CACTUS || targetBlock.getType() == WMaterial.SUGAR_CANE.parseMaterial()) {
                             if(targetBlock.getRelative(BlockFace.DOWN).getType() != targetBlock.getType()){
@@ -132,28 +146,28 @@ public final class WHarvesterTool extends WTool implements HarvesterTool {
                             }
                         }
                         if (plugin.getNMSAdapter().isFullyGrown(targetBlock) &&
-                                BukkitUtil.canBreak(pl, targetBlock) && canBreakBlock(block, targetBlock)) {
-                            if(pl.getGameMode() != GameMode.CREATIVE) {
-                                for(ItemStack drop : BukkitUtil.getBlockDrops(pl, targetBlock)){
-                                    if(sellModesPlayers.contains(pl.getUniqueId()) && pl.hasPermission("wildtools.sellmode") &&
-                                            plugin.getProviders().canSellItem(pl, drop)) {
+                                BukkitUtil.canBreak(player, targetBlock) && canBreakBlock(block, targetBlock)) {
+                            if(player.getGameMode() != GameMode.CREATIVE) {
+                                for(ItemStack drop : BukkitUtil.getBlockDrops(player, targetBlock)){
+                                    if(sellModesPlayers.contains(player.getUniqueId()) && player.hasPermission("wildtools.sellmode") &&
+                                            plugin.getProviders().canSellItem(player, drop)) {
                                         toSell.add(drop);
-                                        totalPrice += plugin.getProviders().getPrice(pl, drop);
+                                        totalPrice += plugin.getProviders().getPrice(player, drop);
                                     }
                                     else if(isAutoCollect())
-                                        ItemUtil.addItem(drop, pl.getInventory(), block.getLocation());
+                                        ItemUtil.addItem(drop, player.getInventory(), block.getLocation());
                                     else
-                                        pl.getWorld().dropItemNaturally(block.getLocation(), drop);
+                                        player.getWorld().dropItemNaturally(block.getLocation(), drop);
                                 }
                                 //Tool is using durability, reduces every block
-                                if (!isUnbreakable() && isUsingDurability() && pl.getGameMode() != GameMode.CREATIVE)
-                                    reduceDurablility(pl);
-                                if (plugin.getNMSAdapter().getItemInHand(pl) == null) {
+                                if (!isUnbreakable() && isUsingDurability() && player.getGameMode() != GameMode.CREATIVE)
+                                    reduceDurablility(player);
+                                if (plugin.getNMSAdapter().getItemInHand(player) == null) {
                                     break;
                                 }
                             }
                             if(targetBlock.getType() == Material.CACTUS || targetBlock.getType() == WMaterial.SUGAR_CANE.parseMaterial() ||
-                                targetBlock.getType() == WMaterial.MELON.parseMaterial() || targetBlock.getType() == Material.PUMPKIN)
+                                    targetBlock.getType() == WMaterial.MELON.parseMaterial() || targetBlock.getType() == Material.PUMPKIN)
                                 targetBlock.setType(Material.AIR);
                             else{
                                 plugin.getNMSAdapter().setCropState(targetBlock, CropState.SEEDED);
@@ -164,8 +178,8 @@ public final class WHarvesterTool extends WTool implements HarvesterTool {
             }
         }
 
-        if(sellModesPlayers.contains(pl.getUniqueId())){
-            HarvesterHoeSellEvent harvesterHoeSellEvent = new HarvesterHoeSellEvent(pl, totalPrice, Locale.HARVESTER_SELL_SUCCEED.getMessage());
+        if(sellModesPlayers.contains(player.getUniqueId())){
+            HarvesterHoeSellEvent harvesterHoeSellEvent = new HarvesterHoeSellEvent(player, totalPrice, Locale.HARVESTER_SELL_SUCCEED.getMessage());
             Bukkit.getPluginManager().callEvent(harvesterHoeSellEvent);
 
             totalPrice = harvesterHoeSellEvent.getPrice();
@@ -173,14 +187,14 @@ public final class WHarvesterTool extends WTool implements HarvesterTool {
             if(!harvesterHoeSellEvent.isCancelled()) {
 
                 for(ItemStack itemStack : toSell)
-                    plugin.getProviders().trySellingItem(pl, itemStack);
+                    plugin.getProviders().trySellingItem(player, itemStack);
 
-                pl.sendMessage(harvesterHoeSellEvent.getMessage()
+                player.sendMessage(harvesterHoeSellEvent.getMessage()
                         .replace("{0}", toSell.size() + "").replace("{1}", totalPrice + ""));
             }
         }
 
-        toolBlockBreak.remove(pl.getUniqueId());
+        return true;
     }
 
 }

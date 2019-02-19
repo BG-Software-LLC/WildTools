@@ -1,13 +1,11 @@
 package xyz.wildseries.wildtools.objects.tools;
 
-import org.bukkit.Bukkit;
-import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.block.Block;
 import org.bukkit.block.Dispenser;
 import org.bukkit.entity.Player;
 
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
@@ -21,6 +19,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+@SuppressWarnings("WeakerAccess")
 public final class WCannonTool extends WTool implements CannonTool {
 
     private static Map<UUID, WSelection> selections = new HashMap<>();
@@ -38,65 +37,66 @@ public final class WCannonTool extends WTool implements CannonTool {
     }
 
     @Override
-    public void useOnBlock(Player pl, Block block) {
-        if(Bukkit.isPrimaryThread()){
-            Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> useOnBlock(pl, block));
-            return;
-        }
+    public boolean onBlockInteract(PlayerInteractEvent e) {
+        WCannonTool.addSelection(e.getPlayer(), e.getClickedBlock().getLocation(), null);
+        Locale.SELECTION_RIGHT_CLICK.send(e.getPlayer());
+        return false;
+    }
 
-        if(!canUse(pl.getUniqueId())){
-            Locale.COOLDOWN_TIME.send(pl, getTime(getTimeLeft(pl.getUniqueId())));
-            return;
-        }
+    @Override
+    public boolean onBlockHit(PlayerInteractEvent e) {
+        WCannonTool.addSelection(e.getPlayer(),null, e.getClickedBlock().getLocation());
+        Locale.SELECTION_LEFT_CLICK.send(e.getPlayer());
+        return false;
+    }
 
-        WSelection selection = selections.get(pl.getUniqueId());
+    @Override
+    public boolean onAirInteract(PlayerInteractEvent e) {
+        WSelection selection = selections.get(e.getPlayer().getUniqueId());
 
         if(selection == null || !selection.isReady()){
-            Locale.SELECTION_NOT_READY.send(pl);
-            return;
+            Locale.SELECTION_NOT_READY.send(e.getPlayer());
+            return false;
         }
 
         if(!selection.isInside()){
-            Locale.SELECTION_MUST_BE_INSIDE.send(pl);
-            return;
+            Locale.SELECTION_MUST_BE_INSIDE.send(e.getPlayer());
+            return false;
         }
-
-        setLastUse(pl.getUniqueId());
 
         int filledDispensers = 0;
         int totalTNT = 0;
 
-        toolBlockBreak.add(pl.getUniqueId());
 
         for(Dispenser dispenser : selection.getDispensers()){
-            if(isOnlyInsideClaim() && !plugin.getProviders().inClaim(pl, dispenser.getLocation()))
+            if(isOnlyInsideClaim() && !plugin.getProviders().inClaim(e.getPlayer(), dispenser.getLocation()))
                 continue;
+
             int amount = tntAmount, freeSpace;
+
             if((freeSpace = getFreeSpace(dispenser.getInventory(), new ItemStack(Material.TNT))) < amount)
                 amount = freeSpace;
+
             if(amount <= 0)
                 continue;
-            if(pl.getInventory().containsAtLeast(new ItemStack(Material.TNT), amount)){
+
+            if(e.getPlayer().getInventory().containsAtLeast(new ItemStack(Material.TNT), amount)){
                 ItemUtil.addItem(new ItemStack(Material.TNT, amount), dispenser.getInventory(), null);
-                pl.getInventory().removeItem(new ItemStack(Material.TNT, amount));
+                e.getPlayer().getInventory().removeItem(new ItemStack(Material.TNT, amount));
                 filledDispensers++;
                 totalTNT += amount;
             }
-            else if(plugin.getProviders().getTNTAmountFromBank(pl) >= amount){
+            else if(plugin.getProviders().getTNTAmountFromBank(e.getPlayer()) >= amount){
                 ItemUtil.addItem(new ItemStack(Material.TNT, amount), dispenser.getInventory(), null);
-                plugin.getProviders().takeTNTFromBank(pl, amount);
+                plugin.getProviders().takeTNTFromBank(e.getPlayer(), amount);
                 filledDispensers++;
                 totalTNT += amount;
             }
             else break;
         }
 
-        if(filledDispensers > 0 && pl.getGameMode() != GameMode.CREATIVE && !isUnbreakable())
-            reduceDurablility(pl);
-
-        toolBlockBreak.remove(pl.getUniqueId());
-
-        Locale.FILLED_DISPENSERS.send(pl, filledDispensers, totalTNT);
+        Locale.FILLED_DISPENSERS.send(e.getPlayer(), filledDispensers, totalTNT);
+        return true;
     }
 
     public static void addSelection(Player player, Location rightClick, Location leftClick){

@@ -1,6 +1,8 @@
 package xyz.wildseries.wildtools.objects.tools;
 
 import org.bukkit.block.Block;
+import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import xyz.wildseries.wildtools.WildToolsPlugin;
 import xyz.wildseries.wildtools.api.objects.tools.Tool;
 import xyz.wildseries.wildtools.api.objects.ToolMode;
@@ -280,9 +282,6 @@ public abstract class WTool implements Tool {
     /***********************************************************************************/
 
     @Override
-    public abstract void useOnBlock(Player pl, Block bl);
-
-    @Override
     public void reduceDurablility(Player pl){
         ItemStack is = plugin.getNMSAdapter().getItemInHand(pl).clone();
 
@@ -403,6 +402,26 @@ public abstract class WTool implements Tool {
             return 0;
 
         return (lastUses.get(uuid) + cooldown) - System.currentTimeMillis();
+    }
+
+    @Override
+    public boolean onBlockBreak(BlockBreakEvent e){
+        return false;
+    }
+
+    @Override
+    public boolean onBlockInteract(PlayerInteractEvent e){
+        return false;
+    }
+
+    @Override
+    public boolean onBlockHit(PlayerInteractEvent e){
+        return false;
+    }
+
+    @Override
+    public boolean onAirInteract(PlayerInteractEvent e){
+        return false;
     }
 
     /***********************************************************************************/
