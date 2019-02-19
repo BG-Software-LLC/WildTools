@@ -75,7 +75,7 @@ public final class EditorHandler {
 
     @SuppressWarnings("unchecked")
     public Inventory getToolEditor(String toolName){
-        if(plugin.getToolsManager().getTool(toolName) == null)
+        if(plugin.getToolsManager().getTool(toolName) == null) 
             return getSettingsEditor();
 
         Inventory editor = Bukkit.createInventory(null, 9 * 6, "" + ChatColor.DARK_GRAY + ChatColor.BOLD + "Tool Editor");
