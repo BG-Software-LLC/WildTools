@@ -8,16 +8,12 @@ import net.minecraft.server.v1_13_R1.BlockCrops;
 import net.minecraft.server.v1_13_R1.BlockNetherWart;
 import net.minecraft.server.v1_13_R1.BlockPosition;
 import net.minecraft.server.v1_13_R1.BlockPotatoes;
-import net.minecraft.server.v1_13_R1.Enchantment;
 import net.minecraft.server.v1_13_R1.EnchantmentManager;
-import net.minecraft.server.v1_13_R1.EnchantmentSlotType;
 import net.minecraft.server.v1_13_R1.Enchantments;
 import net.minecraft.server.v1_13_R1.EntityPlayer;
-import net.minecraft.server.v1_13_R1.EnumItemSlot;
 import net.minecraft.server.v1_13_R1.Item;
 import net.minecraft.server.v1_13_R1.ItemStack;
 import net.minecraft.server.v1_13_R1.Items;
-import net.minecraft.server.v1_13_R1.MinecraftKey;
 import net.minecraft.server.v1_13_R1.NBTTagCompound;
 import net.minecraft.server.v1_13_R1.PlayerInventory;
 import net.minecraft.server.v1_13_R1.World;
@@ -28,7 +24,6 @@ import org.bukkit.block.data.Ageable;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.craftbukkit.v1_13_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_13_R1.block.CraftBlock;
-import org.bukkit.craftbukkit.v1_13_R1.enchantments.CraftEnchantment;
 import org.bukkit.craftbukkit.v1_13_R1.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_13_R1.inventory.CraftInventoryPlayer;
 import org.bukkit.craftbukkit.v1_13_R1.inventory.CraftItemStack;
@@ -36,10 +31,11 @@ import org.bukkit.craftbukkit.v1_13_R1.util.CraftMagicNumbers;
 
 import org.bukkit.CropState;
 import org.bukkit.NamespacedKey;
+import org.bukkit.enchantments.Enchantment;
+import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.Player;
 
 import xyz.wildseries.wildtools.objects.WMaterial;
-import xyz.wildseries.wildtools.utils.EnchantUtil;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -229,25 +225,6 @@ public final class NMSAdapter_v1_13_R1 implements NMSAdapter {
     }
 
     @Override
-    public void registerGlowEnchant() {
-        class GlowEnchantment extends Enchantment {
-
-            private GlowEnchantment(){
-                super(Rarity.VERY_RARE, EnchantmentSlotType.ALL, EnumItemSlot.values());
-            }
-
-        }
-        GlowEnchantment glow = new GlowEnchantment();
-
-        Enchantment.enchantments.a(new MinecraftKey("custom_glow"), glow);
-
-        CraftEnchantment enchantment = new CraftEnchantment(glow);
-
-        EnchantUtil.getByKey().put(NamespacedKey.minecraft("custom_glow"), enchantment);
-        EnchantUtil.getByName().put("custom_glow", enchantment);
-    }
-
-    @Override
     public void copyBlock(org.bukkit.block.Block from, org.bukkit.block.Block to) {
         CraftBlock fromBlock = (CraftBlock) from, toBlock = (CraftBlock) to;
         toBlock.setType(fromBlock.getType());
@@ -264,6 +241,51 @@ public final class NMSAdapter_v1_13_R1 implements NMSAdapter {
         World world = ((CraftWorld) block.getWorld()).getHandle();
         BlockPosition blockPosition = new BlockPosition(block.getX(), block.getY(), block.getZ());
         world.setTypeAndData(blockPosition, Block.getByCombinedId(0), 2);
+    }
+
+    @Override
+    public Enchantment getGlowEnchant() {
+        return new Enchantment(NamespacedKey.minecraft("glowing_enchant")) {
+            @Override
+            public String getName() {
+                return "";
+            }
+
+            @Override
+            public int getMaxLevel() {
+                return 1;
+            }
+
+            @Override
+            public int getStartLevel() {
+                return 0;
+            }
+
+            @Override
+            public EnchantmentTarget getItemTarget() {
+                return null;
+            }
+
+            @Override
+            public boolean conflictsWith(Enchantment enchantment) {
+                return false;
+            }
+
+            @Override
+            public boolean canEnchantItem(org.bukkit.inventory.ItemStack itemStack) {
+                return true;
+            }
+
+            @Override
+            public boolean isTreasure() {
+                return false;
+            }
+
+            @Override
+            public boolean isCursed() {
+                return false;
+            }
+        };
     }
 
 }

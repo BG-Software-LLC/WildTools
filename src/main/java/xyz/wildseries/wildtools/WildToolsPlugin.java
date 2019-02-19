@@ -1,5 +1,6 @@
 package xyz.wildseries.wildtools;
 
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.plugin.RegisteredServiceProvider;
@@ -22,7 +23,6 @@ import net.milkbowl.vault.economy.Economy;
 
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
-import xyz.wildseries.wildtools.utils.GlowEnchantment;
 
 import java.lang.reflect.Field;
 
@@ -34,6 +34,7 @@ public final class WildToolsPlugin extends JavaPlugin implements WildTools {
     private ProvidersHandler providersHandler;
     private EditorHandler editorHandler;
     private RecipesHandler recipesHandler;
+    private Enchantment glowEnchant;
 
     private NMSAdapter nmsAdapter;
 
@@ -54,8 +55,7 @@ public final class WildToolsPlugin extends JavaPlugin implements WildTools {
         getCommand("tools").setTabCompleter(commandsHandler);
 
         loadNMSAdapter();
-        //nmsAdapter.registerGlowEnchant();
-        GlowEnchantment.register();
+        registerGlowEnchantment();
 
         toolsManager = new ToolsHandler(this);
 
@@ -133,6 +133,25 @@ public final class WildToolsPlugin extends JavaPlugin implements WildTools {
             setEnabled(false);
             ex.printStackTrace();
         }
+    }
+
+    private void registerGlowEnchantment(){
+        glowEnchant = nmsAdapter.getGlowEnchant();
+
+        try{
+            Field field = Enchantment.class.getDeclaredField("acceptingNew");
+            field.setAccessible(true);
+            field.set(null, true);
+            field.setAccessible(false);
+        }catch(Exception ignored){}
+
+        try{
+            Enchantment.registerEnchantment(glowEnchant);
+        }catch(Exception ignored){}
+    }
+
+    public Enchantment getGlowEnchant() {
+        return glowEnchant;
     }
 
     @Override

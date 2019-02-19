@@ -187,9 +187,8 @@ public final class DataHandler {
             if(cfg.contains("tools." + name + ".lore"))
                 tool.setLore(cfg.getStringList("tools." + name + ".lore"));
 
-            if(cfg.getBoolean("tools." + name + ".glow", false)){
-                tool.addEnchantment(Enchantment.getByName("custom_glow"), 1);
-            }
+            if(cfg.getBoolean("tools." + name + ".glow", false))
+                tool.addEnchantment(plugin.getGlowEnchant(), 1);
 
             if(cfg.contains("tools." + name + ".enchants")){
                 List<String> enchants = cfg.getStringList("tools." + name + ".enchants");

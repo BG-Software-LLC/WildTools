@@ -7,7 +7,6 @@ import net.minecraft.server.v1_7_R3.BlockCrops;
 import net.minecraft.server.v1_7_R3.BlockNetherWart;
 import net.minecraft.server.v1_7_R3.BlockPotatoes;
 import net.minecraft.server.v1_7_R3.EnchantmentManager;
-import net.minecraft.server.v1_7_R3.EnchantmentSlotType;
 import net.minecraft.server.v1_7_R3.EntityPlayer;
 import net.minecraft.server.v1_7_R3.Item;
 import net.minecraft.server.v1_7_R3.ItemStack;
@@ -21,20 +20,18 @@ import org.bukkit.Material;
 import org.bukkit.NetherWartsState;
 import org.bukkit.craftbukkit.v1_7_R3.CraftWorld;
 import org.bukkit.craftbukkit.v1_7_R3.block.CraftBlock;
-import org.bukkit.craftbukkit.v1_7_R3.enchantments.CraftEnchantment;
 import org.bukkit.craftbukkit.v1_7_R3.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_7_R3.inventory.CraftInventoryPlayer;
 import org.bukkit.craftbukkit.v1_7_R3.inventory.CraftItemStack;
 
 import org.bukkit.CropState;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.Player;
 import org.bukkit.material.CocoaPlant;
 import org.bukkit.material.Crops;
 import org.bukkit.material.NetherWarts;
-import xyz.wildseries.wildtools.utils.EnchantUtil;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -237,38 +234,6 @@ public final class NMSAdapter_v1_7_R3 implements NMSAdapter {
     }
 
     @Override
-    public void registerGlowEnchant() {
-        class GlowEnchantment extends net.minecraft.server.v1_7_R3.Enchantment {
-
-            private GlowEnchantment(){
-                super(200, 0, EnchantmentSlotType.ALL);
-            }
-
-        }
-
-        try{
-            Field acceptingNew = Enchantment.class.getDeclaredField("acceptingNew");
-            acceptingNew.setAccessible(true);
-            acceptingNew.set(null, true);
-        }catch(Exception ex){
-            ex.printStackTrace();
-        }
-
-        GlowEnchantment glow;
-        CraftEnchantment enchantment;
-
-        try {
-            glow = new GlowEnchantment();
-            enchantment = new CraftEnchantment(glow);
-        }catch(IllegalArgumentException ex){
-            return;
-        }
-
-        EnchantUtil.getById().put(200, enchantment);
-        EnchantUtil.getByName().put("custom_glow", enchantment);
-    }
-
-    @Override
     public void copyBlock(org.bukkit.block.Block from, org.bukkit.block.Block to) {
         CraftBlock fromBlock = (CraftBlock) from, toBlock = (CraftBlock) to;
         toBlock.setType(fromBlock.getType());
@@ -284,5 +249,40 @@ public final class NMSAdapter_v1_7_R3 implements NMSAdapter {
     public void setAirFast(org.bukkit.block.Block block) {
         World world = ((CraftWorld) block.getWorld()).getHandle();
         world.setTypeAndData(block.getX(), block.getY(), block.getZ(), Block.e(0), 2,  0);
+    }
+
+    @Override
+    public Enchantment getGlowEnchant() {
+        return new Enchantment(101) {
+            @Override
+            public String getName() {
+                return "";
+            }
+
+            @Override
+            public int getMaxLevel() {
+                return 1;
+            }
+
+            @Override
+            public int getStartLevel() {
+                return 0;
+            }
+
+            @Override
+            public EnchantmentTarget getItemTarget() {
+                return null;
+            }
+
+            @Override
+            public boolean conflictsWith(Enchantment enchantment) {
+                return false;
+            }
+
+            @Override
+            public boolean canEnchantItem(org.bukkit.inventory.ItemStack itemStack) {
+                return true;
+            }
+        };
     }
 }

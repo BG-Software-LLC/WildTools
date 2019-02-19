@@ -107,8 +107,6 @@ public final class WCraftingTool extends WTool implements CraftingTool {
                 recipeList.add(current);
         }
 
-        System.out.println(recipeList);
-
         return recipeList.iterator();
     }
 

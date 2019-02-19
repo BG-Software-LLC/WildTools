@@ -1,8 +1,8 @@
 package xyz.wildseries.wildtools.nms;
 
 import org.bukkit.CropState;
-import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -29,12 +29,12 @@ public interface NMSAdapter {
 
     void setCropState(Block block, CropState cropState);
 
-    void registerGlowEnchant();
-
     void copyBlock(Block from, Block to);
 
     Collection<Player> getOnlinePlayers();
 
     void setAirFast(Block block);
+
+    Enchantment getGlowEnchant();
 
 }

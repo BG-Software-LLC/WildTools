@@ -15,6 +15,8 @@ import java.util.List;
 @SuppressWarnings("WeakerAccess")
 public final class ItemBuilder {
 
+    private static WildToolsPlugin plugin = WildToolsPlugin.getPlugin();
+
     private ItemStack itemStack;
     private ItemMeta itemMeta;
 
@@ -56,7 +58,7 @@ public final class ItemBuilder {
             withLore(section.getStringList("lore"));
 
         if(section.getBoolean("glow", false))
-            itemMeta.addEnchant(Enchantment.getByName("custom_glow"), 1, true);
+            itemMeta.addEnchant(plugin.getGlowEnchant(), 1, true);
 
         if(section.contains("enchants")){
             List<String> enchants = section.getStringList("enchants");

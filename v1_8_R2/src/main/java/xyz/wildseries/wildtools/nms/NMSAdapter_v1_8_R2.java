@@ -8,13 +8,11 @@ import net.minecraft.server.v1_8_R2.BlockNetherWart;
 import net.minecraft.server.v1_8_R2.BlockPosition;
 import net.minecraft.server.v1_8_R2.BlockPotatoes;
 import net.minecraft.server.v1_8_R2.EnchantmentManager;
-import net.minecraft.server.v1_8_R2.EnchantmentSlotType;
 import net.minecraft.server.v1_8_R2.EntityPlayer;
 import net.minecraft.server.v1_8_R2.EnumColor;
 import net.minecraft.server.v1_8_R2.Item;
 import net.minecraft.server.v1_8_R2.ItemStack;
 import net.minecraft.server.v1_8_R2.Items;
-import net.minecraft.server.v1_8_R2.MinecraftKey;
 import net.minecraft.server.v1_8_R2.NBTTagCompound;
 import net.minecraft.server.v1_8_R2.PlayerInventory;
 import net.minecraft.server.v1_8_R2.World;
@@ -24,20 +22,18 @@ import org.bukkit.Material;
 import org.bukkit.NetherWartsState;
 import org.bukkit.craftbukkit.v1_8_R2.CraftWorld;
 import org.bukkit.craftbukkit.v1_8_R2.block.CraftBlock;
-import org.bukkit.craftbukkit.v1_8_R2.enchantments.CraftEnchantment;
 import org.bukkit.craftbukkit.v1_8_R2.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_8_R2.inventory.CraftInventoryPlayer;
 import org.bukkit.craftbukkit.v1_8_R2.inventory.CraftItemStack;
 
 import org.bukkit.CropState;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.Player;
 import org.bukkit.material.CocoaPlant;
 import org.bukkit.material.Crops;
 import org.bukkit.material.NetherWarts;
-import xyz.wildseries.wildtools.utils.EnchantUtil;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -240,38 +236,6 @@ public final class NMSAdapter_v1_8_R2 implements NMSAdapter {
     }
 
     @Override
-    public void registerGlowEnchant() {
-        class GlowEnchantment extends net.minecraft.server.v1_8_R2.Enchantment {
-
-            private GlowEnchantment(){
-                super(200, new MinecraftKey("custom_glow"),0, EnchantmentSlotType.ALL);
-            }
-
-        }
-
-        try{
-            Field acceptingNew = Enchantment.class.getDeclaredField("acceptingNew");
-            acceptingNew.setAccessible(true);
-            acceptingNew.set(null, true);
-        }catch(Exception ex){
-            ex.printStackTrace();
-        }
-
-        GlowEnchantment glow;
-        CraftEnchantment enchantment;
-
-        try {
-            glow = new GlowEnchantment();
-            enchantment = new CraftEnchantment(glow);
-        }catch(IllegalArgumentException ex){
-            return;
-        }
-
-        EnchantUtil.getById().put(200, enchantment);
-        EnchantUtil.getByName().put("custom_glow", enchantment);
-    }
-
-    @Override
     public void copyBlock(org.bukkit.block.Block from, org.bukkit.block.Block to) {
         CraftBlock fromBlock = (CraftBlock) from, toBlock = (CraftBlock) to;
         toBlock.setType(fromBlock.getType());
@@ -288,6 +252,41 @@ public final class NMSAdapter_v1_8_R2 implements NMSAdapter {
         World world = ((CraftWorld) block.getWorld()).getHandle();
         BlockPosition blockPosition = new BlockPosition(block.getX(), block.getY(), block.getZ());
         world.setTypeAndData(blockPosition, Block.getByCombinedId(0), 2);
+    }
+
+    @Override
+    public Enchantment getGlowEnchant() {
+        return new Enchantment(101) {
+            @Override
+            public String getName() {
+                return "";
+            }
+
+            @Override
+            public int getMaxLevel() {
+                return 1;
+            }
+
+            @Override
+            public int getStartLevel() {
+                return 0;
+            }
+
+            @Override
+            public EnchantmentTarget getItemTarget() {
+                return null;
+            }
+
+            @Override
+            public boolean conflictsWith(Enchantment enchantment) {
+                return false;
+            }
+
+            @Override
+            public boolean canEnchantItem(org.bukkit.inventory.ItemStack itemStack) {
+                return true;
+            }
+        };
     }
 
 }
