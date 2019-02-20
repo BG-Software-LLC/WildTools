@@ -40,6 +40,9 @@ public final class WLightningTool extends WTool implements LightningTool {
         new Thread(() -> {
             player.getWorld().strikeLightningEffect(entity.getLocation());
 
+            if(entity instanceof Creeper)
+                ((Creeper) entity).setPowered(true);
+
             for(Entity nearby : entity.getNearbyEntities(3, 3, 3)){
                 if(nearby instanceof Creeper)
                     ((Creeper) nearby).setPowered(true);
