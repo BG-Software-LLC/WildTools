@@ -1,10 +1,10 @@
 package xyz.wildseries.wildtools.listeners;
 
+import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 
@@ -59,8 +59,9 @@ public final class BlocksListener implements Listener {
         WTool.toolBlockBreak.remove(e.getPlayer().getUniqueId());
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onBlockInteract(PlayerInteractEvent e){
+        Bukkit.broadcastMessage(e.isCancelled() + ": " + e.getAction());
         //One of the blocks that were broken by a tool
         if(WTool.toolBlockBreak.contains(e.getPlayer().getUniqueId()) || e.getItem() == null)
             return;
@@ -86,8 +87,21 @@ public final class BlocksListener implements Listener {
 
         WTool.toolBlockBreak.add(e.getPlayer().getUniqueId());
 
-        if(e.getAction() == Action.RIGHT_CLICK_AIR ? tool.onAirInteract(e) :
-                e.getAction() == Action.RIGHT_CLICK_BLOCK ? tool.onBlockInteract(e) : tool.onBlockHit(e)){
+        boolean toolInteract = false;
+
+        switch (e.getAction()){
+            case RIGHT_CLICK_AIR:
+                toolInteract = tool.onAirInteract(e);
+                break;
+            case RIGHT_CLICK_BLOCK:
+                toolInteract = tool.onBlockInteract(e);
+                break;
+            case LEFT_CLICK_BLOCK:
+                toolInteract = tool.onBlockHit(e);
+                break;
+        }
+
+        if(toolInteract){
             e.setCancelled(true);
             tool.setLastUse(e.getPlayer().getUniqueId());
             if(!tool.isUnbreakable() && e.getPlayer().getGameMode() != GameMode.CREATIVE)

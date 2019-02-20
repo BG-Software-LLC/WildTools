@@ -1,9 +1,7 @@
 package xyz.wildseries.wildtools.objects.tools;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
-import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.util.Vector;
 import xyz.wildseries.wildtools.api.objects.tools.LightningTool;
@@ -29,7 +27,6 @@ public final class WLightningTool extends WTool implements LightningTool {
                 Vector toEntity = ((LivingEntity) entity).getEyeLocation().toVector().subtract(eye.toVector());
                 double dot = toEntity.normalize().dot(eye.getDirection());
                 if(dot > 0.99D){
-                    e.setCancelled(true);
                     handleUse(e.getPlayer(), entity);
                     break;
                 }
