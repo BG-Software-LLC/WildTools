@@ -2,11 +2,7 @@ package xyz.wildseries.wildtools;
 
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
-import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryType;
-import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import xyz.wildseries.wildtools.api.WildTools;
 import xyz.wildseries.wildtools.api.WildToolsAPI;
