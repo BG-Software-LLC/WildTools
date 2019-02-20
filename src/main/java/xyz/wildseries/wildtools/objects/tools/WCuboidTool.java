@@ -38,6 +38,8 @@ public final class WCuboidTool extends WTool implements CuboidTool {
                     if(canBreakBlock(e.getBlock(), targetBlock)) {
                         if(isOnlyInsideClaim() && !plugin.getProviders().inClaim(e.getPlayer(), targetBlock.getLocation()))
                             continue;
+                        if(!BukkitUtil.canBreak(e.getPlayer(), targetBlock))
+                            continue;
                         BukkitUtil.breakNaturally(e.getPlayer(), targetBlock);
                         //Tool is using durability, reduces every block
                         if(!isUnbreakable() && isUsingDurability() && e.getPlayer().getGameMode() != GameMode.CREATIVE)

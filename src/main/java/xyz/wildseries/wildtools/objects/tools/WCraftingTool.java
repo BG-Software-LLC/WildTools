@@ -13,6 +13,7 @@ import org.bukkit.inventory.ShapelessRecipe;
 import xyz.wildseries.wildtools.Locale;
 import xyz.wildseries.wildtools.api.objects.tools.CraftingTool;
 import xyz.wildseries.wildtools.api.objects.ToolMode;
+import xyz.wildseries.wildtools.utils.BukkitUtil;
 import xyz.wildseries.wildtools.utils.ItemUtil;
 
 import java.util.ArrayList;
@@ -37,6 +38,9 @@ public final class WCraftingTool extends WTool implements CraftingTool {
 
     @Override
     public boolean onBlockInteract(PlayerInteractEvent e) {
+        if(!BukkitUtil.canInteract(e.getPlayer(), e.getClickedBlock()))
+            return false;
+
         if(e.getClickedBlock().getType() != Material.CHEST && e.getClickedBlock().getType() != Material.TRAPPED_CHEST){
             Locale.INVALID_CONTAINER_CRAFTING.send(e.getPlayer());
             return false;

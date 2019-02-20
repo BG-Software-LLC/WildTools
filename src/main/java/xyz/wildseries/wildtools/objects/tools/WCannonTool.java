@@ -13,6 +13,7 @@ import xyz.wildseries.wildtools.Locale;
 import xyz.wildseries.wildtools.api.objects.ToolMode;
 import xyz.wildseries.wildtools.api.objects.tools.CannonTool;
 import xyz.wildseries.wildtools.objects.WSelection;
+import xyz.wildseries.wildtools.utils.BukkitUtil;
 import xyz.wildseries.wildtools.utils.ItemUtil;
 
 import java.util.HashMap;
@@ -70,6 +71,9 @@ public final class WCannonTool extends WTool implements CannonTool {
 
         for(Dispenser dispenser : selection.getDispensers()){
             if(isOnlyInsideClaim() && !plugin.getProviders().inClaim(e.getPlayer(), dispenser.getLocation()))
+                continue;
+
+            if(!BukkitUtil.canInteract(e.getPlayer(), dispenser.getBlock()))
                 continue;
 
             int amount = tntAmount, freeSpace;

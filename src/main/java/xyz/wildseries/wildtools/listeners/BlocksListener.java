@@ -1,6 +1,5 @@
 package xyz.wildseries.wildtools.listeners;
 
-import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.EventHandler;
@@ -22,7 +21,7 @@ public final class BlocksListener implements Listener {
         this.instance = instance;
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onBlockBreak(BlockBreakEvent e){
         //One of the blocks that were broken by a tool
         if(WTool.toolBlockBreak.contains(e.getPlayer().getUniqueId()))
@@ -59,9 +58,8 @@ public final class BlocksListener implements Listener {
         WTool.toolBlockBreak.remove(e.getPlayer().getUniqueId());
     }
 
-    @EventHandler(priority = EventPriority.LOWEST)
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onBlockInteract(PlayerInteractEvent e){
-        Bukkit.broadcastMessage(e.isCancelled() + ": " + e.getAction());
         //One of the blocks that were broken by a tool
         if(WTool.toolBlockBreak.contains(e.getPlayer().getUniqueId()) || e.getItem() == null)
             return;
@@ -110,44 +108,6 @@ public final class BlocksListener implements Listener {
 
         WTool.toolBlockBreak.remove(e.getPlayer().getUniqueId());
     }
-
-//    @EventHandler(priority = EventPriority.HIGHEST)
-//    public void onAirInteract(PlayerInteractEvent e){
-//        //One of the blocks that were broken by a tool
-//        if(WTool.toolBlockBreak.contains(e.getPlayer().getUniqueId()) ||
-//                e.getAction() != Action.RIGHT_CLICK_AIR || e.getItem() == null)
-//            return;
-//
-//        if(!e.getPlayer().hasPermission("wildtools.use"))
-//            return;
-//
-//        Tool tool = instance.getToolsManager().getTool(instance.getNMSAdapter().getItemInHand(e.getPlayer()));
-//
-//        if(tool == null)
-//            return;
-//
-//        if(tool.isOnlyInsideClaim() && !instance.getProviders().inClaim(e.getPlayer(), e.getClickedBlock().getLocation())) {
-//            e.setCancelled(true);
-//            return;
-//        }
-//
-//        if(!tool.canUse(e.getPlayer().getUniqueId())){
-//            e.setCancelled(true);
-//            Locale.COOLDOWN_TIME.send(e.getPlayer(), getTime(tool.getTimeLeft(e.getPlayer().getUniqueId())));
-//            return;
-//        }
-//
-//        WTool.toolBlockBreak.add(e.getPlayer().getUniqueId());
-//
-//        if(tool.onAirInteract(e)){
-//            e.setCancelled(true);
-//            tool.setLastUse(e.getPlayer().getUniqueId());
-//            if(!tool.isUnbreakable() && e.getPlayer().getGameMode() != GameMode.CREATIVE)
-//                tool.reduceDurablility(e.getPlayer());
-//        }
-//
-//        WTool.toolBlockBreak.remove(e.getPlayer().getUniqueId());
-//    }
 
     private String getTime(long timeLeft){
         String time = "";

@@ -13,6 +13,7 @@ import org.bukkit.Material;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
+import xyz.wildseries.wildtools.utils.BukkitUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,6 +31,9 @@ public final class WSellTool extends WTool implements SellTool {
                     "Please contact the server administrators if you believe that this is an error.");
             return false;
         }
+
+        if(!BukkitUtil.canInteract(e.getPlayer(), e.getClickedBlock()))
+            return false;
 
         if(e.getClickedBlock().getType() != Material.CHEST && e.getClickedBlock().getType() != Material.TRAPPED_CHEST){
             Locale.INVALID_CONTAINER_SELL_WAND.send(e.getPlayer());

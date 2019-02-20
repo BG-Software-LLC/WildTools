@@ -9,6 +9,7 @@ import org.bukkit.inventory.ItemStack;
 import xyz.wildseries.wildtools.Locale;
 import xyz.wildseries.wildtools.api.objects.ToolMode;
 import xyz.wildseries.wildtools.api.objects.tools.SortTool;
+import xyz.wildseries.wildtools.utils.BukkitUtil;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -24,6 +25,9 @@ public final class WSortTool extends WTool implements SortTool {
 
     @Override
     public boolean onBlockInteract(PlayerInteractEvent e) {
+        if(!BukkitUtil.canInteract(e.getPlayer(), e.getClickedBlock()))
+            return false;
+
         if(e.getClickedBlock().getType() != Material.CHEST && e.getClickedBlock().getType() != Material.TRAPPED_CHEST){
             Locale.INVALID_CONTAINER_SORT_WAND.send(e.getPlayer());
             return false;

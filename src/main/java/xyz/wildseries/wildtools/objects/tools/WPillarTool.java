@@ -26,6 +26,8 @@ public final class WPillarTool extends WTool implements PillarTool {
             if(canBreakBlock(e.getClickedBlock(), targetBlock)) {
                 if(isOnlyInsideClaim() && !plugin.getProviders().inClaim(e.getPlayer(), e.getClickedBlock().getLocation()))
                     continue;
+                if(!BukkitUtil.canBreak(e.getPlayer(), targetBlock))
+                    continue;
                 BukkitUtil.breakNaturally(e.getPlayer(), targetBlock);
                 //Tool is using durability, reduces every block
                 if(!isUnbreakable() && isUsingDurability() && e.getPlayer().getGameMode() != GameMode.CREATIVE){
