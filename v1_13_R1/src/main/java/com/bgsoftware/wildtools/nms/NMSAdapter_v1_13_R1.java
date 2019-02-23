@@ -28,7 +28,6 @@ import org.bukkit.craftbukkit.v1_13_R1.block.CraftBlock;
 import org.bukkit.craftbukkit.v1_13_R1.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_13_R1.inventory.CraftInventoryPlayer;
 import org.bukkit.craftbukkit.v1_13_R1.inventory.CraftItemStack;
-import org.bukkit.craftbukkit.v1_13_R1.util.CraftMagicNumbers;
 
 import org.bukkit.CropState;
 import org.bukkit.NamespacedKey;
