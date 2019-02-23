@@ -17,6 +17,7 @@ import xyz.wildseries.wildtools.listeners.EditorListener;
 import xyz.wildseries.wildtools.listeners.McMMOListener;
 import xyz.wildseries.wildtools.listeners.PlayerListener;
 import xyz.wildseries.wildtools.listeners.RecipesListener;
+import xyz.wildseries.wildtools.metrics.Metrics;
 import xyz.wildseries.wildtools.nms.NMSAdapter;
 
 import net.milkbowl.vault.economy.Economy;
@@ -41,6 +42,8 @@ public final class WildToolsPlugin extends JavaPlugin implements WildTools {
     @Override
     public void onEnable() {
         plugin = this;
+        new Metrics(this);
+
         log("******** ENABLE START ********");
 
         getServer().getPluginManager().registerEvents(new BlocksListener(this), this);
