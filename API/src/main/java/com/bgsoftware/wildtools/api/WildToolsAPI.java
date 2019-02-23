@@ -1,17 +1,17 @@
-package xyz.wildseries.wildtools.api;
+package com.bgsoftware.wildtools.api;
 
+import com.bgsoftware.wildtools.api.objects.Selection;
+import com.bgsoftware.wildtools.api.objects.tools.CannonTool;
+import com.bgsoftware.wildtools.api.objects.tools.CraftingTool;
+import com.bgsoftware.wildtools.api.objects.tools.CuboidTool;
+import com.bgsoftware.wildtools.api.objects.tools.HarvesterTool;
+import com.bgsoftware.wildtools.api.objects.tools.LightningTool;
+import com.bgsoftware.wildtools.api.objects.tools.PillarTool;
+import com.bgsoftware.wildtools.api.objects.tools.Tool;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import xyz.wildseries.wildtools.api.objects.Selection;
-import xyz.wildseries.wildtools.api.objects.tools.CannonTool;
-import xyz.wildseries.wildtools.api.objects.tools.CraftingTool;
-import xyz.wildseries.wildtools.api.objects.tools.CuboidTool;
-import xyz.wildseries.wildtools.api.objects.tools.HarvesterTool;
-import xyz.wildseries.wildtools.api.objects.tools.LightningTool;
-import xyz.wildseries.wildtools.api.objects.tools.PillarTool;
-import xyz.wildseries.wildtools.api.objects.tools.SellTool;
-import xyz.wildseries.wildtools.api.objects.tools.Tool;
+import com.bgsoftware.wildtools.api.objects.tools.SellTool;
 
 @SuppressWarnings("unused")
 public final class WildToolsAPI {

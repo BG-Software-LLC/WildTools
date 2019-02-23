@@ -6,7 +6,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import com.bgsoftware.wildtools.WildToolsPlugin;
-import xyz.wildseries.wildtools.api.objects.tools.Tool;
+import com.bgsoftware.wildtools.api.objects.tools.Tool;
 
 import java.util.ArrayList;
 import java.util.HashMap;

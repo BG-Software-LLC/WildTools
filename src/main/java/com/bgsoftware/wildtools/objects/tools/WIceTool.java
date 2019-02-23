@@ -7,8 +7,8 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerInteractEvent;
-import xyz.wildseries.wildtools.api.objects.ToolMode;
-import xyz.wildseries.wildtools.api.objects.tools.IceTool;
+import com.bgsoftware.wildtools.api.objects.ToolMode;
+import com.bgsoftware.wildtools.api.objects.tools.IceTool;
 
 public final class WIceTool extends WTool implements IceTool {
 

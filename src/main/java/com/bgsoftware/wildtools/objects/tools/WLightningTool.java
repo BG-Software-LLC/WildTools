@@ -4,8 +4,8 @@ import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.util.Vector;
-import xyz.wildseries.wildtools.api.objects.tools.LightningTool;
-import xyz.wildseries.wildtools.api.objects.ToolMode;
+import com.bgsoftware.wildtools.api.objects.tools.LightningTool;
+import com.bgsoftware.wildtools.api.objects.ToolMode;
 
 import org.bukkit.Material;
 import org.bukkit.entity.Creeper;

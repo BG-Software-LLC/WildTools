@@ -6,7 +6,7 @@ import org.apache.commons.lang3.math.NumberUtils;
 import org.bukkit.inventory.ItemStack;
 import com.bgsoftware.wildtools.Locale;
 import com.bgsoftware.wildtools.WildToolsPlugin;
-import xyz.wildseries.wildtools.api.objects.tools.Tool;
+import com.bgsoftware.wildtools.api.objects.tools.Tool;
 import com.bgsoftware.wildtools.command.ICommand;
 
 import org.bukkit.Bukkit;

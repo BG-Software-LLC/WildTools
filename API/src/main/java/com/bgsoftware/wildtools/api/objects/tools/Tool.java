@@ -1,6 +1,6 @@
-package xyz.wildseries.wildtools.api.objects.tools;
+package com.bgsoftware.wildtools.api.objects.tools;
 
-import xyz.wildseries.wildtools.api.objects.ToolMode;
+import com.bgsoftware.wildtools.api.objects.ToolMode;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.enchantments.Enchantment;

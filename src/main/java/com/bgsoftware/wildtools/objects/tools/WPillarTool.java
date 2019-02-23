@@ -2,8 +2,8 @@ package com.bgsoftware.wildtools.objects.tools;
 
 import com.bgsoftware.wildtools.utils.BukkitUtil;
 import org.bukkit.event.player.PlayerInteractEvent;
-import xyz.wildseries.wildtools.api.objects.tools.PillarTool;
-import xyz.wildseries.wildtools.api.objects.ToolMode;
+import com.bgsoftware.wildtools.api.objects.tools.PillarTool;
+import com.bgsoftware.wildtools.api.objects.ToolMode;
 
 import org.bukkit.GameMode;
 import org.bukkit.block.Block;

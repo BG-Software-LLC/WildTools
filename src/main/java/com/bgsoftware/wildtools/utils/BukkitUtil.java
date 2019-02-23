@@ -10,7 +10,7 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import com.bgsoftware.wildtools.WildToolsPlugin;
-import xyz.wildseries.wildtools.api.objects.tools.Tool;
+import com.bgsoftware.wildtools.api.objects.tools.Tool;
 import com.bgsoftware.wildtools.objects.WMaterial;
 import com.bgsoftware.wildtools.objects.tools.WHarvesterTool;
 

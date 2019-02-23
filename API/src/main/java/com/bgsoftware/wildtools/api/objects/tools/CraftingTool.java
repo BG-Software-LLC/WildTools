@@ -1,4 +1,4 @@
-package xyz.wildseries.wildtools.api.objects.tools;
+package com.bgsoftware.wildtools.api.objects.tools;
 
 import org.bukkit.inventory.Recipe;
 

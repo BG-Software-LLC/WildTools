@@ -5,8 +5,8 @@ import org.bukkit.block.Block;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import com.bgsoftware.wildtools.WildToolsPlugin;
-import xyz.wildseries.wildtools.api.objects.tools.Tool;
-import xyz.wildseries.wildtools.api.objects.ToolMode;
+import com.bgsoftware.wildtools.api.objects.tools.Tool;
+import com.bgsoftware.wildtools.api.objects.ToolMode;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Material;

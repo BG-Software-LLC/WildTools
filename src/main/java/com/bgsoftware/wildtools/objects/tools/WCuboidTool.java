@@ -2,8 +2,8 @@ package com.bgsoftware.wildtools.objects.tools;
 
 import com.bgsoftware.wildtools.utils.BukkitUtil;
 import org.bukkit.event.block.BlockBreakEvent;
-import xyz.wildseries.wildtools.api.objects.tools.CuboidTool;
-import xyz.wildseries.wildtools.api.objects.ToolMode;
+import com.bgsoftware.wildtools.api.objects.tools.CuboidTool;
+import com.bgsoftware.wildtools.api.objects.ToolMode;
 
 import org.bukkit.block.Block;
 import org.bukkit.GameMode;

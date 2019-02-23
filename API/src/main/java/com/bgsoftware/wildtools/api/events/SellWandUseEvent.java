@@ -1,24 +1,32 @@
-package xyz.wildseries.wildtools.api.events;
+package com.bgsoftware.wildtools.api.events;
 
+import org.bukkit.block.Chest;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.player.PlayerEvent;
 
 @SuppressWarnings("unused")
-public final class HarvesterHoeSellEvent extends PlayerEvent implements Cancellable {
+public final class SellWandUseEvent extends PlayerEvent implements Cancellable {
 
     private static final HandlerList HANDLERS = new HandlerList();
+
+    private final Chest chest;
 
     private boolean cancelled;
     private String sellMessage;
     private double price;
 
-    public HarvesterHoeSellEvent(Player player, double price, String sellMessage){
+    public SellWandUseEvent(Player player, Chest chest, double price, String sellMessage){
         super(player);
-        this.price = price;
+        this.chest = chest;
         this.sellMessage = sellMessage;
+        this.price = price;
         this.cancelled = false;
+    }
+
+    public Chest getChest(){
+        return chest;
     }
 
     public double getPrice(){
@@ -29,7 +37,7 @@ public final class HarvesterHoeSellEvent extends PlayerEvent implements Cancella
         this.price = price;
     }
 
-    public String getMessage() {
+    public String getMessage(){
         return sellMessage;
     }
 

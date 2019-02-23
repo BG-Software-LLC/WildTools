@@ -1,4 +1,4 @@
-package xyz.wildseries.wildtools.api.objects;
+package com.bgsoftware.wildtools.api.objects;
 
 import org.bukkit.Location;
 import org.bukkit.block.Dispenser;

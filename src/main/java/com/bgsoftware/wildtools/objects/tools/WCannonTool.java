@@ -13,8 +13,8 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import com.bgsoftware.wildtools.Locale;
-import xyz.wildseries.wildtools.api.objects.ToolMode;
-import xyz.wildseries.wildtools.api.objects.tools.CannonTool;
+import com.bgsoftware.wildtools.api.objects.ToolMode;
+import com.bgsoftware.wildtools.api.objects.tools.CannonTool;
 
 import java.util.HashMap;
 import java.util.Map;

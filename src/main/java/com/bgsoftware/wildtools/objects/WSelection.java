@@ -8,7 +8,7 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.Dispenser;
 import com.bgsoftware.wildtools.WildToolsPlugin;
-import xyz.wildseries.wildtools.api.objects.Selection;
+import com.bgsoftware.wildtools.api.objects.Selection;
 import com.bgsoftware.wildtools.objects.tools.WCannonTool;
 
 import java.util.ArrayList;

@@ -7,8 +7,8 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import com.bgsoftware.wildtools.Locale;
-import xyz.wildseries.wildtools.api.objects.ToolMode;
-import xyz.wildseries.wildtools.api.objects.tools.BuilderTool;
+import com.bgsoftware.wildtools.api.objects.ToolMode;
+import com.bgsoftware.wildtools.api.objects.tools.BuilderTool;
 
 import java.util.HashMap;
 import java.util.Map;

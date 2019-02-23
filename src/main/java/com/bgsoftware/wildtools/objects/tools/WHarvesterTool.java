@@ -16,9 +16,9 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
 import com.bgsoftware.wildtools.Locale;
-import xyz.wildseries.wildtools.api.events.HarvesterHoeSellEvent;
-import xyz.wildseries.wildtools.api.objects.tools.HarvesterTool;
-import xyz.wildseries.wildtools.api.objects.ToolMode;
+import com.bgsoftware.wildtools.api.events.HarvesterHoeSellEvent;
+import com.bgsoftware.wildtools.api.objects.tools.HarvesterTool;
+import com.bgsoftware.wildtools.api.objects.ToolMode;
 
 import java.util.ArrayList;
 import java.util.Arrays;

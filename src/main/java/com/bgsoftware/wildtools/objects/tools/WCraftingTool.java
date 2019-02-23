@@ -13,8 +13,8 @@ import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.inventory.ShapelessRecipe;
 
 import com.bgsoftware.wildtools.Locale;
-import xyz.wildseries.wildtools.api.objects.tools.CraftingTool;
-import xyz.wildseries.wildtools.api.objects.ToolMode;
+import com.bgsoftware.wildtools.api.objects.tools.CraftingTool;
+import com.bgsoftware.wildtools.api.objects.ToolMode;
 
 import java.util.ArrayList;
 import java.util.HashMap;

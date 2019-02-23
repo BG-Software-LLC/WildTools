@@ -8,8 +8,8 @@ import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 
 import com.bgsoftware.wildtools.Locale;
-import xyz.wildseries.wildtools.api.objects.ToolMode;
-import xyz.wildseries.wildtools.api.objects.tools.SortTool;
+import com.bgsoftware.wildtools.api.objects.ToolMode;
+import com.bgsoftware.wildtools.api.objects.tools.SortTool;
 
 import java.util.ArrayList;
 import java.util.Arrays;

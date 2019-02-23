@@ -1,7 +1,7 @@
 package com.bgsoftware.wildtools;
 
-import xyz.wildseries.wildtools.api.WildTools;
-import xyz.wildseries.wildtools.api.WildToolsAPI;
+import com.bgsoftware.wildtools.api.WildTools;
+import com.bgsoftware.wildtools.api.WildToolsAPI;
 import com.bgsoftware.wildtools.command.CommandsHandler;
 import com.bgsoftware.wildtools.handlers.EditorHandler;
 import com.bgsoftware.wildtools.handlers.ToolsHandler;

@@ -6,10 +6,10 @@ import org.bukkit.inventory.ItemStack;
 
 import com.bgsoftware.wildtools.Locale;
 import com.bgsoftware.wildtools.WildToolsPlugin;
-import xyz.wildseries.wildtools.api.objects.tools.CannonTool;
-import xyz.wildseries.wildtools.api.objects.tools.CuboidTool;
-import xyz.wildseries.wildtools.api.objects.tools.HarvesterTool;
-import xyz.wildseries.wildtools.api.objects.tools.Tool;
+import com.bgsoftware.wildtools.api.objects.tools.CannonTool;
+import com.bgsoftware.wildtools.api.objects.tools.CuboidTool;
+import com.bgsoftware.wildtools.api.objects.tools.HarvesterTool;
+import com.bgsoftware.wildtools.api.objects.tools.Tool;
 
 import java.util.ArrayList;
 import java.util.List;

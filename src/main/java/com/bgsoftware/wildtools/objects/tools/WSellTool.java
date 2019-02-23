@@ -6,9 +6,9 @@ import org.bukkit.ChatColor;
 import org.bukkit.block.Chest;
 import org.bukkit.event.player.PlayerInteractEvent;
 import com.bgsoftware.wildtools.Locale;
-import xyz.wildseries.wildtools.api.events.SellWandUseEvent;
-import xyz.wildseries.wildtools.api.objects.tools.SellTool;
-import xyz.wildseries.wildtools.api.objects.ToolMode;
+import com.bgsoftware.wildtools.api.events.SellWandUseEvent;
+import com.bgsoftware.wildtools.api.objects.tools.SellTool;
+import com.bgsoftware.wildtools.api.objects.ToolMode;
 
 import org.bukkit.Material;
 import org.bukkit.inventory.Inventory;

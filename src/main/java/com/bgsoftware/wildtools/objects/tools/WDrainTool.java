@@ -1,7 +1,7 @@
 package com.bgsoftware.wildtools.objects.tools;
 
-import xyz.wildseries.wildtools.api.objects.ToolMode;
-import xyz.wildseries.wildtools.api.objects.tools.DrainTool;
+import com.bgsoftware.wildtools.api.objects.ToolMode;
+import com.bgsoftware.wildtools.api.objects.tools.DrainTool;
 import com.bgsoftware.wildtools.utils.BukkitUtil;
 import org.bukkit.Location;
 import org.bukkit.Material;
