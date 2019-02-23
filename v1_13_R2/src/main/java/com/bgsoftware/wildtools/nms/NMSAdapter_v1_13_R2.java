@@ -16,6 +16,7 @@ import net.minecraft.server.v1_13_R2.Item;
 import net.minecraft.server.v1_13_R2.ItemStack;
 import net.minecraft.server.v1_13_R2.Items;
 import net.minecraft.server.v1_13_R2.NBTTagCompound;
+import net.minecraft.server.v1_13_R2.PlayerInteractManager;
 import net.minecraft.server.v1_13_R2.PlayerInventory;
 import net.minecraft.server.v1_13_R2.World;
 
@@ -25,7 +26,6 @@ import org.bukkit.craftbukkit.v1_13_R2.block.CraftBlock;
 import org.bukkit.craftbukkit.v1_13_R2.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_13_R2.inventory.CraftInventoryPlayer;
 import org.bukkit.craftbukkit.v1_13_R2.inventory.CraftItemStack;
-import org.bukkit.craftbukkit.v1_13_R2.util.CraftMagicNumbers;
 
 import org.bukkit.Material;
 import org.bukkit.block.data.BlockData;
@@ -40,7 +40,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-@SuppressWarnings({"unused", "deprecation", "ConstantConditions"})
+@SuppressWarnings({"unused", "ConstantConditions"})
 public class NMSAdapter_v1_13_R2 implements NMSAdapter {
 
     @Override
@@ -62,14 +62,8 @@ public class NMSAdapter_v1_13_R2 implements NMSAdapter {
 
         // Has silk touch enchant
         if ((block.j() && !block.isTileEntity()) && (silkTouch || EnchantmentManager.a(Enchantments.SILK_TOUCH, player) > 0)) {
-            int damage = 0;
-            Item item = Item.getItemOf(block);
-            if (item != null && item.n()) {
-                damage = CraftMagicNumbers.toLegacyData(block.getBlockData());
-            }
-
+            Item item = block.getItem();
             ItemStack itemStack = new ItemStack(item);
-            itemStack.setDamage(damage);
             drops.add(CraftItemStack.asBukkitCopy(itemStack));
         }
 

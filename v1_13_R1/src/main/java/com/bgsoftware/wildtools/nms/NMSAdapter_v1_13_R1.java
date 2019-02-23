@@ -40,7 +40,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-@SuppressWarnings({"unused", "deprecation", "ConstantConditions"})
+@SuppressWarnings({"unused", "ConstantConditions"})
 public final class NMSAdapter_v1_13_R1 implements NMSAdapter {
 
     @Override
@@ -62,14 +62,8 @@ public final class NMSAdapter_v1_13_R1 implements NMSAdapter {
 
         // Has silk touch enchant
         if ((block.j() && !block.isTileEntity()) && (silkTouch || EnchantmentManager.a(Enchantments.SILK_TOUCH, player) > 0)) {
-            int damage = 0;
-            Item item = Item.getItemOf(block);
-            if (item != null && item.n()) {
-                damage = CraftMagicNumbers.toLegacyData(block.getBlockData());
-            }
-
+            Item item = block.getItem();
             ItemStack itemStack = new ItemStack(item);
-            itemStack.setDamage(damage);
             drops.add(CraftItemStack.asBukkitCopy(itemStack));
         }
 
