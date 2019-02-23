@@ -1,7 +1,7 @@
 name: WildTools
 version: 2.4.3
 api-version: 1.13
-main: xyz.wildseries.wildtools.WildToolsPlugin
+main: com.bgsoftware.wildtools.WildToolsPlugin
 description: Configurable trench picks, tray picks, sell-wands, harvester-hoes and more!
 website: http://wildseries.xyz/
 authors: [Ome_R, WildSeries]
