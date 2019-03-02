@@ -20,7 +20,9 @@ import net.minecraft.server.v1_13_R1.PlayerInventory;
 import net.minecraft.server.v1_13_R1.World;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.WorldBorder;
 import org.bukkit.block.data.Ageable;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.craftbukkit.v1_13_R1.CraftWorld;
@@ -278,6 +280,14 @@ public final class NMSAdapter_v1_13_R1 implements NMSAdapter {
                 return false;
             }
         };
+    }
+
+    @Override
+    public boolean isOutsideWorldborder(Location location) {
+        WorldBorder worldBorder = location.getWorld().getWorldBorder();
+        int radius = (int) worldBorder.getSize() / 2;
+        return location.getBlockX() > (worldBorder.getCenter().getBlockX() + radius) || location.getBlockX() < (worldBorder.getCenter().getBlockX() - radius) ||
+                location.getBlockZ() > (worldBorder.getCenter().getBlockZ() + radius) || location.getBlockZ() < (worldBorder.getCenter().getBlockZ() - radius);
     }
 
 }

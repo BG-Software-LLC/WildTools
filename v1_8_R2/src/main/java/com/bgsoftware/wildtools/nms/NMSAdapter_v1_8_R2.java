@@ -18,8 +18,10 @@ import net.minecraft.server.v1_8_R2.PlayerInventory;
 import net.minecraft.server.v1_8_R2.World;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.NetherWartsState;
+import org.bukkit.WorldBorder;
 import org.bukkit.craftbukkit.v1_8_R2.CraftWorld;
 import org.bukkit.craftbukkit.v1_8_R2.block.CraftBlock;
 import org.bukkit.craftbukkit.v1_8_R2.entity.CraftPlayer;
@@ -287,6 +289,14 @@ public final class NMSAdapter_v1_8_R2 implements NMSAdapter {
                 return true;
             }
         };
+    }
+
+    @Override
+    public boolean isOutsideWorldborder(Location location) {
+        WorldBorder worldBorder = location.getWorld().getWorldBorder();
+        int radius = (int) worldBorder.getSize() / 2;
+        return location.getBlockX() > (worldBorder.getCenter().getBlockX() + radius) || location.getBlockX() < (worldBorder.getCenter().getBlockX() - radius) ||
+                location.getBlockZ() > (worldBorder.getCenter().getBlockZ() + radius) || location.getBlockZ() < (worldBorder.getCenter().getBlockZ() - radius);
     }
 
 }

@@ -1,5 +1,6 @@
 package com.bgsoftware.wildtools.handlers;
 
+import com.bgsoftware.wildtools.WildToolsPlugin;
 import com.bgsoftware.wildtools.api.objects.tools.Tool;
 import com.bgsoftware.wildtools.hooks.BlocksProvider;
 import com.bgsoftware.wildtools.hooks.BlocksProvider_ASkyblock;
@@ -32,6 +33,8 @@ import com.bgsoftware.wildtools.hooks.PricesProvider_ShopGUIPlus;
 import java.util.List;
 
 public final class ProvidersHandler {
+
+    private static WildToolsPlugin plugin = WildToolsPlugin.getPlugin();
 
     static String pricesPlugin;
 
@@ -102,6 +105,9 @@ public final class ProvidersHandler {
     }
 
     public boolean canBreak(Player player, Block block, Tool tool){
+        if(plugin.getNMSAdapter().isOutsideWorldborder(block.getLocation()))
+            return false;
+
         for(BlocksProvider blocksProvider : blocksProviders) {
             if (!blocksProvider.canBreak(player, block, tool.isOnlyInsideClaim()))
                 return false;
@@ -110,6 +116,9 @@ public final class ProvidersHandler {
     }
 
     public boolean canInteract(Player player, Block block, Tool tool){
+        if(plugin.getNMSAdapter().isOutsideWorldborder(block.getLocation()))
+            return false;
+
         for(BlocksProvider blocksProvider : blocksProviders) {
             if (!blocksProvider.canInteract(player, block, tool.isOnlyInsideClaim()))
                 return false;

@@ -16,6 +16,7 @@ import net.minecraft.server.v1_7_R3.PlayerInventory;
 import net.minecraft.server.v1_7_R3.World;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.NetherWartsState;
 import org.bukkit.craftbukkit.v1_7_R3.CraftWorld;
@@ -285,4 +286,10 @@ public final class NMSAdapter_v1_7_R3 implements NMSAdapter {
             }
         };
     }
+
+    @Override
+    public boolean isOutsideWorldborder(Location location) {
+        return false;
+    }
+
 }
