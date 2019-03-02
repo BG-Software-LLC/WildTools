@@ -1,6 +1,5 @@
 package com.bgsoftware.wildtools.objects.tools;
 
-import com.bgsoftware.wildtools.utils.BukkitUtil;
 import org.bukkit.Material;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.Inventory;
@@ -25,7 +24,7 @@ public final class WSortTool extends WTool implements SortTool {
 
     @Override
     public boolean onBlockInteract(PlayerInteractEvent e) {
-        if(!BukkitUtil.canInteract(e.getPlayer(), e.getClickedBlock()))
+        if(!plugin.getProviders().canInteract(e.getPlayer(), e.getClickedBlock(), this))
             return false;
 
         if(e.getClickedBlock().getType() != Material.CHEST && e.getClickedBlock().getType() != Material.TRAPPED_CHEST){

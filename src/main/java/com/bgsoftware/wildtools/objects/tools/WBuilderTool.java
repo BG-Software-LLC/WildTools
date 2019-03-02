@@ -1,6 +1,5 @@
 package com.bgsoftware.wildtools.objects.tools;
 
-import com.bgsoftware.wildtools.utils.BukkitUtil;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -10,13 +9,7 @@ import com.bgsoftware.wildtools.Locale;
 import com.bgsoftware.wildtools.api.objects.ToolMode;
 import com.bgsoftware.wildtools.api.objects.tools.BuilderTool;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
-
 public final class WBuilderTool extends WTool implements BuilderTool {
-
-    public static Map<UUID, BlockFace> blockFaces = new HashMap<>();
 
     private int length;
 
@@ -38,10 +31,7 @@ public final class WBuilderTool extends WTool implements BuilderTool {
         for(int i = 0; i < length; i++){
             nextBlock = nextBlock.getRelative(blockFace);
 
-            if(nextBlock.getType() != Material.AIR || !BukkitUtil.canBreak(e.getPlayer(), nextBlock))
-                break;
-
-            if(isOnlyInsideClaim() && !plugin.getProviders().inClaim(e.getPlayer(), nextBlock.getLocation()))
+            if(nextBlock.getType() != Material.AIR || !plugin.getProviders().canBreak(e.getPlayer(), nextBlock, this))
                 break;
 
             ItemStack blockItemStack = e.getClickedBlock().getState().getData().toItemStack(1);

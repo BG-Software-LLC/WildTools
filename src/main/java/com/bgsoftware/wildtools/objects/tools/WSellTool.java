@@ -1,6 +1,5 @@
 package com.bgsoftware.wildtools.objects.tools;
 
-import com.bgsoftware.wildtools.utils.BukkitUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.block.Chest;
@@ -32,7 +31,7 @@ public final class WSellTool extends WTool implements SellTool {
             return false;
         }
 
-        if(!BukkitUtil.canInteract(e.getPlayer(), e.getClickedBlock()))
+        if(!plugin.getProviders().canInteract(e.getPlayer(), e.getClickedBlock(), this))
             return false;
 
         if(e.getClickedBlock().getType() != Material.CHEST && e.getClickedBlock().getType() != Material.TRAPPED_CHEST){

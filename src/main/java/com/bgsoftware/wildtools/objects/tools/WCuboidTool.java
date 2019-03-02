@@ -35,11 +35,9 @@ public final class WCuboidTool extends WTool implements CuboidTool {
                 for(int y = min.getBlockY(); y <= max.getBlockY(); y++){
                     Block targetBlock = e.getPlayer().getWorld().getBlockAt(x, y, z);
                     if(canBreakBlock(e.getBlock(), targetBlock)) {
-                        if(isOnlyInsideClaim() && !plugin.getProviders().inClaim(e.getPlayer(), targetBlock.getLocation()))
+                        if(!plugin.getProviders().canBreak(e.getPlayer(), targetBlock, this))
                             continue;
-                        if(!BukkitUtil.canBreak(e.getPlayer(), targetBlock))
-                            continue;
-                        BukkitUtil.breakNaturally(e.getPlayer(), targetBlock);
+                        BukkitUtil.breakNaturally(e.getPlayer(), targetBlock, this);
                         //Tool is using durability, reduces every block
                         if(!isUnbreakable() && isUsingDurability() && e.getPlayer().getGameMode() != GameMode.CREATIVE)
                             reduceDurablility(e.getPlayer());

@@ -1,6 +1,5 @@
 package com.bgsoftware.wildtools.objects.tools;
 
-import com.bgsoftware.wildtools.utils.BukkitUtil;
 import com.bgsoftware.wildtools.utils.ItemUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -38,7 +37,7 @@ public final class WCraftingTool extends WTool implements CraftingTool {
 
     @Override
     public boolean onBlockInteract(PlayerInteractEvent e) {
-        if(!BukkitUtil.canInteract(e.getPlayer(), e.getClickedBlock()))
+        if(!plugin.getProviders().canInteract(e.getPlayer(), e.getClickedBlock(), this))
             return false;
 
         if(e.getClickedBlock().getType() != Material.CHEST && e.getClickedBlock().getType() != Material.TRAPPED_CHEST){

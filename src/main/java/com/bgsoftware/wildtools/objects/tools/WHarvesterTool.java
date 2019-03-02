@@ -118,9 +118,7 @@ public final class WHarvesterTool extends WTool implements HarvesterTool {
                         Block targetBlock = player.getWorld().getBlockAt(x, y, z);
                         if ((targetBlock.getType() == Material.DIRT || targetBlock.getType() == WMaterial.GRASS_BLOCK.parseMaterial()) &&
                                 targetBlock.getRelative(BlockFace.UP).getType() == Material.AIR) {
-                            if(isOnlyInsideClaim() && !plugin.getProviders().inClaim(player, targetBlock.getLocation()))
-                                continue;
-                            if (BukkitUtil.canBreak(player, targetBlock) && canBreakBlock(block, targetBlock)) {
+                            if (plugin.getProviders().canBreak(player, targetBlock, this) && canBreakBlock(block, targetBlock)) {
                                 targetBlock.setType(WMaterial.FARMLAND.parseMaterial());
                             }
                         }
@@ -146,7 +144,7 @@ public final class WHarvesterTool extends WTool implements HarvesterTool {
                             }
                         }
                         if (plugin.getNMSAdapter().isFullyGrown(targetBlock) &&
-                                BukkitUtil.canBreak(player, targetBlock) && canBreakBlock(block, targetBlock)) {
+                                plugin.getProviders().canBreak(player, targetBlock, this) && canBreakBlock(block, targetBlock)) {
                             if(player.getGameMode() != GameMode.CREATIVE) {
                                 for(ItemStack drop : BukkitUtil.getBlockDrops(player, targetBlock)){
                                     if(sellModesPlayers.contains(player.getUniqueId()) && player.hasPermission("wildtools.sellmode") &&

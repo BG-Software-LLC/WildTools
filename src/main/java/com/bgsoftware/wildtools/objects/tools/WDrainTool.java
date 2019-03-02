@@ -2,7 +2,6 @@ package com.bgsoftware.wildtools.objects.tools;
 
 import com.bgsoftware.wildtools.api.objects.ToolMode;
 import com.bgsoftware.wildtools.api.objects.tools.DrainTool;
-import com.bgsoftware.wildtools.utils.BukkitUtil;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -41,9 +40,7 @@ public final class WDrainTool extends WTool implements DrainTool {
             for(int z = min.getBlockZ(); z <= max.getBlockZ(); z++){
                 for(int y = max.getBlockY(); y >= min.getBlockY(); y--){
                     Block targetBlock = block.getWorld().getBlockAt(x, y, z);
-                    if(isOnlyInsideClaim() && !plugin.getProviders().inClaim(player, targetBlock.getLocation()))
-                        continue;
-                    if(targetBlock.getType() == Material.ICE && BukkitUtil.canBreak(player, targetBlock)){
+                    if(targetBlock.getType() == Material.ICE && plugin.getProviders().canBreak(player, targetBlock, this)){
                         targetBlock.setType(Material.AIR);
                     }
                 }

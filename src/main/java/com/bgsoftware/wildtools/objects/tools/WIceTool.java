@@ -1,6 +1,5 @@
 package com.bgsoftware.wildtools.objects.tools;
 
-import com.bgsoftware.wildtools.utils.BukkitUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -43,9 +42,7 @@ public final class WIceTool extends WTool implements IceTool {
                 for(int y = max.getBlockY(); y >= min.getBlockY(); y--){
                     Block targetBlock = block.getWorld().getBlockAt(x, y, z);
                     Bukkit.getScheduler().runTask(plugin, () -> {
-                        if(isOnlyInsideClaim() && !plugin.getProviders().inClaim(player, targetBlock.getLocation()))
-                            return;
-                        if(targetBlock.getType() == Material.ICE && BukkitUtil.canBreak(player, targetBlock)){
+                        if(targetBlock.getType() == Material.ICE && plugin.getProviders().canBreak(player, targetBlock, this)){
                             targetBlock.setType(Material.WATER);
                         }
                     });

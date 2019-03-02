@@ -35,11 +35,6 @@ public final class BlocksListener implements Listener {
         if(tool == null)
             return;
 
-        if(tool.isOnlyInsideClaim() && !instance.getProviders().inClaim(e.getPlayer(), e.getBlock().getLocation())) {
-            e.setCancelled(true);
-            return;
-        }
-
         if(!tool.canUse(e.getPlayer().getUniqueId())){
             e.setCancelled(true);
             Locale.COOLDOWN_TIME.send(e.getPlayer(), getTime(tool.getTimeLeft(e.getPlayer().getUniqueId())));
@@ -71,11 +66,6 @@ public final class BlocksListener implements Listener {
 
         if(tool == null)
             return;
-
-        if(tool.isOnlyInsideClaim() && !instance.getProviders().inClaim(e.getPlayer(), e.getClickedBlock().getLocation())) {
-            e.setCancelled(true);
-            return;
-        }
 
         if(!tool.canUse(e.getPlayer().getUniqueId())){
             e.setCancelled(true);

@@ -1,6 +1,6 @@
 package com.bgsoftware.wildtools.objects;
 
-import com.bgsoftware.wildtools.utils.BukkitUtil;
+import com.bgsoftware.wildtools.api.objects.tools.Tool;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -10,6 +10,7 @@ import org.bukkit.block.Dispenser;
 import com.bgsoftware.wildtools.WildToolsPlugin;
 import com.bgsoftware.wildtools.api.objects.Selection;
 import com.bgsoftware.wildtools.objects.tools.WCannonTool;
+import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -64,7 +65,7 @@ public final class WSelection implements Selection {
     }
 
     @Override
-    public List<Dispenser> getDispensers(){
+    public List<Dispenser> getDispensers(Tool tool){
         List<Dispenser> dispensers = new ArrayList<>();
 
         Location min = new Location(world, Math.min(rightClick.getBlockX(), leftClick.getBlockX()),
@@ -76,7 +77,7 @@ public final class WSelection implements Selection {
             for(int x = min.getBlockX(); x <= max.getBlockX(); x++){
                 for(int z = min.getBlockZ(); z <= max.getBlockZ(); z++){
                     Block block = world.getBlockAt(x, y, z);
-                    if(block.getType() == Material.DISPENSER && BukkitUtil.canInteract(Bukkit.getPlayer(uuid), block))
+                    if(block.getType() == Material.DISPENSER && plugin.getProviders().canInteract(Bukkit.getPlayer(uuid), block, tool))
                         dispensers.add((Dispenser) block.getState());
                 }
             }

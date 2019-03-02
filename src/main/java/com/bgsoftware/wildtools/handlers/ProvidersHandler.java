@@ -1,5 +1,6 @@
 package com.bgsoftware.wildtools.handlers;
 
+import com.bgsoftware.wildtools.api.objects.tools.Tool;
 import com.bgsoftware.wildtools.hooks.BlocksProvider;
 import com.bgsoftware.wildtools.hooks.BlocksProvider_ASkyblock;
 import com.bgsoftware.wildtools.hooks.BlocksProvider_AcidIsland;
@@ -123,17 +124,17 @@ public final class ProvidersHandler {
         factionsProvider.takeTNTFromBank(player, amount);
     }
 
-    public boolean canBreak(Player player, Block block, boolean onlyInClaim){
+    public boolean canBreak(Player player, Block block, Tool tool){
         for(BlocksProvider blocksProvider : blocksProviders) {
-            if (!blocksProvider.canBreak(player, block, onlyInClaim))
+            if (!blocksProvider.canBreak(player, block, tool.isOnlyInsideClaim()))
                 return false;
         }
         return true;
     }
 
-    public boolean canInteract(Player player, Block block, boolean onlyInClaim){
+    public boolean canInteract(Player player, Block block, Tool tool){
         for(BlocksProvider blocksProvider : blocksProviders) {
-            if (!blocksProvider.canInteract(player, block, onlyInClaim))
+            if (!blocksProvider.canInteract(player, block, tool.isOnlyInsideClaim()))
                 return false;
         }
         return true;

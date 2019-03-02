@@ -1,5 +1,6 @@
 package com.bgsoftware.wildtools.api.objects;
 
+import com.bgsoftware.wildtools.api.objects.tools.Tool;
 import org.bukkit.Location;
 import org.bukkit.block.Dispenser;
 
@@ -15,7 +16,7 @@ public interface Selection {
 
     boolean isInside();
 
-    List<Dispenser> getDispensers();
+    List<Dispenser> getDispensers(Tool tool);
 
     void remove();
 
