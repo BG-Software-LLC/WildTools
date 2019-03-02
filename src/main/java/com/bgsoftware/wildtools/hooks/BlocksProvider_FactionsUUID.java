@@ -14,7 +14,7 @@ public final class BlocksProvider_FactionsUUID implements BlocksProvider {
     public boolean canBreak(Player player, Block block, boolean onlyInClaim) {
         FPlayer fPlayer = FPlayers.getInstance().getByPlayer(player);
         Faction faction = Board.getInstance().getFactionAt(new FLocation(block.getLocation()));
-        if(onlyInClaim && faction == null) return false;
-        return faction == null || fPlayer.isAdminBypassing() || (fPlayer.hasFaction() && fPlayer.getFaction().equals(faction));
+        if(onlyInClaim && faction.isWilderness()) return false;
+        return faction.isWilderness() || fPlayer.isAdminBypassing() || (fPlayer.hasFaction() && fPlayer.getFaction().equals(faction));
     }
 }
