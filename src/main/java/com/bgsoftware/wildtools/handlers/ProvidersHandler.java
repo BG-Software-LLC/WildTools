@@ -12,7 +12,6 @@ import com.bgsoftware.wildtools.hooks.BlocksProvider_SuperiorSkyblock;
 import com.bgsoftware.wildtools.hooks.BlocksProvider_Towny;
 import com.bgsoftware.wildtools.hooks.BlocksProvider_Villages;
 import com.bgsoftware.wildtools.hooks.BlocksProvider_WorldGuard;
-import com.gmail.nossr50.util.player.UserManager;
 
 import com.google.common.collect.Lists;
 import net.milkbowl.vault.economy.Economy;
@@ -22,11 +21,6 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import com.bgsoftware.wildtools.hooks.AntiCheatProvider;
-import com.bgsoftware.wildtools.hooks.AntiCheatProvider_AAC;
-import com.bgsoftware.wildtools.hooks.AntiCheatProvider_Default;
-import com.bgsoftware.wildtools.hooks.AntiCheatProvider_NoCheatPlus;
-import com.bgsoftware.wildtools.hooks.AntiCheatProvider_Spartan;
 import com.bgsoftware.wildtools.hooks.FactionsProvider;
 import com.bgsoftware.wildtools.hooks.FactionsProvider_Default;
 import com.bgsoftware.wildtools.hooks.FactionsProvider_SavageFactions;
@@ -45,19 +39,10 @@ public final class ProvidersHandler {
     private Economy economy;
 
     private List<BlocksProvider> blocksProviders = Lists.newArrayList();
-    private AntiCheatProvider antiCheatProvider;
     private PricesProvider pricesProvider;
     private FactionsProvider factionsProvider;
 
     public ProvidersHandler(){
-        //AntiCheat Hookup
-        if(Bukkit.getPluginManager().isPluginEnabled("NoCheatPlus"))
-            antiCheatProvider = new AntiCheatProvider_NoCheatPlus();
-        else if(Bukkit.getPluginManager().isPluginEnabled("Spartan"))
-            antiCheatProvider = new AntiCheatProvider_Spartan();
-        else if(Bukkit.getPluginManager().isPluginEnabled("AAC"))
-            antiCheatProvider = new AntiCheatProvider_AAC();
-        else antiCheatProvider = new AntiCheatProvider_Default();
         //Prices Plugin Hookup
         if(pricesPlugin.equalsIgnoreCase("ShopGUIPlus") && Bukkit.getPluginManager().isPluginEnabled("ShopGUIPlus"))
             pricesProvider = new PricesProvider_ShopGUIPlus();
@@ -100,14 +85,6 @@ public final class ProvidersHandler {
      * Hooks' methods
      */
 
-    public void enableAntiCheatBypass(Player player){
-        antiCheatProvider.enableBypass(player);
-    }
-
-    public void disableAntiCheatBypass(Player player){
-        antiCheatProvider.disableBypass(player);
-    }
-
     public double getPrice(Player player, ItemStack itemStack){
         try {
             return pricesProvider.getPrice(player, itemStack);
@@ -147,12 +124,6 @@ public final class ProvidersHandler {
     public void enableVault(){
         isVaultEnabled = true;
         economy = Bukkit.getServicesManager().getRegistration(Economy.class).getProvider();
-    }
-
-    public void toggleChatNotifications(Player player){
-        if(Bukkit.getPluginManager().isPluginEnabled("mcMMO")){
-            UserManager.getPlayer(player).toggleChatNotifications();
-        }
     }
 
     @SuppressWarnings("UnusedReturnValue")
