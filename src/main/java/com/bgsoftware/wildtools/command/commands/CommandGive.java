@@ -67,7 +67,7 @@ public final class CommandGive implements ICommand {
         int uses = -1;
         int amount = 1;
 
-        if(args.length == 4){
+        if(args.length >= 4){
             if(!NumberUtils.isDigits(args[3])){
                 Locale.INVALID_NUMBER.send(sender, args[3]);
                 return;
