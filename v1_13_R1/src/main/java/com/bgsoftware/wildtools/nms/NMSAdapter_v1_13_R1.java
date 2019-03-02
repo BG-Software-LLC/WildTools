@@ -240,7 +240,7 @@ public final class NMSAdapter_v1_13_R1 implements NMSAdapter {
         return new Enchantment(NamespacedKey.minecraft("glowing_enchant")) {
             @Override
             public String getName() {
-                return "";
+                return "WildToolsGlow";
             }
 
             @Override

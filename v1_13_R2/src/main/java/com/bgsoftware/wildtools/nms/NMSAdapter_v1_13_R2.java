@@ -16,7 +16,6 @@ import net.minecraft.server.v1_13_R2.Item;
 import net.minecraft.server.v1_13_R2.ItemStack;
 import net.minecraft.server.v1_13_R2.Items;
 import net.minecraft.server.v1_13_R2.NBTTagCompound;
-import net.minecraft.server.v1_13_R2.PlayerInteractManager;
 import net.minecraft.server.v1_13_R2.PlayerInventory;
 import net.minecraft.server.v1_13_R2.World;
 
@@ -241,7 +240,7 @@ public class NMSAdapter_v1_13_R2 implements NMSAdapter {
         return new org.bukkit.enchantments.Enchantment(NamespacedKey.minecraft("glowing_enchant")) {
             @Override
             public String getName() {
-                return "";
+                return "WildToolsGlow";
             }
 
             @Override

@@ -256,7 +256,7 @@ public final class NMSAdapter_v1_7_R3 implements NMSAdapter {
         return new Enchantment(101) {
             @Override
             public String getName() {
-                return "";
+                return "WildToolsGlow";
             }
 
             @Override
