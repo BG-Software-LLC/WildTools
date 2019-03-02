@@ -1,11 +1,23 @@
 package com.bgsoftware.wildtools.handlers;
 
+import com.bgsoftware.wildtools.hooks.BlocksProvider;
+import com.bgsoftware.wildtools.hooks.BlocksProvider_ASkyblock;
+import com.bgsoftware.wildtools.hooks.BlocksProvider_AcidIsland;
+import com.bgsoftware.wildtools.hooks.BlocksProvider_BentoBox;
+import com.bgsoftware.wildtools.hooks.BlocksProvider_FactionsUUID;
+import com.bgsoftware.wildtools.hooks.BlocksProvider_GriefPrevention;
+import com.bgsoftware.wildtools.hooks.BlocksProvider_MassiveFactions;
+import com.bgsoftware.wildtools.hooks.BlocksProvider_SuperiorSkyblock;
+import com.bgsoftware.wildtools.hooks.BlocksProvider_Towny;
+import com.bgsoftware.wildtools.hooks.BlocksProvider_Villages;
+import com.bgsoftware.wildtools.hooks.BlocksProvider_WorldGuard;
 import com.gmail.nossr50.util.player.UserManager;
 
+import com.google.common.collect.Lists;
 import net.milkbowl.vault.economy.Economy;
 
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -14,10 +26,6 @@ import com.bgsoftware.wildtools.hooks.AntiCheatProvider_AAC;
 import com.bgsoftware.wildtools.hooks.AntiCheatProvider_Default;
 import com.bgsoftware.wildtools.hooks.AntiCheatProvider_NoCheatPlus;
 import com.bgsoftware.wildtools.hooks.AntiCheatProvider_Spartan;
-import com.bgsoftware.wildtools.hooks.ClaimProvider;
-import com.bgsoftware.wildtools.hooks.ClaimProvider_Default;
-import com.bgsoftware.wildtools.hooks.ClaimProvider_Factions;
-import com.bgsoftware.wildtools.hooks.ClaimProvider_FactionsUUID;
 import com.bgsoftware.wildtools.hooks.FactionsProvider;
 import com.bgsoftware.wildtools.hooks.FactionsProvider_Default;
 import com.bgsoftware.wildtools.hooks.FactionsProvider_SavageFactions;
@@ -26,6 +34,8 @@ import com.bgsoftware.wildtools.hooks.PricesProvider_Default;
 import com.bgsoftware.wildtools.hooks.PricesProvider_Essentials;
 import com.bgsoftware.wildtools.hooks.PricesProvider_ShopGUIPlus;
 
+import java.util.List;
+
 public final class ProvidersHandler {
 
     static String pricesPlugin;
@@ -33,10 +43,10 @@ public final class ProvidersHandler {
     private boolean isVaultEnabled = false;
     private Economy economy;
 
+    private List<BlocksProvider> blocksProviders = Lists.newArrayList();
     private AntiCheatProvider antiCheatProvider;
     private PricesProvider pricesProvider;
     private FactionsProvider factionsProvider;
-    private ClaimProvider claimProvider;
 
     public ProvidersHandler(){
         //AntiCheat Hookup
@@ -59,9 +69,30 @@ public final class ProvidersHandler {
             factionsProvider = new FactionsProvider_SavageFactions();
         else factionsProvider = new FactionsProvider_Default();
         //Claim Hookup
+        if(Bukkit.getPluginManager().isPluginEnabled("AcidIsland"))
+            blocksProviders.add(new BlocksProvider_AcidIsland());
+        if(Bukkit.getPluginManager().isPluginEnabled("ASkyBlock"))
+            blocksProviders.add(new BlocksProvider_ASkyblock());
+        if(Bukkit.getPluginManager().isPluginEnabled("BentoBox"))
+            blocksProviders.add(new BlocksProvider_BentoBox());
         if(Bukkit.getPluginManager().isPluginEnabled("Factions")){
-                claimProvider = Bukkit.getPluginManager().isPluginEnabled("MassiveCore") ? new ClaimProvider_Factions() : new ClaimProvider_FactionsUUID();
-        }else claimProvider = new ClaimProvider_Default();
+            if(Bukkit.getPluginManager().isPluginEnabled("MassiveCore")){
+                blocksProviders.add(new BlocksProvider_MassiveFactions());
+            }else {
+                blocksProviders.add(new BlocksProvider_FactionsUUID());
+            }
+        }
+        if(Bukkit.getPluginManager().isPluginEnabled("GriefPrevention"))
+            blocksProviders.add(new BlocksProvider_GriefPrevention());
+        if(Bukkit.getPluginManager().isPluginEnabled("SuperiorSkyblock2"))
+            blocksProviders.add(new BlocksProvider_SuperiorSkyblock());
+        if(Bukkit.getPluginManager().isPluginEnabled("Towny"))
+            blocksProviders.add(new BlocksProvider_Towny());
+        if(Bukkit.getPluginManager().isPluginEnabled("Villages"))
+            blocksProviders.add(new BlocksProvider_Villages());
+        if(Bukkit.getPluginManager().isPluginEnabled("WorldGuard"))
+            blocksProviders.add(new BlocksProvider_WorldGuard());
+
     }
 
     /*
@@ -92,8 +123,20 @@ public final class ProvidersHandler {
         factionsProvider.takeTNTFromBank(player, amount);
     }
 
-    public boolean inClaim(Player player, Location location){
-        return claimProvider.inClaim(player, location);
+    public boolean canBreak(Player player, Block block, boolean onlyInClaim){
+        for(BlocksProvider blocksProvider : blocksProviders) {
+            if (!blocksProvider.canBreak(player, block, onlyInClaim))
+                return false;
+        }
+        return true;
+    }
+
+    public boolean canInteract(Player player, Block block, boolean onlyInClaim){
+        for(BlocksProvider blocksProvider : blocksProviders) {
+            if (!blocksProvider.canInteract(player, block, onlyInClaim))
+                return false;
+        }
+        return true;
     }
 
     /*
