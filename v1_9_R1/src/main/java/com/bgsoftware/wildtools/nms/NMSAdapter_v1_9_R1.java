@@ -307,5 +307,5 @@ public final class NMSAdapter_v1_9_R1 implements NMSAdapter {
         return location.getBlockX() > (worldBorder.getCenter().getBlockX() + radius) || location.getBlockX() < (worldBorder.getCenter().getBlockX() - radius) ||
                 location.getBlockZ() > (worldBorder.getCenter().getBlockZ() + radius) || location.getBlockZ() < (worldBorder.getCenter().getBlockZ() - radius);
     }
-    
+
 }
