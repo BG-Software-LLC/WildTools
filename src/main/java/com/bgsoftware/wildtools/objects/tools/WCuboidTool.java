@@ -30,20 +30,21 @@ public final class WCuboidTool extends WTool implements CuboidTool {
         Location max = e.getBlock().getLocation().add(radius, radius, radius),
                 min = e.getBlock().getLocation().subtract(radius, radius, radius);
 
+        Material firstType = e.getBlock().getType();
+        short firstData = e.getBlock().getState().getData().toItemStack().getDurability();
+
         for(int x = min.getBlockX(); x <= max.getBlockX(); x++){
             for(int z = min.getBlockZ(); z <= max.getBlockZ(); z++){
                 for(int y = min.getBlockY(); y <= max.getBlockY(); y++){
                     Block targetBlock = e.getPlayer().getWorld().getBlockAt(x, y, z);
-                    if(canBreakBlock(e.getBlock(), targetBlock)) {
-                        if(!plugin.getProviders().canBreak(e.getPlayer(), targetBlock, this))
-                            continue;
-                        BukkitUtil.breakNaturally(e.getPlayer(), targetBlock, this);
-                        //Tool is using durability, reduces every block
-                        if(!isUnbreakable() && isUsingDurability() && e.getPlayer().getGameMode() != GameMode.CREATIVE)
-                            reduceDurablility(e.getPlayer());
-                        if(plugin.getNMSAdapter().getItemInHand(e.getPlayer()) == null)
-                            break;
-                    }
+                    if(!plugin.getProviders().canBreak(e.getPlayer(), targetBlock, firstType, firstData, this))
+                        continue;
+                    BukkitUtil.breakNaturally(e.getPlayer(), targetBlock, this);
+                    //Tool is using durability, reduces every block
+                    if(!isUnbreakable() && isUsingDurability() && e.getPlayer().getGameMode() != GameMode.CREATIVE)
+                        reduceDurablility(e.getPlayer());
+                    if(plugin.getNMSAdapter().getItemInHand(e.getPlayer()) == null)
+                        break;
                 }
             }
         }

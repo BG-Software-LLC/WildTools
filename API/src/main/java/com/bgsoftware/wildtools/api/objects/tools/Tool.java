@@ -97,7 +97,7 @@ public interface Tool {
 
     void reduceDurablility(Player pl);
 
-    boolean canBreakBlock(Block firstBlock, Block targetBlock);
+    boolean canBreakBlock(Block block, Material firstType, short data);
 
     List<ItemStack> filterDrops(List<ItemStack> drops);
 

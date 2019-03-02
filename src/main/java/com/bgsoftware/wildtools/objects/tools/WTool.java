@@ -323,14 +323,14 @@ public abstract class WTool implements Tool {
     }
 
     @Override
-    public boolean canBreakBlock(Block firstBlock, Block targetBlock){
-        if(targetBlock.getType() == null || targetBlock.getType() == Material.AIR)
+    public boolean canBreakBlock(Block block, Material firstType, short firstData){
+        if(block.getType() == null || block.getType() == Material.AIR)
             return false;
-        if(onlySameType && (firstBlock.getType() != targetBlock.getType() || firstBlock.getData() != targetBlock.getData()))
+        if(onlySameType && (firstType != block.getType() || firstData != block.getData()))
             return false;
-        if(hasBlacklistedMaterials() && isBlacklistedMaterial(targetBlock.getType(), targetBlock.getData()))
+        if(hasBlacklistedMaterials() && isBlacklistedMaterial(block.getType(), block.getData()))
             return false;
-        if(hasWhitelistedMaterials() && !isWhitelistedMaterial(targetBlock.getType(), targetBlock.getData()))
+        if(hasWhitelistedMaterials() && !isWhitelistedMaterial(block.getType(), block.getData()))
             return false;
         return true;
     }

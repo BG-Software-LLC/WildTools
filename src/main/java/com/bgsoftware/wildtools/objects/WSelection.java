@@ -10,7 +10,6 @@ import org.bukkit.block.Dispenser;
 import com.bgsoftware.wildtools.WildToolsPlugin;
 import com.bgsoftware.wildtools.api.objects.Selection;
 import com.bgsoftware.wildtools.objects.tools.WCannonTool;
-import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.List;

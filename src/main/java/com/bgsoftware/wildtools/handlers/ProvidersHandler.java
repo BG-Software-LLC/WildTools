@@ -18,6 +18,7 @@ import com.google.common.collect.Lists;
 import net.milkbowl.vault.economy.Economy;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -105,7 +106,12 @@ public final class ProvidersHandler {
     }
 
     public boolean canBreak(Player player, Block block, Tool tool){
-        if(plugin.getNMSAdapter().isOutsideWorldborder(block.getLocation()))
+        return canBreak(player, block, block.getType(), block.getState().getData().toItemStack().getDurability(), tool);
+    }
+
+    public boolean canBreak(Player player, Block block, Material firstType, short firstData, Tool tool){
+        if(!tool.canBreakBlock(block, firstType, firstData) || plugin.getNMSAdapter().isOutsideWorldborder(block.getLocation()) ||
+            block.getType() == Material.BEDROCK)
             return false;
 
         for(BlocksProvider blocksProvider : blocksProviders) {
@@ -116,7 +122,12 @@ public final class ProvidersHandler {
     }
 
     public boolean canInteract(Player player, Block block, Tool tool){
-        if(plugin.getNMSAdapter().isOutsideWorldborder(block.getLocation()))
+        return canInteract(player, block, block.getType(), block.getState().getData().toItemStack().getDurability(), tool);
+    }
+
+    @SuppressWarnings("WeakerAccess")
+    public boolean canInteract(Player player, Block block, Material firstType, short firstData, Tool tool){
+        if(!tool.canBreakBlock(block, firstType, firstData) || plugin.getNMSAdapter().isOutsideWorldborder(block.getLocation()))
             return false;
 
         for(BlocksProvider blocksProvider : blocksProviders) {

@@ -21,19 +21,20 @@ public final class WPillarTool extends WTool implements PillarTool {
         int maxY = getPoint(e.getClickedBlock(), true), minY = getPoint(e.getClickedBlock(), false),
                 x = e.getClickedBlock().getLocation().getBlockX(), z = e.getClickedBlock().getLocation().getBlockZ();
 
+        Material firstType = e.getClickedBlock().getType();
+        short firstData = e.getClickedBlock().getState().getData().toItemStack().getDurability();
+
         for(int y = maxY; y >= minY; y--){
             Block targetBlock = e.getPlayer().getWorld().getBlockAt(x, y, z);
-            if(canBreakBlock(e.getClickedBlock(), targetBlock)) {
-                if(!plugin.getProviders().canBreak(e.getPlayer(), targetBlock, this))
-                    continue;
-                BukkitUtil.breakNaturally(e.getPlayer(), targetBlock, this);
-                //Tool is using durability, reduces every block
-                if(!isUnbreakable() && isUsingDurability() && e.getPlayer().getGameMode() != GameMode.CREATIVE){
-                    reduceDurablility(e.getPlayer());
-                }
-                if(plugin.getNMSAdapter().getItemInHand(e.getPlayer()) == null) {
-                    break;
-                }
+            if(!plugin.getProviders().canBreak(e.getPlayer(), targetBlock, firstType, firstData, this))
+                continue;
+            BukkitUtil.breakNaturally(e.getPlayer(), targetBlock, this);
+            //Tool is using durability, reduces every block
+            if(!isUnbreakable() && isUsingDurability() && e.getPlayer().getGameMode() != GameMode.CREATIVE){
+                reduceDurablility(e.getPlayer());
+            }
+            if(plugin.getNMSAdapter().getItemInHand(e.getPlayer()) == null) {
+                break;
             }
         }
 
@@ -48,7 +49,7 @@ public final class WPillarTool extends WTool implements PillarTool {
         if(max) {
             while (isSameBlock) {
                 loc = loc.clone().add(0, 1, 0);
-                isSameBlock = canBreakBlock(bl, loc.getBlock()) && loc.getBlockY() <= 256;
+                isSameBlock = canBreakBlock(bl, loc.getBlock().getType(), loc.getBlock().getState().getData().toItemStack().getDurability()) && loc.getBlockY() <= 256;
             }
         }
 
@@ -56,7 +57,7 @@ public final class WPillarTool extends WTool implements PillarTool {
         else{
             while(isSameBlock){
                 loc = loc.clone().subtract(0, 1, 0);
-                isSameBlock = canBreakBlock(bl, loc.getBlock()) && loc.getBlockY() >= 0;
+                isSameBlock = canBreakBlock(bl, loc.getBlock().getType(), loc.getBlock().getState().getData().toItemStack().getDurability()) && loc.getBlockY() >= 0;
             }
         }
 
