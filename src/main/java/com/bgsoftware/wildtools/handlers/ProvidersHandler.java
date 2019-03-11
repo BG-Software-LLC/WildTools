@@ -6,6 +6,7 @@ import com.bgsoftware.wildtools.hooks.BlocksProvider;
 import com.bgsoftware.wildtools.hooks.BlocksProvider_ASkyblock;
 import com.bgsoftware.wildtools.hooks.BlocksProvider_AcidIsland;
 import com.bgsoftware.wildtools.hooks.BlocksProvider_BentoBox;
+import com.bgsoftware.wildtools.hooks.BlocksProvider_FabledSkyblock;
 import com.bgsoftware.wildtools.hooks.BlocksProvider_FactionsUUID;
 import com.bgsoftware.wildtools.hooks.BlocksProvider_GriefPrevention;
 import com.bgsoftware.wildtools.hooks.BlocksProvider_MassiveFactions;
@@ -65,6 +66,8 @@ public final class ProvidersHandler {
             blocksProviders.add(new BlocksProvider_ASkyblock());
         if(Bukkit.getPluginManager().isPluginEnabled("BentoBox"))
             blocksProviders.add(new BlocksProvider_BentoBox());
+        if(Bukkit.getPluginManager().isPluginEnabled("FabledSkyBlock"))
+            blocksProviders.add(new BlocksProvider_FabledSkyblock());
         if(Bukkit.getPluginManager().isPluginEnabled("Factions")){
             if(Bukkit.getPluginManager().isPluginEnabled("MassiveCore")){
                 blocksProviders.add(new BlocksProvider_MassiveFactions());
