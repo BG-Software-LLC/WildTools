@@ -11,7 +11,7 @@ public final class BlocksProvider_FabledSkyblock implements BlocksProvider {
     @Override
     public boolean canBreak(Player player, Block block, boolean onlyInClaim) {
         Island island = SkyBlockAPI.getIslandManager().getIslandAtLocation(block.getLocation());
-        if(onlyInClaim && island != null) return false;
-        return island == null || island.getRole(player) != IslandRole.VISITOR;
+        if(onlyInClaim && island == null) return false;
+        return island == null || (island.getRole(player) != null && island.getRole(player) != IslandRole.VISITOR);
     }
 }
