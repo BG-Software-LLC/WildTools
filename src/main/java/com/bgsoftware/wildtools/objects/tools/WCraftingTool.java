@@ -4,6 +4,7 @@ import com.bgsoftware.wildtools.utils.ItemUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.FurnaceRecipe;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
@@ -16,6 +17,7 @@ import com.bgsoftware.wildtools.api.objects.tools.CraftingTool;
 import com.bgsoftware.wildtools.api.objects.ToolMode;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -62,6 +64,8 @@ public final class WCraftingTool extends WTool implements CraftingTool {
                     ingredients = getIngredients(new ArrayList<>(((ShapedRecipe) recipe).getIngredientMap().values()));
                 } else if (recipe instanceof ShapelessRecipe) {
                     ingredients = getIngredients(((ShapelessRecipe) recipe).getIngredientList());
+                } else if(recipe instanceof FurnaceRecipe){
+                    ingredients = Collections.singletonList(((FurnaceRecipe) recipe).getInput());
                 } else continue;
 
                 if (ingredients.isEmpty())
@@ -77,7 +81,9 @@ public final class WCraftingTool extends WTool implements CraftingTool {
                     for (ItemStack ingredient : ingredients) {
                         ItemStack cloned = ingredient.clone();
                         cloned.setAmount(ingredient.getAmount() * amountOfRecipes);
-                        inventory.removeItem(cloned);
+                        if(ingredient.getDurability() == Short.MAX_VALUE)
+                            inventory.remove(cloned.getType());
+                        else inventory.removeItem(cloned);
                     }
                     ItemStack result = recipe.getResult().clone();
                     result.setAmount(result.getAmount() * amountOfRecipes);
@@ -134,9 +140,15 @@ public final class WCraftingTool extends WTool implements CraftingTool {
     private int countItems(ItemStack itemStack, Inventory inventory){
         int amount = 0;
 
+        ItemStack cloned = itemStack.clone();
+
         for(ItemStack _itemStack : inventory.getContents()){
-            if(_itemStack != null && _itemStack.isSimilar(itemStack))
-                amount += _itemStack.getAmount();
+            if(_itemStack != null) {
+                if (itemStack.getDurability() == Short.MAX_VALUE)
+                    cloned.setDurability(_itemStack.getDurability());
+                if (_itemStack.isSimilar(cloned))
+                    amount += _itemStack.getAmount();
+            }
         }
 
         return amount;
