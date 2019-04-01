@@ -24,6 +24,17 @@ public final class WBuilderTool extends WTool implements BuilderTool {
     }
 
     @Override
+    public boolean canBreakBlock(Block block, Material firstType, short firstData) {
+        if(isOnlySameType() && (firstType != block.getType() || firstData != block.getData()))
+            return false;
+        if(hasBlacklistedMaterials() && isBlacklistedMaterial(block.getType(), block.getData()))
+            return false;
+        if(hasWhitelistedMaterials() && !isWhitelistedMaterial(block.getType(), block.getData()))
+            return false;
+        return true;
+    }
+
+    @Override
     public boolean onBlockInteract(PlayerInteractEvent e) {
         BlockFace blockFace = e.getBlockFace();
 
