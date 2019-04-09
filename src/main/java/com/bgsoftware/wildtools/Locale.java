@@ -1,8 +1,9 @@
 package com.bgsoftware.wildtools;
 
+import com.bgsoftware.wildtools.config.CommentedConfiguration;
+import com.bgsoftware.wildtools.config.LangComments;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
 import java.util.HashMap;
@@ -102,11 +103,10 @@ public final class Locale {
         if(!file.exists())
             WildToolsPlugin.getPlugin().saveResource("lang.yml", false);
 
-        YamlConfiguration cfg = YamlConfiguration.loadConfiguration(file);
+        CommentedConfiguration cfg = new CommentedConfiguration(LangComments.class);
+        cfg.load(file);
 
-        //Convert old data
-        if(cfg.contains("CLICKED_INVALID_CONTAINER"))
-            cfg.set("INVALID_CONTAINER_SELL_WAND", cfg.getString("CLICKED_INVALID_CONTAINER"));
+        cfg.resetYamlFile(WildToolsPlugin.getPlugin(), "lang.yml");
 
         for(String identifier : localeMap.keySet())
             localeMap.get(identifier).setMessage(ChatColor.translateAlternateColorCodes('&', cfg.getString(identifier, "")));

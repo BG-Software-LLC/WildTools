@@ -5,7 +5,7 @@
 ##                                                ##
 ####################################################
 
-#If you want to disable a message, set it to '' (empty)
+# If you want to disable a message, set it to '' (empty)
 
 # Called when a player doesn't have the required block.
 BUILDER_NO_BLOCK: '&b&lWildTools &7You must have at least x1 {0} for building a pillar.'
