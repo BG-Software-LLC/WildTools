@@ -36,16 +36,27 @@ public final class WDrainTool extends WTool implements DrainTool {
         Location max = block.getLocation().clone().add(radius, radius, radius),
                 min = block.getLocation().clone().subtract(radius, radius, radius);
 
+        boolean reduceDurability = false;
+
+        outerLoop:
         for(int x = min.getBlockX(); x <= max.getBlockX(); x++){
             for(int z = min.getBlockZ(); z <= max.getBlockZ(); z++){
                 for(int y = max.getBlockY(); y >= min.getBlockY(); y--){
                     Block targetBlock = block.getWorld().getBlockAt(x, y, z);
                     if(targetBlock.getType() == Material.ICE && plugin.getProviders().canBreak(player, targetBlock, this)){
                         targetBlock.setType(Material.AIR);
+                        if(isUsingDurability())
+                            reduceDurablility(player);
+                        if(plugin.getNMSAdapter().getItemInHand(player).getType() == Material.AIR)
+                            break outerLoop;
+                        reduceDurability = true;
                     }
                 }
             }
         }
+
+        if(reduceDurability && !isUsingDurability())
+            reduceDurablility(player);
 
         return true;
     }

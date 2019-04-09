@@ -1,6 +1,7 @@
 package com.bgsoftware.wildtools.objects.tools;
 
 import com.bgsoftware.wildtools.utils.ItemUtil;
+import org.bukkit.GameMode;
 import org.bukkit.block.Block;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -285,7 +286,7 @@ public abstract class WTool implements Tool {
     public void reduceDurablility(Player pl){
         ItemStack is = plugin.getNMSAdapter().getItemInHand(pl).clone();
 
-        if(isUnbreakable())
+        if(isUnbreakable() || pl.getGameMode() == GameMode.CREATIVE)
             return;
 
         if(isUsingDurability()){
@@ -300,7 +301,7 @@ public abstract class WTool implements Tool {
 
             is.setDurability((short) (is.getDurability() + 1));
 
-            if(is.getDurability() >= is.getType().getMaxDurability()) {
+            if(is.getDurability() > is.getType().getMaxDurability()) {
                 is = new ItemStack(Material.AIR);
             }
         }

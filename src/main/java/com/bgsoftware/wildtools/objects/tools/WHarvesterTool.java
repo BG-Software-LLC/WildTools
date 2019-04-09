@@ -120,6 +120,9 @@ public final class WHarvesterTool extends WTool implements HarvesterTool {
                                 targetBlock.getRelative(BlockFace.UP).getType() == Material.AIR) {
                             if (plugin.getProviders().canBreak(player, targetBlock, this)) {
                                 targetBlock.setType(WMaterial.FARMLAND.parseMaterial());
+                                //Tool is using durability, reduces every block
+                                if (!isUnbreakable() && isUsingDurability() && player.getGameMode() != GameMode.CREATIVE)
+                                    reduceDurablility(player);
                             }
                         }
                     }
@@ -133,6 +136,9 @@ public final class WHarvesterTool extends WTool implements HarvesterTool {
         double totalPrice = 0;
         List<ItemStack> toSell = new ArrayList<>();
 
+        boolean reduceDurability = false;
+
+        outerLoop:
         for(int y = max.getBlockY(); y >= min.getBlockY(); y--) {
             for (int x = min.getBlockX(); x <= max.getBlockX(); x++) {
                 for (int z = min.getBlockZ(); z <= max.getBlockZ(); z++) {
@@ -157,12 +163,6 @@ public final class WHarvesterTool extends WTool implements HarvesterTool {
                                     else
                                         player.getWorld().dropItemNaturally(block.getLocation(), drop);
                                 }
-                                //Tool is using durability, reduces every block
-                                if (!isUnbreakable() && isUsingDurability() && player.getGameMode() != GameMode.CREATIVE)
-                                    reduceDurablility(player);
-                                if (plugin.getNMSAdapter().getItemInHand(player) == null) {
-                                    break;
-                                }
                             }
                             if(targetBlock.getType() == Material.CACTUS || targetBlock.getType() == WMaterial.SUGAR_CANE.parseMaterial() ||
                                     targetBlock.getType() == WMaterial.MELON.parseMaterial() || targetBlock.getType() == Material.PUMPKIN)
@@ -170,6 +170,12 @@ public final class WHarvesterTool extends WTool implements HarvesterTool {
                             else{
                                 plugin.getNMSAdapter().setCropState(targetBlock, CropState.SEEDED);
                             }
+                            //Tool is using durability, reduces every block
+                            if (isUsingDurability())
+                                reduceDurablility(player);
+                            if (plugin.getNMSAdapter().getItemInHand(player).getType() == Material.AIR)
+                                break outerLoop;
+                            reduceDurability = true;
                         }
                     }
                 }
@@ -191,6 +197,10 @@ public final class WHarvesterTool extends WTool implements HarvesterTool {
                         .replace("{0}", toSell.size() + "").replace("{1}", totalPrice + ""));
             }
         }
+
+        //Tool is not using durability, reduces once per use
+        if (reduceDurability && !isUsingDurability())
+            reduceDurablility(player);
 
         return true;
     }

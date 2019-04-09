@@ -16,7 +16,9 @@ public final class Locale {
     public static Locale COMMAND_USAGE = new Locale("COMMAND_USAGE");
     public static Locale COOLDOWN_TIME = new Locale("COOLDOWN_TIME");
     public static Locale CRAFT_SUCCESS = new Locale("CRAFT_SUCCESS");
+    public static Locale NO_CRAFT_ITEMS = new Locale("NO_CRAFT_ITEMS");
     public static Locale FILLED_DISPENSERS = new Locale("FILLED_DISPENSERS");
+    public static Locale NO_FILLED_DISPENSERS = new Locale("NO_FILLED_DISPENSERS");
     public static Locale GIVE_TOOL_SUCCESS = new Locale("GIVE_TOOL_SUCCESS");
     public static Locale HARVESTER_SELL_SUCCEED = new Locale("HARVESTER_SELL_SUCCEED");
     public static Locale HELP_COMMAND_HEADER = new Locale("HELP_COMMAND_HEADER");
@@ -38,7 +40,9 @@ public final class Locale {
     public static Locale SELL_MODE_ENABLED = new Locale("SELL_MODE_ENABLED");
     public static Locale SELL_MODE_DISABLED = new Locale("SELL_MODE_DISABLED");
     public static Locale SOLD_CHEST = new Locale("SOLD_CHEST");
+    public static Locale NO_SELL_ITEMS = new Locale("NO_SELL_ITEMS");
     public static Locale SORTED_CHEST = new Locale("SORTED_CHEST");
+    public static Locale NO_SORT_ITEMS = new Locale("NO_SORT_ITEMS");
     public static Locale TOOL_INFO_HEADER = new Locale("TOOL_INFO_HEADER");
     public static Locale TOOL_INFO_NAME = new Locale("TOOL_INFO_NAME");
     public static Locale TOOL_INFO_MODE = new Locale("TOOL_INFO_MODE");

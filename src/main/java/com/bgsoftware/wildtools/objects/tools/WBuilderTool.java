@@ -24,6 +24,7 @@ public final class WBuilderTool extends WTool implements BuilderTool {
     }
 
     @Override
+    @SuppressWarnings("all")
     public boolean canBreakBlock(Block block, Material firstType, short firstData) {
         if(isOnlySameType() && (firstType != block.getType() || firstData != block.getData()))
             return false;
@@ -37,6 +38,8 @@ public final class WBuilderTool extends WTool implements BuilderTool {
     @Override
     public boolean onBlockInteract(PlayerInteractEvent e) {
         BlockFace blockFace = e.getBlockFace();
+
+        boolean reduceDurablity = false;
 
         Block nextBlock = e.getClickedBlock();
         for(int i = 0; i < length; i++){
@@ -54,7 +57,18 @@ public final class WBuilderTool extends WTool implements BuilderTool {
 
             e.getPlayer().getInventory().removeItem(blockItemStack);
             plugin.getNMSAdapter().copyBlock(e.getClickedBlock(), nextBlock);
+
+            if(isUsingDurability())
+                reduceDurablility(e.getPlayer());
+
+            if(plugin.getNMSAdapter().getItemInHand(e.getPlayer()).getType() == Material.AIR)
+                break;
+
+            reduceDurablity = true;
         }
+
+        if(reduceDurablity && !isUsingDurability())
+            reduceDurablility(e.getPlayer());
 
         return true;
     }

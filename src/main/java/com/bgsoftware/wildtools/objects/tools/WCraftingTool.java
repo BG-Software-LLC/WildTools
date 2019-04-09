@@ -96,7 +96,13 @@ public final class WCraftingTool extends WTool implements CraftingTool {
             for(ItemStack itemStack : toAdd)
                 ItemUtil.addItem(itemStack, inventory, e.getClickedBlock().getLocation());
 
-            Locale.CRAFT_SUCCESS.send(e.getPlayer(), craftedItemsAmount);
+            if(craftedItemsAmount > 0){
+                reduceDurablility(e.getPlayer());
+                Locale.CRAFT_SUCCESS.send(e.getPlayer(), craftedItemsAmount);
+            }else{
+                Locale.NO_CRAFT_ITEMS.send(e.getPlayer());
+            }
+
         }).start();
 
         return true;

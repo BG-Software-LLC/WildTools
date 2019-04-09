@@ -18,9 +18,11 @@ COOLDOWN_TIME: '&b&lWildTools &7Please wait {0} before using this tool.'
 
 # Called when a player uses a crafting wand on a chest.
 CRAFT_SUCCESS: '&b&lWildTools &7Successfully crafted x{0} items.'
+NO_CRAFT_ITEMS: '&b&lWildTools &7There were no items to craft.'
 
-# Called when a player successfully filled all dispensers with cannon-tool.
+# Called when a player uses a cannon-tool.
 FILLED_DISPENSERS: '&b&lWildTools &7Successfully filled {0} dispensers with {1} tnt.'
+NO_FILLED_DISPENSERS: '&b&lWildTools &7There were no dispensers to fill.'
 
 # Called when a player successfully gave a tool to a player.
 GIVE_TOOL_SUCCESS: '&b&lWildTools &7Successfully gave x{0} {1} to {2}.'
@@ -74,11 +76,13 @@ SELECTION_NOT_READY: '&b&lWildTools &7You must select an area to fill all dispen
 SELL_MODE_ENABLED: '&b&lWildTools &7Enabled sell-mode for this harvester.'
 SELL_MODE_DISABLED: '&b&lWildTools &7Disabled sell-mode for this harvester.'
 
-# Called when a player successfully sold a container with a sell-tool.
+# Called when a player uses a sell-tool.
 SOLD_CHEST: '&b&lWildTools &7Successfully sold the container''s content for ${0}.'
+NO_SELL_ITEMS: '&b&lWildTools &7There were no items to sell.'
 
 # Called when a player successfully sorted a container with a sort-tool.
 SORTED_CHEST: '&b&lWildTools &7Successfully sorted this container.'
+NO_SORT_ITEMS: '&b&lWildTools &7There were no items to sort.'
 
 # Called when a player runs the info sub-command.
 # Optional sections will be seen only if it's applied for the tool.

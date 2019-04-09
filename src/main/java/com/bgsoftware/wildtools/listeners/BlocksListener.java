@@ -46,8 +46,6 @@ public final class BlocksListener implements Listener {
         if(tool.onBlockBreak(e)){
             e.setCancelled(true);
             tool.setLastUse(e.getPlayer().getUniqueId());
-            if(!tool.isUnbreakable() && e.getPlayer().getGameMode() != GameMode.CREATIVE)
-                tool.reduceDurablility(e.getPlayer());
         }
 
         WTool.toolBlockBreak.remove(e.getPlayer().getUniqueId());
@@ -92,8 +90,6 @@ public final class BlocksListener implements Listener {
         if(toolInteract){
             e.setCancelled(true);
             tool.setLastUse(e.getPlayer().getUniqueId());
-            if(!tool.isUnbreakable() && e.getPlayer().getGameMode() != GameMode.CREATIVE)
-                tool.reduceDurablility(e.getPlayer());
         }
 
         WTool.toolBlockBreak.remove(e.getPlayer().getUniqueId());

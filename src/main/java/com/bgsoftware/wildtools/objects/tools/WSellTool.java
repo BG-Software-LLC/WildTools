@@ -54,7 +54,9 @@ public final class WSellTool extends WTool implements SellTool {
                 }
             }
 
-            SellWandUseEvent sellWandUseEvent = new SellWandUseEvent(e.getPlayer(), (Chest) e.getClickedBlock().getState(), totalEarnings, Locale.SOLD_CHEST.getMessage());
+            String message = toSell.isEmpty() ? Locale.NO_SELL_ITEMS.getMessage() : Locale.SOLD_CHEST.getMessage();
+
+            SellWandUseEvent sellWandUseEvent = new SellWandUseEvent(e.getPlayer(), (Chest) e.getClickedBlock().getState(), totalEarnings, message);
             Bukkit.getPluginManager().callEvent(sellWandUseEvent);
 
             if(sellWandUseEvent.isCancelled())
@@ -67,7 +69,10 @@ public final class WSellTool extends WTool implements SellTool {
                 inventory.setItem(slot, new ItemStack(Material.AIR));
             }
 
-            String message = sellWandUseEvent.getMessage().replace("{0}", totalEarnings + "");
+            message = sellWandUseEvent.getMessage().replace("{0}", totalEarnings + "");
+
+            if(!toSell.isEmpty())
+                reduceDurablility(e.getPlayer());
 
             if(!message.isEmpty())
                 e.getPlayer().sendMessage(message);

@@ -5,7 +5,6 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import com.bgsoftware.wildtools.api.objects.tools.PillarTool;
 import com.bgsoftware.wildtools.api.objects.ToolMode;
 
-import org.bukkit.GameMode;
 import org.bukkit.block.Block;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -24,19 +23,24 @@ public final class WPillarTool extends WTool implements PillarTool {
         Material firstType = e.getClickedBlock().getType();
         short firstData = e.getClickedBlock().getState().getData().toItemStack().getDurability();
 
+        boolean reduceDurablity = false;
+
         for(int y = maxY; y >= minY; y--){
             Block targetBlock = e.getPlayer().getWorld().getBlockAt(x, y, z);
             if(!plugin.getProviders().canBreak(e.getPlayer(), targetBlock, firstType, firstData, this))
                 continue;
             BukkitUtil.breakNaturally(e.getPlayer(), targetBlock, this);
             //Tool is using durability, reduces every block
-            if(!isUnbreakable() && isUsingDurability() && e.getPlayer().getGameMode() != GameMode.CREATIVE){
+            if(isUsingDurability())
                 reduceDurablility(e.getPlayer());
-            }
-            if(plugin.getNMSAdapter().getItemInHand(e.getPlayer()) == null) {
+            if(plugin.getNMSAdapter().getItemInHand(e.getPlayer()).getType() == Material.AIR)
                 break;
-            }
+            reduceDurablity = true;
         }
+
+        //Tool is not using durability, reduces once only
+        if (reduceDurablity && !isUsingDurability())
+            reduceDurablility(e.getPlayer());
 
         return true;
     }

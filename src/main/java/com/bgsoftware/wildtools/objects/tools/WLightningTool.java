@@ -23,7 +23,7 @@ public final class WLightningTool extends WTool implements LightningTool {
         Location eye = e.getPlayer().getEyeLocation();
 
         for(Entity entity : e.getPlayer().getNearbyEntities(10, 10, 10)){
-            if(entity instanceof LivingEntity){
+            if(entity instanceof Creeper && !((Creeper) entity).isPowered()){
                 Vector toEntity = ((LivingEntity) entity).getEyeLocation().toVector().subtract(eye.toVector());
                 double dot = toEntity.normalize().dot(eye.getDirection());
                 if(dot > 0.99D){
@@ -40,13 +40,34 @@ public final class WLightningTool extends WTool implements LightningTool {
         new Thread(() -> {
             player.getWorld().strikeLightningEffect(entity.getLocation());
 
-            if(entity instanceof Creeper)
+            boolean reduceDurability = false;
+
+            if(entity instanceof Creeper) {
                 ((Creeper) entity).setPowered(true);
+                //Tool is using durability, reduces every block
+                if (isUsingDurability())
+                    reduceDurablility(player);
+                if(plugin.getNMSAdapter().getItemInHand(player).getType() == Material.AIR)
+                    return;
+                reduceDurability = true;
+            }
 
             for(Entity nearby : entity.getNearbyEntities(3, 3, 3)){
-                if(nearby instanceof Creeper)
+                if(nearby instanceof Creeper) {
                     ((Creeper) nearby).setPowered(true);
+                    //Tool is using durability, reduces every block
+                    if (isUsingDurability())
+                        reduceDurablility(player);
+                    if(plugin.getNMSAdapter().getItemInHand(player).getType() == Material.AIR)
+                        break;
+                    reduceDurability = true;
+                }
             }
+
+            //Tool is using durability, reduces every block
+            if (reduceDurability && !isUsingDurability())
+                reduceDurablility(player);
+
         }).start();
     }
 

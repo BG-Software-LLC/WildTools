@@ -92,7 +92,13 @@ public final class WCannonTool extends WTool implements CannonTool {
             else break;
         }
 
-        Locale.FILLED_DISPENSERS.send(e.getPlayer(), filledDispensers, totalTNT);
+        if(filledDispensers > 0){
+            reduceDurablility(e.getPlayer());
+            Locale.FILLED_DISPENSERS.send(e.getPlayer(), filledDispensers, totalTNT);
+        }else {
+            Locale.NO_FILLED_DISPENSERS.send(e.getPlayer(), filledDispensers, totalTNT);
+        }
+
         return true;
     }
 

@@ -37,6 +37,8 @@ public final class WSortTool extends WTool implements SortTool {
         new Thread(() -> {
             Inventory inventory = ((InventoryHolder) e.getClickedBlock().getState()).getInventory();
 
+            ItemStack[] originContents = inventory.getContents();
+
             Arrays.stream(inventory.getContents())
                     .filter(Objects::nonNull)
                     .forEach(itemStack -> inventoryItems.add(new InventoryItem(itemStack)));
@@ -47,7 +49,14 @@ public final class WSortTool extends WTool implements SortTool {
 
             inventoryItems.forEach(inventoryItem -> inventory.addItem(inventoryItem.itemStack));
 
-            Locale.SORTED_CHEST.send(e.getPlayer());
+            if(!Arrays.equals(originContents, inventory.getContents())) {
+                reduceDurablility(e.getPlayer());
+                Locale.SORTED_CHEST.send(e.getPlayer());
+            }
+            else{
+                Locale.NO_SORT_ITEMS.send(e.getPlayer());
+            }
+
         }).start();
 
         return true;
@@ -62,7 +71,6 @@ public final class WSortTool extends WTool implements SortTool {
         }
 
         @Override
-        @SuppressWarnings("NullableProblems")
         public int compareTo(InventoryItem o) {
             //Comparing itemstack types
             if(itemStack.getType().ordinal() > o.itemStack.getType().ordinal())

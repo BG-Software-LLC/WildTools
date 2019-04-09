@@ -9,6 +9,9 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import com.bgsoftware.wildtools.api.objects.ToolMode;
 import com.bgsoftware.wildtools.api.objects.tools.IceTool;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public final class WIceTool extends WTool implements IceTool {
 
     private int radius;
@@ -37,18 +40,36 @@ public final class WIceTool extends WTool implements IceTool {
         Location max = block.getLocation().clone().add(radius, radius, radius),
                 min = block.getLocation().clone().subtract(radius, radius, radius);
 
+        List<Block> toBeReplaced = new ArrayList<>();
+        boolean reduceDurability = false;
+
+        outerLoop:
         for(int x = min.getBlockX(); x <= max.getBlockX(); x++){
             for(int z = min.getBlockZ(); z <= max.getBlockZ(); z++){
                 for(int y = max.getBlockY(); y >= min.getBlockY(); y--){
                     Block targetBlock = block.getWorld().getBlockAt(x, y, z);
-                    Bukkit.getScheduler().runTask(plugin, () -> {
-                        if(targetBlock.getType() == Material.ICE && plugin.getProviders().canBreak(player, targetBlock, this)){
-                            targetBlock.setType(Material.WATER);
-                        }
-                    });
+                    if(targetBlock.getType() == Material.ICE && plugin.getProviders().canBreak(player, targetBlock, this)){
+                        toBeReplaced.add(targetBlock);
+                        //Tool is using durability, reduces every block
+                        if (isUsingDurability())
+                            reduceDurablility(player);
+                        if(plugin.getNMSAdapter().getItemInHand(player).getType() == Material.AIR)
+                            break outerLoop;
+                        reduceDurability = true;
+                    }
                 }
             }
         }
+
+        //Tool is using durability, reduces every block
+        if (reduceDurability && !isUsingDurability())
+            reduceDurablility(player);
+
+        //Setting all the blocks sync
+        Bukkit.getScheduler().runTask(plugin, () -> {
+           for(Block _block : toBeReplaced)
+               _block.setType(Material.AIR);
+        });
 
         return true;
     }

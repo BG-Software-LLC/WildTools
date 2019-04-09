@@ -6,7 +6,6 @@ import com.bgsoftware.wildtools.api.objects.tools.CuboidTool;
 import com.bgsoftware.wildtools.api.objects.ToolMode;
 
 import org.bukkit.block.Block;
-import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 
@@ -33,6 +32,9 @@ public final class WCuboidTool extends WTool implements CuboidTool {
         Material firstType = e.getBlock().getType();
         short firstData = e.getBlock().getState().getData().toItemStack().getDurability();
 
+        boolean reduceDurability = false;
+
+        outerLoop:
         for(int x = min.getBlockX(); x <= max.getBlockX(); x++){
             for(int z = min.getBlockZ(); z <= max.getBlockZ(); z++){
                 for(int y = min.getBlockY(); y <= max.getBlockY(); y++){
@@ -41,13 +43,17 @@ public final class WCuboidTool extends WTool implements CuboidTool {
                         continue;
                     BukkitUtil.breakNaturally(e.getPlayer(), targetBlock, this);
                     //Tool is using durability, reduces every block
-                    if(!isUnbreakable() && isUsingDurability() && e.getPlayer().getGameMode() != GameMode.CREATIVE)
+                    if(isUsingDurability())
                         reduceDurablility(e.getPlayer());
-                    if(plugin.getNMSAdapter().getItemInHand(e.getPlayer()) == null)
-                        break;
+                    if(plugin.getNMSAdapter().getItemInHand(e.getPlayer()).getType() == Material.AIR)
+                        break outerLoop;
+                    reduceDurability = true;
                 }
             }
         }
+
+        if(reduceDurability && !isUsingDurability())
+            reduceDurablility(e.getPlayer());
 
         return true;
     }
