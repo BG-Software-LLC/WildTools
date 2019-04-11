@@ -9,6 +9,7 @@ import com.bgsoftware.wildtools.hooks.BlocksProvider_BentoBox;
 import com.bgsoftware.wildtools.hooks.BlocksProvider_FabledSkyblock;
 import com.bgsoftware.wildtools.hooks.BlocksProvider_FactionsUUID;
 import com.bgsoftware.wildtools.hooks.BlocksProvider_GriefPrevention;
+import com.bgsoftware.wildtools.hooks.BlocksProvider_Lands;
 import com.bgsoftware.wildtools.hooks.BlocksProvider_MassiveFactions;
 import com.bgsoftware.wildtools.hooks.BlocksProvider_SuperiorSkyblock;
 import com.bgsoftware.wildtools.hooks.BlocksProvider_Towny;
@@ -85,6 +86,8 @@ public final class ProvidersHandler {
             blocksProviders.add(new BlocksProvider_Villages());
         if(Bukkit.getPluginManager().isPluginEnabled("WorldGuard"))
             blocksProviders.add(new BlocksProvider_WorldGuard());
+        if(Bukkit.getPluginManager().isPluginEnabled("Lands"))
+            blocksProviders.add(new BlocksProvider_Lands());
 
     }
 
