@@ -34,7 +34,8 @@ public final class ItemUtil {
         int usesLeft = plugin.getNMSAdapter().getTag(itemStack, "tool-uses", tool.getDefaultUses());
 
         if(meta.hasDisplayName()){
-            if(tool.getItemStack().getItemMeta().getDisplayName().replace("{}", (usesLeft + 1) + "").equals(meta.getDisplayName()))
+            if(tool.getItemStack().getItemMeta().getDisplayName().equals(meta.getDisplayName()) ||
+                    tool.getItemStack().getItemMeta().getDisplayName().replace("{}", (usesLeft + 1) + "").equals(meta.getDisplayName()))
                 meta.setDisplayName(tool.getItemStack().getItemMeta().getDisplayName().replace("{}", usesLeft + ""));
         }
 
@@ -47,9 +48,10 @@ public final class ItemUtil {
                 wantedLore.add(line.replace("{}", (usesLeft + 1) + ""));
             }
 
-            if(wantedLore.equals(meta.getLore()))
+            if(meta.getLore().equals(tool.getItemStack().getItemMeta().getLore()) || meta.getLore().equals(wantedLore))
                 meta.setLore(lore);
         }
+
         itemStack.setItemMeta(meta);
     }
 
