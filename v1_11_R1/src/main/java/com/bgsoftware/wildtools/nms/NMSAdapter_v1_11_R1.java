@@ -12,6 +12,7 @@ import net.minecraft.server.v1_11_R1.EnchantmentManager;
 import net.minecraft.server.v1_11_R1.Enchantments;
 import net.minecraft.server.v1_11_R1.EntityPlayer;
 import net.minecraft.server.v1_11_R1.EnumColor;
+import net.minecraft.server.v1_11_R1.IBlockData;
 import net.minecraft.server.v1_11_R1.Item;
 import net.minecraft.server.v1_11_R1.ItemStack;
 import net.minecraft.server.v1_11_R1.Items;
@@ -58,9 +59,10 @@ public final class NMSAdapter_v1_11_R1 implements NMSAdapter {
         EntityPlayer player = ((CraftPlayer) pl).getHandle();
         BlockPosition blockPosition = new BlockPosition(bl.getX(), bl.getY(), bl.getZ());
         World world = player.world;
-        Block block = world.getType(blockPosition).getBlock();
+        IBlockData blockData = world.getType(blockPosition);
+        Block block = blockData.getBlock();
 
-        if(!player.hasBlock(block.getBlockData()) || player.playerInteractManager.isCreative())
+        if(!player.hasBlock(blockData) || player.playerInteractManager.isCreative())
             return drops;
 
         // Has silk touch enchant
@@ -69,7 +71,7 @@ public final class NMSAdapter_v1_11_R1 implements NMSAdapter {
             int i = 0;
             Item item = Item.getItemOf(block);
             if (item != null && item.l()) {
-                i = block.toLegacyData(block.getBlockData());
+                i = block.toLegacyData(blockData);
             }
 
             ItemStack itemStack = new ItemStack(item, 1, i);
@@ -82,9 +84,9 @@ public final class NMSAdapter_v1_11_R1 implements NMSAdapter {
 
             for(int i = 0; i < dropCount; i++) {
                 if (world.random.nextFloat() < 1.0F) {
-                    Item item = block.getDropType(block.getBlockData(), world.random, fortuneLevel);
+                    Item item = block.getDropType(blockData, world.random, fortuneLevel);
                     if (item != null) {
-                        ItemStack itemStack = new ItemStack(item, 1, block.getDropData(block.getBlockData()));
+                        ItemStack itemStack = new ItemStack(item, 1, block.getDropData(blockData));
                         drops.add(CraftItemStack.asBukkitCopy(itemStack));
                     }
                 }

@@ -10,6 +10,7 @@ import net.minecraft.server.v1_8_R1.BlockPotatoes;
 import net.minecraft.server.v1_8_R1.EnchantmentManager;
 import net.minecraft.server.v1_8_R1.EntityPlayer;
 import net.minecraft.server.v1_8_R1.EnumColor;
+import net.minecraft.server.v1_8_R1.IBlockData;
 import net.minecraft.server.v1_8_R1.Item;
 import net.minecraft.server.v1_8_R1.ItemStack;
 import net.minecraft.server.v1_8_R1.Items;
@@ -55,7 +56,8 @@ public final class NMSAdapter_v1_8_R1 implements NMSAdapter {
         EntityPlayer player = ((CraftPlayer) pl).getHandle();
         BlockPosition blockPosition = new BlockPosition(bl.getX(), bl.getY(), bl.getZ());
         World world = player.world;
-        Block block = world.getType(blockPosition).getBlock();
+        IBlockData blockData = world.getType(blockPosition);
+        Block block = blockData.getBlock();
 
         //Checks if player cannot break the block or player in creative mode
         if(!player.b(block) || player.playerInteractManager.isCreative())
@@ -67,7 +69,7 @@ public final class NMSAdapter_v1_8_R1 implements NMSAdapter {
             Item item = Item.getItemOf(block);
             //Checks if item not null and something else?
             if (item != null && item.k()) {
-                data = block.toLegacyData(block.getBlockData());
+                data = block.toLegacyData(blockData);
             }
             //Adds item to drops
             drops.add(CraftItemStack.asBukkitCopy(new ItemStack(item, 1, data)));
@@ -80,10 +82,10 @@ public final class NMSAdapter_v1_8_R1 implements NMSAdapter {
             //This loop will run at least one time, depends on the block.
             for(int i = 0; i < dropCount; i++) {
                 if (world.random.nextFloat() < 1.0F) {
-                    Item item = block.getDropType(block.getBlockData(), world.random, fortuneLevel);
+                    Item item = block.getDropType(blockData, world.random, fortuneLevel);
                     if (item != null) {
                         //Adds item to drops
-                        drops.add(CraftItemStack.asBukkitCopy(new ItemStack(item, 1, block.getDropData(block.getBlockData()))));
+                        drops.add(CraftItemStack.asBukkitCopy(new ItemStack(item, 1, block.getDropData(blockData))));
                     }
                 }
             }
