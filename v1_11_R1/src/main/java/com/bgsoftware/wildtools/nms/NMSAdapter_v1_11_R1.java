@@ -164,7 +164,7 @@ public final class NMSAdapter_v1_11_R1 implements NMSAdapter {
     }
 
     @Override
-    public int getIntTag(org.bukkit.inventory.ItemStack is, String key, int def) {
+    public int getTag(org.bukkit.inventory.ItemStack is, String key, int def) {
         ItemStack nmsStack = CraftItemStack.asNMSCopy(is);
         NBTTagCompound tag = new NBTTagCompound();
 
@@ -180,7 +180,7 @@ public final class NMSAdapter_v1_11_R1 implements NMSAdapter {
     }
 
     @Override
-    public org.bukkit.inventory.ItemStack setIntTag(org.bukkit.inventory.ItemStack is, String key, int value) {
+    public org.bukkit.inventory.ItemStack setTag(org.bukkit.inventory.ItemStack is, String key, int value) {
         ItemStack nmsStack = CraftItemStack.asNMSCopy(is);
         NBTTagCompound tag = new NBTTagCompound();
 
@@ -189,6 +189,38 @@ public final class NMSAdapter_v1_11_R1 implements NMSAdapter {
         }
 
         tag.setInt(key, value);
+
+        nmsStack.setTag(tag);
+
+        return CraftItemStack.asBukkitCopy(nmsStack);
+    }
+
+    @Override
+    public String getTag(org.bukkit.inventory.ItemStack is, String key, String def) {
+        ItemStack nmsStack = CraftItemStack.asNMSCopy(is);
+        NBTTagCompound tag = new NBTTagCompound();
+
+        if(nmsStack.hasTag()){
+            tag = nmsStack.getTag();
+        }
+
+        if(tag.hasKey(key)){
+            return tag.getString(key);
+        }
+
+        return def;
+    }
+
+    @Override
+    public org.bukkit.inventory.ItemStack setTag(org.bukkit.inventory.ItemStack is, String key, String value) {
+        ItemStack nmsStack = CraftItemStack.asNMSCopy(is);
+        NBTTagCompound tag = new NBTTagCompound();
+
+        if(nmsStack.hasTag()){
+            tag = nmsStack.getTag();
+        }
+
+        tag.setString(key, value);
 
         nmsStack.setTag(tag);
 

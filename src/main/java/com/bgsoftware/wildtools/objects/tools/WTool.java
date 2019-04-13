@@ -169,6 +169,8 @@ public abstract class WTool implements Tool {
 
         ItemUtil.formatItemStack(this, is);
 
+        is = plugin.getNMSAdapter().setTag(is, "tool-type", getName().toLowerCase());
+
         return is;
     }
 
@@ -319,8 +321,8 @@ public abstract class WTool implements Tool {
         }
 
         else{
-            int usesLeft = plugin.getNMSAdapter().getIntTag(plugin.getNMSAdapter().getItemInHand(pl), "tool-uses", getDefaultUses());
-            is = plugin.getNMSAdapter().setIntTag(is, "tool-uses", --usesLeft);
+            int usesLeft = plugin.getNMSAdapter().getTag(plugin.getNMSAdapter().getItemInHand(pl), "tool-uses", getDefaultUses());
+            is = plugin.getNMSAdapter().setTag(is, "tool-uses", --usesLeft);
 
             if (usesLeft <= 0) {
                 is = new ItemStack(Material.AIR);
@@ -367,11 +369,14 @@ public abstract class WTool implements Tool {
 
     @Override
     public boolean isSimilar(ItemStack is){
+        if(plugin.getNMSAdapter().getTag(is, "tool-type", "").equals(getName().toLowerCase()))
+            return true;
+
         if(this.is.getType() != is.getType() || this.is.hasItemMeta() != is.hasItemMeta())
             return false;
 
         if(this.is.hasItemMeta()){
-            int usesLeft = plugin.getNMSAdapter().getIntTag(is, "tool-uses", getDefaultUses());
+            int usesLeft = plugin.getNMSAdapter().getTag(is, "tool-uses", getDefaultUses());
             if(this.is.getItemMeta().hasDisplayName()) {
                 if(!is.getItemMeta().hasDisplayName())
                     return false;

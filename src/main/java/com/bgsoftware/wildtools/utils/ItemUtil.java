@@ -31,19 +31,24 @@ public final class ItemUtil {
 
     public static void formatItemStack(Tool tool, ItemStack itemStack){
         ItemMeta meta = itemStack.getItemMeta();
-        int usesLeft = plugin.getNMSAdapter().getIntTag(itemStack, "tool-uses", tool.getDefaultUses());
+        int usesLeft = plugin.getNMSAdapter().getTag(itemStack, "tool-uses", tool.getDefaultUses());
 
         if(meta.hasDisplayName()){
-            meta.setDisplayName(tool.getItemStack().getItemMeta().getDisplayName().replace("{}", usesLeft + ""));
+            if(tool.getItemStack().getItemMeta().getDisplayName().replace("{}", (usesLeft + 1) + "").equals(meta.getDisplayName()))
+                meta.setDisplayName(tool.getItemStack().getItemMeta().getDisplayName().replace("{}", usesLeft + ""));
         }
 
         if(meta.hasLore()){
+            List<String> wantedLore = new ArrayList<>();
             List<String> lore = new ArrayList<>();
 
-            for(String line : tool.getItemStack().getItemMeta().getLore())
+            for(String line : tool.getItemStack().getItemMeta().getLore()) {
                 lore.add(line.replace("{}", usesLeft + ""));
+                wantedLore.add(line.replace("{}", (usesLeft + 1) + ""));
+            }
 
-            meta.setLore(lore);
+            if(wantedLore.equals(meta.getLore()))
+                meta.setLore(lore);
         }
         itemStack.setItemMeta(meta);
     }

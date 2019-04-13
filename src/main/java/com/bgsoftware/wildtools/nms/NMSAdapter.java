@@ -18,9 +18,13 @@ public interface NMSAdapter {
 
     List<ItemStack> getCropDrops(Player pl, Block bl);
 
-    int getIntTag(ItemStack is, String key, int def);
+    int getTag(ItemStack is, String key, int def);
 
-    ItemStack setIntTag(ItemStack is, String key, int value);
+    ItemStack setTag(ItemStack is, String key, int value);
+
+    String getTag(ItemStack is, String key, String def);
+
+    ItemStack setTag(ItemStack is, String key, String value);
 
     ItemStack getItemInHand(Player player);
 
