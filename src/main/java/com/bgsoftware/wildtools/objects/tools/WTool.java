@@ -39,6 +39,7 @@ public abstract class WTool implements Tool {
     private String name, toolMode;
     private boolean onlySameType, onlyInsideClaim, unbreakable, autoCollect, silkTouch, keepInventory;
     private long cooldown;
+    private double multiplier;
 
     private Set<String> blacklistedMaterials, whitelistedMaterials, blacklistedDrops, whitelistedDrops;
 
@@ -60,6 +61,7 @@ public abstract class WTool implements Tool {
         this.blacklistedDrops = new HashSet<>();
         this.whitelistedDrops = new HashSet<>();
         this.lastUses = new HashMap<>();
+        this.multiplier = 1;
         toolBlockBreak = new HashSet<>();
     }
 
@@ -147,6 +149,11 @@ public abstract class WTool implements Tool {
     @Override
     public void addWhitelistedDrop(String drop){
         whitelistedDrops.add(drop);
+    }
+
+    @Override
+    public void setMultiplier(double multiplier) {
+        this.multiplier = multiplier;
     }
 
     /***********************************************************************************/
@@ -278,6 +285,11 @@ public abstract class WTool implements Tool {
     @Override
     public boolean isWhitelistedDrop(Material type, short data){
         return isMaterialInList(type, data, whitelistedDrops);
+    }
+
+    @Override
+    public double getMultiplier() {
+        return multiplier;
     }
 
     /***********************************************************************************/

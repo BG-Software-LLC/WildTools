@@ -223,6 +223,9 @@ public final class DataHandler {
                     tool.addWhitelistedDrop(drop);
             }
 
+            if(cfg.contains("tools." + name + ".multiplier"))
+                tool.setMultiplier(cfg.getDouble("tools." + name + ".multiplier"));
+
             toolsAmount++;
         }
 

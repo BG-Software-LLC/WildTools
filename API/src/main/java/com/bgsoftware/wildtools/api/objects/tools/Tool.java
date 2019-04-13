@@ -45,6 +45,8 @@ public interface Tool {
 
     void addWhitelistedDrop(String drop);
 
+    void setMultiplier(double multiplier);
+
     ItemStack getItemStack();
 
     ItemStack getFormattedItemStack();
@@ -94,6 +96,8 @@ public interface Tool {
     boolean isBlacklistedDrop(Material type, short data);
 
     boolean isWhitelistedDrop(Material type, short data);
+
+    double getMultiplier();
 
     void reduceDurablility(Player pl);
 

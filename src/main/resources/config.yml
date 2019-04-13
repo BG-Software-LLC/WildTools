@@ -37,6 +37,8 @@ prices-list:
 #
 # *** Sell Tool-Mode ***
 # Tools in this mode will sell all the container's contents. This mode is used for sell-wands.
+# Optional sections:
+# multiplier: Multiply the earnings from a chest.
 #
 # *** Lightning Tool-Mode ***
 # Tools in this mode will strike a lightning to charge creepers. This mode is used for lightning-wands.
@@ -66,9 +68,6 @@ prices-list:
 # Required sections:
 # craftings: All the crafting *results* for the tool (LIST)
 #      Please follow the "TYPE" or "TYPE:DATA" format for results.
-#
-# *** Sell Tool-Mode ***
-# Tools in this mode will sell all the clicked chest's contents.
 #
 # *** Sort Tool-Mode ***
 # Tools in this mode will sort all the clicked chest's contents.
@@ -167,12 +166,12 @@ tools:
     - '&8&m---------------------------------------'
     whitelisted-blocks:
     - 'SAND'
-  sell_wand:
+  sell_wand1:
     tool-mode: SELL
     cooldown: 5000
     uses: 50
     type: STICK
-    name: '&f --{ &6&lSell Wand &f}-- '
+    name: '&f --{ &6&lSell Wand &7(Tier I) &f}-- '
     lore:
     - '&8&m---------------------------------------'
     - '&7 This wand sells all of the contents of'
@@ -182,6 +181,24 @@ tools:
     - '&f   {}'
     - '&f'
     - '&8&m---------------------------------------'
+  sell_wand2:
+    tool-mode: SELL
+    cooldown: 5000
+    uses: 50
+    multiplier: 1.5
+    type: STICK
+    name: '&f --{ &6&lSell Wand &7(Tier II) &f}-- '
+    lore:
+      - '&8&m---------------------------------------'
+      - '&7 This wand sells all of the contents of'
+      - '&7 a container (chest or trapped-chest).'
+      - '&7'
+      - '&6&lMultiplier:'
+      - '&f   x1.5'
+      - '&6&l Uses:'
+      - '&f   {}'
+      - '&f'
+      - '&8&m---------------------------------------'
   lightning_wand:
     tool-mode: LIGHTNING
     type: STICK

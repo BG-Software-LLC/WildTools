@@ -41,6 +41,7 @@ public final class Locale {
     public static Locale SELL_MODE_ENABLED = new Locale("SELL_MODE_ENABLED");
     public static Locale SELL_MODE_DISABLED = new Locale("SELL_MODE_DISABLED");
     public static Locale SOLD_CHEST = new Locale("SOLD_CHEST");
+    public static Locale MULTIPLIER = new Locale("MULTIPLIER");
     public static Locale NO_SELL_ITEMS = new Locale("NO_SELL_ITEMS");
     public static Locale SORTED_CHEST = new Locale("SORTED_CHEST");
     public static Locale NO_SORT_ITEMS = new Locale("NO_SORT_ITEMS");

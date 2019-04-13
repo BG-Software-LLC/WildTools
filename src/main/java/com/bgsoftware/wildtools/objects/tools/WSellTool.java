@@ -54,6 +54,8 @@ public final class WSellTool extends WTool implements SellTool {
                 }
             }
 
+            totalEarnings *= getMultiplier();
+
             String message = toSell.isEmpty() ? Locale.NO_SELL_ITEMS.getMessage() : Locale.SOLD_CHEST.getMessage();
 
             SellWandUseEvent sellWandUseEvent = new SellWandUseEvent(e.getPlayer(), (Chest) e.getClickedBlock().getState(), totalEarnings, message);
@@ -69,7 +71,9 @@ public final class WSellTool extends WTool implements SellTool {
                 inventory.setItem(slot, new ItemStack(Material.AIR));
             }
 
-            message = sellWandUseEvent.getMessage().replace("{0}", totalEarnings + "");
+            //noinspection all
+            message = sellWandUseEvent.getMessage().replace("{0}", totalEarnings + "")
+                    .replace("{1}", getMultiplier() != 1 && Locale.MULTIPLIER.getMessage() != null ? Locale.MULTIPLIER.getMessage(getMultiplier()) : "");
 
             if(!toSell.isEmpty())
                 reduceDurablility(e.getPlayer());

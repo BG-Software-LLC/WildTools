@@ -77,7 +77,8 @@ SELL_MODE_ENABLED: '&b&lWildTools &7Enabled sell-mode for this harvester.'
 SELL_MODE_DISABLED: '&b&lWildTools &7Disabled sell-mode for this harvester.'
 
 # Called when a player uses a sell-tool.
-SOLD_CHEST: '&b&lWildTools &7Successfully sold the container''s content for ${0}.'
+SOLD_CHEST: '&b&lWildTools &7Successfully sold the container''s content for ${0}{1}.'
+MULTIPLIER: ' (x{0} Multiplier)'
 NO_SELL_ITEMS: '&b&lWildTools &7There were no items to sell.'
 
 # Called when a player successfully sorted a container with a sort-tool.
