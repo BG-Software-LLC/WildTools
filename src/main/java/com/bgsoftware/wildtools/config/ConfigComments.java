@@ -12,7 +12,7 @@ public final class ConfigComments {
     public static String HEADER = "";
 
     @Comment("")
-    @Comment("Choose which prices plugin to check for prices (ShopGUIPlus, Essentials, WildTools).")
+    @Comment("Choose which prices plugin to check for prices (ShopGUIPlus, Essentials, CMI, WildTools).")
     public static String PRICES_PLUGIN = "prices-plugin";
 
     @Comment("")

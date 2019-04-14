@@ -16,6 +16,7 @@ import com.bgsoftware.wildtools.hooks.BlocksProvider_Towny;
 import com.bgsoftware.wildtools.hooks.BlocksProvider_Villages;
 import com.bgsoftware.wildtools.hooks.BlocksProvider_WorldGuard;
 
+import com.bgsoftware.wildtools.hooks.PricesProvider_CMI;
 import com.google.common.collect.Lists;
 import net.milkbowl.vault.economy.Economy;
 
@@ -54,6 +55,8 @@ public final class ProvidersHandler {
             pricesProvider = new PricesProvider_ShopGUIPlus();
         else if(pricesPlugin.equalsIgnoreCase("Essentials") && Bukkit.getPluginManager().isPluginEnabled("Essentials"))
             pricesProvider = new PricesProvider_Essentials();
+        else if(pricesPlugin.equals("CMI") && Bukkit.getPluginManager().isPluginEnabled("CMI"))
+            pricesProvider = new PricesProvider_CMI();
         else pricesProvider = new PricesProvider_Default();
         //Factions Hookup
         if(Bukkit.getPluginManager().isPluginEnabled("Factions") &&
