@@ -36,6 +36,7 @@ public final class EditorListener implements Listener {
 
     private String[] integerValues = new String[] {"length", "break-level", "radius", "farmland-radius", "tnt-amount",
             "cooldown", "uses"};
+    private String[] doubleValues = new String[] {"multiplier"};
     private String[] booleanValues = new String[] {"auto-collect", "silk-touch", "only-same-type", "only-inside-claim",
             "unbreakable", "keep-inventory", "glow"};
     private String[] listValues = new String[] {"prices-list", "craftings", "enchants", "whitelisted-blocks", "blacklisted-blocks",
@@ -156,6 +157,8 @@ public final class EditorListener implements Listener {
                         toolValues.put(player.getUniqueId(), "tnt-amount");
                     else if(toolMode == ToolMode.CRAFTING)
                         toolValues.put(player.getUniqueId(), "craftings");
+                    else if(toolMode == ToolMode.SELL)
+                        toolValues.put(player.getUniqueId(), "multiplier");
                     else return;
                     break;
                 case 15:
@@ -168,46 +171,51 @@ public final class EditorListener implements Listener {
                         toolValues.put(player.getUniqueId(), "active-action");
                     else return;
                     break;
-                case 28:
-                    toolValues.put(player.getUniqueId(), "cooldown");
-                    break;
-                case 29:
-                    toolValues.put(player.getUniqueId(), "silk-touch");
-                    break;
-                case 30:
-                    toolValues.put(player.getUniqueId(), "unbreakable");
-                    break;
-                case 31:
-                    toolValues.put(player.getUniqueId(), "only-inside-claim");
-                    break;
-                case 32:
-                    toolValues.put(player.getUniqueId(), "keep-inventory");
-                    break;
-                case 33:
-                    toolValues.put(player.getUniqueId(), "whitelisted-blocks");
-                    break;
-                case 34:
-                    toolValues.put(player.getUniqueId(), "blacklisted-blocks");
+                case 24:
+                    if(toolMode == ToolMode.HARVESTER)
+                        toolValues.put(player.getUniqueId(), "multiplier");
+                    else return;
                     break;
                 case 37:
-                    toolValues.put(player.getUniqueId(), "auto-collect");
+                    toolValues.put(player.getUniqueId(), "cooldown");
                     break;
                 case 38:
-                    toolValues.put(player.getUniqueId(), "only-same-type");
+                    toolValues.put(player.getUniqueId(), "silk-touch");
                     break;
                 case 39:
-                    toolValues.put(player.getUniqueId(), "uses");
+                    toolValues.put(player.getUniqueId(), "unbreakable");
                     break;
                 case 40:
-                    toolValues.put(player.getUniqueId(), "glow");
+                    toolValues.put(player.getUniqueId(), "only-inside-claim");
                     break;
                 case 41:
-                    toolValues.put(player.getUniqueId(), "enchants");
+                    toolValues.put(player.getUniqueId(), "keep-inventory");
                     break;
                 case 42:
-                    toolValues.put(player.getUniqueId(), "whitelisted-drops");
+                    toolValues.put(player.getUniqueId(), "whitelisted-blocks");
                     break;
                 case 43:
+                    toolValues.put(player.getUniqueId(), "blacklisted-blocks");
+                    break;
+                case 46:
+                    toolValues.put(player.getUniqueId(), "auto-collect");
+                    break;
+                case 47:
+                    toolValues.put(player.getUniqueId(), "only-same-type");
+                    break;
+                case 48:
+                    toolValues.put(player.getUniqueId(), "uses");
+                    break;
+                case 49:
+                    toolValues.put(player.getUniqueId(), "glow");
+                    break;
+                case 50:
+                    toolValues.put(player.getUniqueId(), "enchants");
+                    break;
+                case 51:
+                    toolValues.put(player.getUniqueId(), "whitelisted-drops");
+                    break;
+                case 52:
                     toolValues.put(player.getUniqueId(), "blacklisted-drops");
                     break;
                 default:
@@ -322,6 +330,15 @@ public final class EditorListener implements Listener {
                 if(Arrays.asList(integerValues).contains(toolValue)){
                     try{
                         value = Integer.valueOf(value.toString());
+                    }catch(IllegalArgumentException ex){
+                        e.getPlayer().sendMessage(ChatColor.RED + "Please specify a valid number");
+                        valid = false;
+                    }
+                }
+
+                else if(Arrays.asList(doubleValues).contains(toolValue)){
+                    try{
+                        value = Double.valueOf(value.toString());
                     }catch(IllegalArgumentException ex){
                         e.getPlayer().sendMessage(ChatColor.RED + "Please specify a valid number");
                         valid = false;

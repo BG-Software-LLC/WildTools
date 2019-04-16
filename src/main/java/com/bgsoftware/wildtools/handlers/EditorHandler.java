@@ -92,37 +92,37 @@ public final class EditorHandler {
         editor.setItem(12, new ItemBuilder(WMaterial.MAP)
                 .withName("&bTool Lore").withLore("&7Lore:", getFromConfig(toolName, "lore", List.class, new ArrayList())).build());
 
-        editor.setItem(28, new ItemBuilder(WMaterial.CLOCK)
+        editor.setItem(37, new ItemBuilder(WMaterial.CLOCK)
                 .withName("&bTool Cooldown").withLore("&7Cooldown: " + getFromConfig(toolName, "cooldown", Integer.class, 0)).build());
-        editor.setItem(29, new ItemBuilder(Material.ENCHANTED_BOOK)
+        editor.setItem(38, new ItemBuilder(Material.ENCHANTED_BOOK)
                 .withName("&bTool Silktouch").withLore("&7Silktouch: " + getFromConfig(toolName, "silk-touch", Boolean.class, false)).build());
-        editor.setItem(30, new ItemBuilder(WMaterial.IRON_BARS)
+        editor.setItem(39, new ItemBuilder(WMaterial.IRON_BARS)
                 .withName("&bTool Unbreakable").withLore("&7Unbreakable: " + getFromConfig(toolName, "unbreakable", Boolean.class, false)).build());
-        editor.setItem(31, new ItemBuilder(WMaterial.REDSTONE_TORCH)
+        editor.setItem(40, new ItemBuilder(WMaterial.REDSTONE_TORCH)
                 .withName("&bTool Only-Inside-Claim").withLore("&7Only-Inside-Claim: " + getFromConfig(toolName, "only-inside-claim", Boolean.class, false)).build());
-        editor.setItem(32, new ItemBuilder(Material.CHEST)
+        editor.setItem(41, new ItemBuilder(Material.CHEST)
                 .withName("&bTool Keep-Inventory").withLore("&7Keep-Inventory: " + getFromConfig(toolName, "keep-inventory", Boolean.class, false)).build());
-        editor.setItem(33, new ItemBuilder(Material.QUARTZ_BLOCK)
+        editor.setItem(42, new ItemBuilder(Material.QUARTZ_BLOCK)
                 .withName("&bTool Whitelisted Blocks").withLore("&7Whitelisted Blocks: ",
                         getFromConfig(toolName, "whitelisted-blocks", List.class, new ArrayList())).build());
-        editor.setItem(34, new ItemBuilder(Material.COAL_BLOCK)
+        editor.setItem(43, new ItemBuilder(Material.COAL_BLOCK)
                 .withName("&bTool Blacklisted Blocks").withLore("&7Blacklisted Blocks: ",
                         getFromConfig(toolName, "blacklisted-blocks", List.class, new ArrayList())).build());
 
-        editor.setItem(37, new ItemBuilder(Material.HOPPER)
+        editor.setItem(46, new ItemBuilder(Material.HOPPER)
                 .withName("&bTool Auto-Collect").withLore("&7Auto-Collect: " + getFromConfig(toolName, "auto-collect", Boolean.class, false)).build());
-        editor.setItem(38, new ItemBuilder(Material.ARROW)
+        editor.setItem(47, new ItemBuilder(Material.ARROW)
                 .withName("&bTool Only-Same-Type").withLore("&7Only-Same-Type: " + getFromConfig(toolName, "only-same-type", Boolean.class, false)).build());
-        editor.setItem(39, new ItemBuilder(Material.ANVIL)
+        editor.setItem(48, new ItemBuilder(Material.ANVIL)
                 .withName("&bTool Uses").withLore("&7Uses: " + getFromConfig(toolName, "uses", Integer.class, -1)).build());
-        editor.setItem(40, new ItemBuilder(Material.NETHER_STAR)
+        editor.setItem(49, new ItemBuilder(Material.NETHER_STAR)
                 .withName("&bTool Glow").withLore("&7Glow: " + getFromConfig(toolName, "glow", Boolean.class, false)).build());
-        editor.setItem(41, new ItemBuilder(WMaterial.getGodApple())
+        editor.setItem(50, new ItemBuilder(WMaterial.getGodApple())
                 .withName("&bTool Enchants").withLore("&7Enchantments:", getEnchants(toolName)).build());
-        editor.setItem(42, new ItemBuilder(Material.QUARTZ)
+        editor.setItem(51, new ItemBuilder(Material.QUARTZ)
                 .withName("&bTool Whitelisted Drops").withLore("&7Whitelisted Drops: ",
                         getFromConfig(toolName, "whitelisted-drops", List.class, new ArrayList())).build());
-        editor.setItem(43, new ItemBuilder(Material.COAL)
+        editor.setItem(52, new ItemBuilder(Material.COAL)
                 .withName("&bTool Blacklisted Drops").withLore("&7Blacklisted Drops: ",
                         getFromConfig(toolName, "blacklisted-drops", List.class, new ArrayList())).build());
 
@@ -141,6 +141,8 @@ public final class EditorHandler {
                     .withName("&bTool Farmland Radius").withLore("&7Farmland Radius: " + getFromConfig(toolName, "farmland-radius", Integer.class, 0)).build());
             editor.setItem(16, new ItemBuilder(Material.REDSTONE)
                     .withName("&bTool Active Action").withLore("&7Active Action: " + getFromConfig(toolName, "active-action", String.class, "")).build());
+            editor.setItem(24, new ItemBuilder(Material.GOLD_INGOT)
+                    .withName("&bTool Multiplier").withLore("&7Multiplier: " + getFromConfig(toolName, "multiplier", Double.class, 1.0)).build());
         }else if(toolMode == ToolMode.ICE){
             editor.setItem(14, new ItemBuilder(Material.FEATHER)
                     .withName("&bTool Radius").withLore("&7Radius: " + getFromConfig(toolName, "radius", Integer.class, 0)).build());
@@ -150,6 +152,9 @@ public final class EditorHandler {
         }else if(toolMode == ToolMode.CRAFTING){
             editor.setItem(14, new ItemBuilder(WMaterial.CRAFTING_TABLE)
                     .withName("&bTool Recipes").withLore("&7Recipes: ", getFromConfig(toolName, "craftings", List.class, new ArrayList())).build());
+        }else if(toolMode == ToolMode.SELL){
+            editor.setItem(14, new ItemBuilder(Material.GOLD_INGOT)
+                    .withName("&bTool Multiplier").withLore("&7Multiplier: " + getFromConfig(toolName, "multiplier", Double.class, 1.0)).build());
         }
 
         return editor;
