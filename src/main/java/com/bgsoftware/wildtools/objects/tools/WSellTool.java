@@ -67,7 +67,7 @@ public final class WSellTool extends WTool implements SellTool {
             totalEarnings = sellWandUseEvent.getPrice();
 
             for(int slot : toSell){
-                plugin.getProviders().trySellingItem(e.getPlayer(), inventory.getItem(slot));
+                plugin.getProviders().trySellingItem(e.getPlayer(), inventory.getItem(slot), getMultiplier());
                 inventory.setItem(slot, new ItemStack(Material.AIR));
             }
 

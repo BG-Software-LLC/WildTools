@@ -156,11 +156,11 @@ public final class ProvidersHandler {
     }
 
     @SuppressWarnings("UnusedReturnValue")
-    public boolean trySellingItem(Player player, ItemStack itemStack){
+    public boolean trySellingItem(Player player, ItemStack itemStack, double multiplier){
         if(!canSellItem(player, itemStack))
             return false;
 
-        double price = getPrice(player, itemStack);
+        double price = getPrice(player, itemStack) * multiplier;
 
         if(!economy.hasAccount(player))
             economy.createPlayerAccount(player);
