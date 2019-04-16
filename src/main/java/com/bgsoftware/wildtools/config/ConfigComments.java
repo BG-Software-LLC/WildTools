@@ -59,6 +59,7 @@ public final class ConfigComments {
     @Comment("Optional sections:")
     @Comment("farmland-radius: What is the radius of the checking for dirt area? (Same as radius)")
     @Comment("active-action: Which action should activate the harvester? (RIGHT_CLICK or LEFT_CLICK)")
+    @Comment("multiplier: Multiply the earnings from the sell mode.")
     @Comment(" ")
     @Comment("*** Ice Tool-Mode ***")
     @Comment("Tools in this mode will smelt all ice blocks in the checking area.")
