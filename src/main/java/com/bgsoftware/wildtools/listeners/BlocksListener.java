@@ -3,7 +3,6 @@ package com.bgsoftware.wildtools.listeners;
 import com.bgsoftware.wildtools.Locale;
 import com.bgsoftware.wildtools.WildToolsPlugin;
 import com.bgsoftware.wildtools.objects.tools.WTool;
-import org.bukkit.GameMode;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
