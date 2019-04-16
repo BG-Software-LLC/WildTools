@@ -12,11 +12,17 @@ public final class HarvesterHoeSellEvent extends PlayerEvent implements Cancella
 
     private boolean cancelled;
     private String sellMessage;
-    private double price;
+    private double price, multiplier;
 
+    @Deprecated
     public HarvesterHoeSellEvent(Player player, double price, String sellMessage){
+        this(player, price, 1, sellMessage);
+    }
+
+    public HarvesterHoeSellEvent(Player player, double price, double multiplier, String sellMessage){
         super(player);
         this.price = price;
+        this.multiplier = multiplier;
         this.sellMessage = sellMessage;
         this.cancelled = false;
     }
@@ -27,6 +33,14 @@ public final class HarvesterHoeSellEvent extends PlayerEvent implements Cancella
 
     public void setPrice(double price){
         this.price = price;
+    }
+
+    public double getMultiplier() {
+        return multiplier;
+    }
+
+    public void setMultiplier(double multiplier) {
+        this.multiplier = multiplier;
     }
 
     public String getMessage() {

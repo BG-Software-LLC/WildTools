@@ -15,13 +15,19 @@ public final class SellWandUseEvent extends PlayerEvent implements Cancellable {
 
     private boolean cancelled;
     private String sellMessage;
-    private double price;
+    private double price, multiplier;
 
+    @Deprecated
     public SellWandUseEvent(Player player, Chest chest, double price, String sellMessage){
+        this(player, chest, price, 1, sellMessage);
+    }
+
+    public SellWandUseEvent(Player player, Chest chest, double price, double multiplier, String sellMessage){
         super(player);
         this.chest = chest;
         this.sellMessage = sellMessage;
         this.price = price;
+        this.multiplier = multiplier;
         this.cancelled = false;
     }
 
@@ -35,6 +41,14 @@ public final class SellWandUseEvent extends PlayerEvent implements Cancellable {
 
     public void setPrice(double price){
         this.price = price;
+    }
+
+    public double getMultiplier() {
+        return multiplier;
+    }
+
+    public void setMultiplier(double multiplier) {
+        this.multiplier = multiplier;
     }
 
     public String getMessage(){

@@ -54,26 +54,27 @@ public final class WSellTool extends WTool implements SellTool {
                 }
             }
 
-            totalEarnings *= getMultiplier();
+            double multiplier = getMultiplier();
 
             String message = toSell.isEmpty() ? Locale.NO_SELL_ITEMS.getMessage() : Locale.SOLD_CHEST.getMessage();
 
-            SellWandUseEvent sellWandUseEvent = new SellWandUseEvent(e.getPlayer(), (Chest) e.getClickedBlock().getState(), totalEarnings, message);
+            SellWandUseEvent sellWandUseEvent = new SellWandUseEvent(e.getPlayer(), (Chest) e.getClickedBlock().getState(), totalEarnings, multiplier, message);
             Bukkit.getPluginManager().callEvent(sellWandUseEvent);
 
             if(sellWandUseEvent.isCancelled())
                 return;
 
-            totalEarnings = sellWandUseEvent.getPrice();
+            multiplier = sellWandUseEvent.getMultiplier();
+            totalEarnings *= multiplier;
 
             for(int slot : toSell){
-                plugin.getProviders().trySellingItem(e.getPlayer(), inventory.getItem(slot), getMultiplier());
+                plugin.getProviders().trySellingItem(e.getPlayer(), inventory.getItem(slot), multiplier);
                 inventory.setItem(slot, new ItemStack(Material.AIR));
             }
 
             //noinspection all
             message = sellWandUseEvent.getMessage().replace("{0}", totalEarnings + "")
-                    .replace("{1}", getMultiplier() != 1 && Locale.MULTIPLIER.getMessage() != null ? Locale.MULTIPLIER.getMessage(getMultiplier()) : "");
+                    .replace("{1}", multiplier != 1 && Locale.MULTIPLIER.getMessage() != null ? Locale.MULTIPLIER.getMessage(multiplier) : "");
 
             if(!toSell.isEmpty())
                 reduceDurablility(e.getPlayer());
