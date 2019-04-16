@@ -177,6 +177,9 @@ public final class EditorListener implements Listener {
                 case 30:
                     toolValues.put(player.getUniqueId(), "unbreakable");
                     break;
+                case 31:
+                    toolValues.put(player.getUniqueId(), "only-inside-claim");
+                    break;
                 case 32:
                     toolValues.put(player.getUniqueId(), "keep-inventory");
                     break;
@@ -194,6 +197,9 @@ public final class EditorListener implements Listener {
                     break;
                 case 39:
                     toolValues.put(player.getUniqueId(), "uses");
+                    break;
+                case 40:
+                    toolValues.put(player.getUniqueId(), "glow");
                     break;
                 case 41:
                     toolValues.put(player.getUniqueId(), "enchants");
