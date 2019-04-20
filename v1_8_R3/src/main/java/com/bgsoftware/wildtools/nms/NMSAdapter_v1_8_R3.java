@@ -190,6 +190,10 @@ public final class NMSAdapter_v1_8_R3 implements NMSAdapter {
     @Override
     public String getTag(org.bukkit.inventory.ItemStack is, String key, String def) {
         ItemStack nmsStack = CraftItemStack.asNMSCopy(is);
+
+        if(nmsStack == null)
+            return def;
+
         NBTTagCompound tag = new NBTTagCompound();
 
         if(nmsStack.hasTag()){
