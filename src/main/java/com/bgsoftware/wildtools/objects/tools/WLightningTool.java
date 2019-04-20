@@ -36,6 +36,11 @@ public final class WLightningTool extends WTool implements LightningTool {
         return true;
     }
 
+    @Override
+    public boolean onBlockInteract(PlayerInteractEvent e) {
+        return onAirInteract(e);
+    }
+
     private void handleUse(Player player, Entity entity){
         new Thread(() -> {
             player.getWorld().strikeLightningEffect(entity.getLocation());
