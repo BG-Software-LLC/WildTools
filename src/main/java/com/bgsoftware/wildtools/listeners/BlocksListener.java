@@ -4,7 +4,6 @@ import com.bgsoftware.wildtools.Locale;
 import com.bgsoftware.wildtools.WildToolsPlugin;
 import com.bgsoftware.wildtools.objects.tools.WTool;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.EventHandler;
