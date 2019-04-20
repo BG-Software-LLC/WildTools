@@ -2,29 +2,34 @@ package com.bgsoftware.wildtools.listeners;
 
 import com.bgsoftware.wildtools.Locale;
 import com.bgsoftware.wildtools.WildToolsPlugin;
-import com.bgsoftware.wildtools.api.events.SellWandUseEvent;
 import com.bgsoftware.wildtools.objects.tools.WTool;
+import org.bukkit.Material;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 
 import com.bgsoftware.wildtools.api.objects.tools.Tool;
+import org.bukkit.inventory.ItemStack;
+
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 @SuppressWarnings("unused")
 public final class BlocksListener implements Listener {
+
+    private static Map<UUID, Material> lastClickedType = new HashMap<>();
+    private static String[] shovelMaterials = new String[] {"DIRT"};
+    private static String[] axeMaterials = new String[] {"LOG"};
 
     private WildToolsPlugin instance;
 
     public BlocksListener(WildToolsPlugin instance){
         this.instance = instance;
-    }
-
-    @EventHandler
-    public void g(SellWandUseEvent e){
-        if(e.getPlayer().getName().equals("OmerBenGera"))
-            e.setMultiplier(e.getMultiplier() * 2);
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
@@ -99,6 +104,39 @@ public final class BlocksListener implements Listener {
         }
 
         WTool.toolBlockBreak.remove(e.getPlayer().getUniqueId());
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onOmniInteract(PlayerInteractEvent e){
+        if(e.getAction() != Action.LEFT_CLICK_BLOCK ||
+                (lastClickedType.containsKey(e.getPlayer().getUniqueId()) && lastClickedType.get(e.getPlayer().getUniqueId()) == e.getClickedBlock().getType()))
+            return;
+
+        Tool tool = instance.getToolsManager().getTool(instance.getNMSAdapter().getItemInHand(e.getPlayer()));
+
+        if(tool == null || !tool.isOmni())
+            return;
+
+        e.setCancelled(true);
+
+        lastClickedType.put(e.getPlayer().getUniqueId(), e.getClickedBlock().getType());
+
+        String replaceType = "PICKAXE";
+        if(Arrays.asList(shovelMaterials).contains(e.getClickedBlock().getType().name())){
+            replaceType = "SPADE";
+        }
+        else if(Arrays.asList(axeMaterials).contains(e.getClickedBlock().getType().name())){
+            replaceType = "AXE";
+        }
+
+        ItemStack itemStack = instance.getNMSAdapter().getItemInHand(e.getPlayer());
+        replaceType = itemStack.getType().name().split("_")[0] + "_" + replaceType;
+
+        if(itemStack.getType().name().equals(replaceType))
+            return;
+
+        itemStack.setType(Material.valueOf(replaceType));
+        instance.getNMSAdapter().setItemInHand(e.getPlayer(), itemStack);
     }
 
     private String getTime(long timeLeft){

@@ -37,7 +37,7 @@ public abstract class WTool implements Tool {
     private ItemStack is;
     private int usesLeft;
     private String name, toolMode;
-    private boolean onlySameType, onlyInsideClaim, unbreakable, autoCollect, silkTouch, keepInventory;
+    private boolean onlySameType, onlyInsideClaim, unbreakable, autoCollect, silkTouch, keepInventory, omni;
     private long cooldown;
     private double multiplier;
 
@@ -56,6 +56,7 @@ public abstract class WTool implements Tool {
         this.autoCollect = false;
         this.silkTouch = false;
         this.unbreakable = false;
+        this.omni = false;
         this.blacklistedMaterials = new HashSet<>();
         this.whitelistedMaterials = new HashSet<>();
         this.blacklistedDrops = new HashSet<>();
@@ -122,6 +123,11 @@ public abstract class WTool implements Tool {
     @Override
     public void setKeepInventory(boolean keepInventory) {
         this.keepInventory = keepInventory;
+    }
+
+    @Override
+    public void setOmni(boolean omni) {
+        this.omni = omni;
     }
 
     @Override
@@ -232,6 +238,11 @@ public abstract class WTool implements Tool {
     @Override
     public boolean hasKeepInventory() {
         return keepInventory;
+    }
+
+    @Override
+    public boolean isOmni() {
+        return omni;
     }
 
     @Override

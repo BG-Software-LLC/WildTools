@@ -35,6 +35,8 @@ public interface Tool {
 
     void setKeepInventory(boolean keepInventory);
 
+    void setOmni(boolean omni);
+
     void addEnchantment(Enchantment ench, int level);
 
     void addBlacklistedMaterial(String type);
@@ -74,6 +76,8 @@ public interface Tool {
     long getCooldown();
 
     boolean hasKeepInventory();
+
+    boolean isOmni();
 
     Set<String> getBlacklistedMaterials();
 

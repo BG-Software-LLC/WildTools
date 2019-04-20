@@ -226,6 +226,9 @@ public final class DataHandler {
             if(cfg.contains("tools." + name + ".multiplier"))
                 tool.setMultiplier(cfg.getDouble("tools." + name + ".multiplier"));
 
+            if(cfg.contains("tools." + name + ".omni-tool") && type.name().contains("_"))
+                tool.setOmni(cfg.getBoolean("tools." + name + ".omni-tool"));
+
             toolsAmount++;
         }
 

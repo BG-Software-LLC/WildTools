@@ -88,6 +88,8 @@ public final class ConfigComments {
     @Comment("only-same-type: Only blocks with the same type will be dug. (BOOLEAN) (Default false)")
     @Comment("only-inside-claim: Will only work on blocks inside claim land.")
     @Comment("unbreakable: Tool will never be broken (BOOLEAN) (Default false)")
+    @Comment("omni-tool: Tool will change it's type depends on broken block (BOOLEAN) (Default false)")
+    @Comment("     Tool's default type must be a tool, such as pickaxe, shovel or axe.")
     @Comment("uses: Custom durability for the tool (INTEGER)")
     @Comment("     If both unbreakable and uses are not set, tool will use the vanilla durability (supports unbreaking enchantment)")
     @Comment("keep-inventory: Tool won't get dropped from players inventory (BOOLEAN) (Default false)")
