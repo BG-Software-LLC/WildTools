@@ -51,6 +51,8 @@ public interface Tool {
 
     ItemStack getFormattedItemStack();
 
+    ItemStack getFormattedItemStack(int uses);
+
     ToolMode getToolMode();
 
     String getName();

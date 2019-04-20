@@ -165,9 +165,14 @@ public abstract class WTool implements Tool {
 
     @Override
     public ItemStack getFormattedItemStack(){
+        return getFormattedItemStack(getDefaultUses());
+    }
+
+    @Override
+    public ItemStack getFormattedItemStack(int uses) {
         ItemStack is = this.is.clone();
 
-        ItemUtil.formatItemStack(this, is);
+        ItemUtil.formatItemStack(this, is, uses);
 
         is = plugin.getNMSAdapter().setTag(is, "tool-type", getName().toLowerCase());
 
@@ -330,7 +335,7 @@ public abstract class WTool implements Tool {
 
             //Update name and lore
             else if(is.hasItemMeta()){
-                ItemUtil.formatItemStack(this, is);
+                ItemUtil.formatItemStack(this, is, getDefaultUses());
             }
         }
 

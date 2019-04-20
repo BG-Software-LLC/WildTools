@@ -84,11 +84,10 @@ public final class CommandGive implements ICommand {
         }
 
         for(int i = 0; i < amount; i++){
-            ItemStack toolItem = tool.getFormattedItemStack();
+            ItemStack toolItem = tool.getFormattedItemStack(uses > -1 ? uses : tool.getDefaultUses());
 
             if(uses > -1){
                 toolItem = plugin.getNMSAdapter().setTag(toolItem, "tool-uses", uses);
-                ItemUtil.formatItemStack(tool, toolItem);
             }
 
             ItemUtil.addItem(toolItem, pl.getInventory(), null);

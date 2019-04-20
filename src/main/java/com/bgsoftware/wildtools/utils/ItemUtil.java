@@ -29,9 +29,9 @@ public final class ItemUtil {
         }
     }
 
-    public static void formatItemStack(Tool tool, ItemStack itemStack){
+    public static void formatItemStack(Tool tool, ItemStack itemStack, int defaultUses){
         ItemMeta meta = itemStack.getItemMeta();
-        int usesLeft = plugin.getNMSAdapter().getTag(itemStack, "tool-uses", tool.getDefaultUses());
+        int usesLeft = plugin.getNMSAdapter().getTag(itemStack, "tool-uses", defaultUses);
 
         if(meta.hasDisplayName()){
             if(tool.getItemStack().getItemMeta().getDisplayName().equals(meta.getDisplayName()) ||
