@@ -29,8 +29,7 @@ public final class EditorHandler {
 
     public EditorHandler(WildToolsPlugin plugin){
         this.plugin = plugin;
-        this.config = new CommentedConfiguration(ConfigComments.class);
-        reloadConfiguration();
+        this.config = new CommentedConfiguration(ConfigComments.class, new File(plugin.getDataFolder(), "config.yml"));
         loadSettingsEditor();
     }
 
