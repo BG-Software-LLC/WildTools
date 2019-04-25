@@ -19,6 +19,8 @@ public interface Tool {
 
     void setLore(List<String> lore);
 
+    void setSpigotUnbreakable(boolean spigotUnbreakable);
+
     void setOnlySameType(boolean onlySameType);
 
     void setOnlyInsideClaim(boolean onlyInsideClaim);

@@ -86,6 +86,15 @@ public abstract class WTool implements Tool {
     }
 
     @Override
+    public void setSpigotUnbreakable(boolean spigotUnbreakable) {
+        try {
+            ItemMeta itemMeta = is.getItemMeta();
+            ItemMeta.class.getMethod("setUnbreakable", boolean.class).invoke(itemMeta, spigotUnbreakable);
+            is.setItemMeta(itemMeta);
+        }catch(Throwable ignored){}
+    }
+
+    @Override
     public void setOnlySameType(boolean onlySameType){
         this.onlySameType = onlySameType;
     }
@@ -196,7 +205,7 @@ public abstract class WTool implements Tool {
     }
 
     @Override
-    public boolean isUnbreakable(){
+    public boolean isUnbreakable() {
         return unbreakable;
     }
 

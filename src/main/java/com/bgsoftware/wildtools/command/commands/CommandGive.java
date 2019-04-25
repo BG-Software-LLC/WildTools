@@ -1,8 +1,8 @@
 package com.bgsoftware.wildtools.command.commands;
 
 import com.bgsoftware.wildtools.utils.ItemUtil;
-import org.apache.commons.lang3.math.NumberUtils;
 
+import com.bgsoftware.wildtools.utils.NumberUtils;
 import org.bukkit.inventory.ItemStack;
 import com.bgsoftware.wildtools.Locale;
 import com.bgsoftware.wildtools.WildToolsPlugin;
