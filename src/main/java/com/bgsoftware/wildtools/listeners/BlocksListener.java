@@ -140,7 +140,7 @@ public final class BlocksListener implements Listener {
 
         String replaceType = "PICKAXE";
         if(Arrays.asList(shovelMaterials).contains(e.getClickedBlock().getType().name())){
-            replaceType = instance.getNMSAdapter().getVersion().contains("1_13") ? "SHOVEL" : "SPADE";
+            replaceType = instance.getNMSAdapter().isLegacy() ? "SPADE" : "SHOVEL";
         }
         else if(Arrays.asList(axeMaterials).contains(e.getClickedBlock().getType().name())){
             replaceType = "AXE";

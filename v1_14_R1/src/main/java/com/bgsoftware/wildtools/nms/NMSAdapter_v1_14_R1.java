@@ -1,39 +1,38 @@
 package com.bgsoftware.wildtools.nms;
 
 import com.bgsoftware.wildtools.objects.WMaterial;
-import net.minecraft.server.v1_13_R1.Block;
-import net.minecraft.server.v1_13_R1.BlockBeetroot;
-import net.minecraft.server.v1_13_R1.BlockCarrots;
-import net.minecraft.server.v1_13_R1.BlockCocoa;
-import net.minecraft.server.v1_13_R1.BlockCrops;
-import net.minecraft.server.v1_13_R1.BlockNetherWart;
-import net.minecraft.server.v1_13_R1.BlockPosition;
-import net.minecraft.server.v1_13_R1.BlockPotatoes;
-import net.minecraft.server.v1_13_R1.EnchantmentManager;
-import net.minecraft.server.v1_13_R1.Enchantments;
-import net.minecraft.server.v1_13_R1.EntityPlayer;
-import net.minecraft.server.v1_13_R1.IBlockData;
-import net.minecraft.server.v1_13_R1.Item;
-import net.minecraft.server.v1_13_R1.ItemStack;
-import net.minecraft.server.v1_13_R1.Items;
-import net.minecraft.server.v1_13_R1.NBTTagCompound;
-import net.minecraft.server.v1_13_R1.PlayerInventory;
-import net.minecraft.server.v1_13_R1.World;
-
+import net.minecraft.server.v1_14_R1.Block;
+import net.minecraft.server.v1_14_R1.BlockBeetroot;
+import net.minecraft.server.v1_14_R1.BlockCarrots;
+import net.minecraft.server.v1_14_R1.BlockCocoa;
+import net.minecraft.server.v1_14_R1.BlockCrops;
+import net.minecraft.server.v1_14_R1.BlockNetherWart;
+import net.minecraft.server.v1_14_R1.BlockPosition;
+import net.minecraft.server.v1_14_R1.BlockPotatoes;
+import net.minecraft.server.v1_14_R1.EnchantmentManager;
+import net.minecraft.server.v1_14_R1.Enchantments;
+import net.minecraft.server.v1_14_R1.EntityPlayer;
+import net.minecraft.server.v1_14_R1.IBlockData;
+import net.minecraft.server.v1_14_R1.ItemStack;
+import net.minecraft.server.v1_14_R1.Items;
+import net.minecraft.server.v1_14_R1.NBTTagCompound;
+import net.minecraft.server.v1_14_R1.PlayerInventory;
+import net.minecraft.server.v1_14_R1.TileEntity;
+import net.minecraft.server.v1_14_R1.World;
+import net.minecraft.server.v1_14_R1.WorldServer;
 import org.bukkit.Bukkit;
+import org.bukkit.CropState;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.WorldBorder;
 import org.bukkit.block.data.Ageable;
 import org.bukkit.block.data.BlockData;
-import org.bukkit.craftbukkit.v1_13_R1.CraftWorld;
-import org.bukkit.craftbukkit.v1_13_R1.block.CraftBlock;
-import org.bukkit.craftbukkit.v1_13_R1.entity.CraftPlayer;
-import org.bukkit.craftbukkit.v1_13_R1.inventory.CraftInventoryPlayer;
-import org.bukkit.craftbukkit.v1_13_R1.inventory.CraftItemStack;
-
-import org.bukkit.CropState;
-import org.bukkit.NamespacedKey;
+import org.bukkit.craftbukkit.v1_14_R1.CraftWorld;
+import org.bukkit.craftbukkit.v1_14_R1.block.CraftBlock;
+import org.bukkit.craftbukkit.v1_14_R1.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_14_R1.inventory.CraftInventoryPlayer;
+import org.bukkit.craftbukkit.v1_14_R1.inventory.CraftItemStack;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.Player;
@@ -41,13 +40,14 @@ import org.bukkit.entity.Player;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @SuppressWarnings({"unused", "ConstantConditions"})
-public final class NMSAdapter_v1_13_R1 implements NMSAdapter {
+public class NMSAdapter_v1_14_R1 implements NMSAdapter {
 
     @Override
     public String getVersion() {
-        return "v1_13_R1";
+        return "v1_14_R1";
     }
 
     @Override
@@ -61,36 +61,39 @@ public final class NMSAdapter_v1_13_R1 implements NMSAdapter {
 
         EntityPlayer player = ((CraftPlayer) pl).getHandle();
         BlockPosition blockPosition = new BlockPosition(bl.getX(), bl.getY(), bl.getZ());
-        World world = player.world;
-        IBlockData blockData = world.getType(blockPosition);
+        WorldServer worldServer = player.playerInteractManager.world;
+        IBlockData blockData = worldServer.getType(blockPosition);
         Block block = blockData.getBlock();
+        ItemStack itemStack = player.getItemInMainHand();
+        itemStack = itemStack.isEmpty() ? ItemStack.a : itemStack.cloneItemStack();
+        TileEntity tileEntity = worldServer.getTileEntity(blockPosition);
 
-        if(!player.hasBlock(blockData) || player.playerInteractManager.isCreative())
-            return drops;
-
-        // Has silk touch enchant
-        if ((block.j() && !block.isTileEntity()) && (silkTouch || EnchantmentManager.a(Enchantments.SILK_TOUCH, player) > 0)) {
-            Item item = block.getItem();
-            ItemStack itemStack = new ItemStack(item);
-            drops.add(CraftItemStack.asBukkitCopy(itemStack));
-        }
-
-        else if (!world.isClientSide) {
-            int fortuneLevel = EnchantmentManager.a(Enchantments.LOOT_BONUS_BLOCKS, player),
-                    dropCount = block.getDropCount(blockData, fortuneLevel, world, blockPosition, world.random);
-
-            for(int i = 0; i < dropCount; i++) {
-                if (world.random.nextFloat() < 1.0F) {
-                    Item item = block.getDropType(blockData, world, blockPosition, fortuneLevel).getItem();
-                    if (item != null) {
-                        ItemStack itemStack = new ItemStack(item);
-                        drops.add(CraftItemStack.asBukkitCopy(itemStack));
-                    }
-                }
-            }
-        }
-
-        return drops;
+        return Block.getDrops(blockData, worldServer, blockPosition, tileEntity, player, itemStack.isEmpty() ? ItemStack.a : itemStack.cloneItemStack())
+                .stream().map(CraftItemStack::asBukkitCopy).collect(Collectors.toList());
+//        if(!player.hasBlock(blockData) || player.playerInteractManager.isCreative())
+//            return drops;
+//
+//        // Has silk touch enchant
+//        if ((block.j() && !block.isTileEntity()) && (silkTouch || EnchantmentManager.a(Enchantments.SILK_TOUCH, player) > 0)) {
+//            Item item = block.getItem();
+//            ItemStack itemStack = new ItemStack(item);
+//            drops.add(CraftItemStack.asBukkitCopy(itemStack));
+//        }
+//
+//        else if (!world.isClientSide) {
+//            int fortuneLevel = EnchantmentManager.a(Enchantments.LOOT_BONUS_BLOCKS, player),
+//                    dropCount = block.getDropCount(blockData, fortuneLevel, world, blockPosition, world.random);
+//
+//            for(int i = 0; i < dropCount; i++) {
+//                if (world.random.nextFloat() < 1.0F) {
+//                    Item item = block.getDropType(blockData, world, blockPosition, fortuneLevel).getItem();
+//                    if (item != null) {
+//                        ItemStack itemStack = new ItemStack(item);
+//                        drops.add(CraftItemStack.asBukkitCopy(itemStack));
+//                    }
+//                }
+//            }
+//        }
     }
 
     @Override
@@ -250,7 +253,7 @@ public final class NMSAdapter_v1_13_R1 implements NMSAdapter {
     @Override
     public boolean isFullyGrown(org.bukkit.block.Block block) {
         if(block.getType() == Material.CACTUS || block.getType() == WMaterial.SUGAR_CANE.parseMaterial() ||
-                block.getType() == Material.PUMPKIN || block.getType() == WMaterial.MELON.parseMaterial())
+            block.getType() == Material.PUMPKIN || block.getType() == WMaterial.MELON.parseMaterial())
             return true;
         CraftBlock craftBlock = (CraftBlock) block;
         BlockData blockData = craftBlock.getBlockData();
@@ -286,6 +289,7 @@ public final class NMSAdapter_v1_13_R1 implements NMSAdapter {
 
     @Override
     public Enchantment getGlowEnchant() {
+        //noinspection NullableProblems
         return new Enchantment(NamespacedKey.minecraft("glowing_enchant")) {
             @Override
             public String getName() {
@@ -336,5 +340,6 @@ public final class NMSAdapter_v1_13_R1 implements NMSAdapter {
         return location.getBlockX() > (worldBorder.getCenter().getBlockX() + radius) || location.getBlockX() < (worldBorder.getCenter().getBlockX() - radius) ||
                 location.getBlockZ() > (worldBorder.getCenter().getBlockZ() + radius) || location.getBlockZ() < (worldBorder.getCenter().getBlockZ() - radius);
     }
+
 
 }

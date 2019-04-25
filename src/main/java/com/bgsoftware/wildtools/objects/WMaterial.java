@@ -1,6 +1,6 @@
 package com.bgsoftware.wildtools.objects;
 
-import org.bukkit.Bukkit;
+import com.bgsoftware.wildtools.WildToolsPlugin;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
@@ -16,6 +16,7 @@ public enum WMaterial {
     IRON_BARS("IRON_FENCE"),
     CRAFTING_TABLE("WORKBENCH");
 
+    private static final boolean isLegacy = WildToolsPlugin.getPlugin().getNMSAdapter().isLegacy();
     private final String legacy;
 
     WMaterial(String legacy){
@@ -23,22 +24,22 @@ public enum WMaterial {
     }
 
     public static ItemStack getBlackGlassPane(){
-        return Bukkit.getVersion().contains("1.13") ? new ItemStack(Material.matchMaterial("BLACK_STAINED_GLASS_PANE")) :
+        return !isLegacy ? new ItemStack(Material.matchMaterial("BLACK_STAINED_GLASS_PANE")) :
                 new ItemStack(Material.matchMaterial("STAINED_GLASS_PANE"), 1, (short) 15);
     }
 
     public static ItemStack getBlueGlassPane(){
-        return Bukkit.getVersion().contains("1.13") ? new ItemStack(Material.matchMaterial("LIGHT_BLUE_STAINED_GLASS_PANE")) :
+        return !isLegacy ? new ItemStack(Material.matchMaterial("LIGHT_BLUE_STAINED_GLASS_PANE")) :
                 new ItemStack(Material.matchMaterial("STAINED_GLASS_PANE"), 1, (short) 3);
     }
 
     public static ItemStack getGodApple(){
-        return Bukkit.getVersion().contains("1.13") ? new ItemStack(Material.matchMaterial("ENCHANTED_GOLDEN_APPLE")) :
+        return !isLegacy ? new ItemStack(Material.matchMaterial("ENCHANTED_GOLDEN_APPLE")) :
                 new ItemStack(Material.matchMaterial("GOLDEN_APPLE"), 1, (short) 1);
     }
 
     public Material parseMaterial(){
-        return Bukkit.getBukkitVersion().contains("1.13") ? Material.matchMaterial(toString()) : Material.matchMaterial(legacy);
+        return !isLegacy ? Material.matchMaterial(toString()) : Material.matchMaterial(legacy);
     }
 
 }

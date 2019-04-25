@@ -14,6 +14,10 @@ public interface NMSAdapter {
 
     String getVersion();
 
+    default boolean isLegacy(){
+        return true;
+    }
+
     List<ItemStack> getBlockDrops(Player pl, Block bl, boolean silkTouch);
 
     List<ItemStack> getCropDrops(Player pl, Block bl);

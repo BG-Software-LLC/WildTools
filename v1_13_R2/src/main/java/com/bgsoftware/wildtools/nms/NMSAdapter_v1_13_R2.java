@@ -51,6 +51,11 @@ public class NMSAdapter_v1_13_R2 implements NMSAdapter {
     }
 
     @Override
+    public boolean isLegacy() {
+        return false;
+    }
+
+    @Override
     public List<org.bukkit.inventory.ItemStack> getBlockDrops(Player pl, org.bukkit.block.Block bl, boolean silkTouch) {
         List<org.bukkit.inventory.ItemStack> drops = new ArrayList<>();
 
