@@ -1,17 +1,16 @@
 package com.bgsoftware.wildtools.objects.tools;
 
-import com.bgsoftware.wildtools.utils.ItemUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.FurnaceRecipe;
 import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.Recipe;
 import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.inventory.ShapelessRecipe;
 
+import com.bgsoftware.wildtools.hooks.WildChestsHook;
 import com.bgsoftware.wildtools.Locale;
 import com.bgsoftware.wildtools.api.objects.tools.CraftingTool;
 import com.bgsoftware.wildtools.api.objects.ToolMode;
@@ -47,15 +46,16 @@ public final class WCraftingTool extends WTool implements CraftingTool {
             return false;
         }
 
-        Inventory inventory = ((InventoryHolder) e.getClickedBlock().getState()).getInventory();
         Iterator<Recipe> craftings = getCraftings();
+
+        List<ItemStack> toAdd = new ArrayList<>();
 
         new Thread(() -> {
             int craftedItemsAmount = 0;
 
-            List<ItemStack> toAdd = new ArrayList<>();
+            List<Inventory> inventories = WildChestsHook.getAllInventories(e.getClickedBlock());
 
-            while(craftings.hasNext()){
+            while (craftings.hasNext()) {
                 Recipe recipe = craftings.next();
                 List<ItemStack> ingredients;
 
@@ -64,37 +64,38 @@ public final class WCraftingTool extends WTool implements CraftingTool {
                     ingredients = getIngredients(new ArrayList<>(((ShapedRecipe) recipe).getIngredientMap().values()));
                 } else if (recipe instanceof ShapelessRecipe) {
                     ingredients = getIngredients(((ShapelessRecipe) recipe).getIngredientList());
-                } else if(recipe instanceof FurnaceRecipe){
+                } else if (recipe instanceof FurnaceRecipe) {
                     ingredients = Collections.singletonList(((FurnaceRecipe) recipe).getInput());
                 } else continue;
 
                 if (ingredients.isEmpty())
                     continue;
 
-                int amountOfRecipes = Integer.MAX_VALUE;
+                for(Inventory inventory : inventories) {
+                    int amountOfRecipes = Integer.MAX_VALUE;
 
-                for(ItemStack ingredient : ingredients){
-                    amountOfRecipes = Math.min(amountOfRecipes, countItems(ingredient, inventory) / ingredient.getAmount());
-                }
-
-                if(amountOfRecipes > 0) {
                     for (ItemStack ingredient : ingredients) {
-                        ItemStack cloned = ingredient.clone();
-                        cloned.setAmount(ingredient.getAmount() * amountOfRecipes);
-                        if(ingredient.getDurability() == Short.MAX_VALUE)
-                            inventory.remove(cloned.getType());
-                        else inventory.removeItem(cloned);
+                        amountOfRecipes = Math.min(amountOfRecipes, countItems(ingredient, inventory) / ingredient.getAmount());
                     }
-                    ItemStack result = recipe.getResult().clone();
-                    result.setAmount(result.getAmount() * amountOfRecipes);
-                    toAdd.add(result);
 
-                    craftedItemsAmount += amountOfRecipes;
+                    if (amountOfRecipes > 0) {
+                        for (ItemStack ingredient : ingredients) {
+                            ItemStack cloned = ingredient.clone();
+                            cloned.setAmount(ingredient.getAmount() * amountOfRecipes);
+                            if (ingredient.getDurability() == Short.MAX_VALUE)
+                                inventory.remove(cloned.getType());
+                            else inventory.removeItem(cloned);
+                        }
+                        ItemStack result = recipe.getResult().clone();
+                        result.setAmount(result.getAmount() * amountOfRecipes);
+                        toAdd.add(result);
+
+                        craftedItemsAmount += amountOfRecipes;
+                    }
                 }
             }
 
-            for(ItemStack itemStack : toAdd)
-                ItemUtil.addItem(itemStack, inventory, e.getClickedBlock().getLocation());
+            WildChestsHook.addItems(e.getClickedBlock(), toAdd);
 
             if(craftedItemsAmount > 0){
                 reduceDurablility(e.getPlayer());

@@ -1,5 +1,6 @@
 package com.bgsoftware.wildtools.objects.tools;
 
+import com.bgsoftware.wildtools.hooks.WildChestsHook;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.block.Chest;
@@ -11,11 +12,12 @@ import com.bgsoftware.wildtools.api.objects.ToolMode;
 
 import org.bukkit.Material;
 import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public final class WSellTool extends WTool implements SellTool {
 
@@ -40,23 +42,25 @@ public final class WSellTool extends WTool implements SellTool {
         }
 
         new Thread(() -> {
-            Inventory inventory = ((InventoryHolder) e.getClickedBlock().getState()).getInventory();
-
             double totalEarnings = 0.0;
 
-            List<Integer> toSell = new ArrayList<>();
+            Map<Inventory, List<Integer>> toSell = new HashMap<>();
 
-            for(int slot = 0; slot < inventory.getSize(); slot++){
-                ItemStack is = inventory.getItem(slot);
-                if(is != null && plugin.getProviders().canSellItem(e.getPlayer(), is)){
-                    toSell.add(slot);
-                    totalEarnings += plugin.getProviders().getPrice(e.getPlayer(), is);
+            for(Inventory inventory : WildChestsHook.getAllInventories(e.getClickedBlock())) {
+                toSell.put(inventory, new ArrayList<>());
+                for (int slot = 0; slot < inventory.getSize(); slot++) {
+                    ItemStack is = inventory.getItem(slot);
+                    if (is != null && plugin.getProviders().canSellItem(e.getPlayer(), is)) {
+                        toSell.get(inventory).add(slot);
+                        totalEarnings += plugin.getProviders().getPrice(e.getPlayer(), is);
+                    }
                 }
             }
 
             double multiplier = getMultiplier();
 
-            String message = toSell.isEmpty() ? Locale.NO_SELL_ITEMS.getMessage() : Locale.SOLD_CHEST.getMessage();
+            String message = toSell.values().stream().allMatch(List::isEmpty) ?
+                    Locale.NO_SELL_ITEMS.getMessage() : Locale.SOLD_CHEST.getMessage();
 
             SellWandUseEvent sellWandUseEvent = new SellWandUseEvent(e.getPlayer(), (Chest) e.getClickedBlock().getState(), totalEarnings, multiplier, message);
             Bukkit.getPluginManager().callEvent(sellWandUseEvent);
@@ -67,9 +71,11 @@ public final class WSellTool extends WTool implements SellTool {
             multiplier = sellWandUseEvent.getMultiplier();
             totalEarnings *= multiplier;
 
-            for(int slot : toSell){
-                plugin.getProviders().trySellingItem(e.getPlayer(), inventory.getItem(slot), multiplier);
-                inventory.setItem(slot, new ItemStack(Material.AIR));
+            for(Inventory inventory : toSell.keySet()){
+                for(int slot : toSell.get(inventory)){
+                    plugin.getProviders().trySellingItem(e.getPlayer(), inventory.getItem(slot), multiplier);
+                    inventory.setItem(slot, new ItemStack(Material.AIR));
+                }
             }
 
             //noinspection all

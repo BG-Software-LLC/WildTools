@@ -17,15 +17,12 @@ public final class ItemUtil {
     private static WildToolsPlugin plugin = WildToolsPlugin.getPlugin();
 
     public static void addItem(ItemStack itemStack, Inventory inventory, Location location){
-        if(!Bukkit.isPrimaryThread()){
-            Bukkit.getScheduler().runTask(plugin, () -> addItem(itemStack, inventory, location));
-            return;
-        }
-
         HashMap<Integer, ItemStack> additionalItems = inventory.addItem(itemStack);
         if(location != null && !additionalItems.isEmpty()){
-            for(ItemStack additional : additionalItems.values())
-                location.getWorld().dropItemNaturally(location, additional);
+            Bukkit.getScheduler().runTask(plugin, () -> {
+                for(ItemStack additional : additionalItems.values())
+                    location.getWorld().dropItemNaturally(location, additional);
+            });
         }
     }
 

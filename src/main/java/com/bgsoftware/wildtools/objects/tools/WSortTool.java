@@ -1,20 +1,23 @@
 package com.bgsoftware.wildtools.objects.tools;
 
-import org.bukkit.Material;
-import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.InventoryHolder;
-import org.bukkit.inventory.ItemStack;
-
+import com.bgsoftware.wildtools.hooks.WildChestsHook;
 import com.bgsoftware.wildtools.Locale;
 import com.bgsoftware.wildtools.api.objects.ToolMode;
 import com.bgsoftware.wildtools.api.objects.tools.SortTool;
 
+import org.bukkit.Material;
+import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 public final class WSortTool extends WTool implements SortTool {
 
@@ -32,34 +35,39 @@ public final class WSortTool extends WTool implements SortTool {
             return false;
         }
 
-        List<InventoryItem> inventoryItems = new ArrayList<>();
-
         new Thread(() -> {
-            Inventory inventory = ((InventoryHolder) e.getClickedBlock().getState()).getInventory();
+            List<Inventory> inventories = WildChestsHook.getAllInventories(e.getClickedBlock());
+            List<InventoryItem> inventoryItems = new ArrayList<>();
+            Map<Inventory, ItemStack[]> originContents = new HashMap<>();
 
-            ItemStack[] originContents = inventory.getContents();
-
-            Arrays.stream(inventory.getContents())
-                    .filter(Objects::nonNull)
-                    .forEach(itemStack -> inventoryItems.add(new InventoryItem(itemStack)));
-
-            inventory.clear();
+            for(Inventory inventory : inventories) {
+                originContents.put(inventory, inventory.getContents());
+                Arrays.stream(inventory.getContents())
+                        .filter(Objects::nonNull)
+                        .forEach(itemStack -> inventoryItems.add(new InventoryItem(itemStack)));
+                inventory.clear();
+            }
 
             Collections.sort(inventoryItems);
 
-            inventoryItems.forEach(inventoryItem -> inventory.addItem(inventoryItem.itemStack));
+            WildChestsHook.addItems(e.getClickedBlock(), convert(inventoryItems));
 
-            if(!Arrays.equals(originContents, inventory.getContents())) {
-                reduceDurablility(e.getPlayer());
-                Locale.SORTED_CHEST.send(e.getPlayer());
-            }
-            else{
-                Locale.NO_SORT_ITEMS.send(e.getPlayer());
+            for(Inventory inventory : inventories){
+                if(!Arrays.equals(originContents.get(inventory), inventory.getContents())) {
+                    reduceDurablility(e.getPlayer());
+                    Locale.SORTED_CHEST.send(e.getPlayer());
+                    return;
+                }
             }
 
+            Locale.NO_SORT_ITEMS.send(e.getPlayer());
         }).start();
 
         return true;
+    }
+
+    private List<ItemStack> convert(List<InventoryItem> original){
+        return original.stream().map(InventoryItem::getItemStack).collect(Collectors.toList());
     }
 
     private class InventoryItem implements Comparable<InventoryItem>{
@@ -68,6 +76,10 @@ public final class WSortTool extends WTool implements SortTool {
 
         InventoryItem(ItemStack itemStack){
             this.itemStack = itemStack;
+        }
+
+        public ItemStack getItemStack() {
+            return itemStack;
         }
 
         @Override
