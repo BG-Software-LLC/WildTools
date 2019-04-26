@@ -83,7 +83,7 @@ public final class EditorListener implements Listener {
 
         Player player = (Player) e.getWhoClicked();
 
-        if(e.getInventory().getName().equals("" + ChatColor.AQUA + ChatColor.BOLD + "WildTools")){
+        if(e.getView().getTitle().equals("" + ChatColor.AQUA + ChatColor.BOLD + "WildTools")){
             e.setCancelled(true);
 
             switch (e.getRawSlot()){
@@ -107,7 +107,7 @@ public final class EditorListener implements Listener {
 
         }
 
-        else if(e.getInventory().getName().equals("" + ChatColor.DARK_GRAY + ChatColor.BOLD + "Tools Editor")){
+        else if(e.getView().getTitle().equals("" + ChatColor.DARK_GRAY + ChatColor.BOLD + "Tools Editor")){
             e.setCancelled(true);
 
             if(e.getCurrentItem() == null || e.getCurrentItem().getType() == Material.AIR)
@@ -128,7 +128,7 @@ public final class EditorListener implements Listener {
 
         }
 
-        else if(e.getInventory().getName().equals("" + ChatColor.DARK_GRAY + ChatColor.BOLD + "Tool Editor")){
+        else if(e.getView().getTitle().equals("" + ChatColor.DARK_GRAY + ChatColor.BOLD + "Tool Editor")){
             e.setCancelled(true);
 
             String toolName = toolTypes.get(player.getUniqueId());
@@ -251,21 +251,21 @@ public final class EditorListener implements Listener {
         Player player = (Player) e.getPlayer();
 
         Bukkit.getScheduler().runTaskLater(plugin, () -> {
-            if(e.getInventory().getName().equals("" + ChatColor.AQUA + ChatColor.BOLD + "WildTools")){
+            if(e.getView().getTitle().equals("" + ChatColor.AQUA + ChatColor.BOLD + "WildTools")){
                 if(!noResetClose.contains(player.getUniqueId())) {
                     Bukkit.getScheduler().runTaskAsynchronously(plugin, () ->
                             plugin.getEditor().reloadConfiguration());
                 }
             }
 
-            else if(e.getInventory().getName().equals("" + ChatColor.DARK_GRAY + ChatColor.BOLD + "Tools Editor")){
+            else if(e.getView().getTitle().equals("" + ChatColor.DARK_GRAY + ChatColor.BOLD + "Tools Editor")){
                 if(toolTypes.containsKey(player.getUniqueId()))
                     return;
                 noResetClose.remove(player.getUniqueId());
                 player.openInventory(plugin.getEditor().getSettingsEditor());
             }
 
-            else if(e.getInventory().getName().equals("" + ChatColor.DARK_GRAY + ChatColor.BOLD + "Tool Editor")){
+            else if(e.getView().getTitle().equals("" + ChatColor.DARK_GRAY + ChatColor.BOLD + "Tool Editor")){
                 if(toolValues.containsKey(player.getUniqueId()))
                     return;
                 toolTypes.remove(player.getUniqueId());
