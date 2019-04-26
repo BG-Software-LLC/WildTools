@@ -7,6 +7,7 @@ import com.bgsoftware.wildtools.hooks.BlocksProvider_ASkyblock;
 import com.bgsoftware.wildtools.hooks.BlocksProvider_AcidIsland;
 import com.bgsoftware.wildtools.hooks.BlocksProvider_BentoBox;
 import com.bgsoftware.wildtools.hooks.BlocksProvider_FabledSkyblock;
+import com.bgsoftware.wildtools.hooks.BlocksProvider_FactionsOne;
 import com.bgsoftware.wildtools.hooks.BlocksProvider_FactionsUUID;
 import com.bgsoftware.wildtools.hooks.BlocksProvider_GriefPrevention;
 import com.bgsoftware.wildtools.hooks.BlocksProvider_Lands;
@@ -74,7 +75,10 @@ public final class ProvidersHandler {
         if(Bukkit.getPluginManager().isPluginEnabled("FabledSkyBlock"))
             blocksProviders.add(new BlocksProvider_FabledSkyblock());
         if(Bukkit.getPluginManager().isPluginEnabled("Factions")){
-            if(Bukkit.getPluginManager().isPluginEnabled("MassiveCore")){
+            if(Bukkit.getPluginManager().getPlugin("Factions").getDescription().getAuthors().contains("Daniel Saukel")){
+                blocksProviders.add(new BlocksProvider_FactionsOne());
+            }
+            else if(Bukkit.getPluginManager().isPluginEnabled("MassiveCore")){
                 blocksProviders.add(new BlocksProvider_MassiveFactions());
             }else {
                 blocksProviders.add(new BlocksProvider_FactionsUUID());
