@@ -122,7 +122,7 @@ public final class EditorHandler {
                 .withName("&bTool Only-Same-Type").withLore("&7Only-Same-Type: " + getFromConfig(toolName, "only-same-type", Boolean.class, false)).build());
         editor.setItem(42, new ItemBuilder(Material.NETHER_STAR)
                 .withName("&bTool Glow").withLore("&7Glow: " + getFromConfig(toolName, "glow", Boolean.class, false)).build());
-        editor.setItem(43, new ItemBuilder(Material.CAULDRON_ITEM)
+        editor.setItem(43, new ItemBuilder(WMaterial.CAULDRON)
                 .withName("&bTool Spigot Unbreakable").withLore("&7Spigot Unbreakable: " + getFromConfig(toolName, "spigot-unbreakable", Boolean.class, false)).build());
         editor.setItem(44, new ItemBuilder(Material.COAL)
                 .withName("&bTool Blacklisted Drops").withLore("&7Blacklisted Drops: ",
