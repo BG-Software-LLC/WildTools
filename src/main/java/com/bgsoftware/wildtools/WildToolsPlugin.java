@@ -5,6 +5,7 @@ import com.bgsoftware.wildtools.api.WildToolsAPI;
 import com.bgsoftware.wildtools.command.CommandsHandler;
 import com.bgsoftware.wildtools.handlers.EditorHandler;
 import com.bgsoftware.wildtools.handlers.ToolsHandler;
+import com.bgsoftware.wildtools.hooks.SuperMobCoinsHook;
 import com.bgsoftware.wildtools.metrics.Metrics;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
@@ -104,6 +105,9 @@ public final class WildToolsPlugin extends JavaPlugin implements WildTools {
         log(" - Using " + nmsAdapter.getVersion() + " adapter.");
         providersHandler = new ProvidersHandler();
         log("Loading providers done (Took " + (System.currentTimeMillis() - startTime) + "ms)");
+
+        if(Bukkit.getPluginManager().isPluginEnabled("SuperMobCoins"))
+            SuperMobCoinsHook.register();
 
         if(!isVaultEnabled()) {
             log("");
