@@ -44,7 +44,7 @@ public final class Updater {
                 latestVersion = plugin.get("version").getAsString();
                 versionDescription = plugin.get("description").getAsString();
             }
-        } catch(Exception ex){
+        } catch(Throwable ex){
             //Something went wrong...
             latestVersion = plugin.getDescription().getVersion();
         }
