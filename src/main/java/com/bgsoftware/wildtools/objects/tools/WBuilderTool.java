@@ -1,5 +1,6 @@
 package com.bgsoftware.wildtools.objects.tools;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -26,11 +27,9 @@ public final class WBuilderTool extends WTool implements BuilderTool {
     @Override
     @SuppressWarnings("all")
     public boolean canBreakBlock(Block block, Material firstType, short firstData) {
-        if(isOnlySameType() && (firstType != block.getType() || firstData != block.getData()))
+        if(hasBlacklistedMaterials() && isBlacklistedMaterial(firstType, firstData))
             return false;
-        if(hasBlacklistedMaterials() && isBlacklistedMaterial(block.getType(), block.getData()))
-            return false;
-        if(hasWhitelistedMaterials() && !isWhitelistedMaterial(block.getType(), block.getData()))
+        if(hasWhitelistedMaterials() && !isWhitelistedMaterial(firstType, firstData))
             return false;
         return true;
     }
@@ -40,12 +39,14 @@ public final class WBuilderTool extends WTool implements BuilderTool {
         BlockFace blockFace = e.getBlockFace();
 
         boolean reduceDurablity = false;
+        Material firstType = e.getClickedBlock().getType();
+        short firstData = e.getClickedBlock().getState().getData().toItemStack().getDurability();
 
         Block nextBlock = e.getClickedBlock();
         for(int i = 0; i < length; i++){
             nextBlock = nextBlock.getRelative(blockFace);
 
-            if(nextBlock.getType() != Material.AIR || !plugin.getProviders().canBreak(e.getPlayer(), nextBlock, this))
+            if(nextBlock.getType() != Material.AIR || !plugin.getProviders().canBreak(e.getPlayer(), nextBlock, firstType, firstData, this))
                 break;
 
             ItemStack blockItemStack = e.getClickedBlock().getState().getData().toItemStack(1);
