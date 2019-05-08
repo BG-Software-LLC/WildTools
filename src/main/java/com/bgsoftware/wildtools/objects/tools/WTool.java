@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @SuppressWarnings("all")
 public abstract class WTool implements Tool {
@@ -378,18 +379,18 @@ public abstract class WTool implements Tool {
     @Override
     public List<ItemStack> filterDrops(List<ItemStack> drops){
         if(!hasBlacklistedDrops() && !hasWhitelistedDrops())
-            return drops;
+            return drops.stream().filter(is -> is.getType() != Material.AIR).collect(Collectors.toList());
 
         List<ItemStack> filteredDrops = new ArrayList<>();
 
         for(ItemStack is : drops){
-            if(hasBlacklistedDrops() && !isBlacklistedDrop(is.getType(), is.getDurability()))
+            if (hasBlacklistedDrops() && !isBlacklistedDrop(is.getType(), is.getDurability()))
                 filteredDrops.add(is);
-            if(hasWhitelistedDrops() && isWhitelistedDrop(is.getType(), is.getDurability()))
+            if (hasWhitelistedDrops() && isWhitelistedDrop(is.getType(), is.getDurability()))
                 filteredDrops.add(is);
         }
 
-        return filteredDrops;
+        return filteredDrops.stream().filter(is -> is.getType() != Material.AIR).collect(Collectors.toList());
     }
 
     @Override
