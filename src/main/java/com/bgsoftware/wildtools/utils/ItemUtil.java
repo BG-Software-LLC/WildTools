@@ -32,8 +32,6 @@ public final class ItemUtil {
         int usesLeft = plugin.getNMSAdapter().getTag(itemStack, "tool-uses", defaultUses);
         String ownerName = "None", ownerUUID = plugin.getNMSAdapter().getTag(itemStack, "tool-owner", "");
 
-        Bukkit.broadcastMessage(ownerUUID + "");
-
         try {
             ownerName = Bukkit.getOfflinePlayer(UUID.fromString(ownerUUID)).getName();
         }catch(Exception ignored){}
