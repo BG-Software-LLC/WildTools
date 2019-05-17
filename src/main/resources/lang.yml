@@ -27,6 +27,10 @@ NO_FILLED_DISPENSERS: '&b&lWildTools &7There were no dispensers to fill.'
 # Called when a player successfully gave a tool to a player.
 GIVE_TOOL_SUCCESS: '&b&lWildTools &7Successfully gave x{0} {1} to {2}.'
 
+# Placeholders for {sell-mode}
+HARVESTER_SELL_ENABLED: '&a&lEnabled'
+HARVESTER_SELL_DISABLED: '&c&lDisabled'
+
 # Called when a player successfully sold harvested items with a harvester-tool.
 HARVESTER_SELL_SUCCEED: '&b&lWildTools &7Successfully sold {0} items for ${1}.'
 

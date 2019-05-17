@@ -107,6 +107,10 @@ public final class WHarvesterTool extends WTool implements HarvesterTool {
         return handleUse(e.getPlayer(), e.getClickedBlock());
     }
 
+    boolean hasSellMode(Player player){
+        return sellModesPlayers.contains(player.getUniqueId());
+    }
+
     private boolean handleUse(Player player, Block block){
         Location max = block.getLocation().clone().add(farmlandRadius, farmlandRadius, farmlandRadius),
                 min = block.getLocation().clone().subtract(farmlandRadius, farmlandRadius, farmlandRadius);

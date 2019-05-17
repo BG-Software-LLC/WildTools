@@ -21,6 +21,8 @@ public final class Locale {
     public static Locale FILLED_DISPENSERS = new Locale("FILLED_DISPENSERS");
     public static Locale NO_FILLED_DISPENSERS = new Locale("NO_FILLED_DISPENSERS");
     public static Locale GIVE_TOOL_SUCCESS = new Locale("GIVE_TOOL_SUCCESS");
+    public static Locale HARVESTER_SELL_ENABLED = new Locale("HARVESTER_SELL_ENABLED");
+    public static Locale HARVESTER_SELL_DISABLED = new Locale("HARVESTER_SELL_DISABLED");
     public static Locale HARVESTER_SELL_SUCCEED = new Locale("HARVESTER_SELL_SUCCEED");
     public static Locale HELP_COMMAND_HEADER = new Locale("HELP_COMMAND_HEADER");
     public static Locale HELP_COMMAND_LINE = new Locale("HELP_COMMAND_LINE");

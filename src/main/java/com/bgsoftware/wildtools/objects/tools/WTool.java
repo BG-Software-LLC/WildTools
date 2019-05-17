@@ -1,5 +1,6 @@
 package com.bgsoftware.wildtools.objects.tools;
 
+import com.bgsoftware.wildtools.api.objects.tools.HarvesterTool;
 import com.bgsoftware.wildtools.utils.ItemUtil;
 import org.bukkit.GameMode;
 import org.bukkit.block.Block;
@@ -193,7 +194,7 @@ public abstract class WTool implements Tool {
     public ItemStack getFormattedItemStack(int uses) {
         ItemStack is = this.is.clone();
 
-        ItemUtil.formatItemStack(this, is, uses);
+        ItemUtil.formatItemStack(this, is, uses, false);
 
         is = plugin.getNMSAdapter().setTag(is, "tool-type", getName().toLowerCase());
 
@@ -366,7 +367,8 @@ public abstract class WTool implements Tool {
 
             //Update name and lore
             else if(is.hasItemMeta()){
-                ItemUtil.formatItemStack(this, is, getDefaultUses());
+                ItemUtil.formatItemStack(this, is, getDefaultUses(),
+                        this instanceof HarvesterTool && ((WHarvesterTool) this).hasSellMode(pl));
             }
         }
 

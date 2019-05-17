@@ -1,5 +1,6 @@
 package com.bgsoftware.wildtools.utils;
 
+import com.bgsoftware.wildtools.Locale;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.inventory.Inventory;
@@ -27,10 +28,14 @@ public final class ItemUtil {
         }
     }
 
-    public static void formatItemStack(Tool tool, ItemStack itemStack, int defaultUses){
+    public static void formatItemStack(Tool tool, ItemStack itemStack, int defaultUses, boolean sellMode){
         ItemMeta meta = itemStack.getItemMeta();
         int usesLeft = plugin.getNMSAdapter().getTag(itemStack, "tool-uses", defaultUses);
-        String ownerName = "None", ownerUUID = plugin.getNMSAdapter().getTag(itemStack, "tool-owner", "");
+        String ownerName = "None", ownerUUID = plugin.getNMSAdapter().getTag(itemStack, "tool-owner", ""),
+                enabled = Locale.HARVESTER_SELL_ENABLED.getMessage(), disabled = Locale.HARVESTER_SELL_DISABLED.getMessage();
+
+        if(enabled == null) enabled = "";
+        if(disabled == null) disabled = "";
 
         try {
             ownerName = Bukkit.getOfflinePlayer(UUID.fromString(ownerUUID)).getName();
@@ -40,14 +45,19 @@ public final class ItemUtil {
             if(tool.getItemStack().getItemMeta().getDisplayName().equals(meta.getDisplayName()) ||
                     tool.getItemStack().getItemMeta().getDisplayName().replace("{}", (usesLeft + 1) + "").equals(meta.getDisplayName()))
                 meta.setDisplayName(tool.getItemStack().getItemMeta().getDisplayName()
-                        .replace("{}", usesLeft + "").replace("{owner}", ownerName));
+                        .replace("{}", usesLeft + "")
+                        .replace("{owner}", ownerName)
+                        .replace("{sell-mode}", sellMode ? enabled : disabled));
         }
 
         if(meta.hasLore()){
             List<String> lore = new ArrayList<>();
 
             for(String line : tool.getItemStack().getItemMeta().getLore())
-                lore.add(line.replace("{}", usesLeft + "").replace("{owner}", ownerName));
+                lore.add(line
+                        .replace("{}", usesLeft + "")
+                        .replace("{owner}", ownerName)
+                        .replace("{sell-mode}", sellMode ? enabled : disabled));
 
             meta.setLore(lore);
         }

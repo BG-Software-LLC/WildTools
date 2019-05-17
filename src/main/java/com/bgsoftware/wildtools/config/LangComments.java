@@ -38,6 +38,10 @@ public final class LangComments {
     public static String GIVE_TOOL_SUCCESS = "GIVE_TOOL_SUCCESS";
 
     @Comment("")
+    @Comment("Placeholders for {sell-mode}")
+    public static String HARVESTER_SELL_ENABLED = "HARVESTER_SELL_ENABLED";
+
+    @Comment("")
     @Comment("Called when a player successfully sold harvested items with a harvester-tool.")
     public static String HARVESTER_SELL_SUCCEED = "HARVESTER_SELL_SUCCEED";
 
@@ -76,6 +80,10 @@ public final class LangComments {
     @Comment("")
     @Comment("Called when a player runs a command without the required permission.")
     public static String NO_PERMISSION = "NO_PERMISSION";
+
+    @Comment("")
+    @Comment("Called when using an unowned tool.")
+    public static String NOT_OWNER = "NOT_OWNER";
 
     @Comment("")
     @Comment("Called when a player successfully reloaded all configuration files.")
