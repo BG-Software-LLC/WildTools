@@ -59,6 +59,9 @@ MCMMO_TOOL_SUPER_BREAKER: '&b&lWildTools &7You cannot use super-breaker on this 
 # Called when a player runs a command without the required permission.
 NO_PERMISSION: '&fUnknown command. Type "/help" for help.'
 
+# Called when using an unowned tool.
+NOT_OWNER: '&cYou are not owning the tool.'
+
 # Called when a player successfully reloaded all configuration files.
 RELOAD_SUCCESS: '&b&lWildTools &7Successfully reloaded the configuration files.'
 

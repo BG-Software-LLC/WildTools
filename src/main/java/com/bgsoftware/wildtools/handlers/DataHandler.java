@@ -231,6 +231,9 @@ public final class DataHandler {
             if(cfg.contains("tools." + name + ".omni-tool") && type.name().contains("_"))
                 tool.setOmni(cfg.getBoolean("tools." + name + ".omni-tool"));
 
+            if(cfg.contains("tools." + name + ".private"))
+                tool.setPrivate(cfg.getBoolean("tools." + name + ".private"));
+
             toolsAmount++;
         }
 

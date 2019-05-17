@@ -4,6 +4,7 @@ import com.bgsoftware.wildtools.Locale;
 import com.bgsoftware.wildtools.WildToolsPlugin;
 import com.bgsoftware.wildtools.objects.tools.WTool;
 
+import com.bgsoftware.wildtools.utils.ItemUtil;
 import org.bukkit.Material;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.EventHandler;
@@ -45,13 +46,13 @@ public final class BlocksListener implements Listener {
             "GRAY_BANNER", "LIGHT_GRAY_BANNER", "CYAN_BANNER", "PURPLE_BANNER", "BLUE_BANNER", "BROWN_BANNER", "SPRUCE_STAIRS",
             "GREEN_BANNER", "RED_BANNER", "BLACK_BANNER", "SIGN", "MUSHROOM_STEM", "RED_MUSHROOM_BLOCK", "BROWN_MUSHROOM_BLOCK"};
 
-    private WildToolsPlugin instance;
+    private WildToolsPlugin plugin;
 
-    public BlocksListener(WildToolsPlugin instance){
-        this.instance = instance;
+    public BlocksListener(WildToolsPlugin plugin){
+        this.plugin = plugin;
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onBlockBreak(BlockBreakEvent e){
         //One of the blocks that were broken by a tool
         if(WTool.toolBlockBreak.contains(e.getPlayer().getUniqueId()))
@@ -60,7 +61,8 @@ public final class BlocksListener implements Listener {
         if(!e.getPlayer().hasPermission("wildtools.use"))
             return;
 
-        Tool tool = instance.getToolsManager().getTool(instance.getNMSAdapter().getItemInHand(e.getPlayer()));
+        ItemStack inHand = plugin.getNMSAdapter().getItemInHand(e.getPlayer());
+        Tool tool = plugin.getToolsManager().getTool(inHand);
 
         if(tool == null)
             return;
@@ -68,6 +70,12 @@ public final class BlocksListener implements Listener {
         if(!tool.canUse(e.getPlayer().getUniqueId())){
             e.setCancelled(true);
             Locale.COOLDOWN_TIME.send(e.getPlayer(), getTime(tool.getTimeLeft(e.getPlayer().getUniqueId())));
+            return;
+        }
+
+        if(!plugin.getToolsManager().isOwningTool(inHand, e.getPlayer())){
+            e.setCancelled(true);
+            Locale.NOT_OWNER.send(e.getPlayer());
             return;
         }
 
@@ -78,10 +86,19 @@ public final class BlocksListener implements Listener {
             tool.setLastUse(e.getPlayer().getUniqueId());
         }
 
+        if(tool.isPrivate()) {
+            String owner = plugin.getNMSAdapter().getTag(inHand, "tool-owner", "");
+            if(owner.isEmpty()) {
+                inHand = plugin.getNMSAdapter().setTag(inHand, "tool-owner", e.getPlayer().getUniqueId().toString());
+                ItemUtil.formatItemStack(tool, inHand, tool.getDefaultUses());
+                plugin.getNMSAdapter().setItemInHand(e.getPlayer(), inHand);
+            }
+        }
+
         WTool.toolBlockBreak.remove(e.getPlayer().getUniqueId());
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onBlockInteract(PlayerInteractEvent e){
         //One of the blocks that were broken by a tool
         if(WTool.toolBlockBreak.contains(e.getPlayer().getUniqueId()) || e.getItem() == null)
@@ -90,7 +107,8 @@ public final class BlocksListener implements Listener {
         if(!e.getPlayer().hasPermission("wildtools.use"))
             return;
 
-        Tool tool = instance.getToolsManager().getTool(instance.getNMSAdapter().getItemInHand(e.getPlayer()));
+        ItemStack inHand = plugin.getNMSAdapter().getItemInHand(e.getPlayer());
+        Tool tool = plugin.getToolsManager().getTool(inHand);
 
         if(tool == null)
             return;
@@ -98,6 +116,12 @@ public final class BlocksListener implements Listener {
         if(!tool.canUse(e.getPlayer().getUniqueId())){
             e.setCancelled(true);
             Locale.COOLDOWN_TIME.send(e.getPlayer(), getTime(tool.getTimeLeft(e.getPlayer().getUniqueId())));
+            return;
+        }
+
+        if(!plugin.getToolsManager().isOwningTool(inHand, e.getPlayer())){
+            e.setCancelled(true);
+            Locale.NOT_OWNER.send(e.getPlayer());
             return;
         }
 
@@ -122,6 +146,15 @@ public final class BlocksListener implements Listener {
             tool.setLastUse(e.getPlayer().getUniqueId());
         }
 
+        if(tool.isPrivate()) {
+            String owner = plugin.getNMSAdapter().getTag(inHand, "tool-owner", "");
+            if(owner.isEmpty()) {
+                inHand = plugin.getNMSAdapter().setTag(inHand, "tool-owner", e.getPlayer().getUniqueId().toString());
+                ItemUtil.formatItemStack(tool, inHand, tool.getDefaultUses());
+                plugin.getNMSAdapter().setItemInHand(e.getPlayer(), inHand);
+            }
+        }
+
         WTool.toolBlockBreak.remove(e.getPlayer().getUniqueId());
     }
 
@@ -131,7 +164,7 @@ public final class BlocksListener implements Listener {
                 (lastClickedType.containsKey(e.getPlayer().getUniqueId()) && lastClickedType.get(e.getPlayer().getUniqueId()) == e.getClickedBlock().getType()))
             return;
 
-        Tool tool = instance.getToolsManager().getTool(instance.getNMSAdapter().getItemInHand(e.getPlayer()));
+        Tool tool = plugin.getToolsManager().getTool(plugin.getNMSAdapter().getItemInHand(e.getPlayer()));
 
         if(tool == null || !tool.isOmni())
             return;
@@ -140,20 +173,20 @@ public final class BlocksListener implements Listener {
 
         String replaceType = "PICKAXE";
         if(Arrays.asList(shovelMaterials).contains(e.getClickedBlock().getType().name())){
-            replaceType = instance.getNMSAdapter().isLegacy() ? "SPADE" : "SHOVEL";
+            replaceType = plugin.getNMSAdapter().isLegacy() ? "SPADE" : "SHOVEL";
         }
         else if(Arrays.asList(axeMaterials).contains(e.getClickedBlock().getType().name())){
             replaceType = "AXE";
         }
 
-        ItemStack itemStack = instance.getNMSAdapter().getItemInHand(e.getPlayer());
+        ItemStack itemStack = plugin.getNMSAdapter().getItemInHand(e.getPlayer());
         replaceType = itemStack.getType().name().split("_")[0] + "_" + replaceType;
 
         if(itemStack.getType().name().equals(replaceType))
             return;
 
         itemStack.setType(Material.valueOf(replaceType));
-        instance.getNMSAdapter().setItemInHand(e.getPlayer(), itemStack);
+        plugin.getNMSAdapter().setItemInHand(e.getPlayer(), itemStack);
     }
 
     private String getTime(long timeLeft){

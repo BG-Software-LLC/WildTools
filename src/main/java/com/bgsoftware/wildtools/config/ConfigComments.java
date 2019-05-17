@@ -94,6 +94,7 @@ public final class ConfigComments {
     @Comment("uses: Custom durability for the tool (INTEGER)")
     @Comment("     If both unbreakable and uses are not set, tool will use the vanilla durability (supports unbreaking enchantment)")
     @Comment("keep-inventory: Tool won't get dropped from players inventory (BOOLEAN) (Default false)")
+    @Comment("private: Should tool be assigned to only one player? (BOOLEAN) (Default false)")
     @Comment("type: Material type (Check https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Material.html)")
     @Comment("name: Custom name for the tool (STRING)")
     @Comment("lore: Custom lore for the tool (LIST)")

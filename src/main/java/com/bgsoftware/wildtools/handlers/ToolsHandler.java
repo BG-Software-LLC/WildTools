@@ -174,6 +174,18 @@ public final class ToolsHandler implements ToolsManager {
         return toolClass.cast(tool);
     }
 
+    @Override
+    public boolean isOwningTool(ItemStack itemStack, Player player) {
+        Tool tool = getTool(itemStack);
+
+        if(tool == null || !tool.isPrivate())
+            return true;
+
+        String uuid = plugin.getNMSAdapter().getTag(itemStack, "tool-owner", "");
+
+        return uuid.isEmpty() || player.getUniqueId().toString().equals(uuid);
+    }
+
     public static void reload(){
         try{
             Field field = ToolsHandler.class.getDeclaredField("tools");

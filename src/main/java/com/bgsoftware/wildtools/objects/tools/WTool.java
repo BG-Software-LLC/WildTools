@@ -38,7 +38,7 @@ public abstract class WTool implements Tool {
     private ItemStack is;
     private int usesLeft;
     private String name, toolMode;
-    private boolean onlySameType, onlyInsideClaim, unbreakable, autoCollect, silkTouch, keepInventory, omni;
+    private boolean onlySameType, onlyInsideClaim, unbreakable, autoCollect, silkTouch, keepInventory, omni, privateTool;
     private long cooldown;
     private double multiplier;
 
@@ -138,6 +138,11 @@ public abstract class WTool implements Tool {
     @Override
     public void setOmni(boolean omni) {
         this.omni = omni;
+    }
+
+    @Override
+    public void setPrivate(boolean privateTool) {
+        this.privateTool = privateTool;
     }
 
     @Override
@@ -253,6 +258,11 @@ public abstract class WTool implements Tool {
     @Override
     public boolean isOmni() {
         return omni;
+    }
+
+    @Override
+    public boolean isPrivate() {
+        return privateTool;
     }
 
     @Override

@@ -85,6 +85,7 @@ prices-list:
 # uses: Custom durability for the tool (INTEGER)
 #      If both unbreakable and uses are not set, tool will use the vanilla durability (supports unbreaking enchantment)
 # keep-inventory: Tool won't get dropped from players inventory (BOOLEAN) (Default false)
+# private: Should tool be assigned to only one player? (BOOLEAN) (Default false)
 # type: Material type (Check https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Material.html)
 # name: Custom name for the tool (STRING)
 # lore: Custom lore for the tool (LIST)

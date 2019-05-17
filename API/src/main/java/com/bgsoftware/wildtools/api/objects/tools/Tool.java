@@ -39,6 +39,8 @@ public interface Tool {
 
     void setOmni(boolean omni);
 
+    void setPrivate(boolean privateTool);
+
     void addEnchantment(Enchantment ench, int level);
 
     void addBlacklistedMaterial(String type);
@@ -80,6 +82,8 @@ public interface Tool {
     boolean hasKeepInventory();
 
     boolean isOmni();
+
+    boolean isPrivate();
 
     Set<String> getBlacklistedMaterials();
 

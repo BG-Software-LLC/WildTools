@@ -57,4 +57,6 @@ public interface ToolsManager {
 
     <T extends Tool> T registerTool(Material type, String name, Class<T> toolClass, Object arg);
 
+    boolean isOwningTool(ItemStack itemStack, Player player);
+
 }

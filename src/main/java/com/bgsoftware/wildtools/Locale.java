@@ -33,6 +33,7 @@ public final class Locale {
     public static Locale INVALID_TOOL = new Locale("INVALID_TOOL");
     public static Locale MCMMO_TOOL_SUPER_BREAKER = new Locale("MCMMO_TOOL_SUPER_BREAKER");
     public static Locale NO_PERMISSION = new Locale("NO_PERMISSION");
+    public static Locale NOT_OWNER = new Locale("NOT_OWNER");
     public static Locale RELOAD_SUCCESS = new Locale("RELOAD_SUCCESS");
     public static Locale SELECTION_RIGHT_CLICK = new Locale("SELECTION_RIGHT_CLICK");
     public static Locale SELECTION_LEFT_CLICK = new Locale("SELECTION_LEFT_CLICK");

@@ -118,6 +118,18 @@ public final class WildToolsAPI {
         return instance.getToolsManager().getSelection(player);
     }
 
+    /**
+     * Checks if a player is owning the private tool.
+     * If there's no tool for the item or it's not private, true will be returned.
+     *
+     * @param itemStack The item to check
+     * @param player The player to check
+     * @return True if player is owning the tool, otherwise false.
+     */
+    public static boolean isOwningTool(ItemStack itemStack, Player player) {
+        return instance.getToolsManager().isOwningTool(itemStack, player);
+    }
+
 
     /**
      * Get the wildtools object

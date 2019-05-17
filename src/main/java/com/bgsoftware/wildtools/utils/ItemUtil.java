@@ -11,6 +11,7 @@ import com.bgsoftware.wildtools.api.objects.tools.Tool;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.UUID;
 
 public final class ItemUtil {
 
@@ -29,24 +30,28 @@ public final class ItemUtil {
     public static void formatItemStack(Tool tool, ItemStack itemStack, int defaultUses){
         ItemMeta meta = itemStack.getItemMeta();
         int usesLeft = plugin.getNMSAdapter().getTag(itemStack, "tool-uses", defaultUses);
+        String ownerName = "None", ownerUUID = plugin.getNMSAdapter().getTag(itemStack, "tool-owner", "");
+
+        Bukkit.broadcastMessage(ownerUUID + "");
+
+        try {
+            ownerName = Bukkit.getOfflinePlayer(UUID.fromString(ownerUUID)).getName();
+        }catch(Exception ignored){}
 
         if(meta.hasDisplayName()){
             if(tool.getItemStack().getItemMeta().getDisplayName().equals(meta.getDisplayName()) ||
                     tool.getItemStack().getItemMeta().getDisplayName().replace("{}", (usesLeft + 1) + "").equals(meta.getDisplayName()))
-                meta.setDisplayName(tool.getItemStack().getItemMeta().getDisplayName().replace("{}", usesLeft + ""));
+                meta.setDisplayName(tool.getItemStack().getItemMeta().getDisplayName()
+                        .replace("{}", usesLeft + "").replace("{owner}", ownerName));
         }
 
         if(meta.hasLore()){
-            List<String> wantedLore = new ArrayList<>();
             List<String> lore = new ArrayList<>();
 
-            for(String line : tool.getItemStack().getItemMeta().getLore()) {
-                lore.add(line.replace("{}", usesLeft + ""));
-                wantedLore.add(line.replace("{}", (usesLeft + 1) + ""));
-            }
+            for(String line : tool.getItemStack().getItemMeta().getLore())
+                lore.add(line.replace("{}", usesLeft + "").replace("{owner}", ownerName));
 
-            if(meta.getLore().equals(tool.getItemStack().getItemMeta().getLore()) || meta.getLore().equals(wantedLore))
-                meta.setLore(lore);
+            meta.setLore(lore);
         }
 
         itemStack.setItemMeta(meta);
