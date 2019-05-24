@@ -13,6 +13,7 @@ import com.bgsoftware.wildtools.hooks.BlocksProvider_GriefPrevention;
 import com.bgsoftware.wildtools.hooks.BlocksProvider_Lands;
 import com.bgsoftware.wildtools.hooks.BlocksProvider_MassiveFactions;
 import com.bgsoftware.wildtools.hooks.BlocksProvider_PlotSquared;
+import com.bgsoftware.wildtools.hooks.BlocksProvider_PlotSquaredLegacy;
 import com.bgsoftware.wildtools.hooks.BlocksProvider_SuperiorSkyblock;
 import com.bgsoftware.wildtools.hooks.BlocksProvider_Towny;
 import com.bgsoftware.wildtools.hooks.BlocksProvider_Villages;
@@ -96,8 +97,14 @@ public final class ProvidersHandler {
             blocksProviders.add(new BlocksProvider_WorldGuard());
         if(Bukkit.getPluginManager().isPluginEnabled("Lands"))
             blocksProviders.add(new BlocksProvider_Lands());
-        if(Bukkit.getPluginManager().isPluginEnabled("PlotSquared"))
-            blocksProviders.add(new BlocksProvider_PlotSquared());
+        if(Bukkit.getPluginManager().isPluginEnabled("PlotSquared")) {
+            try {
+                Class.forName("com.intellectualcrafters.plot.api.PlotAPI");
+                blocksProviders.add(new BlocksProvider_PlotSquaredLegacy());
+            }catch(ClassNotFoundException ex){
+                blocksProviders.add(new BlocksProvider_PlotSquared());
+            }
+        }
 
     }
 
