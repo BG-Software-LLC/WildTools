@@ -1,9 +1,9 @@
 package com.bgsoftware.wildtools.objects.tools;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.block.data.BlockData;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import com.bgsoftware.wildtools.Locale;
@@ -49,7 +49,15 @@ public final class WBuilderTool extends WTool implements BuilderTool {
             if(nextBlock.getType() != Material.AIR || !plugin.getProviders().canBreak(e.getPlayer(), nextBlock, firstType, firstData, this))
                 break;
 
-            ItemStack blockItemStack = e.getClickedBlock().getState().getData().toItemStack(1);
+            ItemStack blockItemStack;
+
+            try{
+                //noinspection JavaReflectionMemberAccess
+                BlockData blockData = (BlockData) Block.class.getMethod("getBlockData").invoke(e.getClickedBlock());
+                blockItemStack = new ItemStack(blockData.getMaterial());
+            }catch(Exception ex){
+                blockItemStack = e.getClickedBlock().getState().getData().toItemStack(1);
+            }
 
             if(!e.getPlayer().getInventory().containsAtLeast(blockItemStack, 1)){
                 Locale.BUILDER_NO_BLOCK.send(e.getPlayer(), e.getClickedBlock().getType().name());
