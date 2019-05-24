@@ -32,10 +32,12 @@ public final class BukkitUtil {
         }
 
         for(ItemStack is : drops) {
-            if(autoCollect)
-                ItemUtil.addItem(is, player.getInventory(), block.getLocation());
-            else
-                block.getWorld().dropItemNaturally(block.getLocation(), is);
+            if(is != null && is.getType() != Material.AIR) {
+                if (autoCollect)
+                    ItemUtil.addItem(is, player.getInventory(), block.getLocation());
+                else
+                    block.getWorld().dropItemNaturally(block.getLocation(), is);
+            }
         }
     }
 

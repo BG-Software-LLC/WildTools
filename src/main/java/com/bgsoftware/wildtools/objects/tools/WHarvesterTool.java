@@ -157,15 +157,16 @@ public final class WHarvesterTool extends WTool implements HarvesterTool {
                                 plugin.getProviders().canBreak(player, targetBlock, this)) {
                             if(player.getGameMode() != GameMode.CREATIVE) {
                                 for(ItemStack drop : BukkitUtil.getBlockDrops(player, targetBlock)){
-                                    if(sellModesPlayers.contains(player.getUniqueId()) && player.hasPermission("wildtools.sellmode") &&
-                                            plugin.getProviders().canSellItem(player, drop)) {
-                                        toSell.add(drop);
-                                        totalPrice += plugin.getProviders().getPrice(player, drop);
+                                    if(drop != null && drop.getType() != Material.AIR) {
+                                        if (sellModesPlayers.contains(player.getUniqueId()) && player.hasPermission("wildtools.sellmode") &&
+                                                plugin.getProviders().canSellItem(player, drop)) {
+                                            toSell.add(drop);
+                                            totalPrice += plugin.getProviders().getPrice(player, drop);
+                                        } else if (isAutoCollect())
+                                            ItemUtil.addItem(drop, player.getInventory(), block.getLocation());
+                                        else
+                                            player.getWorld().dropItemNaturally(block.getLocation(), drop);
                                     }
-                                    else if(isAutoCollect())
-                                        ItemUtil.addItem(drop, player.getInventory(), block.getLocation());
-                                    else
-                                        player.getWorld().dropItemNaturally(block.getLocation(), drop);
                                 }
                             }
                             if(targetBlock.getType() == Material.CACTUS || targetBlock.getType() == WMaterial.SUGAR_CANE.parseMaterial() ||

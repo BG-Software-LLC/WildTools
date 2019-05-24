@@ -3,6 +3,7 @@ package com.bgsoftware.wildtools.utils;
 import com.bgsoftware.wildtools.Locale;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -22,8 +23,11 @@ public final class ItemUtil {
         HashMap<Integer, ItemStack> additionalItems = inventory.addItem(itemStack);
         if(location != null && !additionalItems.isEmpty()){
             Bukkit.getScheduler().runTask(plugin, () -> {
-                for(ItemStack additional : additionalItems.values())
-                    location.getWorld().dropItemNaturally(location, additional);
+                for(ItemStack additional : additionalItems.values()) {
+                    if (additional != null && additional.getType() != Material.AIR) {
+                        location.getWorld().dropItemNaturally(location, additional);
+                    }
+                }
             });
         }
     }
