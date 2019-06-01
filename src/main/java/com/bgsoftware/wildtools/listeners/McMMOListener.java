@@ -2,7 +2,6 @@ package com.bgsoftware.wildtools.listeners;
 
 import com.bgsoftware.wildtools.Locale;
 import com.bgsoftware.wildtools.WildToolsPlugin;
-import com.gmail.nossr50.datatypes.skills.AbilityType;
 import com.gmail.nossr50.events.skills.abilities.McMMOPlayerAbilityActivateEvent;
 
 import org.bukkit.event.EventHandler;
@@ -19,7 +18,7 @@ public final class McMMOListener implements Listener {
 
     @EventHandler
     public void onPlayerAbilityActive(McMMOPlayerAbilityActivateEvent e){
-        if(e.getAbility() != AbilityType.SUPER_BREAKER)
+        if(!e.getAbility().name().equals("SUPER_BREAKER"))
             return;
 
 
