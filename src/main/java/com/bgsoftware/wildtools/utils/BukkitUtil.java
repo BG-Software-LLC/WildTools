@@ -44,7 +44,7 @@ public final class BukkitUtil {
     public static List<ItemStack> getBlockDrops(Player player, Block block){
         Material type = block.getType();
         if(Arrays.asList(WHarvesterTool.crops).contains(type.name()) && type != Material.CACTUS &&
-                type != WMaterial.SUGAR_CANE.parseMaterial() && type != WMaterial.MELON.parseMaterial() && type != Material.PUMPKIN) {
+                type != WMaterial.SUGAR_CANE.parseMaterial() && type != WMaterial.MELON.parseMaterial() && type != Material.PUMPKIN && !type.name().equals("BAMBOO")) {
             return plugin.getNMSAdapter().getCropDrops(player, block);
         }
 

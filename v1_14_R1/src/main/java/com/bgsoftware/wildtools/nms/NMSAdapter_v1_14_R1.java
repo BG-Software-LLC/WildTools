@@ -253,7 +253,8 @@ public class NMSAdapter_v1_14_R1 implements NMSAdapter {
     @Override
     public boolean isFullyGrown(org.bukkit.block.Block block) {
         if(block.getType() == Material.CACTUS || block.getType() == WMaterial.SUGAR_CANE.parseMaterial() ||
-            block.getType() == Material.PUMPKIN || block.getType() == WMaterial.MELON.parseMaterial())
+            block.getType() == Material.PUMPKIN || block.getType() == WMaterial.MELON.parseMaterial() ||
+                block.getType().name().equals("BAMBOO"))
             return true;
         CraftBlock craftBlock = (CraftBlock) block;
         BlockData blockData = craftBlock.getBlockData();
