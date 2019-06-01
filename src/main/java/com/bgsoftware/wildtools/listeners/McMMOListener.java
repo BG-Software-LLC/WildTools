@@ -4,12 +4,18 @@ import com.bgsoftware.wildtools.Locale;
 import com.bgsoftware.wildtools.WildToolsPlugin;
 import com.gmail.nossr50.events.skills.abilities.McMMOPlayerAbilityActivateEvent;
 
+import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
 
 @SuppressWarnings("unused")
 public final class McMMOListener implements Listener {
 
+    private Set<UUID> messageCooldowns = new HashSet<>();
     private WildToolsPlugin plugin;
 
     public McMMOListener(WildToolsPlugin plugin){
@@ -26,7 +32,12 @@ public final class McMMOListener implements Listener {
             return;
 
         e.setCancelled(true);
-        Locale.MCMMO_TOOL_SUPER_BREAKER.send(e.getPlayer());
+
+        if(!messageCooldowns.contains(e.getPlayer().getUniqueId())) {
+            Locale.MCMMO_TOOL_SUPER_BREAKER.send(e.getPlayer());
+            messageCooldowns.add(e.getPlayer().getUniqueId());
+            Bukkit.getScheduler().runTaskLater(plugin, () -> messageCooldowns.remove(e.getPlayer().getUniqueId()), 100L);
+        }
     }
 
 }
