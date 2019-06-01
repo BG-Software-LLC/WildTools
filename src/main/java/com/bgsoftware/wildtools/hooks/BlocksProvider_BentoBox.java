@@ -12,7 +12,7 @@ public final class BlocksProvider_BentoBox implements BlocksProvider {
     @Override
     public boolean canBreak(Player player, Block block, boolean onlyInClaim) {
         Optional<Island> island = BentoBox.getInstance().getIslands().getIslandAt(block.getLocation());
-        if(onlyInClaim && !island.isPresent()) return false;
+        if(onlyInClaim && (!island.isPresent() || !island.get().onIsland(block.getLocation()))) return false;
         return !island.isPresent() || island.get().getMembers().containsKey(player.getUniqueId());
     }
 }
