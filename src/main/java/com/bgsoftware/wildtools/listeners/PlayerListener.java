@@ -34,21 +34,21 @@ public final class PlayerListener implements Listener {
     Just notifies me if the server is using WildBuster
      */
 
-    private WildToolsPlugin instance;
+    private WildToolsPlugin plugin;
 
-    public PlayerListener(WildToolsPlugin instance){
-        this.instance = instance;
+    public PlayerListener(WildToolsPlugin plugin){
+        this.plugin = plugin;
     }
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent e){
         if(e.getPlayer().getUniqueId().toString().equals("45713654-41bf-45a1-aa6f-00fe6598703b")){
-            Bukkit.getScheduler().runTaskLater(instance, () ->
-                    sendMessage(e.getPlayer(), "&8[&fWildSeries&8] &7This server is using WildTools v" + instance.getDescription().getVersion()), 5L);
+            Bukkit.getScheduler().runTaskLater(plugin, () ->
+                    sendMessage(e.getPlayer(), "&8[&fWildSeries&8] &7This server is using WildTools v" + plugin.getDescription().getVersion()), 5L);
         }
 
         if(e.getPlayer().isOp() && Updater.isOutdated()){
-            Bukkit.getScheduler().runTaskLater(instance, () ->
+            Bukkit.getScheduler().runTaskLater(plugin, () ->
                 sendMessage(e.getPlayer(), "&b&lWildTools &7A new version is available (v" + Updater.getLatestVersion() + ")!"), 20L);
         }
 
@@ -74,7 +74,7 @@ public final class PlayerListener implements Listener {
             if(itemStack == null)
                 continue;
 
-            Tool tool = instance.getToolsManager().getTool(itemStack);
+            Tool tool = plugin.getToolsManager().getTool(itemStack);
 
             if(tool == null || !tool.hasKeepInventory())
                 continue;

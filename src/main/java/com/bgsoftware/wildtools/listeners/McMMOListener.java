@@ -10,10 +10,10 @@ import org.bukkit.event.Listener;
 @SuppressWarnings("unused")
 public final class McMMOListener implements Listener {
 
-    private WildToolsPlugin instance;
+    private WildToolsPlugin plugin;
 
-    public McMMOListener(WildToolsPlugin instance){
-        this.instance = instance;
+    public McMMOListener(WildToolsPlugin plugin){
+        this.plugin = plugin;
     }
 
     @EventHandler
@@ -22,7 +22,7 @@ public final class McMMOListener implements Listener {
             return;
 
 
-        if(instance.getToolsManager().getTool(instance.getNMSAdapter().getItemInHand(e.getPlayer())) == null)
+        if(plugin.getToolsManager().getTool(plugin.getNMSAdapter().getItemInHand(e.getPlayer())) == null)
             return;
 
         e.setCancelled(true);
