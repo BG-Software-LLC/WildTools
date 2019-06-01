@@ -1,5 +1,6 @@
 package com.bgsoftware.wildtools.hooks;
 
+import com.massivecraft.factions.Rel;
 import com.massivecraft.factions.entity.BoardColl;
 import com.massivecraft.factions.entity.Faction;
 import com.massivecraft.factions.entity.MPlayer;
@@ -26,6 +27,7 @@ public final class BlocksProvider_MassiveFactions implements BlocksProvider {
 
         if(onlyInClaim && faction == null) return false;
 
-        return faction == null || overriding || (mPlayer.hasFaction() && mPlayer.getFaction().equals(faction));
+        return faction == null || overriding || (mPlayer.hasFaction() && (mPlayer.getFaction().equals(faction) ||
+                faction.getRelationWish(mPlayer.getFaction()) == Rel.ALLY));
     }
 }

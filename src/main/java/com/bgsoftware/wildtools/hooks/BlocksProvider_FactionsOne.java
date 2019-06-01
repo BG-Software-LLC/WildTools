@@ -3,6 +3,7 @@ package com.bgsoftware.wildtools.hooks;
 import com.massivecraft.factions.Board;
 import com.massivecraft.factions.FPlayer;
 import com.massivecraft.factions.Faction;
+import com.massivecraft.factions.struct.Relation;
 import de.erethon.factionsone.FactionsOneAPI;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
@@ -23,6 +24,7 @@ public final class BlocksProvider_FactionsOne implements BlocksProvider {
 
         if(onlyInClaim && faction == null) return false;
 
-        return faction == null || overriding || (fPlayer.hasFaction() && fPlayer.getFaction().equals(faction));
+        return faction == null || overriding || (fPlayer.hasFaction() && (fPlayer.getFaction().equals(faction) ||
+                faction.getRelationWish(fPlayer.getFaction()) == Relation.ALLY));
     }
 }
