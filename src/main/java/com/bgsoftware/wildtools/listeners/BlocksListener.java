@@ -98,7 +98,7 @@ public final class BlocksListener implements Listener {
         WTool.toolBlockBreak.remove(e.getPlayer().getUniqueId());
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onBlockInteract(PlayerInteractEvent e){
         //One of the blocks that were broken by a tool
         if(WTool.toolBlockBreak.contains(e.getPlayer().getUniqueId()) || e.getItem() == null)
@@ -134,10 +134,12 @@ public final class BlocksListener implements Listener {
                 toolInteract = tool.onAirInteract(e);
                 break;
             case RIGHT_CLICK_BLOCK:
-                toolInteract = tool.onBlockInteract(e);
+                if(!e.isCancelled())
+                    toolInteract = tool.onBlockInteract(e);
                 break;
             case LEFT_CLICK_BLOCK:
-                toolInteract = tool.onBlockHit(e);
+                if(!e.isCancelled())
+                    toolInteract = tool.onBlockHit(e);
                 break;
         }
 
