@@ -2,6 +2,7 @@ package com.bgsoftware.wildtools.objects.tools;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.block.Chest;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.FurnaceRecipe;
 import org.bukkit.inventory.Inventory;
@@ -50,10 +51,12 @@ public final class WCraftingTool extends WTool implements CraftingTool {
 
         List<ItemStack> toAdd = new ArrayList<>();
 
+        Chest chest = (Chest) e.getClickedBlock().getState();
+
         new Thread(() -> {
             int craftedItemsAmount = 0;
 
-            List<Inventory> inventories = WildChestsHook.getAllInventories(e.getClickedBlock());
+            List<Inventory> inventories = WildChestsHook.getAllInventories(chest);
 
             while (craftings.hasNext()) {
                 Recipe recipe = craftings.next();
@@ -95,7 +98,7 @@ public final class WCraftingTool extends WTool implements CraftingTool {
                 }
             }
 
-            WildChestsHook.addItems(e.getClickedBlock(), toAdd);
+            WildChestsHook.addItems(chest, toAdd);
 
             if(craftedItemsAmount > 0){
                 reduceDurablility(e.getPlayer());

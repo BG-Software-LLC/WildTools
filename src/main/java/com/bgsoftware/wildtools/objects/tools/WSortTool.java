@@ -6,6 +6,7 @@ import com.bgsoftware.wildtools.api.objects.ToolMode;
 import com.bgsoftware.wildtools.api.objects.tools.SortTool;
 
 import org.bukkit.Material;
+import org.bukkit.block.Chest;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -35,8 +36,10 @@ public final class WSortTool extends WTool implements SortTool {
             return false;
         }
 
+        Chest chest = (Chest) e.getClickedBlock().getState();
+
         new Thread(() -> {
-            List<Inventory> inventories = WildChestsHook.getAllInventories(e.getClickedBlock());
+            List<Inventory> inventories = WildChestsHook.getAllInventories(chest);
             List<InventoryItem> inventoryItems = new ArrayList<>();
             Map<Inventory, ItemStack[]> originContents = new HashMap<>();
 
@@ -50,7 +53,7 @@ public final class WSortTool extends WTool implements SortTool {
 
             Collections.sort(inventoryItems);
 
-            WildChestsHook.addItems(e.getClickedBlock(), convert(inventoryItems));
+            WildChestsHook.addItems(chest, convert(inventoryItems));
 
             for(Inventory inventory : inventories){
                 if(!Arrays.equals(originContents.get(inventory), inventory.getContents())) {

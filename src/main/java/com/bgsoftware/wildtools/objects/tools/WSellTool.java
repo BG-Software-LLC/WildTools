@@ -41,12 +41,14 @@ public final class WSellTool extends WTool implements SellTool {
             return false;
         }
 
+        Chest chest = (Chest) e.getClickedBlock().getState();
+
         new Thread(() -> {
             double totalEarnings = 0.0;
 
             Map<Inventory, List<Integer>> toSell = new HashMap<>();
 
-            for(Inventory inventory : WildChestsHook.getAllInventories(e.getClickedBlock())) {
+            for(Inventory inventory : WildChestsHook.getAllInventories(chest)) {
                 toSell.put(inventory, new ArrayList<>());
                 for (int slot = 0; slot < inventory.getSize(); slot++) {
                     ItemStack is = inventory.getItem(slot);

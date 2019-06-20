@@ -14,9 +14,8 @@ import java.util.List;
 
 public final class WildChestsHook {
 
-    public static List<Inventory> getAllInventories(Block block){
+    public static List<Inventory> getAllInventories(Chest chest){
         List<Inventory> inventories = new ArrayList<>();
-        Chest chest = (Chest) block.getState();
         inventories.add(chest.getInventory());
 
         if(Bukkit.getPluginManager().isPluginEnabled("WildChests")){
@@ -28,17 +27,17 @@ public final class WildChestsHook {
         return inventories;
     }
 
-    public static void addItems(Block block, List<ItemStack> itemStackList){
+    public static void addItems(Chest chest, List<ItemStack> itemStackList){
         if(Bukkit.getPluginManager().isPluginEnabled("WildChests")){
-            com.bgsoftware.wildchests.api.objects.chests.Chest wildChest = WildChestsAPI.getChest(block.getLocation());
+            com.bgsoftware.wildchests.api.objects.chests.Chest wildChest = WildChestsAPI.getChest(chest.getLocation());
             if(wildChest != null){
                 wildChest.addItems(itemStackList.toArray(new ItemStack[]{}));
                 return;
             }
         }
 
-        Inventory inventory = ((Chest) block.getState()).getInventory();
-        itemStackList.forEach(itemStack -> ItemUtil.addItem(itemStack, inventory, block.getLocation()));
+        Inventory inventory = chest.getInventory();
+        itemStackList.forEach(itemStack -> ItemUtil.addItem(itemStack, inventory, chest.getLocation()));
     }
 
 
