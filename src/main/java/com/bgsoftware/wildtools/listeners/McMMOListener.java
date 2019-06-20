@@ -24,9 +24,8 @@ public final class McMMOListener implements Listener {
 
     @EventHandler
     public void onPlayerAbilityActive(McMMOPlayerAbilityActivateEvent e){
-        if(!e.getAbility().name().equals("SUPER_BREAKER"))
+        if(!getAbilityName(e).equals("SUPER_BREAKER"))
             return;
-
 
         if(plugin.getToolsManager().getTool(plugin.getNMSAdapter().getItemInHand(e.getPlayer())) == null)
             return;
@@ -37,6 +36,20 @@ public final class McMMOListener implements Listener {
             Locale.MCMMO_TOOL_SUPER_BREAKER.send(e.getPlayer());
             messageCooldowns.add(e.getPlayer().getUniqueId());
             Bukkit.getScheduler().runTaskLater(plugin, () -> messageCooldowns.remove(e.getPlayer().getUniqueId()), 100L);
+        }
+    }
+
+    private String getAbilityName(McMMOPlayerAbilityActivateEvent event){
+        try{
+            return event.getAbility().name();
+        }catch(Throwable ex){
+            try{
+                Object ability = McMMOPlayerAbilityActivateEvent.class.getMethod("getAbility").invoke(event);
+                return ability.toString().toUpperCase();
+            }catch(Throwable ex1){
+                ex1.printStackTrace();
+                return "";
+            }
         }
     }
 
