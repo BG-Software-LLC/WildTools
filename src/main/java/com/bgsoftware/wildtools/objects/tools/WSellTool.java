@@ -64,7 +64,7 @@ public final class WSellTool extends WTool implements SellTool {
             String message = toSell.values().stream().allMatch(List::isEmpty) ?
                     Locale.NO_SELL_ITEMS.getMessage() : Locale.SOLD_CHEST.getMessage();
 
-            SellWandUseEvent sellWandUseEvent = new SellWandUseEvent(e.getPlayer(), (Chest) e.getClickedBlock().getState(), totalEarnings, multiplier, message);
+            SellWandUseEvent sellWandUseEvent = new SellWandUseEvent(e.getPlayer(), chest, totalEarnings, multiplier, message);
             Bukkit.getPluginManager().callEvent(sellWandUseEvent);
 
             if(sellWandUseEvent.isCancelled())
