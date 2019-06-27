@@ -2,6 +2,7 @@ package com.bgsoftware.wildtools.objects.tools;
 
 import com.bgsoftware.wildtools.objects.WMaterial;
 import com.bgsoftware.wildtools.utils.BukkitUtil;
+import com.bgsoftware.wildtools.utils.Executor;
 import com.bgsoftware.wildtools.utils.ItemUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.block.Block;
@@ -22,8 +23,10 @@ import com.bgsoftware.wildtools.api.objects.ToolMode;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -112,136 +115,302 @@ public final class WHarvesterTool extends WTool implements HarvesterTool {
     }
 
     private boolean handleUse(Player player, Block block){
-        Location max = block.getLocation().clone().add(farmlandRadius, farmlandRadius, farmlandRadius),
-                min = block.getLocation().clone().subtract(farmlandRadius, farmlandRadius, farmlandRadius);
+        List<Block> dirtToHarvest = new ArrayList<>(), removeBlocks = new ArrayList<>(), seededBlocks = new ArrayList<>();
+        Map<Block, List<ItemStack>> drops = new HashMap<>();
 
-        if(farmlandRadius > 0) {
-            for (int y = max.getBlockY(); y >= min.getBlockY(); y--) {
-                for (int x = min.getBlockX(); x <= max.getBlockX(); x++) {
-                    for (int z = min.getBlockZ(); z <= max.getBlockZ(); z++) {
-                        Block targetBlock = player.getWorld().getBlockAt(x, y, z);
-                        if ((targetBlock.getType() == Material.DIRT || targetBlock.getType() == WMaterial.GRASS_BLOCK.parseMaterial()) &&
-                                targetBlock.getRelative(BlockFace.UP).getType() == Material.AIR) {
-                            if (plugin.getProviders().canBreak(player, targetBlock, this)) {
-                                targetBlock.setType(WMaterial.FARMLAND.parseMaterial());
-                                //Tool is using durability, reduces every block
-                                if (!isUnbreakable() && isUsingDurability() && player.getGameMode() != GameMode.CREATIVE)
-                                    reduceDurablility(player);
+        Executor.async(() -> {
+            Location max = block.getLocation().clone().add(farmlandRadius, farmlandRadius, farmlandRadius),
+                    min = block.getLocation().clone().subtract(farmlandRadius, farmlandRadius, farmlandRadius);
+
+            if(farmlandRadius > 0) {
+                for (int y = max.getBlockY(); y >= min.getBlockY(); y--) {
+                    for (int x = min.getBlockX(); x <= max.getBlockX(); x++) {
+                        for (int z = min.getBlockZ(); z <= max.getBlockZ(); z++) {
+                            Block targetBlock = player.getWorld().getBlockAt(x, y, z);
+                            if ((targetBlock.getType() == Material.DIRT || targetBlock.getType() == WMaterial.GRASS_BLOCK.parseMaterial()) &&
+                                    targetBlock.getRelative(BlockFace.UP).getType() == Material.AIR) {
+                                if (plugin.getProviders().canBreak(player, targetBlock, this)) {
+                                    dirtToHarvest.add(targetBlock);
+                                }
                             }
                         }
                     }
                 }
             }
-        }
 
-        max = block.getLocation().clone().add(radius, radius, radius);
-        min = block.getLocation().clone().subtract(radius, radius, radius);
+            max = block.getLocation().clone().add(radius, radius, radius);
+            min = block.getLocation().clone().subtract(radius, radius, radius);
 
-        List<Block> blocksToCheck = new ArrayList<>();
+            for(int y = max.getBlockY(); y >= min.getBlockY(); y--) {
+                for (int x = min.getBlockX(); x <= max.getBlockX(); x++) {
+                    for (int z = min.getBlockZ(); z <= max.getBlockZ(); z++) {
+                        Block targetBlock = player.getWorld().getBlockAt(x, y, z);
 
-        for(int y = max.getBlockY(); y >= min.getBlockY(); y--) {
-            for (int x = min.getBlockX(); x <= max.getBlockX(); x++) {
-                for (int z = min.getBlockZ(); z <= max.getBlockZ(); z++) {
-                    Block targetBlock = player.getWorld().getBlockAt(x, y, z);
-                    if (Arrays.asList(crops).contains(targetBlock.getType().name()) && plugin.getNMSAdapter().isFullyGrown(targetBlock) &&
-                            plugin.getProviders().canBreak(player, targetBlock, this)) {
-                        //We don't want to harvest the first block of these blocks
+                        //Checks if it's a crop
+                        if(!Arrays.asList(crops).contains(targetBlock.getType().name()))
+                            continue;
+
+                        //Checks if it's fully grown
+                        if(!plugin.getNMSAdapter().isFullyGrown(targetBlock))
+                            continue;
+
+                        //Making sure the block is breakable.
+                        if(!plugin.getProviders().canBreak(player, targetBlock, this))
+                            continue;
+
                         if (targetBlock.getType() == Material.CACTUS || targetBlock.getType() == WMaterial.SUGAR_CANE.parseMaterial() ||
                                 targetBlock.getType().name().equals("BAMBOO")) {
-                            //We need to check for same blocks above the block
                             if(y == max.getBlockY()){
                                 Material targetMaterial = targetBlock.getType();
                                 while(targetBlock.getType() == targetMaterial){
                                     if(targetBlock.getRelative(BlockFace.DOWN).getType() == targetBlock.getType() &&
                                             plugin.getNMSAdapter().isFullyGrown(targetBlock) &&
                                             plugin.getProviders().canBreak(player, targetBlock, this)){
-                                        blocksToCheck.add(targetBlock);
+                                        removeBlocks.add(targetBlock);
+                                        drops.put(targetBlock, BukkitUtil.getBlockDrops(player, targetBlock));
                                     }
                                     targetBlock = targetBlock.getRelative(BlockFace.UP);
                                 }
                                 continue;
                             }
 
-                            if(targetBlock.getRelative(BlockFace.DOWN).getType() != targetBlock.getType()){
+                            //Making sure it's not the bottom crop
+                            if(targetBlock.getRelative(BlockFace.DOWN).getType() != targetBlock.getType())
                                 continue;
-                            }
+
+                            removeBlocks.add(targetBlock);
+                            drops.put(targetBlock, BukkitUtil.getBlockDrops(player, targetBlock));
+                            continue;
                         }
 
-                        blocksToCheck.add(targetBlock);
-                    }
-                }
-            }
-        }
-
-
-        double totalPrice = 0;
-        List<ItemStack> toSell = new ArrayList<>();
-
-        boolean reduceDurability = false;
-
-        for(Block targetBlock : blocksToCheck){
-            if(player.getGameMode() != GameMode.CREATIVE) {
-                for(ItemStack drop : BukkitUtil.getBlockDrops(player, targetBlock)){
-                    if(drop != null && drop.getType() != Material.AIR) {
-                        if (sellModesPlayers.contains(player.getUniqueId()) && player.hasPermission("wildtools.sellmode") &&
-                                plugin.getProviders().canSellItem(player, drop)) {
-                            toSell.add(drop);
-                            totalPrice += plugin.getProviders().getPrice(player, drop);
-                        } else if (isAutoCollect())
-                            ItemUtil.addItem(drop, player.getInventory(), block.getLocation());
-                        else
-                            player.getWorld().dropItemNaturally(block.getLocation(), drop);
+                        seededBlocks.add(targetBlock);
+                        drops.put(targetBlock, BukkitUtil.getBlockDrops(player, targetBlock));
                     }
                 }
             }
 
-            if(targetBlock.getType() == Material.CACTUS || targetBlock.getType() == WMaterial.SUGAR_CANE.parseMaterial() ||
-                    targetBlock.getType() == WMaterial.MELON.parseMaterial() || targetBlock.getType() == Material.PUMPKIN ||
-                    targetBlock.getType().name().equals("BAMBOO"))
-                targetBlock.setType(Material.AIR);
-            else{
-                plugin.getNMSAdapter().setCropState(targetBlock, CropState.SEEDED);
-            }
+            Executor.sync(() -> {
+                List<Block> toCheck = new ArrayList<>();
+                boolean reduceDurability = false;
 
-            //Tool is using durability, reduces every block
-            if (isUsingDurability())
-                reduceDurablility(player);
+                for(Block _block : dirtToHarvest) {
+                    if (plugin.getNMSAdapter().getItemInHand(player).getType() == Material.AIR)
+                        break;
 
-            if (plugin.getNMSAdapter().getItemInHand(player).getType() == Material.AIR)
-                break;
+                    //Tool is using durability, reduces every block
+                    if (isUsingDurability())
+                        reduceDurablility(player);
 
-            reduceDurability = true;
-        }
+                    _block.setType(WMaterial.FARMLAND.parseMaterial());
+                    reduceDurability = true;
+                }
 
-        if(sellModesPlayers.contains(player.getUniqueId())){
-            double multiplier = getMultiplier();
+                for(Block _block : removeBlocks) {
+                    if (plugin.getNMSAdapter().getItemInHand(player).getType() == Material.AIR)
+                        break;
 
-            String message = toSell.isEmpty() ? Locale.NO_SELL_ITEMS.getMessage() : Locale.HARVESTER_SELL_SUCCEED.getMessage();
+                    //Tool is using durability, reduces every block
+                    if (isUsingDurability())
+                        reduceDurablility(player);
 
-            HarvesterHoeSellEvent harvesterHoeSellEvent = new HarvesterHoeSellEvent(player, totalPrice, multiplier, message);
-            Bukkit.getPluginManager().callEvent(harvesterHoeSellEvent);
+                    plugin.getNMSAdapter().setAirFast(_block);
+                    toCheck.add(_block);
+                    reduceDurability = true;
+                }
 
-            if(!harvesterHoeSellEvent.isCancelled()) {
-                multiplier = harvesterHoeSellEvent.getMultiplier();
-                totalPrice *= multiplier;
+                for(Block _block : seededBlocks) {
+                    if (plugin.getNMSAdapter().getItemInHand(player).getType() == Material.AIR)
+                        break;
 
-                for (ItemStack itemStack : toSell)
-                    plugin.getProviders().trySellingItem(player, itemStack, multiplier);
+                    //Tool is using durability, reduces every block
+                    if (isUsingDurability())
+                        reduceDurablility(player);
 
-                //noinspection all
-                message = harvesterHoeSellEvent.getMessage()
-                        .replace("{0}", toSell.size() + "")
-                        .replace("{1}", totalPrice + "")
-                        .replace("{2}", multiplier != 1 && Locale.MULTIPLIER.getMessage() != null ? Locale.MULTIPLIER.getMessage(multiplier) : "");
+                    plugin.getNMSAdapter().setCropState(_block, CropState.SEEDED);
+                    toCheck.add(_block);
+                    reduceDurability = true;
+                }
 
-                if (!message.isEmpty())
-                    player.sendMessage(message);
-            }
-        }
+                double totalPrice = 0;
+                List<ItemStack> toSell = new ArrayList<>();
 
-        //Tool is not using durability, reduces once per use
-        if (reduceDurability && !isUsingDurability())
-            reduceDurablility(player);
+                if(player.getGameMode() != GameMode.CREATIVE) {
+                    for (Block targetBlock : toCheck) {
+                        for (ItemStack drop : drops.getOrDefault(targetBlock, new ArrayList<>())) {
+                            if (drop != null && drop.getType() != Material.AIR) {
+                                if (sellModesPlayers.contains(player.getUniqueId()) && player.hasPermission("wildtools.sellmode") &&
+                                        plugin.getProviders().canSellItem(player, drop)) {
+                                    toSell.add(drop);
+                                    totalPrice += plugin.getProviders().getPrice(player, drop);
+                                } else if (isAutoCollect())
+                                    ItemUtil.addItem(drop, player.getInventory(), block.getLocation());
+                                else
+                                    player.getWorld().dropItemNaturally(block.getLocation(), drop);
+                            }
+                        }
+                    }
+                }
+
+                if(sellModesPlayers.contains(player.getUniqueId())){
+                    double multiplier = getMultiplier();
+
+                    String message = toSell.isEmpty() ? Locale.NO_SELL_ITEMS.getMessage() : Locale.HARVESTER_SELL_SUCCEED.getMessage();
+
+                    HarvesterHoeSellEvent harvesterHoeSellEvent = new HarvesterHoeSellEvent(player, totalPrice, multiplier, message);
+                    Bukkit.getPluginManager().callEvent(harvesterHoeSellEvent);
+
+                    if(!harvesterHoeSellEvent.isCancelled()) {
+                        multiplier = harvesterHoeSellEvent.getMultiplier();
+                        totalPrice *= multiplier;
+
+                        for (ItemStack itemStack : toSell)
+                            plugin.getProviders().trySellingItem(player, itemStack, multiplier);
+
+                        //noinspection all
+                        message = harvesterHoeSellEvent.getMessage()
+                                .replace("{0}", toSell.size() + "")
+                                .replace("{1}", totalPrice + "")
+                                .replace("{2}", multiplier != 1 && Locale.MULTIPLIER.getMessage() != null ? Locale.MULTIPLIER.getMessage(multiplier) : "");
+
+                        if (!message.isEmpty())
+                            player.sendMessage(message);
+                    }
+                }
+
+                //Tool is not using durability, reduces once per use
+                if (reduceDurability && !isUsingDurability())
+                    reduceDurablility(player);
+
+            });
+        });
+
+//        if(farmlandRadius > 0) {
+//            for (int y = max.getBlockY(); y >= min.getBlockY(); y--) {
+//                for (int x = min.getBlockX(); x <= max.getBlockX(); x++) {
+//                    for (int z = min.getBlockZ(); z <= max.getBlockZ(); z++) {
+//                        Block targetBlock = player.getWorld().getBlockAt(x, y, z);
+//                        if ((targetBlock.getType() == Material.DIRT || targetBlock.getType() == WMaterial.GRASS_BLOCK.parseMaterial()) &&
+//                                targetBlock.getRelative(BlockFace.UP).getType() == Material.AIR) {
+//                            if (plugin.getProviders().canBreak(player, targetBlock, this)) {
+//                                targetBlock.setType(WMaterial.FARMLAND.parseMaterial());
+//                                //Tool is using durability, reduces every block
+//                                if (!isUnbreakable() && isUsingDurability() && player.getGameMode() != GameMode.CREATIVE)
+//                                    reduceDurablility(player);
+//                            }
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//
+//        max = block.getLocation().clone().add(radius, radius, radius);
+//        min = block.getLocation().clone().subtract(radius, radius, radius);
+//
+//        List<Block> blocksToCheck = new ArrayList<>();
+//
+//        for(int y = max.getBlockY(); y >= min.getBlockY(); y--) {
+//            for (int x = min.getBlockX(); x <= max.getBlockX(); x++) {
+//                for (int z = min.getBlockZ(); z <= max.getBlockZ(); z++) {
+//                    Block targetBlock = player.getWorld().getBlockAt(x, y, z);
+//                    if (Arrays.asList(crops).contains(targetBlock.getType().name()) && plugin.getNMSAdapter().isFullyGrown(targetBlock) &&
+//                            plugin.getProviders().canBreak(player, targetBlock, this)) {
+//                        //We don't want to harvest the first block of these blocks
+//                        if (targetBlock.getType() == Material.CACTUS || targetBlock.getType() == WMaterial.SUGAR_CANE.parseMaterial() ||
+//                                targetBlock.getType().name().equals("BAMBOO")) {
+//                            //We need to check for same blocks above the block
+//                            if(y == max.getBlockY()){
+//                                Material targetMaterial = targetBlock.getType();
+//                                while(targetBlock.getType() == targetMaterial){
+//                                    if(targetBlock.getRelative(BlockFace.DOWN).getType() == targetBlock.getType() &&
+//                                            plugin.getNMSAdapter().isFullyGrown(targetBlock) &&
+//                                            plugin.getProviders().canBreak(player, targetBlock, this)){
+//                                        blocksToCheck.add(targetBlock);
+//                                    }
+//                                    targetBlock = targetBlock.getRelative(BlockFace.UP);
+//                                }
+//                                continue;
+//                            }
+//
+//                            if(targetBlock.getRelative(BlockFace.DOWN).getType() != targetBlock.getType()){
+//                                continue;
+//                            }
+//                        }
+//
+//                        blocksToCheck.add(targetBlock);
+//                    }
+//                }
+//            }
+//        }
+//
+//
+//        double totalPrice = 0;
+//        List<ItemStack> toSell = new ArrayList<>();
+//
+//        boolean reduceDurability = false;
+//
+//        for(Block targetBlock : blocksToCheck){
+//            if(player.getGameMode() != GameMode.CREATIVE) {
+//                for(ItemStack drop : BukkitUtil.getBlockDrops(player, targetBlock)){
+//                    if(drop != null && drop.getType() != Material.AIR) {
+//                        if (sellModesPlayers.contains(player.getUniqueId()) && player.hasPermission("wildtools.sellmode") &&
+//                                plugin.getProviders().canSellItem(player, drop)) {
+//                            toSell.add(drop);
+//                            totalPrice += plugin.getProviders().getPrice(player, drop);
+//                        } else if (isAutoCollect())
+//                            ItemUtil.addItem(drop, player.getInventory(), block.getLocation());
+//                        else
+//                            player.getWorld().dropItemNaturally(block.getLocation(), drop);
+//                    }
+//                }
+//            }
+//
+//            if(targetBlock.getType() == Material.CACTUS || targetBlock.getType() == WMaterial.SUGAR_CANE.parseMaterial() ||
+//                    targetBlock.getType() == WMaterial.MELON.parseMaterial() || targetBlock.getType() == Material.PUMPKIN ||
+//                    targetBlock.getType().name().equals("BAMBOO"))
+//                plugin.getNMSAdapter().setAirFast(targetBlock);
+//            else{
+//                plugin.getNMSAdapter().setCropState(targetBlock, CropState.SEEDED);
+//            }
+//
+//            //Tool is using durability, reduces every block
+//            if (isUsingDurability())
+//                reduceDurablility(player);
+//
+//            if (plugin.getNMSAdapter().getItemInHand(player).getType() == Material.AIR)
+//                break;
+//
+//            reduceDurability = true;
+//        }
+//
+//        if(sellModesPlayers.contains(player.getUniqueId())){
+//            double multiplier = getMultiplier();
+//
+//            String message = toSell.isEmpty() ? Locale.NO_SELL_ITEMS.getMessage() : Locale.HARVESTER_SELL_SUCCEED.getMessage();
+//
+//            HarvesterHoeSellEvent harvesterHoeSellEvent = new HarvesterHoeSellEvent(player, totalPrice, multiplier, message);
+//            Bukkit.getPluginManager().callEvent(harvesterHoeSellEvent);
+//
+//            if(!harvesterHoeSellEvent.isCancelled()) {
+//                multiplier = harvesterHoeSellEvent.getMultiplier();
+//                totalPrice *= multiplier;
+//
+//                for (ItemStack itemStack : toSell)
+//                    plugin.getProviders().trySellingItem(player, itemStack, multiplier);
+//
+//                //noinspection all
+//                message = harvesterHoeSellEvent.getMessage()
+//                        .replace("{0}", toSell.size() + "")
+//                        .replace("{1}", totalPrice + "")
+//                        .replace("{2}", multiplier != 1 && Locale.MULTIPLIER.getMessage() != null ? Locale.MULTIPLIER.getMessage(multiplier) : "");
+//
+//                if (!message.isEmpty())
+//                    player.sendMessage(message);
+//            }
+//        }
+//
+//        //Tool is not using durability, reduces once per use
+//        if (reduceDurability && !isUsingDurability())
+//            reduceDurablility(player);
 
         return true;
     }
