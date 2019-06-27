@@ -3,7 +3,6 @@ package com.bgsoftware.wildtools.nms;
 import net.minecraft.server.v1_11_R1.Block;
 import net.minecraft.server.v1_11_R1.BlockBeetroot;
 import net.minecraft.server.v1_11_R1.BlockCarrots;
-import net.minecraft.server.v1_11_R1.BlockChorusFruit;
 import net.minecraft.server.v1_11_R1.BlockCocoa;
 import net.minecraft.server.v1_11_R1.BlockCrops;
 import net.minecraft.server.v1_11_R1.BlockNetherWart;
@@ -83,14 +82,10 @@ public final class NMSAdapter_v1_11_R1 implements NMSAdapter {
             int fortuneLevel = EnchantmentManager.a(Enchantments.LOOT_BONUS_BLOCKS, player),
                     dropCount = block.getDropCount(fortuneLevel, world.random);
 
-            for(int i = 0; i < dropCount; i++) {
-                if (world.random.nextFloat() < 1.0F) {
-                    Item item = block.getDropType(blockData, world.random, fortuneLevel);
-                    if (item != null) {
-                        ItemStack itemStack = new ItemStack(item, 1, block.getDropData(blockData));
-                        drops.add(CraftItemStack.asBukkitCopy(itemStack));
-                    }
-                }
+            Item item = block.getDropType(blockData, world.random, fortuneLevel);
+            if (item != null) {
+                ItemStack itemStack = new ItemStack(item);
+                drops.add(CraftItemStack.asBukkitCopy(new ItemStack(item, dropCount)));
             }
         }
 

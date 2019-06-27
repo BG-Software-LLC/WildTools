@@ -76,15 +76,10 @@ public final class NMSAdapter_v1_7_R4 implements NMSAdapter {
             int fortuneLevel = getItemInHand(pl).getEnchantmentLevel(Enchantment.LOOT_BONUS_BLOCKS),
                     dropCount = block.getDropCount(fortuneLevel, world.random);
 
-            //This loop will run at least one time, depends on the block.
-            for(int i = 0; i < dropCount; i++) {
-                if (world.random.nextFloat() < 1.0F) {
-                    Item item = block.getDropType(Block.getId(block), world.random, fortuneLevel);
-                    if (item != null) {
-                        //Adds item to drops
-                        drops.add(CraftItemStack.asBukkitCopy(new ItemStack(item, 1, block.getDropData(Block.getId(block)))));
-                    }
-                }
+            Item item = block.getDropType(Block.getId(block), world.random, fortuneLevel);
+            if (item != null) {
+                ItemStack itemStack = new ItemStack(item);
+                drops.add(CraftItemStack.asBukkitCopy(new ItemStack(item, dropCount)));
             }
         }
 
