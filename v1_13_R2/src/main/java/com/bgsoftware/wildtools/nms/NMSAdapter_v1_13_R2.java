@@ -144,8 +144,7 @@ public class NMSAdapter_v1_13_R2 implements NMSAdapter {
         }
         else if(block instanceof BlockCocoa){
             if(age >= 2) {
-                for (int i = 0; i < 3; i++)
-                    drops.add(CraftItemStack.asBukkitCopy(new ItemStack(Items.COCOA_BEANS)));
+                drops.add(CraftItemStack.asBukkitCopy(new ItemStack(Items.COCOA_BEANS, 3)));
             }
         }
         else if(block instanceof BlockNetherWart){
@@ -154,9 +153,7 @@ public class NMSAdapter_v1_13_R2 implements NMSAdapter {
                 if (fortuneLevel > 0) {
                     amount += world.random.nextInt(fortuneLevel + 1);
                 }
-
-                for(int i = 0; i < amount; i++)
-                    drops.add(CraftItemStack.asBukkitCopy(new ItemStack(Items.NETHER_WART)));
+                drops.add(CraftItemStack.asBukkitCopy(new ItemStack(Items.NETHER_WART, amount)));
             }
         }
 

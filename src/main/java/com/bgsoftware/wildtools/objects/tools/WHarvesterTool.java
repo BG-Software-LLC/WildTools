@@ -141,10 +141,18 @@ public final class WHarvesterTool extends WTool implements HarvesterTool {
             max = block.getLocation().clone().add(radius, radius, radius);
             min = block.getLocation().clone().subtract(radius, radius, radius);
 
+            boolean lookForChorus = true;
+
             for(int y = max.getBlockY(); y >= min.getBlockY(); y--) {
                 for (int x = min.getBlockX(); x <= max.getBlockX(); x++) {
                     for (int z = min.getBlockZ(); z <= max.getBlockZ(); z++) {
                         Block targetBlock = player.getWorld().getBlockAt(x, y, z);
+
+                        if(lookForChorus && targetBlock.getType().name().contains("CHORUS")){
+                            getChorusFruit(player, targetBlock, removeBlocks, drops);
+                            lookForChorus = false;
+                            continue;
+                        }
 
                         //Checks if it's a crop
                         if(!Arrays.asList(crops).contains(targetBlock.getType().name()))
@@ -285,6 +293,21 @@ public final class WHarvesterTool extends WTool implements HarvesterTool {
         });
 
         return true;
+    }
+
+    private BlockFace[] nearby = new BlockFace[]{
+            BlockFace.UP, BlockFace.DOWN, BlockFace.WEST, BlockFace.EAST, BlockFace.NORTH, BlockFace.SOUTH
+    };
+
+    private void getChorusFruit(Player player, Block block, List<Block> removeBlocks, Map<Block, List<ItemStack>> drops){
+        removeBlocks.add(block);
+        drops.put(block, BukkitUtil.getBlockDrops(player, block));
+        for(BlockFace blockFace : nearby){
+            Block nearbyBlock = block.getRelative(blockFace);
+            if(nearbyBlock.getType().name().contains("CHORUS") && !removeBlocks.contains(nearbyBlock)){
+                getChorusFruit(player, nearbyBlock, removeBlocks, drops);
+            }
+        }
     }
 
 }
