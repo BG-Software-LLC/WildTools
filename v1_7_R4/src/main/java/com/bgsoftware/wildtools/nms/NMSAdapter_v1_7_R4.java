@@ -299,7 +299,7 @@ public final class NMSAdapter_v1_7_R4 implements NMSAdapter {
     @Override
     public void setAirFast(org.bukkit.block.Block block) {
         World world = ((CraftWorld) block.getWorld()).getHandle();
-        world.setTypeAndData(block.getX(), block.getY(), block.getZ(), Block.getById(0), 2,  0);
+        world.setTypeAndData(block.getX(), block.getY(), block.getZ(), Block.getById(0), 2,  18);
     }
 
     @Override
