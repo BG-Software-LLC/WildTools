@@ -149,7 +149,7 @@ public final class WHarvesterTool extends WTool implements HarvesterTool {
                         Block targetBlock = player.getWorld().getBlockAt(x, y, z);
 
                         if(lookForChorus && targetBlock.getType().name().contains("CHORUS")){
-                            getChorusFruit(player, targetBlock, removeBlocks, drops);
+                            getChorusFruit(player, targetBlock, removeBlocks, seededBlocks, drops);
                             lookForChorus = false;
                             continue;
                         }
@@ -299,13 +299,18 @@ public final class WHarvesterTool extends WTool implements HarvesterTool {
             BlockFace.UP, BlockFace.DOWN, BlockFace.WEST, BlockFace.EAST, BlockFace.NORTH, BlockFace.SOUTH
     };
 
-    private void getChorusFruit(Player player, Block block, List<Block> removeBlocks, Map<Block, List<ItemStack>> drops){
-        removeBlocks.add(block);
+    private void getChorusFruit(Player player, Block block, List<Block> removeBlocks, List<Block> seededBlocks, Map<Block, List<ItemStack>> drops){
+        if(block.getRelative(BlockFace.DOWN).getType().name().contains("END")){
+            seededBlocks.add(block);
+        }
+        else {
+            removeBlocks.add(block);
+        }
         drops.put(block, BukkitUtil.getBlockDrops(player, block));
         for(BlockFace blockFace : nearby){
             Block nearbyBlock = block.getRelative(blockFace);
             if(nearbyBlock.getType().name().contains("CHORUS") && !removeBlocks.contains(nearbyBlock)){
-                getChorusFruit(player, nearbyBlock, removeBlocks, drops);
+                getChorusFruit(player, nearbyBlock, removeBlocks, seededBlocks, drops);
             }
         }
     }

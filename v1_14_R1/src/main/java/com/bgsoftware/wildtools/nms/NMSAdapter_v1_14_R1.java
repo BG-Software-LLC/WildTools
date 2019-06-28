@@ -166,10 +166,15 @@ public class NMSAdapter_v1_14_R1 implements NMSAdapter {
 
     @Override
     public void setCropState(org.bukkit.block.Block block, CropState cropState) {
-        CraftBlock craftBlock = (CraftBlock) block;
-        BlockData blockData = craftBlock.getBlockData();
-        ((Ageable) blockData).setAge(cropState.ordinal());
-        craftBlock.setBlockData(blockData, true);
+        if(block.getType() == Material.CHORUS_PLANT){
+            block.setType(Material.CHORUS_FLOWER);
+        }
+        else {
+            CraftBlock craftBlock = (CraftBlock) block;
+            BlockData blockData = craftBlock.getBlockData();
+            ((Ageable) blockData).setAge(cropState.ordinal());
+            craftBlock.setBlockData(blockData, true);
+        }
     }
 
     @Override

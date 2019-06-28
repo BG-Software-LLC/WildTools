@@ -255,9 +255,9 @@ public final class NMSAdapter_v1_9_R2 implements NMSAdapter {
 
     @Override
     public void setCropState(org.bukkit.block.Block block, CropState cropState) {
-        if(block.getType() == Material.COCOA){
+        if(block.getType() == Material.COCOA) {
             CocoaPlant cocoaPlant = (CocoaPlant) block.getState().getData();
-            switch (cropState){
+            switch (cropState) {
                 case SEEDED:
                 case GERMINATED:
                 case VERY_SMALL:
@@ -274,6 +274,8 @@ public final class NMSAdapter_v1_9_R2 implements NMSAdapter {
                     break;
             }
             ((CraftBlock) block).setData(cocoaPlant.getData());
+        }else if(block.getType() == Material.CHORUS_PLANT){
+            block.setType(Material.CHORUS_FLOWER);
         }else {
             ((CraftBlock) block).setData(cropState.getData());
         }
