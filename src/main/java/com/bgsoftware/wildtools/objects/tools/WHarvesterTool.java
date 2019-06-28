@@ -23,6 +23,7 @@ import com.bgsoftware.wildtools.api.objects.ToolMode;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -305,8 +306,13 @@ public final class WHarvesterTool extends WTool implements HarvesterTool {
         }
         else {
             removeBlocks.add(block);
+
+            if(block.getType().name().contains("FLOWER"))
+                drops.put(block, Collections.singletonList(new ItemStack(Material.matchMaterial("CHORUS_FLOWER"))));
+            else
+                drops.put(block, BukkitUtil.getBlockDrops(player, block));
         }
-        drops.put(block, BukkitUtil.getBlockDrops(player, block));
+
         for(BlockFace blockFace : nearby){
             Block nearbyBlock = block.getRelative(blockFace);
             if(nearbyBlock.getType().name().contains("CHORUS") && !removeBlocks.contains(nearbyBlock)){
