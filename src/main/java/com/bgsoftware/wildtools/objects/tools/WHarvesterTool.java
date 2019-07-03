@@ -25,11 +25,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
 
 public final class WHarvesterTool extends WTool implements HarvesterTool {
 
@@ -46,8 +43,6 @@ public final class WHarvesterTool extends WTool implements HarvesterTool {
             "COCOA"
     };
 
-    private Set<UUID> sellModesPlayers;
-
     private int radius, farmlandRadius;
     private String activateAction;
 
@@ -55,7 +50,6 @@ public final class WHarvesterTool extends WTool implements HarvesterTool {
         super(type, name, ToolMode.HARVESTER);
         this.radius = radius;
         this.farmlandRadius = 0;
-        this.sellModesPlayers = new HashSet<>();
     }
 
     @Override
@@ -89,33 +83,39 @@ public final class WHarvesterTool extends WTool implements HarvesterTool {
         if(e.getAction() != Action.RIGHT_CLICK_AIR || !e.getPlayer().isSneaking() || !e.getPlayer().hasPermission("wildtools.sellmode"))
             return false;
 
-        if(sellModesPlayers.contains(e.getPlayer().getUniqueId())){
-            sellModesPlayers.remove(e.getPlayer().getUniqueId());
+        boolean sellMode = hasSellMode(e.getItem());
+        ItemStack itemStack;
+
+        if(sellMode){
+            itemStack = plugin.getNMSAdapter().setTag(e.getItem(), "sell-mode", 0);
             Locale.SELL_MODE_DISABLED.send(e.getPlayer());
         }
         else{
-            sellModesPlayers.add(e.getPlayer().getUniqueId());
+            itemStack = plugin.getNMSAdapter().setTag(e.getItem(), "sell-mode", 1);
             Locale.SELL_MODE_ENABLED.send(e.getPlayer());
         }
+
+        ItemUtil.formatItemStack(this, itemStack, getDefaultUses(), !sellMode, () ->
+            plugin.getNMSAdapter().setItemInHand(e.getPlayer(), itemStack));
 
         return true;
     }
 
     @Override
     public boolean onBlockInteract(PlayerInteractEvent e) {
-        return handleUse(e.getPlayer(), e.getClickedBlock());
+        return handleUse(e.getPlayer(), e.getClickedBlock(), e.getItem());
     }
 
     @Override
     public boolean onBlockHit(PlayerInteractEvent e) {
-        return handleUse(e.getPlayer(), e.getClickedBlock());
+        return handleUse(e.getPlayer(), e.getClickedBlock(), e.getItem());
     }
 
-    boolean hasSellMode(Player player){
-        return sellModesPlayers.contains(player.getUniqueId());
+    boolean hasSellMode(ItemStack itemStack){
+        return plugin.getNMSAdapter().getTag(itemStack, "sell-mode", 0) == 1;
     }
 
-    private boolean handleUse(Player player, Block block){
+    private boolean handleUse(Player player, Block block, ItemStack toolItem){
         List<Block> dirtToHarvest = new ArrayList<>(), removeBlocks = new ArrayList<>(), seededBlocks = new ArrayList<>();
         Map<Block, List<ItemStack>> drops = new HashMap<>();
 
@@ -247,7 +247,7 @@ public final class WHarvesterTool extends WTool implements HarvesterTool {
                     for (Block targetBlock : toCheck) {
                         for (ItemStack drop : drops.getOrDefault(targetBlock, new ArrayList<>())) {
                             if (drop != null && drop.getType() != Material.AIR) {
-                                if (sellModesPlayers.contains(player.getUniqueId()) && player.hasPermission("wildtools.sellmode") &&
+                                if (hasSellMode(toolItem) && player.hasPermission("wildtools.sellmode") &&
                                         plugin.getProviders().canSellItem(player, drop)) {
                                     toSell.add(drop);
                                     totalPrice += plugin.getProviders().getPrice(player, drop);
@@ -260,7 +260,7 @@ public final class WHarvesterTool extends WTool implements HarvesterTool {
                     }
                 }
 
-                if(sellModesPlayers.contains(player.getUniqueId())){
+                if(hasSellMode(toolItem)){
                     double multiplier = getMultiplier();
 
                     String message = toSell.isEmpty() ? Locale.NO_SELL_ITEMS.getMessage() : Locale.HARVESTER_SELL_SUCCEED.getMessage();

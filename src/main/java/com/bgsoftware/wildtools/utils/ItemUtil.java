@@ -33,6 +33,15 @@ public final class ItemUtil {
     }
 
     public static void formatItemStack(Tool tool, ItemStack itemStack, int defaultUses, boolean sellMode){
+        formatItemStack(tool, itemStack, defaultUses, sellMode, null);
+    }
+
+    public static void formatItemStack(Tool tool, ItemStack itemStack, int defaultUses, boolean sellMode, Runnable callback){
+        if(Bukkit.isPrimaryThread()){
+            Executor.async(() -> formatItemStack(tool, itemStack, defaultUses, sellMode, callback));
+            return;
+        }
+
         ItemMeta meta = itemStack.getItemMeta();
         int usesLeft = plugin.getNMSAdapter().getTag(itemStack, "tool-uses", defaultUses);
         String ownerName = "None", ownerUUID = plugin.getNMSAdapter().getTag(itemStack, "tool-owner", ""),
@@ -47,11 +56,13 @@ public final class ItemUtil {
 
         if(meta.hasDisplayName()){
             if(tool.getItemStack().getItemMeta().getDisplayName().equals(meta.getDisplayName()) ||
-                    tool.getItemStack().getItemMeta().getDisplayName().replace("{}", (usesLeft + 1) + "").equals(meta.getDisplayName()))
+                    tool.getItemStack().getItemMeta().getDisplayName().replace("{}", (usesLeft + 1) + "").equals(meta.getDisplayName()) ||
+                    tool.getItemStack().getItemMeta().getDisplayName().replace("{sell-mode}", sellMode ? disabled : enabled).equals(meta.getDisplayName())) {
                 meta.setDisplayName(tool.getItemStack().getItemMeta().getDisplayName()
                         .replace("{}", usesLeft + "")
                         .replace("{owner}", ownerName)
                         .replace("{sell-mode}", sellMode ? enabled : disabled));
+            }
         }
 
         if(meta.hasLore()){
@@ -67,6 +78,9 @@ public final class ItemUtil {
         }
 
         itemStack.setItemMeta(meta);
+
+        if(callback != null)
+            callback.run();
     }
 
 }

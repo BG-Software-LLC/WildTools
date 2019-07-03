@@ -368,7 +368,7 @@ public abstract class WTool implements Tool {
             //Update name and lore
             else if(is.hasItemMeta()){
                 ItemUtil.formatItemStack(this, is, getDefaultUses(),
-                        this instanceof HarvesterTool && ((WHarvesterTool) this).hasSellMode(pl));
+                        this instanceof HarvesterTool && ((WHarvesterTool) this).hasSellMode(is));
             }
         }
 
