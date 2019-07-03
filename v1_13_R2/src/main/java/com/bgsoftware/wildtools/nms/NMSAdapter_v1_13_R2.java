@@ -18,6 +18,7 @@ import net.minecraft.server.v1_13_R2.ItemStack;
 import net.minecraft.server.v1_13_R2.Items;
 import net.minecraft.server.v1_13_R2.NBTTagCompound;
 import net.minecraft.server.v1_13_R2.PlayerInventory;
+import net.minecraft.server.v1_13_R2.TileEntityShulkerBox;
 import net.minecraft.server.v1_13_R2.World;
 
 import org.bukkit.Bukkit;
@@ -67,6 +68,21 @@ public class NMSAdapter_v1_13_R2 implements NMSAdapter {
 
         if(!player.hasBlock(blockData) || player.playerInteractManager.isCreative())
             return drops;
+
+        if(world.getTileEntity(blockPosition) instanceof TileEntityShulkerBox){
+            TileEntityShulkerBox tileEntityShulkerBox = (TileEntityShulkerBox) world.getTileEntity(blockPosition);
+            if (!tileEntityShulkerBox.s() && tileEntityShulkerBox.G()) {
+                ItemStack itemStack = new ItemStack(block);
+                itemStack.getOrCreateTag().set("BlockEntityTag", tileEntityShulkerBox.g(new NBTTagCompound()));
+                if (tileEntityShulkerBox.hasCustomName()) {
+                    itemStack.a(tileEntityShulkerBox.getCustomName());
+                    tileEntityShulkerBox.setCustomName(null);
+                }
+
+                drops.add(CraftItemStack.asBukkitCopy(itemStack));
+            }
+            return drops;
+        }
 
         // Has silk touch enchant
         if ((block.j() && !block.isTileEntity()) && (silkTouch || EnchantmentManager.a(Enchantments.SILK_TOUCH, player) > 0)) {

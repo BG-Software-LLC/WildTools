@@ -17,6 +17,7 @@ import net.minecraft.server.v1_12_R1.Item;
 import net.minecraft.server.v1_12_R1.ItemStack;
 import net.minecraft.server.v1_12_R1.Items;
 import net.minecraft.server.v1_12_R1.PlayerInventory;
+import net.minecraft.server.v1_12_R1.TileEntityShulkerBox;
 import net.minecraft.server.v1_12_R1.World;
 import net.minecraft.server.v1_12_R1.NBTTagCompound;
 
@@ -64,6 +65,23 @@ public final class NMSAdapter_v1_12_R1 implements NMSAdapter {
 
         if(!player.hasBlock(blockData) || player.playerInteractManager.isCreative())
             return drops;
+
+        if(world.getTileEntity(blockPosition) instanceof TileEntityShulkerBox){
+            TileEntityShulkerBox tileEntityShulkerBox = (TileEntityShulkerBox) world.getTileEntity(blockPosition);
+            if (!tileEntityShulkerBox.r() && tileEntityShulkerBox.F()) {
+                ItemStack itemStack = new ItemStack(Item.getItemOf(block));
+                NBTTagCompound nbtTagCompound = new NBTTagCompound();
+                nbtTagCompound.set("BlockEntityTag", tileEntityShulkerBox.f(new NBTTagCompound()));
+                itemStack.setTag(nbtTagCompound);
+                if (tileEntityShulkerBox.hasCustomName()) {
+                    itemStack.g(tileEntityShulkerBox.getName());
+                    tileEntityShulkerBox.setCustomName("");
+                }
+
+                drops.add(CraftItemStack.asBukkitCopy(itemStack));
+            }
+            return drops;
+        }
 
         // Has silk touch enchant
         if ((block.r() && !block.isTileEntity()) && (silkTouch || EnchantmentManager.a(Enchantments.SILK_TOUCH, player) > 0)) {
