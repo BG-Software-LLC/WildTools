@@ -5,6 +5,7 @@ import net.minecraft.server.v1_8_R3.BlockCarrots;
 import net.minecraft.server.v1_8_R3.BlockCocoa;
 import net.minecraft.server.v1_8_R3.BlockCrops;
 import net.minecraft.server.v1_8_R3.BlockNetherWart;
+import net.minecraft.server.v1_8_R3.BlockOre;
 import net.minecraft.server.v1_8_R3.BlockPosition;
 import net.minecraft.server.v1_8_R3.BlockPotatoes;
 import net.minecraft.server.v1_8_R3.EnchantmentManager;
@@ -81,8 +82,7 @@ public final class NMSAdapter_v1_8_R3 implements NMSAdapter {
 
             Item item = block.getDropType(blockData, world.random, fortuneLevel);
             if (item != null) {
-                ItemStack itemStack = new ItemStack(item);
-                drops.add(CraftItemStack.asBukkitCopy(new ItemStack(item, dropCount)));
+                drops.add(CraftItemStack.asBukkitCopy(new ItemStack(item, dropCount, block.getDropData(blockData))));
             }
         }
 

@@ -34,7 +34,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @SuppressWarnings({"unused", "ConstantConditions"})
-public class NMSAdapter_v1_14_R1 implements NMSAdapter {
+public final class NMSAdapter_v1_14_R1 implements NMSAdapter {
 
     @Override
     public String getVersion() {

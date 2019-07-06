@@ -44,7 +44,7 @@ import java.util.Collection;
 import java.util.List;
 
 @SuppressWarnings({"unused", "ConstantConditions"})
-public class NMSAdapter_v1_13_R2 implements NMSAdapter {
+public final class NMSAdapter_v1_13_R2 implements NMSAdapter {
 
     @Override
     public String getVersion() {
@@ -97,7 +97,6 @@ public class NMSAdapter_v1_13_R2 implements NMSAdapter {
 
             Item item = block.getDropType(blockData, world, blockPosition, fortuneLevel).getItem();
             if (item != null) {
-                ItemStack itemStack = new ItemStack(item);
                 drops.add(CraftItemStack.asBukkitCopy(new ItemStack(item, dropCount)));
             }
         }

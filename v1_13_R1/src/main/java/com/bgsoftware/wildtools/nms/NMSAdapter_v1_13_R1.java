@@ -97,7 +97,6 @@ public final class NMSAdapter_v1_13_R1 implements NMSAdapter {
 
             Item item = block.getDropType(blockData, world, blockPosition, fortuneLevel).getItem();
             if (item != null) {
-                ItemStack itemStack = new ItemStack(item);
                 drops.add(CraftItemStack.asBukkitCopy(new ItemStack(item, dropCount)));
             }
         }
