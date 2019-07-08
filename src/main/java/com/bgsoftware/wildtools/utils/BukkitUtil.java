@@ -10,6 +10,7 @@ import com.bgsoftware.wildtools.api.objects.tools.Tool;
 import com.bgsoftware.wildtools.objects.WMaterial;
 import com.bgsoftware.wildtools.objects.tools.WHarvesterTool;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -42,6 +43,9 @@ public final class BukkitUtil {
     }
 
     public static List<ItemStack> getBlockDrops(Player player, Block block){
+        if(!Boolean.valueOf(block.getWorld().getGameRuleValue("doTileDrops")))
+            return new ArrayList<>();
+
         Material type = block.getType();
         if(Arrays.asList(WHarvesterTool.crops).contains(type.name()) && type != Material.CACTUS &&
                 type != WMaterial.SUGAR_CANE.parseMaterial() && type != WMaterial.MELON.parseMaterial() && type != Material.PUMPKIN && !type.name().equals("BAMBOO")) {
