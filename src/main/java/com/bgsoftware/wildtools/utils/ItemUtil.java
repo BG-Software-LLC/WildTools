@@ -32,12 +32,12 @@ public final class ItemUtil {
         }
     }
 
-    public static void formatItemStack(Tool tool, ItemStack itemStack, int defaultUses, boolean sellMode){
-        formatItemStack(tool, itemStack, defaultUses, sellMode, null);
+    public static void formatItemStack(Tool tool, ItemStack itemStack, int defaultUses, boolean sellMode, Runnable callback){
+        formatItemStack(tool, itemStack, defaultUses, sellMode, true, callback);
     }
 
-    public static void formatItemStack(Tool tool, ItemStack itemStack, int defaultUses, boolean sellMode, Runnable callback){
-        if(Bukkit.isPrimaryThread()){
+    public static void formatItemStack(Tool tool, ItemStack itemStack, int defaultUses, boolean sellMode, boolean async, Runnable callback){
+        if(async && Bukkit.isPrimaryThread()){
             Executor.async(() -> formatItemStack(tool, itemStack, defaultUses, sellMode, callback));
             return;
         }
@@ -55,14 +55,10 @@ public final class ItemUtil {
         }catch(Exception ignored){}
 
         if(meta.hasDisplayName()){
-            if(tool.getItemStack().getItemMeta().getDisplayName().equals(meta.getDisplayName()) ||
-                    tool.getItemStack().getItemMeta().getDisplayName().replace("{}", (usesLeft + 1) + "").equals(meta.getDisplayName()) ||
-                    tool.getItemStack().getItemMeta().getDisplayName().replace("{sell-mode}", sellMode ? disabled : enabled).equals(meta.getDisplayName())) {
-                meta.setDisplayName(tool.getItemStack().getItemMeta().getDisplayName()
-                        .replace("{}", usesLeft + "")
-                        .replace("{owner}", ownerName)
-                        .replace("{sell-mode}", sellMode ? enabled : disabled));
-            }
+            meta.setDisplayName(tool.getItemStack().getItemMeta().getDisplayName()
+                    .replace("{}", usesLeft + "")
+                    .replace("{owner}", ownerName)
+                    .replace("{sell-mode}", sellMode ? enabled : disabled));
         }
 
         if(meta.hasLore()){

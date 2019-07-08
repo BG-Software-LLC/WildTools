@@ -194,7 +194,7 @@ public abstract class WTool implements Tool {
     public ItemStack getFormattedItemStack(int uses) {
         ItemStack is = this.is.clone();
 
-        ItemUtil.formatItemStack(this, is, uses, false);
+        ItemUtil.formatItemStack(this, is, uses, false, false, null);
 
         is = plugin.getNMSAdapter().setTag(is, "tool-type", getName().toLowerCase());
 
@@ -367,8 +367,15 @@ public abstract class WTool implements Tool {
 
             //Update name and lore
             else if(is.hasItemMeta()){
-                ItemUtil.formatItemStack(this, is, getDefaultUses(),
-                        this instanceof HarvesterTool && ((WHarvesterTool) this).hasSellMode(is));
+                final ItemStack ITEM_STACK = is;
+                ItemUtil.formatItemStack(
+                        this,
+                        ITEM_STACK,
+                        getDefaultUses(),
+                        this instanceof HarvesterTool && ((WHarvesterTool) this).hasSellMode(is),
+                        () -> plugin.getNMSAdapter().setItemInHand(pl, ITEM_STACK)
+                );
+                return;
             }
         }
 

@@ -90,8 +90,9 @@ public final class BlocksListener implements Listener {
             String owner = plugin.getNMSAdapter().getTag(inHand, "tool-owner", "");
             if(owner.isEmpty()) {
                 inHand = plugin.getNMSAdapter().setTag(inHand, "tool-owner", e.getPlayer().getUniqueId().toString());
-                ItemUtil.formatItemStack(tool, inHand, tool.getDefaultUses(), false);
-                plugin.getNMSAdapter().setItemInHand(e.getPlayer(), inHand);
+                final ItemStack IN_HAND = inHand;
+                ItemUtil.formatItemStack(tool, IN_HAND, tool.getDefaultUses(), false, () ->
+                        plugin.getNMSAdapter().setItemInHand(e.getPlayer(), IN_HAND));
             }
         }
 
@@ -152,8 +153,9 @@ public final class BlocksListener implements Listener {
             String owner = plugin.getNMSAdapter().getTag(inHand, "tool-owner", "");
             if(owner.isEmpty()) {
                 inHand = plugin.getNMSAdapter().setTag(inHand, "tool-owner", e.getPlayer().getUniqueId().toString());
-                ItemUtil.formatItemStack(tool, inHand, tool.getDefaultUses(), false);
-                plugin.getNMSAdapter().setItemInHand(e.getPlayer(), inHand);
+                final ItemStack IN_HAND = inHand;
+                ItemUtil.formatItemStack(tool, inHand, tool.getDefaultUses(), false, () ->
+                        plugin.getNMSAdapter().setItemInHand(e.getPlayer(), IN_HAND));
             }
         }
 
