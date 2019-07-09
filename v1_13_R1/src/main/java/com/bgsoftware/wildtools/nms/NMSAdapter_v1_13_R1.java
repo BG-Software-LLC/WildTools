@@ -273,8 +273,13 @@ public final class NMSAdapter_v1_13_R1 implements NMSAdapter {
         else {
             CraftBlock craftBlock = (CraftBlock) block;
             BlockData blockData = craftBlock.getBlockData();
-            ((Ageable) blockData).setAge(cropState.ordinal());
-            craftBlock.setBlockData(blockData, true);
+            if(blockData instanceof Ageable) {
+                ((Ageable) blockData).setAge(cropState.ordinal());
+                craftBlock.setBlockData(blockData, true);
+            }
+            else{
+                block.setType(Material.AIR);
+            }
         }
     }
 
