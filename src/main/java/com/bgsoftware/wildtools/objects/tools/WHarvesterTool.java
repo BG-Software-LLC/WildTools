@@ -301,7 +301,7 @@ public final class WHarvesterTool extends WTool implements HarvesterTool {
     };
 
     private void getChorusFruit(Player player, Block block, List<Block> removeBlocks, List<Block> seededBlocks, Map<Block, List<ItemStack>> drops){
-        if(block.getRelative(BlockFace.DOWN).getType().name().contains("END")){
+        if(block.getType().name().contains("FLOWER") && block.getRelative(BlockFace.DOWN).getType().name().contains("END")){
             seededBlocks.add(block);
         }
         else {
@@ -315,7 +315,7 @@ public final class WHarvesterTool extends WTool implements HarvesterTool {
 
         for(BlockFace blockFace : nearby){
             Block nearbyBlock = block.getRelative(blockFace);
-            if(nearbyBlock.getType().name().contains("CHORUS") && !removeBlocks.contains(nearbyBlock)){
+            if(nearbyBlock.getType().name().contains("CHORUS") && !removeBlocks.contains(nearbyBlock) && !seededBlocks.contains(nearbyBlock)){
                 getChorusFruit(player, nearbyBlock, removeBlocks, seededBlocks, drops);
             }
         }
