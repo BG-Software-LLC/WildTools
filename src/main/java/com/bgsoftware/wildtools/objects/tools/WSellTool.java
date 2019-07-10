@@ -45,24 +45,30 @@ public final class WSellTool extends WTool implements SellTool {
 
         new Thread(() -> {
             double totalEarnings = 0.0;
+            boolean wildChest = false;
 
-            Map<Inventory, List<Integer>> toSell = new HashMap<>();
+            Map<Integer, ItemStack> toSell = new HashMap<>();
+            Inventory inventory = chest.getInventory();
 
-            for(Inventory inventory : WildChestsHook.getAllInventories(chest)) {
-                toSell.put(inventory, new ArrayList<>());
+            if(WildChestsHook.isWildChest(chest)){
+                totalEarnings = WildChestsHook.getChestPrice(chest, e.getPlayer(), toSell);
+                wildChest = true;
+            }
+
+            if(!wildChest) {
+                totalEarnings = 0;
                 for (int slot = 0; slot < inventory.getSize(); slot++) {
-                    ItemStack is = inventory.getItem(slot);
-                    if (is != null && plugin.getProviders().canSellItem(e.getPlayer(), is)) {
-                        toSell.get(inventory).add(slot);
-                        totalEarnings += plugin.getProviders().getPrice(e.getPlayer(), is);
+                    ItemStack itemStack = inventory.getItem(slot);
+                    if (itemStack != null && plugin.getProviders().canSellItem(e.getPlayer(), itemStack)) {
+                        toSell.put(slot, itemStack);
+                        totalEarnings += plugin.getProviders().getPrice(e.getPlayer(), itemStack);
                     }
                 }
             }
 
             double multiplier = getMultiplier();
 
-            String message = toSell.values().stream().allMatch(List::isEmpty) ?
-                    Locale.NO_SELL_ITEMS.getMessage() : Locale.SOLD_CHEST.getMessage();
+            String message = toSell.isEmpty() ? Locale.NO_SELL_ITEMS.getMessage() : Locale.SOLD_CHEST.getMessage();
 
             SellWandUseEvent sellWandUseEvent = new SellWandUseEvent(e.getPlayer(), chest, totalEarnings, multiplier, message);
             Bukkit.getPluginManager().callEvent(sellWandUseEvent);
@@ -73,11 +79,14 @@ public final class WSellTool extends WTool implements SellTool {
             multiplier = sellWandUseEvent.getMultiplier();
             totalEarnings *= multiplier;
 
-            for(Inventory inventory : toSell.keySet()){
-                for(int slot : toSell.get(inventory)){
-                    plugin.getProviders().trySellingItem(e.getPlayer(), inventory.getItem(slot), multiplier);
-                    inventory.setItem(slot, new ItemStack(Material.AIR));
-                }
+            for(Map.Entry<Integer, ItemStack> entry : toSell.entrySet()){
+                plugin.getProviders().trySellingItem(e.getPlayer(), entry.getValue(), multiplier);
+                if(!wildChest)
+                    inventory.setItem(entry.getKey(), new ItemStack(Material.AIR));
+            }
+
+            if(wildChest){
+                WildChestsHook.removeItems(chest, toSell);
             }
 
             //noinspection all
