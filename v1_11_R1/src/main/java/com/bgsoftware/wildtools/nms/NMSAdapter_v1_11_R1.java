@@ -294,6 +294,8 @@ public final class NMSAdapter_v1_11_R1 implements NMSAdapter {
             ((CraftBlock) block).setData(cocoaPlant.getData());
         }else if(block.getType() == Material.CHORUS_PLANT){
             block.setType(Material.CHORUS_FLOWER);
+        }else if(block.getType() == Material.MELON_BLOCK || block.getType() == Material.PUMPKIN){
+            block.setType(Material.AIR);
         }else {
             ((CraftBlock) block).setData(cropState.getData());
         }
