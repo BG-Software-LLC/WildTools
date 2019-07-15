@@ -3,6 +3,8 @@ package com.bgsoftware.wildtools.objects.tools;
 import com.bgsoftware.wildtools.hooks.WildChestsHook;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
+import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
 import org.bukkit.event.player.PlayerInteractEvent;
 import com.bgsoftware.wildtools.Locale;
@@ -12,14 +14,15 @@ import com.bgsoftware.wildtools.api.objects.ToolMode;
 
 import org.bukkit.Material;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public final class WSellTool extends WTool implements SellTool {
+
+    private final Map<Location, Object> sellMutexes = new HashMap<>();
 
     public WSellTool(Material type, String name){
         super(type, name, ToolMode.SELL);
@@ -42,62 +45,64 @@ public final class WSellTool extends WTool implements SellTool {
         }
 
         Chest chest = (Chest) e.getClickedBlock().getState();
+        Inventory inventory = ((InventoryHolder) e.getClickedBlock().getState()).getInventory();
 
         new Thread(() -> {
-            double totalEarnings = 0.0;
-            boolean wildChest = false;
+            synchronized (getToolMutex(e.getClickedBlock())) {
+                double totalEarnings = 0.0;
+                boolean wildChest = false;
 
-            Map<Integer, ItemStack> toSell = new HashMap<>();
-            Inventory inventory = chest.getInventory();
+                Map<Integer, ItemStack> toSell = new HashMap<>();
 
-            if(WildChestsHook.isWildChest(chest)){
-                totalEarnings = WildChestsHook.getChestPrice(chest, e.getPlayer(), toSell);
-                wildChest = true;
-            }
+                if (WildChestsHook.isWildChest(chest)) {
+                    totalEarnings = WildChestsHook.getChestPrice(chest, e.getPlayer(), toSell);
+                    wildChest = true;
+                }
 
-            if(!wildChest) {
-                totalEarnings = 0;
-                for (int slot = 0; slot < inventory.getSize(); slot++) {
-                    ItemStack itemStack = inventory.getItem(slot);
-                    if (itemStack != null && plugin.getProviders().canSellItem(e.getPlayer(), itemStack)) {
-                        toSell.put(slot, itemStack);
-                        totalEarnings += plugin.getProviders().getPrice(e.getPlayer(), itemStack);
+                if (!wildChest) {
+                    totalEarnings = 0;
+                    for (int slot = 0; slot < inventory.getSize(); slot++) {
+                        ItemStack itemStack = inventory.getItem(slot);
+                        if (itemStack != null && plugin.getProviders().canSellItem(e.getPlayer(), itemStack)) {
+                            toSell.put(slot, itemStack);
+                            totalEarnings += plugin.getProviders().getPrice(e.getPlayer(), itemStack);
+                        }
                     }
                 }
+
+                double multiplier = getMultiplier();
+
+                String message = toSell.isEmpty() ? Locale.NO_SELL_ITEMS.getMessage() : Locale.SOLD_CHEST.getMessage();
+
+                SellWandUseEvent sellWandUseEvent = new SellWandUseEvent(e.getPlayer(), chest, totalEarnings, multiplier, message);
+                Bukkit.getPluginManager().callEvent(sellWandUseEvent);
+
+                if (sellWandUseEvent.isCancelled())
+                    return;
+
+                multiplier = sellWandUseEvent.getMultiplier();
+                totalEarnings *= multiplier;
+
+                for (Map.Entry<Integer, ItemStack> entry : toSell.entrySet()) {
+                    plugin.getProviders().trySellingItem(e.getPlayer(), entry.getValue(), multiplier);
+                    if (!wildChest)
+                        inventory.setItem(entry.getKey(), new ItemStack(Material.AIR));
+                }
+
+                if (wildChest) {
+                    WildChestsHook.removeItems(chest, toSell);
+                }
+
+                //noinspection all
+                message = sellWandUseEvent.getMessage().replace("{0}", totalEarnings + "")
+                        .replace("{1}", multiplier != 1 && Locale.MULTIPLIER.getMessage() != null ? Locale.MULTIPLIER.getMessage(multiplier) : "");
+
+                if (!toSell.isEmpty())
+                    reduceDurablility(e.getPlayer());
+
+                if (!message.isEmpty())
+                    e.getPlayer().sendMessage(message);
             }
-
-            double multiplier = getMultiplier();
-
-            String message = toSell.isEmpty() ? Locale.NO_SELL_ITEMS.getMessage() : Locale.SOLD_CHEST.getMessage();
-
-            SellWandUseEvent sellWandUseEvent = new SellWandUseEvent(e.getPlayer(), chest, totalEarnings, multiplier, message);
-            Bukkit.getPluginManager().callEvent(sellWandUseEvent);
-
-            if(sellWandUseEvent.isCancelled())
-                return;
-
-            multiplier = sellWandUseEvent.getMultiplier();
-            totalEarnings *= multiplier;
-
-            for(Map.Entry<Integer, ItemStack> entry : toSell.entrySet()){
-                plugin.getProviders().trySellingItem(e.getPlayer(), entry.getValue(), multiplier);
-                if(!wildChest)
-                    inventory.setItem(entry.getKey(), new ItemStack(Material.AIR));
-            }
-
-            if(wildChest){
-                WildChestsHook.removeItems(chest, toSell);
-            }
-
-            //noinspection all
-            message = sellWandUseEvent.getMessage().replace("{0}", totalEarnings + "")
-                    .replace("{1}", multiplier != 1 && Locale.MULTIPLIER.getMessage() != null ? Locale.MULTIPLIER.getMessage(multiplier) : "");
-
-            if(!toSell.isEmpty())
-                reduceDurablility(e.getPlayer());
-
-            if(!message.isEmpty())
-                e.getPlayer().sendMessage(message);
         }).start();
 
         return true;

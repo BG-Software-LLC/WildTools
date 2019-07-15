@@ -83,9 +83,9 @@ public final class WildChestsHook {
         }
     }
 
-    public static List<Inventory> getAllInventories(Chest chest){
+    public static List<Inventory> getAllInventories(Chest chest, Inventory chestInventory){
         List<Inventory> inventories = new ArrayList<>();
-        inventories.add(chest.getInventory());
+        inventories.add(chestInventory);
 
         if(isWildChest(chest)){
             com.bgsoftware.wildchests.api.objects.chests.Chest wildChest = WildChestsAPI.getChest(chest.getLocation());

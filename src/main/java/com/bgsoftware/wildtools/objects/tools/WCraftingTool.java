@@ -6,6 +6,7 @@ import org.bukkit.block.Chest;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.FurnaceRecipe;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.Recipe;
 import org.bukkit.inventory.ShapedRecipe;
@@ -52,61 +53,63 @@ public final class WCraftingTool extends WTool implements CraftingTool {
         List<ItemStack> toAdd = new ArrayList<>();
 
         Chest chest = (Chest) e.getClickedBlock().getState();
+        Inventory chestInventory = ((InventoryHolder) e.getClickedBlock()).getInventory();
 
         new Thread(() -> {
-            int craftedItemsAmount = 0;
+            synchronized (getToolMutex(e.getClickedBlock())) {
+                int craftedItemsAmount = 0;
 
-            List<Inventory> inventories = WildChestsHook.getAllInventories(chest);
+                List<Inventory> inventories = WildChestsHook.getAllInventories(chest, chestInventory);
 
-            while (craftings.hasNext()) {
-                Recipe recipe = craftings.next();
-                List<ItemStack> ingredients;
+                while (craftings.hasNext()) {
+                    Recipe recipe = craftings.next();
+                    List<ItemStack> ingredients;
 
-                //Get the ingredients for the recipe
-                if (recipe instanceof ShapedRecipe) {
-                    ingredients = getIngredients(new ArrayList<>(((ShapedRecipe) recipe).getIngredientMap().values()));
-                } else if (recipe instanceof ShapelessRecipe) {
-                    ingredients = getIngredients(((ShapelessRecipe) recipe).getIngredientList());
-                } else if (recipe instanceof FurnaceRecipe) {
-                    ingredients = Collections.singletonList(((FurnaceRecipe) recipe).getInput());
-                } else continue;
+                    //Get the ingredients for the recipe
+                    if (recipe instanceof ShapedRecipe) {
+                        ingredients = getIngredients(new ArrayList<>(((ShapedRecipe) recipe).getIngredientMap().values()));
+                    } else if (recipe instanceof ShapelessRecipe) {
+                        ingredients = getIngredients(((ShapelessRecipe) recipe).getIngredientList());
+                    } else if (recipe instanceof FurnaceRecipe) {
+                        ingredients = Collections.singletonList(((FurnaceRecipe) recipe).getInput());
+                    } else continue;
 
-                if (ingredients.isEmpty())
-                    continue;
+                    if (ingredients.isEmpty())
+                        continue;
 
-                for(Inventory inventory : inventories) {
-                    int amountOfRecipes = Integer.MAX_VALUE;
+                    for (Inventory inventory : inventories) {
+                        int amountOfRecipes = Integer.MAX_VALUE;
 
-                    for (ItemStack ingredient : ingredients) {
-                        amountOfRecipes = Math.min(amountOfRecipes, countItems(ingredient, inventory) / ingredient.getAmount());
-                    }
-
-                    if (amountOfRecipes > 0) {
                         for (ItemStack ingredient : ingredients) {
-                            ItemStack cloned = ingredient.clone();
-                            cloned.setAmount(ingredient.getAmount() * amountOfRecipes);
-                            if (ingredient.getDurability() == Short.MAX_VALUE)
-                                inventory.remove(cloned.getType());
-                            else inventory.removeItem(cloned);
+                            amountOfRecipes = Math.min(amountOfRecipes, countItems(ingredient, inventory) / ingredient.getAmount());
                         }
-                        ItemStack result = recipe.getResult().clone();
-                        result.setAmount(result.getAmount() * amountOfRecipes);
-                        toAdd.add(result);
 
-                        craftedItemsAmount += amountOfRecipes;
+                        if (amountOfRecipes > 0) {
+                            for (ItemStack ingredient : ingredients) {
+                                ItemStack cloned = ingredient.clone();
+                                cloned.setAmount(ingredient.getAmount() * amountOfRecipes);
+                                if (ingredient.getDurability() == Short.MAX_VALUE)
+                                    inventory.remove(cloned.getType());
+                                else inventory.removeItem(cloned);
+                            }
+                            ItemStack result = recipe.getResult().clone();
+                            result.setAmount(result.getAmount() * amountOfRecipes);
+                            toAdd.add(result);
+
+                            craftedItemsAmount += amountOfRecipes;
+                        }
                     }
                 }
+
+                WildChestsHook.addItems(chest, toAdd);
+
+                if (craftedItemsAmount > 0) {
+                    reduceDurablility(e.getPlayer());
+                    Locale.CRAFT_SUCCESS.send(e.getPlayer(), craftedItemsAmount);
+                } else {
+                    Locale.NO_CRAFT_ITEMS.send(e.getPlayer());
+                }
             }
-
-            WildChestsHook.addItems(chest, toAdd);
-
-            if(craftedItemsAmount > 0){
-                reduceDurablility(e.getPlayer());
-                Locale.CRAFT_SUCCESS.send(e.getPlayer(), craftedItemsAmount);
-            }else{
-                Locale.NO_CRAFT_ITEMS.send(e.getPlayer());
-            }
-
         }).start();
 
         return true;

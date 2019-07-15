@@ -9,6 +9,7 @@ import org.bukkit.Material;
 import org.bukkit.block.Chest;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
@@ -37,33 +38,36 @@ public final class WSortTool extends WTool implements SortTool {
         }
 
         Chest chest = (Chest) e.getClickedBlock().getState();
+        Inventory chestInventory = ((InventoryHolder) e.getClickedBlock().getState()).getInventory();
 
         new Thread(() -> {
-            List<Inventory> inventories = WildChestsHook.getAllInventories(chest);
-            List<InventoryItem> inventoryItems = new ArrayList<>();
-            Map<Inventory, ItemStack[]> originContents = new HashMap<>();
+            synchronized (getToolMutex(e.getClickedBlock())) {
+                List<Inventory> inventories = WildChestsHook.getAllInventories(chest, chestInventory);
+                List<InventoryItem> inventoryItems = new ArrayList<>();
+                Map<Inventory, ItemStack[]> originContents = new HashMap<>();
 
-            for(Inventory inventory : inventories) {
-                originContents.put(inventory, inventory.getContents());
-                Arrays.stream(inventory.getContents())
-                        .filter(Objects::nonNull)
-                        .forEach(itemStack -> inventoryItems.add(new InventoryItem(itemStack)));
-                inventory.clear();
-            }
-
-            Collections.sort(inventoryItems);
-
-            WildChestsHook.addItems(chest, convert(inventoryItems));
-
-            for(Inventory inventory : inventories){
-                if(!Arrays.equals(originContents.get(inventory), inventory.getContents())) {
-                    reduceDurablility(e.getPlayer());
-                    Locale.SORTED_CHEST.send(e.getPlayer());
-                    return;
+                for (Inventory inventory : inventories) {
+                    originContents.put(inventory, inventory.getContents());
+                    Arrays.stream(inventory.getContents())
+                            .filter(Objects::nonNull)
+                            .forEach(itemStack -> inventoryItems.add(new InventoryItem(itemStack)));
+                    inventory.clear();
                 }
-            }
 
-            Locale.NO_SORT_ITEMS.send(e.getPlayer());
+                Collections.sort(inventoryItems);
+
+                WildChestsHook.addItems(chest, convert(inventoryItems));
+
+                for (Inventory inventory : inventories) {
+                    if (!Arrays.equals(originContents.get(inventory), inventory.getContents())) {
+                        reduceDurablility(e.getPlayer());
+                        Locale.SORTED_CHEST.send(e.getPlayer());
+                        return;
+                    }
+                }
+
+                Locale.NO_SORT_ITEMS.send(e.getPlayer());
+            }
         }).start();
 
         return true;

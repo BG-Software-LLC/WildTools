@@ -3,6 +3,7 @@ package com.bgsoftware.wildtools.objects.tools;
 import com.bgsoftware.wildtools.api.objects.tools.HarvesterTool;
 import com.bgsoftware.wildtools.utils.ItemUtil;
 import org.bukkit.GameMode;
+import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -31,6 +32,7 @@ import java.util.stream.Collectors;
 public abstract class WTool implements Tool {
 
     protected WildToolsPlugin plugin = WildToolsPlugin.getPlugin();
+    private final Map<Location, Object> toolMutexes = new HashMap<>();
 
     public static Set<UUID> toolBlockBreak;
 
@@ -488,6 +490,13 @@ public abstract class WTool implements Tool {
     }
 
     /***********************************************************************************/
+
+    protected Object getToolMutex(Block block){
+        Location location = block.getLocation();
+        if(!toolMutexes.containsKey(location))
+            toolMutexes.put(location, new Object());
+        return toolMutexes.get(location);
+    }
 
     private boolean isMaterialInList(Material type, short data, Set<String> list){
         for(String mat : list) {
