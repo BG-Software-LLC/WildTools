@@ -1,5 +1,6 @@
 package com.bgsoftware.wildtools.objects.tools;
 
+import com.bgsoftware.wildtools.utils.Executor;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -11,6 +12,9 @@ import org.bukkit.Material;
 import org.bukkit.entity.Creeper;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public final class WLightningTool extends WTool implements LightningTool {
 
@@ -43,12 +47,12 @@ public final class WLightningTool extends WTool implements LightningTool {
 
     private void handleUse(Player player, Entity entity){
         new Thread(() -> {
-            player.getWorld().strikeLightningEffect(entity.getLocation());
+            List<Creeper> creeperList = new ArrayList<>();
 
             boolean reduceDurability = false;
 
             if(entity instanceof Creeper) {
-                ((Creeper) entity).setPowered(true);
+                creeperList.add((Creeper) entity);
                 //Tool is using durability, reduces every block
                 if (isUsingDurability())
                     reduceDurablility(player);
@@ -59,7 +63,7 @@ public final class WLightningTool extends WTool implements LightningTool {
 
             for(Entity nearby : entity.getNearbyEntities(3, 3, 3)){
                 if(nearby instanceof Creeper) {
-                    ((Creeper) nearby).setPowered(true);
+                    creeperList.add((Creeper) nearby);
                     //Tool is using durability, reduces every block
                     if (isUsingDurability())
                         reduceDurablility(player);
@@ -73,6 +77,11 @@ public final class WLightningTool extends WTool implements LightningTool {
             if (reduceDurability && !isUsingDurability())
                 reduceDurablility(player);
 
+            Executor.sync(() -> {
+                player.getWorld().strikeLightningEffect(entity.getLocation());
+                for(Creeper creeper : creeperList)
+                    creeper.setPowered(true);
+            });
         }).start();
     }
 
