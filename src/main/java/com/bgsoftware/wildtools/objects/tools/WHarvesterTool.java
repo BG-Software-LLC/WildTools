@@ -103,11 +103,19 @@ public final class WHarvesterTool extends WTool implements HarvesterTool {
 
     @Override
     public boolean onBlockInteract(PlayerInteractEvent e) {
+        if(!getActivationAction().equals("RIGHT_CLICK") ){
+            e.setCancelled(true);
+            return false;
+        }
         return handleUse(e.getPlayer(), e.getClickedBlock(), e.getItem());
     }
 
     @Override
     public boolean onBlockHit(PlayerInteractEvent e) {
+        if(!getActivationAction().equals("LEFT_CLICK") ){
+            e.setCancelled(true);
+            return false;
+        }
         return handleUse(e.getPlayer(), e.getClickedBlock(), e.getItem());
     }
 
