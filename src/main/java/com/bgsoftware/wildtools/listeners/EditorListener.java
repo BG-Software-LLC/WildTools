@@ -367,7 +367,7 @@ public final class EditorListener implements Listener {
             }
         }
 
-        e.getPlayer().openInventory(plugin.getEditor().getToolEditor(toolName));
+        Executor.sync(() -> e.getPlayer().openInventory(plugin.getEditor().getToolEditor(toolName)));
         toolValues.remove(e.getPlayer().getUniqueId());
     }
 
