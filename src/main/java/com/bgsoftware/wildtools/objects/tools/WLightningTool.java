@@ -46,7 +46,7 @@ public final class WLightningTool extends WTool implements LightningTool {
     }
 
     private void handleUse(Player player, Entity entity){
-        new Thread(() -> {
+        Executor.async(() -> {
             List<Creeper> creeperList = new ArrayList<>();
 
             boolean reduceDurability = false;
@@ -82,7 +82,7 @@ public final class WLightningTool extends WTool implements LightningTool {
                 for(Creeper creeper : creeperList)
                     creeper.setPowered(true);
             });
-        }).start();
+        });
     }
 
 }

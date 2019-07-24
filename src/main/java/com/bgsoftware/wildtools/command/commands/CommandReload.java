@@ -5,6 +5,7 @@ import com.bgsoftware.wildtools.Locale;
 import com.bgsoftware.wildtools.WildToolsPlugin;
 import com.bgsoftware.wildtools.handlers.DataHandler;
 
+import com.bgsoftware.wildtools.utils.Executor;
 import org.bukkit.command.CommandSender;
 import com.bgsoftware.wildtools.handlers.ToolsHandler;
 
@@ -45,7 +46,7 @@ public final class CommandReload implements ICommand {
 
     @Override
     public void run(WildToolsPlugin plugin, CommandSender sender, String[] args) {
-        new Thread(() -> {
+        Executor.async(() -> {
             WildToolsPlugin.log("******** RELOAD START ********");
             ToolsHandler.reload();
             DataHandler.reload();
@@ -53,7 +54,7 @@ public final class CommandReload implements ICommand {
             Locale.reload();
             WildToolsPlugin.log("******** RELOAD DONE ********");
             Locale.RELOAD_SUCCESS.send(sender);
-        }).start();
+        });
     }
 
     @Override

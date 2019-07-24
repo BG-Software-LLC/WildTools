@@ -1,6 +1,7 @@
 package com.bgsoftware.wildtools.listeners;
 
 import com.bgsoftware.wildtools.WildToolsPlugin;
+import com.bgsoftware.wildtools.utils.Executor;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -97,10 +98,10 @@ public final class EditorListener implements Listener {
                     player.openInventory(plugin.getEditor().getToolsEditor());
                     break;
                 case 40:
-                    new Thread(() -> {
+                    Executor.async(() -> {
                         plugin.getEditor().saveConfiguration();
                         player.sendMessage("" + ChatColor.AQUA + ChatColor.BOLD + "WildTools " + ChatColor.GRAY + "Saved configuration successfully.");
-                    }).start();
+                    });
                     break;
             }
 

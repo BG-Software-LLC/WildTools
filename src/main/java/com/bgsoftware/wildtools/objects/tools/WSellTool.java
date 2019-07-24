@@ -1,10 +1,9 @@
 package com.bgsoftware.wildtools.objects.tools;
 
 import com.bgsoftware.wildtools.hooks.WildChestsHook;
+import com.bgsoftware.wildtools.utils.Executor;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.Location;
-import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
 import org.bukkit.event.player.PlayerInteractEvent;
 import com.bgsoftware.wildtools.Locale;
@@ -21,8 +20,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 public final class WSellTool extends WTool implements SellTool {
-
-    private final Map<Location, Object> sellMutexes = new HashMap<>();
 
     public WSellTool(Material type, String name){
         super(type, name, ToolMode.SELL);
@@ -47,7 +44,7 @@ public final class WSellTool extends WTool implements SellTool {
         Chest chest = (Chest) e.getClickedBlock().getState();
         Inventory inventory = ((InventoryHolder) e.getClickedBlock().getState()).getInventory();
 
-        new Thread(() -> {
+        Executor.async(() -> {
             synchronized (getToolMutex(e.getClickedBlock())) {
                 double totalEarnings = 0.0;
                 boolean wildChest = false;
@@ -103,7 +100,7 @@ public final class WSellTool extends WTool implements SellTool {
                 if (!message.isEmpty())
                     e.getPlayer().sendMessage(message);
             }
-        }).start();
+        });
 
         return true;
     }

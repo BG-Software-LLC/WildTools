@@ -5,6 +5,7 @@ import com.bgsoftware.wildtools.Locale;
 import com.bgsoftware.wildtools.api.objects.ToolMode;
 import com.bgsoftware.wildtools.api.objects.tools.SortTool;
 
+import com.bgsoftware.wildtools.utils.Executor;
 import org.bukkit.Material;
 import org.bukkit.block.Chest;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -40,7 +41,7 @@ public final class WSortTool extends WTool implements SortTool {
         Chest chest = (Chest) e.getClickedBlock().getState();
         Inventory chestInventory = ((InventoryHolder) e.getClickedBlock().getState()).getInventory();
 
-        new Thread(() -> {
+        Executor.async(() -> {
             synchronized (getToolMutex(e.getClickedBlock())) {
                 List<Inventory> inventories = WildChestsHook.getAllInventories(chest, chestInventory);
                 List<InventoryItem> inventoryItems = new ArrayList<>();
@@ -68,7 +69,7 @@ public final class WSortTool extends WTool implements SortTool {
 
                 Locale.NO_SORT_ITEMS.send(e.getPlayer());
             }
-        }).start();
+        });
 
         return true;
     }

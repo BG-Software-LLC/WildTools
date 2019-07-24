@@ -1,5 +1,6 @@
 package com.bgsoftware.wildtools.objects.tools;
 
+import com.bgsoftware.wildtools.utils.Executor;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Chest;
@@ -55,7 +56,7 @@ public final class WCraftingTool extends WTool implements CraftingTool {
         Chest chest = (Chest) e.getClickedBlock().getState();
         Inventory chestInventory = ((InventoryHolder) e.getClickedBlock()).getInventory();
 
-        new Thread(() -> {
+        Executor.async(() -> {
             synchronized (getToolMutex(e.getClickedBlock())) {
                 int craftedItemsAmount = 0;
 
@@ -110,7 +111,7 @@ public final class WCraftingTool extends WTool implements CraftingTool {
                     Locale.NO_CRAFT_ITEMS.send(e.getPlayer());
                 }
             }
-        }).start();
+        });
 
         return true;
     }
