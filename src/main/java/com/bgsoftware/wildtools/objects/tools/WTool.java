@@ -355,7 +355,14 @@ public abstract class WTool implements Tool {
             is.setDurability((short) (is.getDurability() + 1));
 
             if(is.getDurability() > is.getType().getMaxDurability()) {
-                is = new ItemStack(Material.AIR);
+                if(is.getAmount() > 1){
+                    int amount = is.getAmount() - 1;
+                    is = getFormattedItemStack();
+                    is.setAmount(amount);
+                }
+                else{
+                    is = new ItemStack(Material.AIR);
+                }
             }
         }
 
@@ -364,7 +371,14 @@ public abstract class WTool implements Tool {
             is = plugin.getNMSAdapter().setTag(is, "tool-uses", --usesLeft);
 
             if (usesLeft <= 0) {
-                is = new ItemStack(Material.AIR);
+                if(is.getAmount() > 1){
+                    int amount = is.getAmount() - 1;
+                    is = getFormattedItemStack();
+                    is.setAmount(amount);
+                }
+                else{
+                    is = new ItemStack(Material.AIR);
+                }
             }
 
             //Update name and lore
