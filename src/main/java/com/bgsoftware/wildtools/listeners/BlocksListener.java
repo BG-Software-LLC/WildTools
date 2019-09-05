@@ -52,7 +52,7 @@ public final class BlocksListener implements Listener {
         this.plugin = plugin;
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onBlockBreak(BlockBreakEvent e){
         //One of the blocks that were broken by a tool
         if(WTool.toolBlockBreak.contains(e.getPlayer().getUniqueId()))
