@@ -1,8 +1,8 @@
 package com.bgsoftware.wildtools.hooks;
 
-import me.goodandevil.skyblock.api.SkyBlockAPI;
-import me.goodandevil.skyblock.api.island.Island;
-import me.goodandevil.skyblock.api.island.IslandRole;
+import com.songoda.skyblock.api.SkyBlockAPI;
+import com.songoda.skyblock.api.island.Island;
+import com.songoda.skyblock.api.island.IslandRole;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
