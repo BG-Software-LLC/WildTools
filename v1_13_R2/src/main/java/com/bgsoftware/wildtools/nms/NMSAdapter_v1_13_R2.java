@@ -35,6 +35,7 @@ import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.Ageable;
 import org.bukkit.CropState;
 import org.bukkit.NamespacedKey;
+import org.bukkit.craftbukkit.v1_13_R2.util.CraftMagicNumbers;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.Player;
@@ -355,5 +356,9 @@ public final class NMSAdapter_v1_13_R2 implements NMSAdapter {
                 location.getBlockZ() > (worldBorder.getCenter().getBlockZ() + radius) || location.getBlockZ() < (worldBorder.getCenter().getBlockZ() - radius);
     }
 
+    @Override
+    public Object getBlockData(Material type, byte data) {
+        return CraftMagicNumbers.getBlock(type, data);
+    }
 
 }

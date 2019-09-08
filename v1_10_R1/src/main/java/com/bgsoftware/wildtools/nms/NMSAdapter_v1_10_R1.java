@@ -345,4 +345,10 @@ public final class NMSAdapter_v1_10_R1 implements NMSAdapter {
                 location.getBlockZ() > (worldBorder.getCenter().getBlockZ() + radius) || location.getBlockZ() < (worldBorder.getCenter().getBlockZ() - radius);
     }
 
+    @Override
+    public Object getBlockData(Material type, byte data) {
+        int combinedId = type.getId() + (data << 12);
+        return Block.getByCombinedId(combinedId);
+    }
+
 }

@@ -5,7 +5,6 @@ import net.minecraft.server.v1_8_R3.BlockCarrots;
 import net.minecraft.server.v1_8_R3.BlockCocoa;
 import net.minecraft.server.v1_8_R3.BlockCrops;
 import net.minecraft.server.v1_8_R3.BlockNetherWart;
-import net.minecraft.server.v1_8_R3.BlockOre;
 import net.minecraft.server.v1_8_R3.BlockPosition;
 import net.minecraft.server.v1_8_R3.BlockPotatoes;
 import net.minecraft.server.v1_8_R3.EnchantmentManager;
@@ -329,6 +328,12 @@ public final class NMSAdapter_v1_8_R3 implements NMSAdapter {
         int radius = (int) worldBorder.getSize() / 2;
         return location.getBlockX() > (worldBorder.getCenter().getBlockX() + radius) || location.getBlockX() < (worldBorder.getCenter().getBlockX() - radius) ||
                 location.getBlockZ() > (worldBorder.getCenter().getBlockZ() + radius) || location.getBlockZ() < (worldBorder.getCenter().getBlockZ() - radius);
+    }
+
+    @Override
+    public Object getBlockData(Material type, byte data) {
+        int combinedId = type.getId() + (data << 12);
+        return Block.getByCombinedId(combinedId);
     }
 
 }

@@ -2,6 +2,7 @@ package com.bgsoftware.wildtools.nms;
 
 import org.bukkit.CropState;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
@@ -47,5 +48,7 @@ public interface NMSAdapter {
     Enchantment getGlowEnchant();
 
     boolean isOutsideWorldborder(Location location);
+
+    Object getBlockData(Material type, byte data);
 
 }

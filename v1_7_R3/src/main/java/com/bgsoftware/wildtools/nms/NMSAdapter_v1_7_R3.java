@@ -322,4 +322,9 @@ public final class NMSAdapter_v1_7_R3 implements NMSAdapter {
         return false;
     }
 
+    @Override
+    public Object getBlockData(Material type, byte data) {
+        throw new UnsupportedOperationException("That's not possible to create block data in 1.7");
+    }
+
 }

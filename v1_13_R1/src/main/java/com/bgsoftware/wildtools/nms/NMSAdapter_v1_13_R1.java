@@ -35,6 +35,7 @@ import org.bukkit.craftbukkit.v1_13_R1.inventory.CraftItemStack;
 
 import org.bukkit.CropState;
 import org.bukkit.NamespacedKey;
+import org.bukkit.craftbukkit.v1_13_R1.util.CraftMagicNumbers;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.Player;
@@ -353,6 +354,11 @@ public final class NMSAdapter_v1_13_R1 implements NMSAdapter {
         int radius = (int) worldBorder.getSize() / 2;
         return location.getBlockX() > (worldBorder.getCenter().getBlockX() + radius) || location.getBlockX() < (worldBorder.getCenter().getBlockX() - radius) ||
                 location.getBlockZ() > (worldBorder.getCenter().getBlockZ() + radius) || location.getBlockZ() < (worldBorder.getCenter().getBlockZ() - radius);
+    }
+
+    @Override
+    public Object getBlockData(Material type, byte data) {
+        return CraftMagicNumbers.getBlock(type, data);
     }
 
 }

@@ -1,5 +1,7 @@
 package com.bgsoftware.wildtools.utils;
 
+import com.bgsoftware.wildtools.hooks.CoreProtectHook;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -40,10 +42,13 @@ public final class BukkitUtil {
                     block.getWorld().dropItemNaturally(block.getLocation(), is);
             }
         }
+
+        if(Bukkit.getPluginManager().isPluginEnabled("CoreProtect"))
+            CoreProtectHook.recordBlockChange(player, block);
     }
 
     public static List<ItemStack> getBlockDrops(Player player, Block block){
-        if(!Boolean.valueOf(block.getWorld().getGameRuleValue("doTileDrops")))
+        if(!Boolean.parseBoolean(block.getWorld().getGameRuleValue("doTileDrops")))
             return new ArrayList<>();
 
         Material type = block.getType();
