@@ -57,7 +57,7 @@ public final class WSortTool extends WTool implements SortTool {
 
                 Collections.sort(inventoryItems);
 
-                WildChestsHook.addItems(chest, convert(inventoryItems));
+                WildChestsHook.addItems(chest.getLocation(), chestInventory, convert(inventoryItems));
 
                 for (Inventory inventory : inventories) {
                     if (!Arrays.equals(originContents.get(inventory), inventory.getContents())) {
@@ -78,7 +78,7 @@ public final class WSortTool extends WTool implements SortTool {
         return original.stream().map(InventoryItem::getItemStack).collect(Collectors.toList());
     }
 
-    private class InventoryItem implements Comparable<InventoryItem>{
+    private static class InventoryItem implements Comparable<InventoryItem>{
 
         public ItemStack itemStack;
 

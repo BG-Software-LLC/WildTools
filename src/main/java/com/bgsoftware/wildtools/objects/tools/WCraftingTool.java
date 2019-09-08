@@ -54,7 +54,7 @@ public final class WCraftingTool extends WTool implements CraftingTool {
         List<ItemStack> toAdd = new ArrayList<>();
 
         Chest chest = (Chest) e.getClickedBlock().getState();
-        Inventory chestInventory = ((InventoryHolder) e.getClickedBlock()).getInventory();
+        Inventory chestInventory = ((InventoryHolder) e.getClickedBlock().getState()).getInventory();
 
         Executor.async(() -> {
             synchronized (getToolMutex(e.getClickedBlock())) {
@@ -102,7 +102,7 @@ public final class WCraftingTool extends WTool implements CraftingTool {
                     }
                 }
 
-                WildChestsHook.addItems(chest, toAdd);
+                WildChestsHook.addItems(chest.getLocation(), chestInventory, toAdd);
 
                 if (craftedItemsAmount > 0) {
                     reduceDurablility(e.getPlayer());

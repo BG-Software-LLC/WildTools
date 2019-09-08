@@ -5,6 +5,7 @@ import com.bgsoftware.wildchests.api.objects.chests.StorageChest;
 import com.bgsoftware.wildtools.WildToolsPlugin;
 import com.bgsoftware.wildtools.utils.ItemUtil;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Chest;
 import org.bukkit.entity.Player;
@@ -110,17 +111,16 @@ public final class WildChestsHook {
         return false;
     }
 
-    public static void addItems(Chest chest, List<ItemStack> itemStackList){
+    public static void addItems(Location location, Inventory chestInventory, List<ItemStack> itemStackList){
         if(Bukkit.getPluginManager().isPluginEnabled("WildChests")){
-            com.bgsoftware.wildchests.api.objects.chests.Chest wildChest = WildChestsAPI.getChest(chest.getLocation());
+            com.bgsoftware.wildchests.api.objects.chests.Chest wildChest = WildChestsAPI.getChest(location);
             if(wildChest != null){
                 wildChest.addItems(itemStackList.toArray(new ItemStack[]{}));
                 return;
             }
         }
 
-        Inventory inventory = chest.getInventory();
-        itemStackList.forEach(itemStack -> ItemUtil.addItem(itemStack, inventory, chest.getLocation()));
+        itemStackList.forEach(itemStack -> ItemUtil.addItem(itemStack, chestInventory, location));
     }
 
 
