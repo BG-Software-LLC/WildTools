@@ -43,6 +43,11 @@ prices-list:
 # *** Lightning Tool-Mode ***
 # Tools in this mode will strike a lightning to charge creepers. This mode is used for lightning-wands.
 #
+# *** Magnet Tool-Mode ***
+# Tools in this mode will suction items into the player's inventory.
+# Required sections:
+# radius: What is the radius of the checking area? (INTEGER)
+#
 # *** Harvester Tool-Mode ***
 # Tools in this mode will harvest seeds and replant them automatically. This mode is used for harvester-hoes.
 # Drops support silk-touch and fortune.
@@ -217,6 +222,21 @@ tools:
     - '&f   {}'
     - '&f'
     - '&8&m---------------------------------------'
+  magnet_wand:
+    tool-mode: MAGNET
+    type: STICK
+    radius: 5
+    uses: 500
+    name: '&f --{ &4&lMagnet Wand &f}-- '
+    lore:
+      - '&8&m---------------------------------------'
+      - '&7 This wand suction all nearby items in the'
+      - '&7 radius of 5 blocks into your inventory.'
+      - '&7'
+      - '&b&l Uses:'
+      - '&f   {}'
+      - '&f'
+      - '&8&m---------------------------------------'
   harvester_hoe:
     tool-mode: HARVESTER
     radius: 3

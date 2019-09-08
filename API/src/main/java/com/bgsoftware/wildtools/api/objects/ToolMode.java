@@ -10,6 +10,7 @@ public enum ToolMode {
     HARVESTER,
     ICE,
     LIGHTNING,
+    MAGNET,
     PILLAR,
     SELL,
     SORT

@@ -1,6 +1,7 @@
 package com.bgsoftware.wildtools.handlers;
 
 import com.bgsoftware.wildtools.WildToolsPlugin;
+import com.bgsoftware.wildtools.api.objects.tools.MagnetTool;
 import com.bgsoftware.wildtools.config.CommentedConfiguration;
 import com.bgsoftware.wildtools.config.ConfigComments;
 import com.bgsoftware.wildtools.api.objects.tools.BuilderTool;
@@ -143,6 +144,9 @@ public final class DataHandler {
                 case "LIGHTNING":
                     tool = plugin.getToolsManager().registerTool(type, name, LightningTool.class, null);
                     break;
+                case "MAGNET":
+                    tool = plugin.getToolsManager().registerTool(type, name, MagnetTool.class, cfg.getInt("tools." + name + ".radius"));
+                    break;
                 case "PILLAR":
                     tool = plugin.getToolsManager().registerTool(type, name, PillarTool.class, null);
                     break;
@@ -197,7 +201,7 @@ public final class DataHandler {
                 for(String line : enchants)
                     try {
                         tool.addEnchantment(Enchantment.getByName(line.split(":")[0]),
-                                Integer.valueOf(line.split(":")[1]));
+                                Integer.parseInt(line.split(":")[1]));
                     } catch (IllegalArgumentException ignored){}
             }
 

@@ -5,6 +5,8 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Item;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -50,5 +52,7 @@ public interface NMSAdapter {
     boolean isOutsideWorldborder(Location location);
 
     Object getBlockData(Material type, byte data);
+
+    void playPickupAnimation(LivingEntity livingEntity, Item item);
 
 }

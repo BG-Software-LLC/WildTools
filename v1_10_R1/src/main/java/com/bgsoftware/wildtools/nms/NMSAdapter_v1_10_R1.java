@@ -10,6 +10,8 @@ import net.minecraft.server.v1_10_R1.BlockPosition;
 import net.minecraft.server.v1_10_R1.BlockPotatoes;
 import net.minecraft.server.v1_10_R1.EnchantmentManager;
 import net.minecraft.server.v1_10_R1.Enchantments;
+import net.minecraft.server.v1_10_R1.EntityItem;
+import net.minecraft.server.v1_10_R1.EntityLiving;
 import net.minecraft.server.v1_10_R1.EntityPlayer;
 import net.minecraft.server.v1_10_R1.EnumColor;
 import net.minecraft.server.v1_10_R1.IBlockData;
@@ -17,9 +19,11 @@ import net.minecraft.server.v1_10_R1.Item;
 import net.minecraft.server.v1_10_R1.ItemStack;
 import net.minecraft.server.v1_10_R1.Items;
 import net.minecraft.server.v1_10_R1.NBTTagCompound;
+import net.minecraft.server.v1_10_R1.PacketPlayOutCollect;
 import net.minecraft.server.v1_10_R1.PlayerInventory;
 import net.minecraft.server.v1_10_R1.World;
 
+import net.minecraft.server.v1_10_R1.WorldServer;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -27,6 +31,8 @@ import org.bukkit.NetherWartsState;
 import org.bukkit.WorldBorder;
 import org.bukkit.craftbukkit.v1_10_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_10_R1.block.CraftBlock;
+import org.bukkit.craftbukkit.v1_10_R1.entity.CraftItem;
+import org.bukkit.craftbukkit.v1_10_R1.entity.CraftLivingEntity;
 import org.bukkit.craftbukkit.v1_10_R1.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_10_R1.inventory.CraftInventoryPlayer;
 import org.bukkit.craftbukkit.v1_10_R1.inventory.CraftItemStack;
@@ -34,6 +40,7 @@ import org.bukkit.craftbukkit.v1_10_R1.inventory.CraftItemStack;
 import org.bukkit.CropState;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.enchantments.EnchantmentTarget;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
 import org.bukkit.material.CocoaPlant;
@@ -349,6 +356,13 @@ public final class NMSAdapter_v1_10_R1 implements NMSAdapter {
     public Object getBlockData(Material type, byte data) {
         int combinedId = type.getId() + (data << 12);
         return Block.getByCombinedId(combinedId);
+    }
+
+    @Override
+    public void playPickupAnimation(LivingEntity livingEntity, org.bukkit.entity.Item item) {
+        EntityLiving entityLiving = ((CraftLivingEntity) livingEntity).getHandle();
+        EntityItem entityItem = (EntityItem) ((CraftItem) item).getHandle();
+        ((WorldServer) entityLiving.world).getTracker().a(entityItem, new PacketPlayOutCollect(entityItem.getId(), entityLiving.getId()));
     }
 
 }

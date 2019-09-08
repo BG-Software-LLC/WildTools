@@ -7,20 +7,26 @@ import net.minecraft.server.v1_7_R3.BlockCrops;
 import net.minecraft.server.v1_7_R3.BlockNetherWart;
 import net.minecraft.server.v1_7_R3.BlockPotatoes;
 import net.minecraft.server.v1_7_R3.EnchantmentManager;
+import net.minecraft.server.v1_7_R3.EntityItem;
+import net.minecraft.server.v1_7_R3.EntityLiving;
 import net.minecraft.server.v1_7_R3.EntityPlayer;
 import net.minecraft.server.v1_7_R3.Item;
 import net.minecraft.server.v1_7_R3.ItemStack;
 import net.minecraft.server.v1_7_R3.Items;
 import net.minecraft.server.v1_7_R3.NBTTagCompound;
+import net.minecraft.server.v1_7_R3.PacketPlayOutCollect;
 import net.minecraft.server.v1_7_R3.PlayerInventory;
 import net.minecraft.server.v1_7_R3.World;
 
+import net.minecraft.server.v1_7_R3.WorldServer;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.NetherWartsState;
 import org.bukkit.craftbukkit.v1_7_R3.CraftWorld;
 import org.bukkit.craftbukkit.v1_7_R3.block.CraftBlock;
+import org.bukkit.craftbukkit.v1_7_R3.entity.CraftItem;
+import org.bukkit.craftbukkit.v1_7_R3.entity.CraftLivingEntity;
 import org.bukkit.craftbukkit.v1_7_R3.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_7_R3.inventory.CraftInventoryPlayer;
 import org.bukkit.craftbukkit.v1_7_R3.inventory.CraftItemStack;
@@ -28,6 +34,7 @@ import org.bukkit.craftbukkit.v1_7_R3.inventory.CraftItemStack;
 import org.bukkit.CropState;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.enchantments.EnchantmentTarget;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.material.CocoaPlant;
 import org.bukkit.material.Crops;
@@ -325,6 +332,13 @@ public final class NMSAdapter_v1_7_R3 implements NMSAdapter {
     @Override
     public Object getBlockData(Material type, byte data) {
         throw new UnsupportedOperationException("That's not possible to create block data in 1.7");
+    }
+
+    @Override
+    public void playPickupAnimation(LivingEntity livingEntity, org.bukkit.entity.Item item) {
+        EntityLiving entityLiving = ((CraftLivingEntity) livingEntity).getHandle();
+        EntityItem entityItem = (EntityItem) ((CraftItem) item).getHandle();
+        ((WorldServer) entityLiving.world).getTracker().a(entityItem, new PacketPlayOutCollect(entityItem.getId(), entityLiving.getId()));
     }
 
 }

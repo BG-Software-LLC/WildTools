@@ -1,5 +1,6 @@
 package com.bgsoftware.wildtools.handlers;
 
+import com.bgsoftware.wildtools.api.objects.tools.MagnetTool;
 import com.bgsoftware.wildtools.objects.tools.WBuilderTool;
 import com.bgsoftware.wildtools.objects.tools.WCannonTool;
 import com.bgsoftware.wildtools.objects.tools.WCraftingTool;
@@ -7,6 +8,7 @@ import com.bgsoftware.wildtools.objects.tools.WCuboidTool;
 import com.bgsoftware.wildtools.objects.tools.WHarvesterTool;
 import com.bgsoftware.wildtools.objects.tools.WIceTool;
 import com.bgsoftware.wildtools.objects.tools.WLightningTool;
+import com.bgsoftware.wildtools.objects.tools.WMagnetTool;
 import com.bgsoftware.wildtools.objects.tools.WPillarTool;
 import com.bgsoftware.wildtools.objects.tools.WSellTool;
 import com.bgsoftware.wildtools.objects.tools.WSortTool;
@@ -156,11 +158,13 @@ public final class ToolsHandler implements ToolsManager {
             tool = new WIceTool(type, name, (int) arg);
         }else if(toolClass.isAssignableFrom(LightningTool.class)){
             tool = new WLightningTool(type, name);
+        }else if(toolClass.isAssignableFrom(MagnetTool.class)){
+            tool = new WMagnetTool(type, name, (int) arg);
         }else if(toolClass.isAssignableFrom(PillarTool.class)){
             tool = new WPillarTool(type, name);
         }else if(toolClass.isAssignableFrom(SellTool.class)){
             tool = new WSellTool(type, name);
-        }else if(toolClass.isAssignableFrom(SortTool.class)){
+        }else if(toolClass.isAssignableFrom(SortTool.class)) {
             tool = new WSortTool(type, name);
         }else throw new IllegalArgumentException("Couldn't find tool class " + toolClass.getName());
 
