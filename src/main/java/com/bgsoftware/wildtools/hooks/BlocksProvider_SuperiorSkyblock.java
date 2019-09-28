@@ -15,7 +15,7 @@ public final class BlocksProvider_SuperiorSkyblock implements BlocksProvider {
     public boolean canBreak(Player player, Block block, boolean onlyInClaim) {
         Island island = SuperiorSkyblockAPI.getIslandAt(block.getLocation());
         if(onlyInClaim && island == null) return false;
-        return island == null || island.hasPermission(SuperiorSkyblockAPI.getPlayer(player), IslandPermission.BUILD);
+        return island == null || (island.isInsideRange(block.getLocation()) && island.hasPermission(SuperiorSkyblockAPI.getPlayer(player), IslandPermission.BUILD));
     }
 
     @Override
@@ -31,6 +31,6 @@ public final class BlocksProvider_SuperiorSkyblock implements BlocksProvider {
 
         if(onlyInClaim && island == null) return false;
 
-        return island == null || island.hasPermission(SuperiorSkyblockAPI.getPlayer(player), islandPermission);
+        return island == null || (island.isInsideRange(block.getLocation()) && island.hasPermission(SuperiorSkyblockAPI.getPlayer(player), islandPermission));
     }
 }
