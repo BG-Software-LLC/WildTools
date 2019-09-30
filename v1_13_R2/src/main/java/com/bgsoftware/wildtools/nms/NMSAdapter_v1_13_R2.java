@@ -30,6 +30,7 @@ import org.bukkit.Location;
 import org.bukkit.WorldBorder;
 import org.bukkit.craftbukkit.v1_13_R2.CraftWorld;
 import org.bukkit.craftbukkit.v1_13_R2.block.CraftBlock;
+import org.bukkit.craftbukkit.v1_13_R2.block.data.CraftBlockData;
 import org.bukkit.craftbukkit.v1_13_R2.entity.CraftItem;
 import org.bukkit.craftbukkit.v1_13_R2.entity.CraftLivingEntity;
 import org.bukkit.craftbukkit.v1_13_R2.entity.CraftPlayer;
@@ -365,7 +366,7 @@ public final class NMSAdapter_v1_13_R2 implements NMSAdapter {
 
     @Override
     public Object getBlockData(Material type, byte data) {
-        return CraftMagicNumbers.getBlock(type, data);
+        return CraftBlockData.fromData(CraftMagicNumbers.getBlock(type, data));
     }
 
     @Override
