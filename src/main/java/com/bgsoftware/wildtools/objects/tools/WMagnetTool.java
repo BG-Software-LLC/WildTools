@@ -2,11 +2,14 @@ package com.bgsoftware.wildtools.objects.tools;
 
 import com.bgsoftware.wildtools.api.objects.ToolMode;
 import com.bgsoftware.wildtools.api.objects.tools.MagnetTool;
+import com.bgsoftware.wildtools.hooks.WildStackerHook;
 import com.bgsoftware.wildtools.utils.Executor;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.stream.Stream;
 
@@ -43,7 +46,10 @@ public final class WMagnetTool extends WTool implements MagnetTool {
             if(!item.isValid() || item.isDead())
                 return;
 
-            if(player.getInventory().addItem(item.getItemStack()).isEmpty()){
+            ItemStack itemStack = Bukkit.getPluginManager().isPluginEnabled("WildStacker") ?
+                    WildStackerHook.getItemStack(item) : item.getItemStack();
+
+            if(player.getInventory().addItem(itemStack).isEmpty()){
                 item.remove();
                 plugin.getNMSAdapter().playPickupAnimation(player, item);
             }
