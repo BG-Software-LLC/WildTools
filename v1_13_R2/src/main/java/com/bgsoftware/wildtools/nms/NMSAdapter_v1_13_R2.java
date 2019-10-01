@@ -47,9 +47,14 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.Recipe;
+import org.bukkit.inventory.RecipeChoice;
+import org.bukkit.inventory.ShapedRecipe;
+import org.bukkit.inventory.ShapelessRecipe;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 @SuppressWarnings({"unused", "ConstantConditions"})
@@ -374,6 +379,31 @@ public final class NMSAdapter_v1_13_R2 implements NMSAdapter {
         EntityLiving entityLiving = ((CraftLivingEntity) livingEntity).getHandle();
         EntityItem entityItem = (EntityItem) ((CraftItem) item).getHandle();
         ((WorldServer) entityLiving.world).getTracker().a(entityItem, new PacketPlayOutCollect(entityItem.getId(), entityLiving.getId(), item.getItemStack().getAmount()));
+    }
+
+    @Override
+    public org.bukkit.inventory.ItemStack[] parseChoice(Recipe recipe, org.bukkit.inventory.ItemStack itemStack) {
+        List<org.bukkit.inventory.ItemStack> ingredients = Collections.singletonList(itemStack);
+        List<RecipeChoice> recipeChoices = new ArrayList<>();
+
+        if (recipe instanceof ShapedRecipe) {
+            recipeChoices.addAll(((ShapedRecipe) recipe).getChoiceMap().values());
+        } else if (recipe instanceof ShapelessRecipe) {
+            recipeChoices.addAll(((ShapelessRecipe) recipe).getChoiceList());
+        }
+
+        if(!recipeChoices.isEmpty()) {
+            for (RecipeChoice recipeChoice : recipeChoices) {
+                if (recipeChoice instanceof RecipeChoice.MaterialChoice && recipeChoice.test(itemStack)) {
+                    ingredients.clear();
+                    for (Material material : ((RecipeChoice.MaterialChoice) recipeChoice).getChoices())
+                        ingredients.add(new org.bukkit.inventory.ItemStack(material));
+                    break;
+                }
+            }
+        }
+
+        return ingredients.toArray(new org.bukkit.inventory.ItemStack[0]);
     }
 
 }

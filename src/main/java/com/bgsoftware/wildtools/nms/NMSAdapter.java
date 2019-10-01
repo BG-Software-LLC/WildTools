@@ -9,8 +9,10 @@ import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.Recipe;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 public interface NMSAdapter {
@@ -54,5 +56,9 @@ public interface NMSAdapter {
     Object getBlockData(Material type, byte data);
 
     void playPickupAnimation(LivingEntity livingEntity, Item item);
+
+    default ItemStack[] parseChoice(Recipe recipe, ItemStack itemStack){
+        return new ItemStack[] {itemStack};
+    }
 
 }

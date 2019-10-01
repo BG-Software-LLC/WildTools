@@ -1,6 +1,7 @@
 package com.bgsoftware.wildtools.objects.tools;
 
 import com.bgsoftware.wildtools.utils.Executor;
+import com.bgsoftware.wildtools.utils.recipes.RecipeChoice;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Chest;
@@ -64,15 +65,15 @@ public final class WCraftingTool extends WTool implements CraftingTool {
 
                 while (craftings.hasNext()) {
                     Recipe recipe = craftings.next();
-                    List<ItemStack> ingredients;
+                    List<RecipeChoice> ingredients;
 
                     //Get the ingredients for the recipe
                     if (recipe instanceof ShapedRecipe) {
-                        ingredients = getIngredients(new ArrayList<>(((ShapedRecipe) recipe).getIngredientMap().values()));
+                        ingredients = getIngredients(recipe, new ArrayList<>(((ShapedRecipe) recipe).getIngredientMap().values()));
                     } else if (recipe instanceof ShapelessRecipe) {
-                        ingredients = getIngredients(((ShapelessRecipe) recipe).getIngredientList());
+                        ingredients = getIngredients(recipe, ((ShapelessRecipe) recipe).getIngredientList());
                     } else if (recipe instanceof FurnaceRecipe) {
-                        ingredients = Collections.singletonList(((FurnaceRecipe) recipe).getInput());
+                        ingredients = Collections.singletonList(RecipeChoice.of(((FurnaceRecipe) recipe).getInput()));
                     } else continue;
 
                     if (ingredients.isEmpty())
@@ -81,23 +82,21 @@ public final class WCraftingTool extends WTool implements CraftingTool {
                     for (Inventory inventory : inventories) {
                         int amountOfRecipes = Integer.MAX_VALUE;
 
-                        for (ItemStack ingredient : ingredients) {
+                        for (RecipeChoice ingredient : ingredients) {
                             amountOfRecipes = Math.min(amountOfRecipes, countItems(ingredient, inventory) / ingredient.getAmount());
                         }
 
                         if (amountOfRecipes > 0) {
-                            for (ItemStack ingredient : ingredients) {
-                                ItemStack cloned = ingredient.clone();
-                                cloned.setAmount(ingredient.getAmount() * amountOfRecipes);
-                                if (ingredient.getDurability() == Short.MAX_VALUE)
-                                    inventory.remove(cloned.getType());
-                                else inventory.removeItem(cloned);
+                            for (RecipeChoice ingredient : ingredients) {
+                                ingredient.setAmount(ingredient.getAmount() * amountOfRecipes);
+                                ingredient.remove(inventory);
                             }
+
                             ItemStack result = recipe.getResult().clone();
                             result.setAmount(result.getAmount() * amountOfRecipes);
                             toAdd.add(result);
 
-                            craftedItemsAmount += amountOfRecipes;
+                            craftedItemsAmount += (amountOfRecipes * recipe.getResult().getAmount());
                         }
                     }
                 }
@@ -133,17 +132,23 @@ public final class WCraftingTool extends WTool implements CraftingTool {
     }
 
     @SuppressWarnings("deprecation")
-    private List<ItemStack> getIngredients(List<ItemStack> oldList){
-        Map<ItemStack, Integer> counts = new HashMap<>();
-        List<ItemStack> ingredients = new ArrayList<>();
+    private List<RecipeChoice> getIngredients(Recipe recipe, List<ItemStack> oldList){
+        Map<RecipeChoice, Integer> counts = new HashMap<>();
+        List<RecipeChoice> ingredients = new ArrayList<>();
 
         for(ItemStack itemStack : oldList){
-            if(itemStack.getData().getData() < 0)
-                itemStack.setDurability((short) 0);
-            counts.put(itemStack, counts.getOrDefault(itemStack, 0) + itemStack.getAmount());
+            RecipeChoice recipeChoice;
+
+            if(itemStack.getData().getData() < 0){
+                recipeChoice = RecipeChoice.of(plugin.getNMSAdapter().parseChoice(recipe, itemStack));
+            }else {
+                recipeChoice = RecipeChoice.of(itemStack);
+            }
+
+            counts.put(recipeChoice, counts.getOrDefault(recipeChoice, 0) + itemStack.getAmount());
         }
 
-        for(ItemStack ingredient : counts.keySet()){
+        for(RecipeChoice ingredient : counts.keySet()){
             ingredient.setAmount(counts.get(ingredient));
             ingredients.add(ingredient);
         }
@@ -151,17 +156,12 @@ public final class WCraftingTool extends WTool implements CraftingTool {
         return ingredients;
     }
 
-    private int countItems(ItemStack itemStack, Inventory inventory){
+    private int countItems(RecipeChoice recipeChoice, Inventory inventory){
         int amount = 0;
 
-        ItemStack cloned = itemStack.clone();
-
         for(ItemStack _itemStack : inventory.getContents()){
-            if(_itemStack != null) {
-                if (itemStack.getDurability() == Short.MAX_VALUE)
-                    cloned.setDurability(_itemStack.getDurability());
-                if (_itemStack.isSimilar(cloned))
-                    amount += _itemStack.getAmount();
+            if(recipeChoice.test(_itemStack)) {
+                amount += _itemStack.getAmount();
             }
         }
 
