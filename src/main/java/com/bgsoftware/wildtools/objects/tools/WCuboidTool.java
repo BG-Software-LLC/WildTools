@@ -1,6 +1,7 @@
 package com.bgsoftware.wildtools.objects.tools;
 
 import com.bgsoftware.wildtools.utils.BukkitUtils;
+import com.bgsoftware.wildtools.utils.blocks.BlocksController;
 import org.bukkit.event.block.BlockBreakEvent;
 import com.bgsoftware.wildtools.api.objects.tools.CuboidTool;
 import com.bgsoftware.wildtools.api.objects.ToolMode;
@@ -51,6 +52,8 @@ public final class WCuboidTool extends WTool implements CuboidTool {
                 }
             }
         }
+
+        BlocksController.updateSession();
 
         if(reduceDurability && !isUsingDurability())
             reduceDurablility(e.getPlayer());

@@ -1,6 +1,7 @@
 package com.bgsoftware.wildtools.objects.tools;
 
 import com.bgsoftware.wildtools.utils.BukkitUtils;
+import com.bgsoftware.wildtools.utils.blocks.BlocksController;
 import org.bukkit.event.player.PlayerInteractEvent;
 import com.bgsoftware.wildtools.api.objects.tools.PillarTool;
 import com.bgsoftware.wildtools.api.objects.ToolMode;
@@ -37,6 +38,8 @@ public final class WPillarTool extends WTool implements PillarTool {
                 break;
             reduceDurablity = true;
         }
+
+        BlocksController.updateSession();
 
         //Tool is not using durability, reduces once only
         if (reduceDurablity && !isUsingDurability())

@@ -1,5 +1,6 @@
 package com.bgsoftware.wildtools.nms;
 
+import org.bukkit.Chunk;
 import org.bukkit.CropState;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -12,7 +13,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.Recipe;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 public interface NMSAdapter {
@@ -47,7 +47,13 @@ public interface NMSAdapter {
 
     Collection<Player> getOnlinePlayers();
 
-    void setAirFast(Block block);
+    void setAirFast(Location location);
+
+    void refreshChunks(List<Chunk> chunksList);
+
+    int getCombinedId(Location location);
+
+    void setCombinedId(Location location, int combinedId);
 
     Enchantment getGlowEnchant();
 
@@ -60,5 +66,4 @@ public interface NMSAdapter {
     default ItemStack[] parseChoice(Recipe recipe, ItemStack itemStack){
         return new ItemStack[] {itemStack};
     }
-
 }

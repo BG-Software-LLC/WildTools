@@ -6,6 +6,7 @@ import net.minecraft.server.v1_7_R4.BlockCocoa;
 import net.minecraft.server.v1_7_R4.BlockCrops;
 import net.minecraft.server.v1_7_R4.BlockNetherWart;
 import net.minecraft.server.v1_7_R4.BlockPotatoes;
+import net.minecraft.server.v1_7_R4.Chunk;
 import net.minecraft.server.v1_7_R4.EnchantmentManager;
 import net.minecraft.server.v1_7_R4.EntityItem;
 import net.minecraft.server.v1_7_R4.EntityLiving;
@@ -15,6 +16,7 @@ import net.minecraft.server.v1_7_R4.ItemStack;
 import net.minecraft.server.v1_7_R4.Items;
 import net.minecraft.server.v1_7_R4.NBTTagCompound;
 import net.minecraft.server.v1_7_R4.PacketPlayOutCollect;
+import net.minecraft.server.v1_7_R4.PacketPlayOutMapChunk;
 import net.minecraft.server.v1_7_R4.PlayerInventory;
 import net.minecraft.server.v1_7_R4.World;
 
@@ -23,6 +25,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.NetherWartsState;
+import org.bukkit.craftbukkit.v1_7_R4.CraftChunk;
 import org.bukkit.craftbukkit.v1_7_R4.CraftServer;
 import org.bukkit.craftbukkit.v1_7_R4.CraftWorld;
 import org.bukkit.craftbukkit.v1_7_R4.block.CraftBlock;
@@ -298,9 +301,36 @@ public final class NMSAdapter_v1_7_R4 implements NMSAdapter {
     }
 
     @Override
-    public void setAirFast(org.bukkit.block.Block block) {
-        World world = ((CraftWorld) block.getWorld()).getHandle();
-        world.setTypeAndData(block.getX(), block.getY(), block.getZ(), Block.getById(0), 2,  18);
+    public void setAirFast(Location location) {
+        World world = ((CraftWorld) location.getWorld()).getHandle();
+        Chunk chunk = world.getChunkAt(location.getChunk().getX(), location.getChunk().getZ());
+        chunk.a(location.getBlockX() & 0x0f, location.getBlockY(), location.getBlockZ() & 0x0f, Block.getById(0), 0);
+    }
+
+    @Override
+    public void refreshChunks(List<org.bukkit.Chunk> chunksList) {
+        if(chunksList.size() == 0)
+            return;
+
+        World world = ((CraftWorld) chunksList.get(0).getWorld()).getHandle();
+        for(org.bukkit.Chunk bukkitChunk : chunksList){
+            Chunk chunk = ((CraftChunk) bukkitChunk).getHandle();
+            for(Object entityHuman : world.players)
+                ((EntityPlayer) entityHuman).playerConnection.sendPacket(new PacketPlayOutMapChunk(chunk, true, 65535,
+                        ((EntityPlayer) entityHuman).playerConnection.networkManager.getVersion()));
+        }
+    }
+
+    @Override
+    public int getCombinedId(Location location) {
+        World world = ((CraftWorld) location.getWorld()).getHandle();
+        return Block.getId(world.getType(location.getBlockX(), location.getBlockY(), location.getBlockZ()));
+    }
+
+    @Override
+    public void setCombinedId(Location location, int combinedId) {
+        World world = ((CraftWorld) location.getWorld()).getHandle();
+        world.setTypeAndData(location.getBlockX(), location.getBlockY(), location.getBlockZ(), Block.getById(combinedId), 2,18);
     }
 
     @Override

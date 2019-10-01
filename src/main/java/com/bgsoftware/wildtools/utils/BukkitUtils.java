@@ -1,6 +1,7 @@
 package com.bgsoftware.wildtools.utils;
 
 import com.bgsoftware.wildtools.hooks.CoreProtectHook;
+import com.bgsoftware.wildtools.utils.blocks.BlocksController;
 import com.bgsoftware.wildtools.utils.items.ItemUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -28,7 +29,7 @@ public final class BukkitUtils {
         if(block.getRelative(BlockFace.UP).getType().name().contains("WATER"))
             block.setType(Material.AIR);
         else
-            plugin.getNMSAdapter().setAirFast(block);
+            BlocksController.setAir(block.getLocation());
 
         if(tool != null){
             drops = tool.filterDrops(drops);

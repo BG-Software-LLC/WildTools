@@ -3,6 +3,7 @@ package com.bgsoftware.wildtools.objects.tools;
 import com.bgsoftware.wildtools.objects.WMaterial;
 import com.bgsoftware.wildtools.utils.BukkitUtils;
 import com.bgsoftware.wildtools.utils.Executor;
+import com.bgsoftware.wildtools.utils.blocks.BlocksController;
 import com.bgsoftware.wildtools.utils.items.ItemUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.block.Block;
@@ -230,10 +231,12 @@ public final class WHarvesterTool extends WTool implements HarvesterTool {
                     if (isUsingDurability())
                         reduceDurablility(player);
 
-                    plugin.getNMSAdapter().setAirFast(_block);
+                    BlocksController.setAir(_block.getLocation());
                     toCheck.add(_block);
                     reduceDurability = true;
                 }
+
+                BlocksController.updateSession();
 
                 for(Block _block : seededBlocks) {
                     if (plugin.getNMSAdapter().getItemInHand(player).getType() == Material.AIR)
