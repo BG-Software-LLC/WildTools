@@ -1,6 +1,6 @@
 package com.bgsoftware.wildtools.objects.tools;
 
-import com.bgsoftware.wildtools.utils.BukkitUtil;
+import com.bgsoftware.wildtools.utils.BukkitUtils;
 import org.bukkit.event.player.PlayerInteractEvent;
 import com.bgsoftware.wildtools.api.objects.tools.PillarTool;
 import com.bgsoftware.wildtools.api.objects.ToolMode;
@@ -29,7 +29,7 @@ public final class WPillarTool extends WTool implements PillarTool {
             Block targetBlock = e.getPlayer().getWorld().getBlockAt(x, y, z);
             if(!plugin.getProviders().canBreak(e.getPlayer(), targetBlock, firstType, firstData, this))
                 continue;
-            BukkitUtil.breakNaturally(e.getPlayer(), targetBlock, this);
+            BukkitUtils.breakNaturally(e.getPlayer(), targetBlock, this);
             //Tool is using durability, reduces every block
             if(isUsingDurability())
                 reduceDurablility(e.getPlayer());

@@ -1,6 +1,6 @@
 package com.bgsoftware.wildtools.objects.tools;
 
-import com.bgsoftware.wildtools.utils.BukkitUtil;
+import com.bgsoftware.wildtools.utils.BukkitUtils;
 import org.bukkit.event.block.BlockBreakEvent;
 import com.bgsoftware.wildtools.api.objects.tools.CuboidTool;
 import com.bgsoftware.wildtools.api.objects.ToolMode;
@@ -41,7 +41,7 @@ public final class WCuboidTool extends WTool implements CuboidTool {
                     Block targetBlock = e.getPlayer().getWorld().getBlockAt(x, y, z);
                     if(!plugin.getProviders().canBreak(e.getPlayer(), targetBlock, firstType, firstData, this))
                         continue;
-                    BukkitUtil.breakNaturally(e.getPlayer(), targetBlock, this);
+                    BukkitUtils.breakNaturally(e.getPlayer(), targetBlock, this);
                     //Tool is using durability, reduces every block
                     if(isUsingDurability())
                         reduceDurablility(e.getPlayer());

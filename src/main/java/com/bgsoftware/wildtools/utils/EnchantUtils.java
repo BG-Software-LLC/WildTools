@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @SuppressWarnings({"unchecked", "JavaReflectionMemberAccess"})
-public final class EnchantUtil {
+public final class EnchantUtils {
 
     public static Map<String, Enchantment> getByName(){
         try{

@@ -1,9 +1,9 @@
 package com.bgsoftware.wildtools.objects.tools;
 
 import com.bgsoftware.wildtools.objects.WMaterial;
-import com.bgsoftware.wildtools.utils.BukkitUtil;
+import com.bgsoftware.wildtools.utils.BukkitUtils;
 import com.bgsoftware.wildtools.utils.Executor;
-import com.bgsoftware.wildtools.utils.ItemUtil;
+import com.bgsoftware.wildtools.utils.items.ItemUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.block.Block;
 import org.bukkit.CropState;
@@ -95,7 +95,7 @@ public final class WHarvesterTool extends WTool implements HarvesterTool {
             Locale.SELL_MODE_ENABLED.send(e.getPlayer());
         }
 
-        ItemUtil.formatItemStack(this, itemStack, getDefaultUses(), !sellMode, () ->
+        ItemUtils.formatItemStack(this, itemStack, getDefaultUses(), !sellMode, () ->
             plugin.getNMSAdapter().setItemInHand(e.getPlayer(), itemStack));
 
         return true;
@@ -184,7 +184,7 @@ public final class WHarvesterTool extends WTool implements HarvesterTool {
                                             plugin.getNMSAdapter().isFullyGrown(targetBlock) &&
                                             plugin.getProviders().canBreak(player, targetBlock, this)){
                                         removeBlocks.add(targetBlock);
-                                        drops.put(targetBlock, BukkitUtil.getBlockDrops(player, targetBlock));
+                                        drops.put(targetBlock, BukkitUtils.getBlockDrops(player, targetBlock));
                                     }
                                     targetBlock = targetBlock.getRelative(BlockFace.UP);
                                 }
@@ -196,12 +196,12 @@ public final class WHarvesterTool extends WTool implements HarvesterTool {
                                 continue;
 
                             removeBlocks.add(targetBlock);
-                            drops.put(targetBlock, BukkitUtil.getBlockDrops(player, targetBlock));
+                            drops.put(targetBlock, BukkitUtils.getBlockDrops(player, targetBlock));
                             continue;
                         }
 
                         seededBlocks.add(targetBlock);
-                        drops.put(targetBlock, BukkitUtil.getBlockDrops(player, targetBlock));
+                        drops.put(targetBlock, BukkitUtils.getBlockDrops(player, targetBlock));
                     }
                 }
             }
@@ -260,7 +260,7 @@ public final class WHarvesterTool extends WTool implements HarvesterTool {
                                     toSell.add(drop);
                                     totalPrice += plugin.getProviders().getPrice(player, drop);
                                 } else if (isAutoCollect())
-                                    ItemUtil.addItem(drop, player.getInventory(), block.getLocation());
+                                    ItemUtils.addItem(drop, player.getInventory(), block.getLocation());
                                 else
                                     player.getWorld().dropItemNaturally(block.getLocation(), drop);
                             }
@@ -318,7 +318,7 @@ public final class WHarvesterTool extends WTool implements HarvesterTool {
             if(block.getType().name().contains("FLOWER"))
                 drops.put(block, Collections.singletonList(new ItemStack(Material.matchMaterial("CHORUS_FLOWER"))));
             else
-                drops.put(block, BukkitUtil.getBlockDrops(player, block));
+                drops.put(block, BukkitUtils.getBlockDrops(player, block));
         }
 
         for(BlockFace blockFace : nearby){

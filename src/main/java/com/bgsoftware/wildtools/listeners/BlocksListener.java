@@ -4,7 +4,7 @@ import com.bgsoftware.wildtools.Locale;
 import com.bgsoftware.wildtools.WildToolsPlugin;
 import com.bgsoftware.wildtools.objects.tools.WTool;
 
-import com.bgsoftware.wildtools.utils.ItemUtil;
+import com.bgsoftware.wildtools.utils.items.ItemUtils;
 import org.bukkit.Material;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.EventHandler;
@@ -91,7 +91,7 @@ public final class BlocksListener implements Listener {
             if(owner.isEmpty()) {
                 inHand = plugin.getNMSAdapter().setTag(inHand, "tool-owner", e.getPlayer().getUniqueId().toString());
                 final ItemStack IN_HAND = inHand;
-                ItemUtil.formatItemStack(tool, IN_HAND, tool.getDefaultUses(), false, () ->
+                ItemUtils.formatItemStack(tool, IN_HAND, tool.getDefaultUses(), false, () ->
                         plugin.getNMSAdapter().setItemInHand(e.getPlayer(), IN_HAND));
             }
         }
@@ -154,7 +154,7 @@ public final class BlocksListener implements Listener {
             if(owner.isEmpty()) {
                 inHand = plugin.getNMSAdapter().setTag(inHand, "tool-owner", e.getPlayer().getUniqueId().toString());
                 final ItemStack IN_HAND = inHand;
-                ItemUtil.formatItemStack(tool, inHand, tool.getDefaultUses(), false, () ->
+                ItemUtils.formatItemStack(tool, inHand, tool.getDefaultUses(), false, () ->
                         plugin.getNMSAdapter().setItemInHand(e.getPlayer(), IN_HAND));
             }
         }

@@ -1,7 +1,7 @@
 package com.bgsoftware.wildtools.objects.tools;
 
 import com.bgsoftware.wildtools.objects.WSelection;
-import com.bgsoftware.wildtools.utils.ItemUtil;
+import com.bgsoftware.wildtools.utils.items.ItemUtils;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Dispenser;
@@ -78,13 +78,13 @@ public final class WCannonTool extends WTool implements CannonTool {
                 continue;
 
             if(e.getPlayer().getInventory().containsAtLeast(new ItemStack(Material.TNT), amount)){
-                ItemUtil.addItem(new ItemStack(Material.TNT, amount), dispenser.getInventory(), null);
+                ItemUtils.addItem(new ItemStack(Material.TNT, amount), dispenser.getInventory(), null);
                 e.getPlayer().getInventory().removeItem(new ItemStack(Material.TNT, amount));
                 filledDispensers++;
                 totalTNT += amount;
             }
             else if(plugin.getProviders().getTNTAmountFromBank(e.getPlayer()) >= amount){
-                ItemUtil.addItem(new ItemStack(Material.TNT, amount), dispenser.getInventory(), null);
+                ItemUtils.addItem(new ItemStack(Material.TNT, amount), dispenser.getInventory(), null);
                 plugin.getProviders().takeTNTFromBank(e.getPlayer(), amount);
                 filledDispensers++;
                 totalTNT += amount;

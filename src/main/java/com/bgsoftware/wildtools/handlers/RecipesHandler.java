@@ -1,7 +1,7 @@
 package com.bgsoftware.wildtools.handlers;
 
 import com.bgsoftware.wildtools.WildToolsPlugin;
-import com.bgsoftware.wildtools.utils.ItemBuilder;
+import com.bgsoftware.wildtools.utils.items.ItemBuilder;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.inventory.ItemStack;

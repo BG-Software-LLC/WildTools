@@ -1,6 +1,7 @@
-package com.bgsoftware.wildtools.utils;
+package com.bgsoftware.wildtools.utils.items;
 
 import com.bgsoftware.wildtools.Locale;
+import com.bgsoftware.wildtools.utils.Executor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -15,7 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
-public final class ItemUtil {
+public final class ItemUtils {
 
     private static WildToolsPlugin plugin = WildToolsPlugin.getPlugin();
 

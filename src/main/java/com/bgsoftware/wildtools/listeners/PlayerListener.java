@@ -4,7 +4,7 @@ import com.bgsoftware.wildtools.Updater;
 import com.bgsoftware.wildtools.WildToolsPlugin;
 import com.bgsoftware.wildtools.objects.WSelection;
 import com.bgsoftware.wildtools.objects.tools.WCannonTool;
-import com.bgsoftware.wildtools.utils.ItemUtil;
+import com.bgsoftware.wildtools.utils.items.ItemUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -94,7 +94,7 @@ public final class PlayerListener implements Listener {
         if(keepInventoryTools.containsKey(e.getPlayer().getUniqueId())){
             List<ItemStack> toAdd = keepInventoryTools.get(e.getPlayer().getUniqueId());
             keepInventoryTools.remove(e.getPlayer().getUniqueId());
-            toAdd.forEach(itemStack -> ItemUtil.addItem(itemStack, e.getPlayer().getInventory(), e.getPlayer().getLocation()));
+            toAdd.forEach(itemStack -> ItemUtils.addItem(itemStack, e.getPlayer().getInventory(), e.getPlayer().getLocation()));
         }
     }
 

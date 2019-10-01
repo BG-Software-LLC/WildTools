@@ -3,7 +3,7 @@ package com.bgsoftware.wildtools.handlers;
 import com.bgsoftware.wildtools.config.CommentedConfiguration;
 import com.bgsoftware.wildtools.config.ConfigComments;
 import com.bgsoftware.wildtools.objects.WMaterial;
-import com.bgsoftware.wildtools.utils.ItemBuilder;
+import com.bgsoftware.wildtools.utils.items.ItemBuilder;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;

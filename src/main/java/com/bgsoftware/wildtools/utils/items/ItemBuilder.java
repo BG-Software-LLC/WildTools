@@ -1,4 +1,4 @@
-package com.bgsoftware.wildtools.utils;
+package com.bgsoftware.wildtools.utils.items;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Material;

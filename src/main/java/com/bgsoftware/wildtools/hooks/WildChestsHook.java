@@ -3,7 +3,7 @@ package com.bgsoftware.wildtools.hooks;
 import com.bgsoftware.wildchests.api.WildChestsAPI;
 import com.bgsoftware.wildchests.api.objects.chests.StorageChest;
 import com.bgsoftware.wildtools.WildToolsPlugin;
-import com.bgsoftware.wildtools.utils.ItemUtil;
+import com.bgsoftware.wildtools.utils.items.ItemUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -120,7 +120,7 @@ public final class WildChestsHook {
             }
         }
 
-        itemStackList.forEach(itemStack -> ItemUtil.addItem(itemStack, chestInventory, location));
+        itemStackList.forEach(itemStack -> ItemUtils.addItem(itemStack, chestInventory, location));
     }
 
 

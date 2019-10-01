@@ -1,6 +1,7 @@
 package com.bgsoftware.wildtools.utils;
 
 import com.bgsoftware.wildtools.hooks.CoreProtectHook;
+import com.bgsoftware.wildtools.utils.items.ItemUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -16,7 +17,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public final class BukkitUtil {
+public final class BukkitUtils {
 
     private static WildToolsPlugin plugin = WildToolsPlugin.getPlugin();
 
@@ -37,7 +38,7 @@ public final class BukkitUtil {
         for(ItemStack is : drops) {
             if(is != null && is.getType() != Material.AIR) {
                 if (autoCollect)
-                    ItemUtil.addItem(is, player.getInventory(), block.getLocation());
+                    ItemUtils.addItem(is, player.getInventory(), block.getLocation());
                 else
                     block.getWorld().dropItemNaturally(block.getLocation(), is);
             }
