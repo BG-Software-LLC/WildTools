@@ -281,7 +281,7 @@ public final class WHarvesterTool extends WTool implements HarvesterTool {
 
                     if(!harvesterHoeSellEvent.isCancelled()) {
                         multiplier = harvesterHoeSellEvent.getMultiplier();
-                        totalPrice *= multiplier;
+                        totalPrice = harvesterHoeSellEvent.getPrice() * multiplier;
 
                         for (ItemStack itemStack : toSell)
                             plugin.getProviders().trySellingItem(player, itemStack, multiplier);

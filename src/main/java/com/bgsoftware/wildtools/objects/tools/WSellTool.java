@@ -79,7 +79,7 @@ public final class WSellTool extends WTool implements SellTool {
                     return;
 
                 multiplier = sellWandUseEvent.getMultiplier();
-                totalEarnings *= multiplier;
+                totalEarnings = sellWandUseEvent.getPrice() * multiplier;
 
                 for (Map.Entry<Integer, ItemStack> entry : toSell.entrySet()) {
                     plugin.getProviders().trySellingItem(e.getPlayer(), entry.getValue(), multiplier);
