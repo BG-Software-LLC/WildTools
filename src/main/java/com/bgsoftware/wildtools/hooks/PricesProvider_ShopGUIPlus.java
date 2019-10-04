@@ -3,6 +3,7 @@ package com.bgsoftware.wildtools.hooks;
 import com.bgsoftware.wildtools.WildToolsPlugin;
 import net.brcdev.shopgui.ShopGuiPlugin;
 import net.brcdev.shopgui.player.PlayerData;
+import net.brcdev.shopgui.player.PlayerManager;
 import net.brcdev.shopgui.shop.Shop;
 import net.brcdev.shopgui.shop.ShopItem;
 
@@ -19,8 +20,24 @@ public final class PricesProvider_ShopGUIPlus implements PricesProvider {
         WildToolsPlugin.log(" - Using ShopGUIPlus as PricesProvider.");
         //Loading database of online players
         plugin = ShopGuiPlugin.getInstance();
-        for(Player player : WildToolsPlugin.getPlugin().getNMSAdapter().getOnlinePlayers())
-           plugin.getPlayerManager().loadData(player);
+        for(Player player : WildToolsPlugin.getPlugin().getNMSAdapter().getOnlinePlayers()) {
+            try {
+                //noinspection JavaReflectionMemberAccess
+                PlayerManager.class.getMethod("loadData", Player.class).invoke(plugin.getPlayerManager(), player);
+            }catch(Throwable ex){
+                plugin.getPlayerManager().loadData(player, new net.brcdev.shopgui.database.Callback() {
+                    @Override
+                    public void onSuccess(Object o) {
+
+                    }
+
+                    @Override
+                    public void onFailure(Object o) {
+
+                    }
+                });
+            }
+        }
     }
 
     @Override
