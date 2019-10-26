@@ -46,6 +46,8 @@ public final class WLightningTool extends WTool implements LightningTool {
     }
 
     private void handleUse(Player player, Entity entity){
+        List<Entity> nearbyEntities = entity.getNearbyEntities(3, 3, 3);
+
         Executor.async(() -> {
             List<Creeper> creeperList = new ArrayList<>();
 
@@ -61,7 +63,7 @@ public final class WLightningTool extends WTool implements LightningTool {
                 reduceDurability = true;
             }
 
-            for(Entity nearby : entity.getNearbyEntities(3, 3, 3)){
+            for(Entity nearby : nearbyEntities){
                 if(nearby instanceof Creeper) {
                     creeperList.add((Creeper) nearby);
                     //Tool is using durability, reduces every block
