@@ -36,6 +36,8 @@ public abstract class WTool implements Tool {
 
     public static Set<UUID> toolBlockBreak;
 
+    protected Map<UUID, Integer> heldItemsTracker = new HashMap<>();
+
     private Map<UUID, Long> lastUses;
 
     private ItemStack is;
@@ -337,7 +339,9 @@ public abstract class WTool implements Tool {
 
     @Override
     public void reduceDurablility(Player pl){
-        ItemStack is = plugin.getNMSAdapter().getItemInHand(pl).clone();
+        int heldItem = heldItemsTracker.getOrDefault(pl.getUniqueId(), pl.getInventory().getHeldItemSlot());
+        ItemStack is = pl.getInventory().getItem(heldItem).clone();
+        heldItemsTracker.remove(pl.getUniqueId());
 
         if(isUnbreakable() || pl.getGameMode() == GameMode.CREATIVE)
             return;
@@ -367,7 +371,7 @@ public abstract class WTool implements Tool {
         }
 
         else{
-            int usesLeft = plugin.getNMSAdapter().getTag(plugin.getNMSAdapter().getItemInHand(pl), "tool-uses", getDefaultUses());
+            int usesLeft = plugin.getNMSAdapter().getTag(is, "tool-uses", getDefaultUses());
             is = plugin.getNMSAdapter().setTag(is, "tool-uses", --usesLeft);
 
             if (usesLeft <= 0) {
@@ -389,13 +393,14 @@ public abstract class WTool implements Tool {
                         ITEM_STACK,
                         getDefaultUses(),
                         this instanceof HarvesterTool && ((WHarvesterTool) this).hasSellMode(is),
-                        () -> plugin.getNMSAdapter().setItemInHand(pl, ITEM_STACK)
+                        () -> pl.getInventory().setItem(heldItem, ITEM_STACK)
                 );
                 return;
             }
         }
 
-        plugin.getNMSAdapter().setItemInHand(pl, is);
+        //plugin.getNMSAdapter().setItemInHand(pl, is);
+        pl.getInventory().setItem(heldItem, is);
     }
 
     @Override

@@ -44,6 +44,7 @@ public final class WSellTool extends WTool implements SellTool {
 
         Chest chest = (Chest) e.getClickedBlock().getState();
         Inventory inventory = ((InventoryHolder) e.getClickedBlock().getState()).getInventory();
+        heldItemsTracker.put(e.getPlayer().getUniqueId(), e.getPlayer().getInventory().getHeldItemSlot());
 
         Executor.async(() -> {
             synchronized (getToolMutex(e.getClickedBlock())) {
@@ -81,13 +82,12 @@ public final class WSellTool extends WTool implements SellTool {
                 multiplier = sellWandUseEvent.getMultiplier();
                 totalEarnings = sellWandUseEvent.getPrice() * multiplier;
 
-                for (Map.Entry<Integer, ItemStack> entry : toSell.entrySet()) {
-                    plugin.getProviders().trySellingItem(e.getPlayer(), entry.getValue(), multiplier);
-                    if (!wildChest)
-                        inventory.setItem(entry.getKey(), new ItemStack(Material.AIR));
-                }
+                plugin.getProviders().depositPlayer(e.getPlayer(), totalEarnings);
 
-                if (wildChest) {
+                if(!wildChest){
+                    toSell.keySet().forEach(slot -> inventory.setItem(slot, new ItemStack(Material.AIR)));
+                }
+                else {
                     WildChestsHook.removeItems(chest, toSell);
                 }
 
