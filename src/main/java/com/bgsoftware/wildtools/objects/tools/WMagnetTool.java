@@ -11,7 +11,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.stream.Stream;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public final class WMagnetTool extends WTool implements MagnetTool {
 
@@ -40,21 +41,29 @@ public final class WMagnetTool extends WTool implements MagnetTool {
     }
 
     private void handleUse(Player player){
-        Stream<Item> nearbyItems = player.getNearbyEntities(radius, radius, radius).stream()
-                .filter(entity -> entity instanceof Item).map(entity -> (Item) entity);
-        Executor.async(() -> nearbyItems.forEach(item -> {
-            if(!item.isValid() || item.isDead())
-                return;
+        List<Item> nearbyItems = player.getNearbyEntities(radius, radius, radius).stream()
+                .filter(entity -> entity instanceof Item).map(entity -> (Item) entity).collect(Collectors.toList());
 
-            ItemStack itemStack = Bukkit.getPluginManager().isPluginEnabled("WildStacker") ?
-                    WildStackerHook.getItemStack(item) : item.getItemStack();
+        Executor.async(() -> {
+            boolean reduceDurability = false;
 
-            if(player.getInventory().addItem(itemStack).isEmpty()){
-                item.remove();
-                plugin.getNMSAdapter().playPickupAnimation(player, item);
+            for(Item item : nearbyItems) {
+                if (!item.isValid() || item.isDead())
+                    return;
+
+                ItemStack itemStack = Bukkit.getPluginManager().isPluginEnabled("WildStacker") ?
+                        WildStackerHook.getItemStack(item) : item.getItemStack();
+
+                if (player.getInventory().addItem(itemStack).isEmpty()) {
+                    item.remove();
+                    plugin.getNMSAdapter().playPickupAnimation(player, item);
+                    reduceDurability = true;
+                }
             }
 
-        }));
+            if(reduceDurability)
+                reduceDurablility(player);
+        });
     }
 
 }
