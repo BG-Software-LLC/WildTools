@@ -346,6 +346,14 @@ public abstract class WTool implements Tool {
         if(isUnbreakable() || pl.getGameMode() == GameMode.CREATIVE)
             return;
 
+        ItemStack originalItem = is.clone();
+        boolean giveOriginal = is.getAmount() > 1;
+
+        if(is.getAmount() > 1){
+            is.setAmount(1);
+            originalItem.setAmount(originalItem.getAmount() - 1);
+        }
+
         if(isUsingDurability()){
             int unbLevel = is.getEnchantmentLevel(Enchantment.DURABILITY);
 
@@ -359,14 +367,7 @@ public abstract class WTool implements Tool {
             is.setDurability((short) (is.getDurability() + 1));
 
             if(is.getDurability() > is.getType().getMaxDurability()) {
-                if(is.getAmount() > 1){
-                    int amount = is.getAmount() - 1;
-                    is = getFormattedItemStack();
-                    is.setAmount(amount);
-                }
-                else{
-                    is = new ItemStack(Material.AIR);
-                }
+                is = new ItemStack(Material.AIR);
             }
         }
 
@@ -375,14 +376,7 @@ public abstract class WTool implements Tool {
             is = plugin.getNMSAdapter().setTag(is, "tool-uses", --usesLeft);
 
             if (usesLeft <= 0) {
-                if(is.getAmount() > 1){
-                    int amount = is.getAmount() - 1;
-                    is = getFormattedItemStack();
-                    is.setAmount(amount);
-                }
-                else{
-                    is = new ItemStack(Material.AIR);
-                }
+                is = new ItemStack(Material.AIR);
             }
 
             //Update name and lore
@@ -393,7 +387,11 @@ public abstract class WTool implements Tool {
                         ITEM_STACK,
                         getDefaultUses(),
                         this instanceof HarvesterTool && ((WHarvesterTool) this).hasSellMode(is),
-                        () -> pl.getInventory().setItem(heldItem, ITEM_STACK)
+                        () -> {
+                            pl.getInventory().setItem(heldItem, ITEM_STACK);
+                            if(giveOriginal)
+                                ItemUtils.addItem(originalItem, pl.getInventory(), pl.getLocation());
+                        }
                 );
                 return;
             }
@@ -401,6 +399,9 @@ public abstract class WTool implements Tool {
 
         //plugin.getNMSAdapter().setItemInHand(pl, is);
         pl.getInventory().setItem(heldItem, is);
+
+        if(giveOriginal)
+            ItemUtils.addItem(originalItem, pl.getInventory(), pl.getLocation());
     }
 
     @Override
