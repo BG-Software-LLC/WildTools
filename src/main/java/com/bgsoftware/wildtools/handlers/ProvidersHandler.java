@@ -169,21 +169,7 @@ public final class ProvidersHandler {
         economy = Bukkit.getServicesManager().getRegistration(Economy.class).getProvider();
     }
 
-    @SuppressWarnings("UnusedReturnValue")
-    public void trySellingItem(Player player, ItemStack itemStack, double multiplier){
-        if(!Bukkit.isPrimaryThread()){
-            Bukkit.getScheduler().runTask(plugin, () -> trySellingItem(player, itemStack, multiplier));
-            return;
-        }
-
-        if(!canSellItem(player, itemStack))
-            return;
-
-        double price = getPrice(player, itemStack) * multiplier;
-
-        if(!economy.hasAccount(player))
-            economy.createPlayerAccount(player);
-
+    public void depositPlayer(Player player, double price){
         economy.depositPlayer(player, price);
     }
 
