@@ -69,7 +69,8 @@ public final class WildChestsHook {
         com.bgsoftware.wildchests.api.objects.chests.Chest chest = WildChestsAPI.getChest(bukkitChest.getLocation());
 
         if(chest instanceof StorageChest){
-            ((StorageChest) chest).setAmount(0);
+            if(toSell.containsKey(0))
+                ((StorageChest) chest).setAmount(0);
         }
 
         else{
