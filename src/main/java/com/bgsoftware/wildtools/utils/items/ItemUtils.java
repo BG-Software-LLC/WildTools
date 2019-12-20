@@ -7,6 +7,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
 import com.bgsoftware.wildtools.WildToolsPlugin;
 import com.bgsoftware.wildtools.api.objects.tools.Tool;
@@ -78,6 +79,23 @@ public final class ItemUtils {
 
         if(callback != null)
             callback.run();
+    }
+
+    public static int getItemSlot(PlayerInventory playerInventory, ItemStack itemStack){
+        //Checking for the held slot.
+        if(itemStack.equals(playerInventory.getItem(playerInventory.getHeldItemSlot())))
+            return playerInventory.getHeldItemSlot();
+
+        //Checking off hand slot
+        if(itemStack.equals(playerInventory.getItem(40)))
+            return 40;
+
+        for(int i = 0; i < playerInventory.getSize(); i++){
+            if(itemStack.equals(playerInventory.getItem(i)))
+                return i;
+        }
+
+        throw new IllegalArgumentException("The item wasn't found in the inventory.");
     }
 
 }

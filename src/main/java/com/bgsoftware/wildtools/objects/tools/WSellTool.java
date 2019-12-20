@@ -3,6 +3,7 @@ package com.bgsoftware.wildtools.objects.tools;
 import com.bgsoftware.wildtools.hooks.WildChestsHook;
 import com.bgsoftware.wildtools.utils.Executor;
 import com.bgsoftware.wildtools.utils.NumberUtils;
+import com.bgsoftware.wildtools.utils.items.ToolTaskManager;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.block.Chest;
@@ -19,6 +20,7 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 public final class WSellTool extends WTool implements SellTool {
 
@@ -44,7 +46,7 @@ public final class WSellTool extends WTool implements SellTool {
 
         Chest chest = (Chest) e.getClickedBlock().getState();
         Inventory inventory = ((InventoryHolder) e.getClickedBlock().getState()).getInventory();
-        heldItemsTracker.put(e.getPlayer().getUniqueId(), e.getPlayer().getInventory().getHeldItemSlot());
+        UUID taskId = ToolTaskManager.generateTaskId(e.getItem(), e.getPlayer().getInventory());
 
         Executor.async(() -> {
             synchronized (getToolMutex(e.getClickedBlock())) {
@@ -95,8 +97,12 @@ public final class WSellTool extends WTool implements SellTool {
                 message = sellWandUseEvent.getMessage().replace("{0}", NumberUtils.format(totalEarnings))
                         .replace("{1}", multiplier != 1 && Locale.MULTIPLIER.getMessage() != null ? Locale.MULTIPLIER.getMessage(multiplier) : "");
 
-                if (!toSell.isEmpty())
-                    reduceDurablility(e.getPlayer());
+                if (!toSell.isEmpty()) {
+                    reduceDurablility(e.getPlayer(), taskId);
+                }
+                else{
+                    ToolTaskManager.removeTask(taskId);
+                }
 
                 if (!message.isEmpty())
                     e.getPlayer().sendMessage(message);

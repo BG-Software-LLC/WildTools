@@ -2,6 +2,7 @@ package com.bgsoftware.wildtools.objects.tools;
 
 import com.bgsoftware.wildtools.objects.WSelection;
 import com.bgsoftware.wildtools.utils.items.ItemUtils;
+import com.bgsoftware.wildtools.utils.items.ToolTaskManager;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Dispenser;
@@ -64,9 +65,10 @@ public final class WCannonTool extends WTool implements CannonTool {
             return false;
         }
 
+        UUID taskId = ToolTaskManager.generateTaskId(e.getItem(), e.getPlayer().getInventory());
+
         int filledDispensers = 0;
         int totalTNT = 0;
-
 
         for(Dispenser dispenser : selection.getDispensers(this)){
             int amount = tntAmount, freeSpace;
@@ -93,11 +95,13 @@ public final class WCannonTool extends WTool implements CannonTool {
         }
 
         if(filledDispensers > 0){
-            reduceDurablility(e.getPlayer());
+            reduceDurablility(e.getPlayer(), taskId);
             Locale.FILLED_DISPENSERS.send(e.getPlayer(), filledDispensers, totalTNT);
         }else {
             Locale.NO_FILLED_DISPENSERS.send(e.getPlayer(), filledDispensers, totalTNT);
         }
+
+        ToolTaskManager.removeTask(taskId);
 
         return true;
     }

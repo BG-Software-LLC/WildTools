@@ -1,9 +1,11 @@
 package com.bgsoftware.wildtools.objects.tools;
 
 import com.bgsoftware.wildtools.utils.Executor;
+import com.bgsoftware.wildtools.utils.items.ToolTaskManager;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 import com.bgsoftware.wildtools.api.objects.tools.LightningTool;
 import com.bgsoftware.wildtools.api.objects.ToolMode;
@@ -15,6 +17,7 @@ import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public final class WLightningTool extends WTool implements LightningTool {
 
@@ -31,7 +34,7 @@ public final class WLightningTool extends WTool implements LightningTool {
                 Vector toEntity = ((LivingEntity) entity).getEyeLocation().toVector().subtract(eye.toVector());
                 double dot = toEntity.normalize().dot(eye.getDirection());
                 if(dot > 0.99D){
-                    handleUse(e.getPlayer(), entity);
+                    handleUse(e.getPlayer(), e.getItem(), entity);
                     break;
                 }
             }
@@ -45,8 +48,10 @@ public final class WLightningTool extends WTool implements LightningTool {
         return onAirInteract(e);
     }
 
-    private void handleUse(Player player, Entity entity){
+    private void handleUse(Player player, ItemStack usedItem, Entity entity){
         List<Entity> nearbyEntities = entity.getNearbyEntities(3, 3, 3);
+
+        UUID taskId = ToolTaskManager.generateTaskId(usedItem, player.getInventory());
 
         Executor.async(() -> {
             List<Creeper> creeperList = new ArrayList<>();
@@ -57,7 +62,7 @@ public final class WLightningTool extends WTool implements LightningTool {
                 creeperList.add((Creeper) entity);
                 //Tool is using durability, reduces every block
                 if (isUsingDurability())
-                    reduceDurablility(player);
+                    reduceDurablility(player, taskId);
                 if(plugin.getNMSAdapter().getItemInHand(player).getType() == Material.AIR)
                     return;
                 reduceDurability = true;
@@ -68,7 +73,7 @@ public final class WLightningTool extends WTool implements LightningTool {
                     creeperList.add((Creeper) nearby);
                     //Tool is using durability, reduces every block
                     if (isUsingDurability())
-                        reduceDurablility(player);
+                        reduceDurablility(player, taskId);
                     if(plugin.getNMSAdapter().getItemInHand(player).getType() == Material.AIR)
                         break;
                     reduceDurability = true;
@@ -77,7 +82,7 @@ public final class WLightningTool extends WTool implements LightningTool {
 
             //Tool is using durability, reduces every block
             if (reduceDurability && !isUsingDurability())
-                reduceDurablility(player);
+                reduceDurablility(player, taskId);
 
             Executor.sync(() -> {
                 player.getWorld().strikeLightningEffect(entity.getLocation());

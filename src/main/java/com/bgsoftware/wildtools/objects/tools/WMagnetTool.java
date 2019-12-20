@@ -4,6 +4,7 @@ import com.bgsoftware.wildtools.api.objects.ToolMode;
 import com.bgsoftware.wildtools.api.objects.tools.MagnetTool;
 import com.bgsoftware.wildtools.hooks.WildStackerHook;
 import com.bgsoftware.wildtools.utils.Executor;
+import com.bgsoftware.wildtools.utils.items.ToolTaskManager;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Item;
@@ -12,6 +13,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 public final class WMagnetTool extends WTool implements MagnetTool {
@@ -30,19 +32,21 @@ public final class WMagnetTool extends WTool implements MagnetTool {
 
     @Override
     public boolean onAirInteract(PlayerInteractEvent e) {
-        handleUse(e.getPlayer());
+        handleUse(e.getPlayer(), e.getItem());
         return true;
     }
 
     @Override
     public boolean onBlockInteract(PlayerInteractEvent e) {
-        handleUse(e.getPlayer());
+        handleUse(e.getPlayer(), e.getItem());
         return true;
     }
 
-    private void handleUse(Player player){
+    private void handleUse(Player player, ItemStack usedItem){
         List<Item> nearbyItems = player.getNearbyEntities(radius, radius, radius).stream()
                 .filter(entity -> entity instanceof Item).map(entity -> (Item) entity).collect(Collectors.toList());
+
+        UUID taskId = ToolTaskManager.generateTaskId(usedItem, player.getInventory());
 
         Executor.async(() -> {
             boolean reduceDurability = false;
@@ -62,7 +66,9 @@ public final class WMagnetTool extends WTool implements MagnetTool {
             }
 
             if(reduceDurability)
-                reduceDurablility(player);
+                reduceDurablility(player, taskId);
+
+            ToolTaskManager.removeTask(taskId);
         });
     }
 

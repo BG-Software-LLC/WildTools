@@ -6,6 +6,7 @@ import com.bgsoftware.wildtools.api.objects.ToolMode;
 import com.bgsoftware.wildtools.api.objects.tools.SortTool;
 
 import com.bgsoftware.wildtools.utils.Executor;
+import com.bgsoftware.wildtools.utils.items.ToolTaskManager;
 import org.bukkit.Material;
 import org.bukkit.block.Chest;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -20,6 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 public final class WSortTool extends WTool implements SortTool {
@@ -37,6 +39,8 @@ public final class WSortTool extends WTool implements SortTool {
             Locale.INVALID_CONTAINER_SORT_WAND.send(e.getPlayer());
             return false;
         }
+
+        UUID taskId = ToolTaskManager.generateTaskId(e.getItem(), e.getPlayer().getInventory());
 
         Chest chest = (Chest) e.getClickedBlock().getState();
         Inventory chestInventory = ((InventoryHolder) e.getClickedBlock().getState()).getInventory();
@@ -61,12 +65,14 @@ public final class WSortTool extends WTool implements SortTool {
 
                 for (Inventory inventory : inventories) {
                     if (!Arrays.equals(originContents.get(inventory), inventory.getContents())) {
-                        reduceDurablility(e.getPlayer());
+                        reduceDurablility(e.getPlayer(), taskId);
+                        ToolTaskManager.removeTask(taskId);
                         Locale.SORTED_CHEST.send(e.getPlayer());
                         return;
                     }
                 }
 
+                ToolTaskManager.removeTask(taskId);
                 Locale.NO_SORT_ITEMS.send(e.getPlayer());
             }
         });

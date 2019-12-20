@@ -111,7 +111,7 @@ public interface Tool {
 
     double getMultiplier();
 
-    void reduceDurablility(Player pl);
+    void reduceDurablility(Player pl, UUID taskId);
 
     boolean canBreakBlock(Block block, Material firstType, short data);
 

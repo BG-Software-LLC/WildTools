@@ -2,6 +2,7 @@ package com.bgsoftware.wildtools.objects.tools;
 
 import com.bgsoftware.wildtools.utils.BukkitUtils;
 import com.bgsoftware.wildtools.utils.blocks.BlocksController;
+import com.bgsoftware.wildtools.utils.items.ToolTaskManager;
 import org.bukkit.event.block.BlockBreakEvent;
 import com.bgsoftware.wildtools.api.objects.tools.CuboidTool;
 import com.bgsoftware.wildtools.api.objects.ToolMode;
@@ -9,6 +10,8 @@ import com.bgsoftware.wildtools.api.objects.ToolMode;
 import org.bukkit.block.Block;
 import org.bukkit.Location;
 import org.bukkit.Material;
+
+import java.util.UUID;
 
 public final class WCuboidTool extends WTool implements CuboidTool {
 
@@ -35,6 +38,8 @@ public final class WCuboidTool extends WTool implements CuboidTool {
 
         boolean reduceDurability = false;
 
+        UUID taskId = ToolTaskManager.generateTaskId(e.getPlayer().getItemInHand(), e.getPlayer().getInventory());
+
         outerLoop:
         for(int x = min.getBlockX(); x <= max.getBlockX(); x++){
             for(int z = min.getBlockZ(); z <= max.getBlockZ(); z++){
@@ -45,7 +50,7 @@ public final class WCuboidTool extends WTool implements CuboidTool {
                     BukkitUtils.breakNaturally(e.getPlayer(), targetBlock, this);
                     //Tool is using durability, reduces every block
                     if(isUsingDurability())
-                        reduceDurablility(e.getPlayer());
+                        reduceDurablility(e.getPlayer(), taskId);
                     if(plugin.getNMSAdapter().getItemInHand(e.getPlayer()).getType() == Material.AIR)
                         break outerLoop;
                     reduceDurability = true;
@@ -56,7 +61,9 @@ public final class WCuboidTool extends WTool implements CuboidTool {
         BlocksController.updateSession();
 
         if(reduceDurability && !isUsingDurability())
-            reduceDurablility(e.getPlayer());
+            reduceDurablility(e.getPlayer(), taskId);
+
+        ToolTaskManager.removeTask(taskId);
 
         return true;
     }

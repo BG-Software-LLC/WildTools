@@ -1,5 +1,6 @@
 package com.bgsoftware.wildtools.objects.tools;
 
+import com.bgsoftware.wildtools.utils.items.ToolTaskManager;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -9,6 +10,8 @@ import org.bukkit.inventory.ItemStack;
 import com.bgsoftware.wildtools.Locale;
 import com.bgsoftware.wildtools.api.objects.ToolMode;
 import com.bgsoftware.wildtools.api.objects.tools.BuilderTool;
+
+import java.util.UUID;
 
 public final class WBuilderTool extends WTool implements BuilderTool {
 
@@ -41,6 +44,7 @@ public final class WBuilderTool extends WTool implements BuilderTool {
         boolean reduceDurablity = false;
         Material firstType = e.getClickedBlock().getType();
         short firstData = e.getClickedBlock().getState().getData().toItemStack().getDurability();
+        UUID taskId = ToolTaskManager.generateTaskId(e.getItem(), e.getPlayer().getInventory());
 
         Block nextBlock = e.getClickedBlock();
         for(int i = 0; i < length; i++){
@@ -68,7 +72,7 @@ public final class WBuilderTool extends WTool implements BuilderTool {
             plugin.getNMSAdapter().copyBlock(e.getClickedBlock(), nextBlock);
 
             if(isUsingDurability())
-                reduceDurablility(e.getPlayer());
+                reduceDurablility(e.getPlayer(), taskId);
 
             if(plugin.getNMSAdapter().getItemInHand(e.getPlayer()).getType() == Material.AIR)
                 break;
@@ -77,7 +81,9 @@ public final class WBuilderTool extends WTool implements BuilderTool {
         }
 
         if(reduceDurablity && !isUsingDurability())
-            reduceDurablility(e.getPlayer());
+            reduceDurablility(e.getPlayer(), taskId);
+
+        ToolTaskManager.removeTask(taskId);
 
         return true;
     }

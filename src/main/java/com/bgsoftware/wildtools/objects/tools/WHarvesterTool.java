@@ -5,6 +5,7 @@ import com.bgsoftware.wildtools.utils.BukkitUtils;
 import com.bgsoftware.wildtools.utils.Executor;
 import com.bgsoftware.wildtools.utils.blocks.BlocksController;
 import com.bgsoftware.wildtools.utils.items.ItemUtils;
+import com.bgsoftware.wildtools.utils.items.ToolTaskManager;
 import org.bukkit.Bukkit;
 import org.bukkit.block.Block;
 import org.bukkit.CropState;
@@ -28,6 +29,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 public final class WHarvesterTool extends WTool implements HarvesterTool {
 
@@ -128,6 +130,8 @@ public final class WHarvesterTool extends WTool implements HarvesterTool {
         List<Block> dirtToHarvest = new ArrayList<>(), removeBlocks = new ArrayList<>(), seededBlocks = new ArrayList<>();
         Map<Block, List<ItemStack>> drops = new HashMap<>();
 
+        UUID taskId = ToolTaskManager.generateTaskId(toolItem, player.getInventory());
+
         Executor.async(() -> {
             Location max = block.getLocation().clone().add(farmlandRadius, farmlandRadius, farmlandRadius),
                     min = block.getLocation().clone().subtract(farmlandRadius, farmlandRadius, farmlandRadius);
@@ -217,7 +221,7 @@ public final class WHarvesterTool extends WTool implements HarvesterTool {
 
                     //Tool is using durability, reduces every block
                     if (isUsingDurability())
-                        reduceDurablility(player);
+                        reduceDurablility(player, taskId);
 
                     _block.setType(WMaterial.FARMLAND.parseMaterial());
                     reduceDurability = true;
@@ -229,7 +233,7 @@ public final class WHarvesterTool extends WTool implements HarvesterTool {
 
                     //Tool is using durability, reduces every block
                     if (isUsingDurability())
-                        reduceDurablility(player);
+                        reduceDurablility(player, taskId);
 
                     BlocksController.setAir(_block.getLocation());
                     toCheck.add(_block);
@@ -244,7 +248,7 @@ public final class WHarvesterTool extends WTool implements HarvesterTool {
 
                     //Tool is using durability, reduces every block
                     if (isUsingDurability())
-                        reduceDurablility(player);
+                        reduceDurablility(player, taskId);
 
                     plugin.getNMSAdapter().setCropState(_block, CropState.SEEDED);
                     toCheck.add(_block);
@@ -298,8 +302,9 @@ public final class WHarvesterTool extends WTool implements HarvesterTool {
 
                 //Tool is not using durability, reduces once per use
                 if (reduceDurability && !isUsingDurability())
-                    reduceDurablility(player);
+                    reduceDurablility(player, taskId);
 
+                ToolTaskManager.removeTask(taskId);
             });
         });
 

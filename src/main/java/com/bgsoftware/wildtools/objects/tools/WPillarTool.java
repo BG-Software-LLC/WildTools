@@ -2,6 +2,7 @@ package com.bgsoftware.wildtools.objects.tools;
 
 import com.bgsoftware.wildtools.utils.BukkitUtils;
 import com.bgsoftware.wildtools.utils.blocks.BlocksController;
+import com.bgsoftware.wildtools.utils.items.ToolTaskManager;
 import org.bukkit.event.player.PlayerInteractEvent;
 import com.bgsoftware.wildtools.api.objects.tools.PillarTool;
 import com.bgsoftware.wildtools.api.objects.ToolMode;
@@ -9,6 +10,8 @@ import com.bgsoftware.wildtools.api.objects.ToolMode;
 import org.bukkit.block.Block;
 import org.bukkit.Location;
 import org.bukkit.Material;
+
+import java.util.UUID;
 
 public final class WPillarTool extends WTool implements PillarTool {
 
@@ -20,6 +23,8 @@ public final class WPillarTool extends WTool implements PillarTool {
     public boolean onBlockInteract(PlayerInteractEvent e) {
         int maxY = getPoint(e.getClickedBlock(), true), minY = getPoint(e.getClickedBlock(), false),
                 x = e.getClickedBlock().getLocation().getBlockX(), z = e.getClickedBlock().getLocation().getBlockZ();
+
+        UUID taskId = ToolTaskManager.generateTaskId(e.getItem(), e.getPlayer().getInventory());
 
         Material firstType = e.getClickedBlock().getType();
         short firstData = e.getClickedBlock().getState().getData().toItemStack().getDurability();
@@ -33,7 +38,7 @@ public final class WPillarTool extends WTool implements PillarTool {
             BukkitUtils.breakNaturally(e.getPlayer(), targetBlock, this);
             //Tool is using durability, reduces every block
             if(isUsingDurability())
-                reduceDurablility(e.getPlayer());
+                reduceDurablility(e.getPlayer(), taskId);
             if(plugin.getNMSAdapter().getItemInHand(e.getPlayer()).getType() == Material.AIR)
                 break;
             reduceDurablity = true;
@@ -43,7 +48,9 @@ public final class WPillarTool extends WTool implements PillarTool {
 
         //Tool is not using durability, reduces once only
         if (reduceDurablity && !isUsingDurability())
-            reduceDurablility(e.getPlayer());
+            reduceDurablility(e.getPlayer(), taskId);
+
+        ToolTaskManager.removeTask(taskId);
 
         return true;
     }

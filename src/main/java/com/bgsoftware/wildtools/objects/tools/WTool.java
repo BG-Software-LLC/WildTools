@@ -2,6 +2,7 @@ package com.bgsoftware.wildtools.objects.tools;
 
 import com.bgsoftware.wildtools.api.objects.tools.HarvesterTool;
 import com.bgsoftware.wildtools.utils.items.ItemUtils;
+import com.bgsoftware.wildtools.utils.items.ToolTaskManager;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
@@ -338,10 +339,8 @@ public abstract class WTool implements Tool {
     /***********************************************************************************/
 
     @Override
-    public void reduceDurablility(Player pl){
-        int heldItem = heldItemsTracker.getOrDefault(pl.getUniqueId(), pl.getInventory().getHeldItemSlot());
-        ItemStack is = pl.getInventory().getItem(heldItem).clone();
-        heldItemsTracker.remove(pl.getUniqueId());
+    public void reduceDurablility(Player pl, UUID taskId) {
+        ItemStack is = ToolTaskManager.getItemFromTask(pl.getInventory(), taskId);
 
         if(isUnbreakable() || pl.getGameMode() == GameMode.CREATIVE)
             return;
@@ -388,7 +387,7 @@ public abstract class WTool implements Tool {
                         getDefaultUses(),
                         this instanceof HarvesterTool && ((WHarvesterTool) this).hasSellMode(is),
                         () -> {
-                            pl.getInventory().setItem(heldItem, ITEM_STACK);
+                            ToolTaskManager.setItemOfTask(pl, taskId, ITEM_STACK);
                             if(giveOriginal)
                                 ItemUtils.addItem(originalItem, pl.getInventory(), pl.getLocation());
                         }
@@ -397,8 +396,7 @@ public abstract class WTool implements Tool {
             }
         }
 
-        //plugin.getNMSAdapter().setItemInHand(pl, is);
-        pl.getInventory().setItem(heldItem, is);
+        ToolTaskManager.setItemOfTask(pl, taskId, is);
 
         if(giveOriginal)
             ItemUtils.addItem(originalItem, pl.getInventory(), pl.getLocation());

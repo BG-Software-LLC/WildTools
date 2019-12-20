@@ -1,6 +1,7 @@
 package com.bgsoftware.wildtools.objects.tools;
 
 import com.bgsoftware.wildtools.utils.Executor;
+import com.bgsoftware.wildtools.utils.items.ToolTaskManager;
 import com.bgsoftware.wildtools.utils.recipes.RecipeChoice;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -25,6 +26,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 public final class WCraftingTool extends WTool implements CraftingTool {
 
@@ -49,6 +51,8 @@ public final class WCraftingTool extends WTool implements CraftingTool {
             Locale.INVALID_CONTAINER_CRAFTING.send(e.getPlayer());
             return false;
         }
+
+        UUID taskId = ToolTaskManager.generateTaskId(e.getItem(), e.getPlayer().getInventory());
 
         Iterator<Recipe> craftings = getCraftings();
 
@@ -104,11 +108,13 @@ public final class WCraftingTool extends WTool implements CraftingTool {
                 WildChestsHook.addItems(chest.getLocation(), chestInventory, toAdd);
 
                 if (craftedItemsAmount > 0) {
-                    reduceDurablility(e.getPlayer());
+                    reduceDurablility(e.getPlayer(), taskId);
                     Locale.CRAFT_SUCCESS.send(e.getPlayer(), craftedItemsAmount);
                 } else {
                     Locale.NO_CRAFT_ITEMS.send(e.getPlayer());
                 }
+
+                ToolTaskManager.removeTask(taskId);
             }
         });
 
