@@ -28,6 +28,7 @@ public final class WCuboidTool extends WTool implements CuboidTool {
 
     @Override
     public boolean onBlockBreak(BlockBreakEvent e) {
+        UUID taskId = ToolTaskManager.generateTaskId(e.getPlayer().getItemInHand(), e.getPlayer().getInventory());
         int radius = breakLevel / 2;
 
         Location max = e.getBlock().getLocation().add(radius, radius, radius),
@@ -36,32 +37,33 @@ public final class WCuboidTool extends WTool implements CuboidTool {
         Material firstType = e.getBlock().getType();
         short firstData = e.getBlock().getState().getData().toItemStack().getDurability();
 
-        boolean reduceDurability = false;
-
-        UUID taskId = ToolTaskManager.generateTaskId(e.getPlayer().getItemInHand(), e.getPlayer().getInventory());
+        int toolDurability = getDurability(e.getPlayer(), taskId);
+        boolean usingDurability = isUsingDurability();
+        int toolUsages = 0;
 
         outerLoop:
-        for(int x = min.getBlockX(); x <= max.getBlockX(); x++){
-            for(int z = min.getBlockZ(); z <= max.getBlockZ(); z++){
-                for(int y = min.getBlockY(); y <= max.getBlockY(); y++){
-                    Block targetBlock = e.getPlayer().getWorld().getBlockAt(x, y, z);
-                    if(!plugin.getProviders().canBreak(e.getPlayer(), targetBlock, firstType, firstData, this))
-                        continue;
-                    BukkitUtils.breakNaturally(e.getPlayer(), targetBlock, this);
-                    //Tool is using durability, reduces every block
-                    if(isUsingDurability())
-                        reduceDurablility(e.getPlayer(), taskId);
-                    if(plugin.getNMSAdapter().getItemInHand(e.getPlayer()).getType() == Material.AIR)
+        for(int y = max.getBlockY(); y >= min.getBlockY(); y--){
+            for(int x = min.getBlockX(); x <= max.getBlockX(); x++){
+                for(int z = min.getBlockZ(); z <= max.getBlockZ(); z++){
+                    if(usingDurability && toolUsages >= toolDurability)
                         break outerLoop;
-                    reduceDurability = true;
+
+                    Block targetBlock = e.getPlayer().getWorld().getBlockAt(x, y, z);
+
+                    if(targetBlock.getType() == Material.AIR ||
+                            !plugin.getProviders().canBreak(e.getPlayer(), targetBlock, firstType, firstData, this))
+                        continue;
+
+                    BukkitUtils.breakNaturally(e.getPlayer(), targetBlock, this);
+                    toolUsages++;
                 }
             }
         }
 
         BlocksController.updateSession();
 
-        if(reduceDurability && !isUsingDurability())
-            reduceDurablility(e.getPlayer(), taskId);
+        if(toolUsages > 0)
+            reduceDurablility(e.getPlayer(), usingDurability ? toolUsages : 1, taskId);
 
         ToolTaskManager.removeTask(taskId);
 

@@ -65,7 +65,7 @@ public final class WSortTool extends WTool implements SortTool {
 
                 for (Inventory inventory : inventories) {
                     if (!Arrays.equals(originContents.get(inventory), inventory.getContents())) {
-                        reduceDurablility(e.getPlayer(), taskId);
+                        reduceDurablility(e.getPlayer(), 1, taskId);
                         ToolTaskManager.removeTask(taskId);
                         Locale.SORTED_CHEST.send(e.getPlayer());
                         return;

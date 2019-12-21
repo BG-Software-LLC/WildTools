@@ -56,39 +56,32 @@ public final class WLightningTool extends WTool implements LightningTool {
         Executor.async(() -> {
             List<Creeper> creeperList = new ArrayList<>();
 
-            boolean reduceDurability = false;
+            int toolDurability = getDurability(player, taskId);
+            boolean usingDurability = isUsingDurability();
 
-            if(entity instanceof Creeper) {
+            if(entity instanceof Creeper && (!usingDurability || creeperList.size() < toolDurability)) {
                 creeperList.add((Creeper) entity);
-                //Tool is using durability, reduces every block
-                if (isUsingDurability())
-                    reduceDurablility(player, taskId);
-                if(plugin.getNMSAdapter().getItemInHand(player).getType() == Material.AIR)
-                    return;
-                reduceDurability = true;
             }
 
             for(Entity nearby : nearbyEntities){
                 if(nearby instanceof Creeper) {
-                    creeperList.add((Creeper) nearby);
-                    //Tool is using durability, reduces every block
-                    if (isUsingDurability())
-                        reduceDurablility(player, taskId);
-                    if(plugin.getNMSAdapter().getItemInHand(player).getType() == Material.AIR)
+                    if(usingDurability && creeperList.size() >= toolDurability)
                         break;
-                    reduceDurability = true;
+
+                    creeperList.add((Creeper) nearby);
                 }
             }
-
-            //Tool is using durability, reduces every block
-            if (reduceDurability && !isUsingDurability())
-                reduceDurablility(player, taskId);
 
             Executor.sync(() -> {
                 player.getWorld().strikeLightningEffect(entity.getLocation());
                 for(Creeper creeper : creeperList)
                     creeper.setPowered(true);
             });
+
+            if(creeperList.size() > 0)
+                reduceDurablility(player, usingDurability ? creeperList.size() : 1, taskId);
+
+            ToolTaskManager.removeTask(taskId);
         });
     }
 

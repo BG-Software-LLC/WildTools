@@ -29,26 +29,27 @@ public final class WPillarTool extends WTool implements PillarTool {
         Material firstType = e.getClickedBlock().getType();
         short firstData = e.getClickedBlock().getState().getData().toItemStack().getDurability();
 
-        boolean reduceDurablity = false;
+        int toolDurability = getDurability(e.getPlayer(), taskId);
+        boolean usingDurability = isUsingDurability();
+        int toolUsages = 0;
 
         for(int y = maxY; y >= minY; y--){
+            if(usingDurability && toolUsages >= toolDurability)
+                break;
+
             Block targetBlock = e.getPlayer().getWorld().getBlockAt(x, y, z);
+
             if(!plugin.getProviders().canBreak(e.getPlayer(), targetBlock, firstType, firstData, this))
                 continue;
+
             BukkitUtils.breakNaturally(e.getPlayer(), targetBlock, this);
-            //Tool is using durability, reduces every block
-            if(isUsingDurability())
-                reduceDurablility(e.getPlayer(), taskId);
-            if(plugin.getNMSAdapter().getItemInHand(e.getPlayer()).getType() == Material.AIR)
-                break;
-            reduceDurablity = true;
+            toolUsages++;
         }
 
         BlocksController.updateSession();
 
-        //Tool is not using durability, reduces once only
-        if (reduceDurablity && !isUsingDurability())
-            reduceDurablility(e.getPlayer(), taskId);
+        if(toolUsages > 0)
+            reduceDurablility(e.getPlayer(), usingDurability ? toolUsages : 1, taskId);
 
         ToolTaskManager.removeTask(taskId);
 
@@ -62,7 +63,7 @@ public final class WPillarTool extends WTool implements PillarTool {
         //Find max block
         if(max) {
             while (isSameBlock) {
-                loc = loc.clone().add(0, 1, 0);
+                loc.add(0, 1, 0);
                 isSameBlock = canBreakBlock(bl, loc.getBlock().getType(), loc.getBlock().getState().getData().toItemStack().getDurability()) && loc.getBlockY() <= 256;
             }
         }

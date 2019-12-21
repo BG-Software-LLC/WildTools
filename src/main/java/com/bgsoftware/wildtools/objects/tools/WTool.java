@@ -32,7 +32,7 @@ import java.util.stream.Collectors;
 @SuppressWarnings("all")
 public abstract class WTool implements Tool {
 
-    protected WildToolsPlugin plugin = WildToolsPlugin.getPlugin();
+    protected static WildToolsPlugin plugin = WildToolsPlugin.getPlugin();
     private final Map<Location, Object> toolMutexes = new HashMap<>();
 
     public static Set<UUID> toolBlockBreak;
@@ -339,7 +339,7 @@ public abstract class WTool implements Tool {
     /***********************************************************************************/
 
     @Override
-    public void reduceDurablility(Player pl, UUID taskId) {
+    public void reduceDurablility(Player pl, int amount, UUID taskId) {
         ItemStack is = ToolTaskManager.getItemFromTask(pl.getInventory(), taskId);
 
         if(isUnbreakable() || pl.getGameMode() == GameMode.CREATIVE)
@@ -363,7 +363,7 @@ public abstract class WTool implements Tool {
                     return;
             }
 
-            is.setDurability((short) (is.getDurability() + 1));
+            is.setDurability((short) (is.getDurability() + amount));
 
             if(is.getDurability() > is.getType().getMaxDurability()) {
                 is = new ItemStack(Material.AIR);
@@ -372,7 +372,7 @@ public abstract class WTool implements Tool {
 
         else{
             int usesLeft = plugin.getNMSAdapter().getTag(is, "tool-uses", getDefaultUses());
-            is = plugin.getNMSAdapter().setTag(is, "tool-uses", --usesLeft);
+            is = plugin.getNMSAdapter().setTag(is, "tool-uses", (usesLeft -= amount));
 
             if (usesLeft <= 0) {
                 is = new ItemStack(Material.AIR);
@@ -400,6 +400,16 @@ public abstract class WTool implements Tool {
 
         if(giveOriginal)
             ItemUtils.addItem(originalItem, pl.getInventory(), pl.getLocation());
+    }
+
+    @Override
+    public int getDurability(Player player, UUID taskId) {
+        if(isUnbreakable() || player.getGameMode() == GameMode.CREATIVE)
+            return Integer.MAX_VALUE;
+
+        ItemStack is = ToolTaskManager.getItemFromTask(player.getInventory(), taskId);
+
+        return isUsingDurability() ? is.getType().getMaxDurability() - is.getDurability() + 1 : plugin.getNMSAdapter().getTag(is, "tool-uses", getDefaultUses());
     }
 
     @Override

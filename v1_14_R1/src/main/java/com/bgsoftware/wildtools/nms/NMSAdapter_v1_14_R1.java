@@ -214,11 +214,11 @@ public final class NMSAdapter_v1_14_R1 implements NMSAdapter {
     }
 
     @Override
-    public void setAirFast(Location location) {
+    public void setBlockFast(Location location, int combinedId) {
         World world = ((CraftWorld) location.getWorld()).getHandle();
         Chunk chunk = world.getChunkAt(location.getChunk().getX(), location.getChunk().getZ());
         BlockPosition blockPosition = new BlockPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ());
-        chunk.setType(blockPosition, Block.getByCombinedId(0), true);
+        chunk.setType(blockPosition, Block.getByCombinedId(combinedId), true);
     }
 
     @Override

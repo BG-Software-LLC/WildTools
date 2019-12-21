@@ -1,7 +1,6 @@
 package com.bgsoftware.wildtools.objects.tools;
 
 import com.bgsoftware.wildtools.utils.items.ToolTaskManager;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -11,8 +10,6 @@ import com.bgsoftware.wildtools.api.objects.ToolMode;
 import com.bgsoftware.wildtools.api.objects.tools.IceTool;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 public final class WIceTool extends WTool implements IceTool {
@@ -40,41 +37,35 @@ public final class WIceTool extends WTool implements IceTool {
     }
 
     private boolean handleUse(Player player, ItemStack usedItem, Block block){
+        UUID taskId = ToolTaskManager.generateTaskId(usedItem, player.getInventory());
+
         Location max = block.getLocation().clone().add(radius, radius, radius),
                 min = block.getLocation().clone().subtract(radius, radius, radius);
 
-        List<Block> toBeReplaced = new ArrayList<>();
-        boolean reduceDurability = false;
-
-        UUID taskId = ToolTaskManager.generateTaskId(usedItem, player.getInventory());
+        int toolDurability = getDurability(player, taskId);
+        boolean usingDurability = isUsingDurability();
+        int toolUsages = 0;
 
         outerLoop:
         for(int x = min.getBlockX(); x <= max.getBlockX(); x++){
             for(int z = min.getBlockZ(); z <= max.getBlockZ(); z++){
                 for(int y = max.getBlockY(); y >= min.getBlockY(); y--){
+                    if(usingDurability && toolUsages >= toolDurability)
+                        break outerLoop;
+
                     Block targetBlock = block.getWorld().getBlockAt(x, y, z);
-                    if(targetBlock.getType() == Material.ICE && plugin.getProviders().canBreak(player, targetBlock, this)){
-                        toBeReplaced.add(targetBlock);
-                        //Tool is using durability, reduces every block
-                        if (isUsingDurability())
-                            reduceDurablility(player, taskId);
-                        if(plugin.getNMSAdapter().getItemInHand(player).getType() == Material.AIR)
-                            break outerLoop;
-                        reduceDurability = true;
-                    }
+                    if(targetBlock.getType() != Material.ICE || !plugin.getProviders().canBreak(player, targetBlock, this))
+                        continue;
+
+                    targetBlock.setType(Material.WATER);
+
+                    toolUsages++;
                 }
             }
         }
 
-        //Tool is using durability, reduces every block
-        if (reduceDurability && !isUsingDurability())
-            reduceDurablility(player, taskId);
-
-        //Setting all the blocks sync
-        Bukkit.getScheduler().runTask(plugin, () -> {
-           for(Block _block : toBeReplaced)
-               _block.setType(Material.AIR);
-        });
+        if(toolUsages > 0)
+            reduceDurablility(player, usingDurability ? toolUsages : 1, taskId);
 
         ToolTaskManager.removeTask(taskId);
 

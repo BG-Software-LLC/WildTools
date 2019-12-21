@@ -2,6 +2,7 @@ package com.bgsoftware.wildtools.objects.tools;
 
 import com.bgsoftware.wildtools.api.objects.ToolMode;
 import com.bgsoftware.wildtools.api.objects.tools.DrainTool;
+import com.bgsoftware.wildtools.utils.blocks.BlocksController;
 import com.bgsoftware.wildtools.utils.items.ToolTaskManager;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -42,27 +43,32 @@ public final class WDrainTool extends WTool implements DrainTool {
 
         UUID taskId = ToolTaskManager.generateTaskId(usedItem, player.getInventory());
 
-        boolean reduceDurability = false;
+        int toolDurability = getDurability(player, taskId);
+        boolean usingDurability = isUsingDurability();
+        int toolUsages = 0;
 
         outerLoop:
         for(int x = min.getBlockX(); x <= max.getBlockX(); x++){
             for(int z = min.getBlockZ(); z <= max.getBlockZ(); z++){
                 for(int y = max.getBlockY(); y >= min.getBlockY(); y--){
+                    if(usingDurability && toolUsages >= toolDurability)
+                        break outerLoop;
+
                     Block targetBlock = block.getWorld().getBlockAt(x, y, z);
-                    if(targetBlock.getType() == Material.ICE && plugin.getProviders().canBreak(player, targetBlock, this)){
-                        targetBlock.setType(Material.AIR);
-                        if(isUsingDurability())
-                            reduceDurablility(player, taskId);
-                        if(plugin.getNMSAdapter().getItemInHand(player).getType() == Material.AIR)
-                            break outerLoop;
-                        reduceDurability = true;
-                    }
+                    if(targetBlock.getType() != Material.ICE || !plugin.getProviders().canBreak(player, targetBlock, this))
+                        continue;
+
+                    BlocksController.setAir(targetBlock.getLocation());
+
+                    toolUsages++;
                 }
             }
         }
 
-        if(reduceDurability && !isUsingDurability())
-            reduceDurablility(player, taskId);
+        BlocksController.updateSession();
+
+        if(toolUsages > 0)
+            reduceDurablility(player, usingDurability ? toolUsages : 1, taskId);
 
         ToolTaskManager.removeTask(taskId);
 

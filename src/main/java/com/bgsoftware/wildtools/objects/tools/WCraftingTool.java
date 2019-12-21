@@ -108,7 +108,7 @@ public final class WCraftingTool extends WTool implements CraftingTool {
                 WildChestsHook.addItems(chest.getLocation(), chestInventory, toAdd);
 
                 if (craftedItemsAmount > 0) {
-                    reduceDurablility(e.getPlayer(), taskId);
+                    reduceDurablility(e.getPlayer(), 1, taskId);
                     Locale.CRAFT_SUCCESS.send(e.getPlayer(), craftedItemsAmount);
                 } else {
                     Locale.NO_CRAFT_ITEMS.send(e.getPlayer());

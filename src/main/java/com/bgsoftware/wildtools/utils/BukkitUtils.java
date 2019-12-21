@@ -15,33 +15,54 @@ import com.bgsoftware.wildtools.objects.WMaterial;
 import com.bgsoftware.wildtools.objects.tools.WHarvesterTool;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+import java.util.function.Consumer;
 
 public final class BukkitUtils {
 
     private static WildToolsPlugin plugin = WildToolsPlugin.getPlugin();
 
-    public static void breakNaturally(Player player, Block block, Tool tool){
-        boolean autoCollect = false;
-        List<ItemStack> drops = getBlockDrops(player, block);
-
-        if(block.getRelative(BlockFace.UP).getType().name().contains("WATER"))
-            block.setType(Material.AIR);
+    private static final Consumer<Block> onBlockBreak = blockConsumer -> {
+        if(blockConsumer.getRelative(BlockFace.UP).getType().name().contains("WATER") || blockConsumer.getType().hasGravity())
+            blockConsumer.setType(Material.AIR);
         else
-            BlocksController.setAir(block.getLocation());
+            BlocksController.setAir(blockConsumer.getLocation());
+    };
 
-        if(tool != null){
-            drops = tool.filterDrops(drops);
-            autoCollect = tool.isAutoCollect();
-        }
+    public static void breakNaturally(Player player, Block block, Tool tool){
+        boolean autoCollect = tool.isAutoCollect();
 
-        for(ItemStack is : drops) {
-            if(is != null && is.getType() != Material.AIR) {
-                if (autoCollect)
-                    ItemUtils.addItem(is, player.getInventory(), block.getLocation());
-                else
-                    block.getWorld().dropItemNaturally(block.getLocation(), is);
+        Consumer<ItemStack> onItemDrop = itemConsumer -> {
+            if (autoCollect)
+                ItemUtils.addItem(itemConsumer, player.getInventory(), block.getLocation());
+            else
+                block.getWorld().dropItemNaturally(block.getLocation(), itemConsumer);
+        };
+
+        breakNaturally(player, block, tool, onBlockBreak, onItemDrop);
+    }
+
+    public static void breakNaturally(Player player, Block block, Tool tool, Consumer<ItemStack> onItemDrop){
+        breakNaturally(player, block, tool, onBlockBreak, onItemDrop);
+    }
+
+    public static void breakNaturally(Player player, Block block, Tool tool, Consumer<Block> onBlockBreak, Consumer<ItemStack> onItemDrop){
+        List<ItemStack> drops = new ArrayList<>();
+
+        if(onItemDrop != null)
+            drops.addAll(getBlockDrops(player, block));
+
+        if(onBlockBreak != null)
+            onBlockBreak.accept(block);
+
+        if(!drops.isEmpty()) {
+            if (tool != null)
+                drops = tool.filterDrops(drops);
+
+            for (ItemStack is : drops) {
+                if (is != null && is.getType() != Material.AIR) {
+                    onItemDrop.accept(is);
+                }
             }
         }
 
@@ -54,7 +75,7 @@ public final class BukkitUtils {
             return new ArrayList<>();
 
         Material type = block.getType();
-        if(Arrays.asList(WHarvesterTool.crops).contains(type.name()) && type != Material.CACTUS &&
+        if(WHarvesterTool.crops.contains(type.name()) && type != Material.CACTUS &&
                 type != WMaterial.SUGAR_CANE.parseMaterial() && type != WMaterial.MELON.parseMaterial() && type != Material.PUMPKIN && !type.name().equals("BAMBOO")) {
             return plugin.getNMSAdapter().getCropDrops(player, block);
         }

@@ -20,12 +20,16 @@ public final class BlocksController {
     private static int combinedId = 0;
 
     public static void setAir(Location location){
+        setType(location, 0);
+    }
+
+    public static void setType(Location location, int blockId){
         if(blockToUpdate == null) {
             blockToUpdate = location;
             combinedId = plugin.getNMSAdapter().getCombinedId(blockToUpdate);
         }
 
-        plugin.getNMSAdapter().setAirFast(location);
+        plugin.getNMSAdapter().setBlockFast(location, blockId);
         cachedChunks.add(new CachedChunk(location.getWorld().getName(), location.getBlockX() >> 4, location.getBlockZ() >> 4));
     }
 

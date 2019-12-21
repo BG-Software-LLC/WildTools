@@ -97,15 +97,13 @@ public final class WSellTool extends WTool implements SellTool {
                 message = sellWandUseEvent.getMessage().replace("{0}", NumberUtils.format(totalEarnings))
                         .replace("{1}", multiplier != 1 && Locale.MULTIPLIER.getMessage() != null ? Locale.MULTIPLIER.getMessage(multiplier) : "");
 
-                if (!toSell.isEmpty()) {
-                    reduceDurablility(e.getPlayer(), taskId);
-                }
-                else{
-                    ToolTaskManager.removeTask(taskId);
-                }
+                if (!toSell.isEmpty())
+                    reduceDurablility(e.getPlayer(), 1, taskId);
 
                 if (!message.isEmpty())
                     e.getPlayer().sendMessage(message);
+
+                ToolTaskManager.removeTask(taskId);
             }
         });
 

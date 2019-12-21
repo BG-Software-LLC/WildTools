@@ -1,15 +1,18 @@
 package com.bgsoftware.wildtools.objects.tools;
 
+import com.bgsoftware.wildtools.api.events.HarvesterHoeSellEvent;
+import com.bgsoftware.wildtools.api.objects.tools.HarvesterTool;
+import com.bgsoftware.wildtools.api.objects.ToolMode;
 import com.bgsoftware.wildtools.objects.WMaterial;
 import com.bgsoftware.wildtools.utils.BukkitUtils;
-import com.bgsoftware.wildtools.utils.Executor;
 import com.bgsoftware.wildtools.utils.blocks.BlocksController;
 import com.bgsoftware.wildtools.utils.items.ItemUtils;
 import com.bgsoftware.wildtools.utils.items.ToolTaskManager;
+import com.bgsoftware.wildtools.Locale;
+
 import org.bukkit.Bukkit;
 import org.bukkit.block.Block;
 import org.bukkit.CropState;
-import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
@@ -18,22 +21,15 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
-import com.bgsoftware.wildtools.Locale;
-import com.bgsoftware.wildtools.api.events.HarvesterHoeSellEvent;
-import com.bgsoftware.wildtools.api.objects.tools.HarvesterTool;
-import com.bgsoftware.wildtools.api.objects.ToolMode;
-
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
+import java.util.function.Consumer;
 
 public final class WHarvesterTool extends WTool implements HarvesterTool {
 
-    public static String[] crops = new String[] {
+    public static final List<String> crops = Arrays.asList(
             "CROPS", "WHEAT",
             "CARROT", "CARROTS",
             "POTATO", "POTATOES",
@@ -44,7 +40,14 @@ public final class WHarvesterTool extends WTool implements HarvesterTool {
             "MELON_BLOCK", "MELON",
             "PUMPKIN",
             "COCOA"
+    );
+
+    private static final BlockFace[] nearbyBlocks = new BlockFace[]{
+            BlockFace.UP, BlockFace.DOWN, BlockFace.WEST, BlockFace.EAST, BlockFace.NORTH, BlockFace.SOUTH
     };
+
+    private static final Consumer<Block> onCropsBreak = blockConsumer ->
+            plugin.getNMSAdapter().setCropState(blockConsumer, CropState.SEEDED);
 
     private int radius, farmlandRadius;
     private String activateAction;
@@ -122,218 +125,208 @@ public final class WHarvesterTool extends WTool implements HarvesterTool {
         return handleUse(e.getPlayer(), e.getClickedBlock(), e.getItem());
     }
 
-    boolean hasSellMode(ItemStack itemStack){
+    public boolean hasSellMode(ItemStack itemStack){
         return plugin.getNMSAdapter().getTag(itemStack, "sell-mode", 0) == 1;
     }
 
-    private boolean handleUse(Player player, Block block, ItemStack toolItem){
-        List<Block> dirtToHarvest = new ArrayList<>(), removeBlocks = new ArrayList<>(), seededBlocks = new ArrayList<>();
-        Map<Block, List<ItemStack>> drops = new HashMap<>();
+    private boolean isBetweenBlocks(Location max, Location min, Location location){
+        return location.getBlockX() >= min.getBlockX() && location.getBlockX() <= max.getBlockX() &&
+                location.getBlockY() >= min.getBlockY() && location.getBlockY() <= max.getBlockY() &&
+                location.getBlockZ() >= min.getBlockZ() && location.getBlockZ() <= max.getBlockZ();
+    }
 
-        UUID taskId = ToolTaskManager.generateTaskId(toolItem, player.getInventory());
+    private boolean handleUse(Player player, Block block, ItemStack usedItem){
+        UUID taskId = ToolTaskManager.generateTaskId(usedItem, player.getInventory());
 
-        Executor.async(() -> {
-            Location max = block.getLocation().clone().add(farmlandRadius, farmlandRadius, farmlandRadius),
-                    min = block.getLocation().clone().subtract(farmlandRadius, farmlandRadius, farmlandRadius);
+        Location farmlandMax = block.getLocation().add(farmlandRadius, farmlandRadius, farmlandRadius);
+        Location farmlandMin = block.getLocation().subtract(farmlandRadius, farmlandRadius, farmlandRadius);
+        Location cropsMax = block.getLocation().add(radius, radius, radius);
+        Location cropsMin = block.getLocation().subtract(radius, radius, radius);
 
-            if(farmlandRadius > 0) {
-                for (int y = max.getBlockY(); y >= min.getBlockY(); y--) {
-                    for (int x = min.getBlockX(); x <= max.getBlockX(); x++) {
-                        for (int z = min.getBlockZ(); z <= max.getBlockZ(); z++) {
-                            Block targetBlock = player.getWorld().getBlockAt(x, y, z);
-                            if ((targetBlock.getType() == Material.DIRT || targetBlock.getType() == WMaterial.GRASS_BLOCK.parseMaterial()) &&
-                                    targetBlock.getRelative(BlockFace.UP).getType() == Material.AIR) {
-                                if (plugin.getProviders().canBreak(player, targetBlock, this)) {
-                                    dirtToHarvest.add(targetBlock);
-                                }
-                            }
-                        }
-                    }
+        Location absoluteMax = new Location(farmlandMax.getWorld(), Math.max(farmlandMax.getBlockX(), cropsMax.getBlockX()),
+                Math.max(farmlandMax.getBlockY(), cropsMax.getBlockY()), Math.max(farmlandMax.getBlockZ(), cropsMax.getBlockZ()));
+        Location absoluteMin = new Location(farmlandMin.getWorld(), Math.max(farmlandMin.getBlockX(), cropsMin.getBlockX()),
+                Math.max(farmlandMin.getBlockY(), cropsMin.getBlockY()), Math.max(farmlandMin.getBlockZ(), cropsMin.getBlockZ()));
+
+        List<ItemStack> toSell = new ArrayList<>();
+        ChangeableDouble _totalPrice = new ChangeableDouble();
+
+        int toolDurability = getDurability(player, taskId);
+        boolean usingDurability = isUsingDurability();
+        int toolUsages = 0;
+
+        Consumer<ItemStack> onItemDrop = itemConsumer -> {
+            if(hasSellMode(usedItem) && player.hasPermission("wildtools.sellmode")) {
+                double price = plugin.getProviders().getPrice(player, itemConsumer);
+                if(price > 0) {
+                    toSell.add(itemConsumer);
+                    _totalPrice.add(price);
                 }
             }
+            else if (isAutoCollect()) {
+                ItemUtils.addItem(itemConsumer, player.getInventory(), block.getLocation());
+            }
+            else {
+                block.getWorld().dropItemNaturally(block.getLocation(), itemConsumer);
+            }
+        };
 
-            max = block.getLocation().clone().add(radius, radius, radius);
-            min = block.getLocation().clone().subtract(radius, radius, radius);
+        outerLoop:
+        for(int y = absoluteMax.getBlockY(); y >= absoluteMin.getBlockY(); y--){
+            for(int x = absoluteMin.getBlockX(); x <= absoluteMax.getBlockX(); x++){
+                for(int z = absoluteMin.getBlockZ(); z <= absoluteMax.getBlockZ(); z++){
+                    if(usingDurability && toolUsages >= toolDurability)
+                        break outerLoop;
 
-            for(int y = max.getBlockY(); y >= min.getBlockY(); y--) {
-                for (int x = min.getBlockX(); x <= max.getBlockX(); x++) {
-                    for (int z = min.getBlockZ(); z <= max.getBlockZ(); z++) {
-                        Block targetBlock = player.getWorld().getBlockAt(x, y, z);
+                    Location blockLocation = new Location(player.getWorld(), x, y, z);
+                    Block targetBlock = blockLocation.getBlock();
 
-                        if(removeBlocks.contains(targetBlock) || seededBlocks.contains(targetBlock) || dirtToHarvest.contains(targetBlock))
-                            continue;
+                    if(!plugin.getProviders().canBreak(player, targetBlock, this))
+                        continue;
 
-                        if(targetBlock.getType().name().contains("CHORUS")){
-                            getChorusFruit(player, targetBlock, removeBlocks, seededBlocks, drops);
-                            continue;
-                        }
+                    Material blockType = targetBlock.getType();
 
-                        //Checks if it's a crop
-                        if(!Arrays.asList(crops).contains(targetBlock.getType().name()))
-                            continue;
-
-                        //Checks if it's fully grown
-                        if(!plugin.getNMSAdapter().isFullyGrown(targetBlock))
-                            continue;
-
-                        //Making sure the block is breakable.
-                        if(!plugin.getProviders().canBreak(player, targetBlock, this))
-                            continue;
-
-                        if (targetBlock.getType() == Material.CACTUS || targetBlock.getType() == WMaterial.SUGAR_CANE.parseMaterial() ||
-                                targetBlock.getType().name().equals("BAMBOO")) {
-                            if(y == max.getBlockY()){
-                                Material targetMaterial = targetBlock.getType();
-                                while(targetBlock.getType() == targetMaterial){
-                                    if(targetBlock.getRelative(BlockFace.DOWN).getType() == targetBlock.getType() &&
-                                            plugin.getNMSAdapter().isFullyGrown(targetBlock) &&
-                                            plugin.getProviders().canBreak(player, targetBlock, this)){
-                                        removeBlocks.add(targetBlock);
-                                        drops.put(targetBlock, BukkitUtils.getBlockDrops(player, targetBlock));
-                                    }
-                                    targetBlock = targetBlock.getRelative(BlockFace.UP);
-                                }
-                                continue;
-                            }
-
-                            //Making sure it's not the bottom crop
-                            if(targetBlock.getRelative(BlockFace.DOWN).getType() != targetBlock.getType())
-                                continue;
-
-                            removeBlocks.add(targetBlock);
-                            drops.put(targetBlock, BukkitUtils.getBlockDrops(player, targetBlock));
-                            continue;
-                        }
-
-                        seededBlocks.add(targetBlock);
-                        drops.put(targetBlock, BukkitUtils.getBlockDrops(player, targetBlock));
+                    if((blockType == Material.DIRT || blockType == WMaterial.GRASS_BLOCK.parseMaterial()) &&
+                        isBetweenBlocks(farmlandMax, farmlandMin, blockLocation)){
+                        BlocksController.setType(targetBlock.getLocation(), 60);
+                        continue;
                     }
+
+                    if(!isBetweenBlocks(cropsMax, cropsMin, blockLocation))
+                        continue;
+
+                    if(targetBlock.getType().name().contains("CHORUS")){
+                        toolUsages += breakChorusFruit(player, targetBlock, onItemDrop, new ArrayList<>(), toolUsages, toolDurability, usingDurability);
+                        continue;
+                    }
+
+                    if(!crops.contains(blockType.name()) || !plugin.getNMSAdapter().isFullyGrown(targetBlock))
+                        continue;
+
+                    if (blockType == Material.CACTUS || blockType == WMaterial.SUGAR_CANE.parseMaterial() || blockType.name().equals("BAMBOO")) {
+                        if(y == cropsMax.getBlockY()) {
+                            toolUsages += breakTallCrop(player, targetBlock, onItemDrop, toolUsages, toolDurability, usingDurability);
+                            continue;
+                        }
+
+                        //Making sure it's not the bottom crop
+                        if(targetBlock.getRelative(BlockFace.DOWN).getType() != blockType)
+                            continue;
+
+                        BukkitUtils.breakNaturally(player, targetBlock, this, onItemDrop);
+                        toolUsages++;
+                        continue;
+                    }
+
+                    BukkitUtils.breakNaturally(player, targetBlock, this, onCropsBreak, onItemDrop);
+                    toolUsages++;
                 }
             }
+        }
 
-            Executor.sync(() -> {
-                List<Block> toCheck = new ArrayList<>();
-                boolean reduceDurability = false;
+        if(!toSell.isEmpty()){
+            double multiplier = getMultiplier(), totalPrice = _totalPrice.value;
 
-                for(Block _block : dirtToHarvest) {
-                    if (plugin.getNMSAdapter().getItemInHand(player).getType() == Material.AIR)
-                        break;
+            String message = toSell.isEmpty() ? Locale.NO_SELL_ITEMS.getMessage() : Locale.HARVESTER_SELL_SUCCEED.getMessage();
 
-                    //Tool is using durability, reduces every block
-                    if (isUsingDurability())
-                        reduceDurablility(player, taskId);
+            HarvesterHoeSellEvent harvesterHoeSellEvent = new HarvesterHoeSellEvent(player, totalPrice, multiplier, message);
+            Bukkit.getPluginManager().callEvent(harvesterHoeSellEvent);
 
-                    _block.setType(WMaterial.FARMLAND.parseMaterial());
-                    reduceDurability = true;
-                }
+            if(!harvesterHoeSellEvent.isCancelled()) {
+                multiplier = harvesterHoeSellEvent.getMultiplier();
+                totalPrice = harvesterHoeSellEvent.getPrice() * multiplier;
 
-                for(Block _block : removeBlocks) {
-                    if (plugin.getNMSAdapter().getItemInHand(player).getType() == Material.AIR)
-                        break;
+                plugin.getProviders().depositPlayer(player, totalPrice);
 
-                    //Tool is using durability, reduces every block
-                    if (isUsingDurability())
-                        reduceDurablility(player, taskId);
+                //noinspection all
+                message = harvesterHoeSellEvent.getMessage()
+                        .replace("{0}", toSell.size() + "")
+                        .replace("{1}", totalPrice + "")
+                        .replace("{2}", multiplier != 1 && Locale.MULTIPLIER.getMessage() != null ? Locale.MULTIPLIER.getMessage(multiplier) : "");
 
-                    BlocksController.setAir(_block.getLocation());
-                    toCheck.add(_block);
-                    reduceDurability = true;
-                }
+                if (!message.isEmpty())
+                    player.sendMessage(message);
+            }
+        }
 
-                BlocksController.updateSession();
+        BlocksController.updateSession();
 
-                for(Block _block : seededBlocks) {
-                    if (plugin.getNMSAdapter().getItemInHand(player).getType() == Material.AIR)
-                        break;
+        if(toolUsages > 0)
+            reduceDurablility(player, usingDurability ? toolUsages : 1, taskId);
 
-                    //Tool is using durability, reduces every block
-                    if (isUsingDurability())
-                        reduceDurablility(player, taskId);
-
-                    plugin.getNMSAdapter().setCropState(_block, CropState.SEEDED);
-                    toCheck.add(_block);
-                    reduceDurability = true;
-                }
-
-                double totalPrice = 0;
-                List<ItemStack> toSell = new ArrayList<>();
-
-                if(player.getGameMode() != GameMode.CREATIVE) {
-                    for (Block targetBlock : toCheck) {
-                        for (ItemStack drop : drops.getOrDefault(targetBlock, new ArrayList<>())) {
-                            if (drop != null && drop.getType() != Material.AIR) {
-                                if (hasSellMode(toolItem) && player.hasPermission("wildtools.sellmode") &&
-                                        plugin.getProviders().canSellItem(player, drop)) {
-                                    toSell.add(drop);
-                                    totalPrice += plugin.getProviders().getPrice(player, drop);
-                                } else if (isAutoCollect())
-                                    ItemUtils.addItem(drop, player.getInventory(), block.getLocation());
-                                else
-                                    player.getWorld().dropItemNaturally(block.getLocation(), drop);
-                            }
-                        }
-                    }
-                }
-
-                if(hasSellMode(toolItem)){
-                    double multiplier = getMultiplier();
-
-                    String message = toSell.isEmpty() ? Locale.NO_SELL_ITEMS.getMessage() : Locale.HARVESTER_SELL_SUCCEED.getMessage();
-
-                    HarvesterHoeSellEvent harvesterHoeSellEvent = new HarvesterHoeSellEvent(player, totalPrice, multiplier, message);
-                    Bukkit.getPluginManager().callEvent(harvesterHoeSellEvent);
-
-                    if(!harvesterHoeSellEvent.isCancelled()) {
-                        multiplier = harvesterHoeSellEvent.getMultiplier();
-                        totalPrice = harvesterHoeSellEvent.getPrice() * multiplier;
-
-                        plugin.getProviders().depositPlayer(player, totalPrice);
-
-                        //noinspection all
-                        message = harvesterHoeSellEvent.getMessage()
-                                .replace("{0}", toSell.size() + "")
-                                .replace("{1}", totalPrice + "")
-                                .replace("{2}", multiplier != 1 && Locale.MULTIPLIER.getMessage() != null ? Locale.MULTIPLIER.getMessage(multiplier) : "");
-
-                        if (!message.isEmpty())
-                            player.sendMessage(message);
-                    }
-                }
-
-                //Tool is not using durability, reduces once per use
-                if (reduceDurability && !isUsingDurability())
-                    reduceDurablility(player, taskId);
-
-                ToolTaskManager.removeTask(taskId);
-            });
-        });
+        ToolTaskManager.removeTask(taskId);
 
         return true;
     }
 
-    private BlockFace[] nearby = new BlockFace[]{
-            BlockFace.UP, BlockFace.DOWN, BlockFace.WEST, BlockFace.EAST, BlockFace.NORTH, BlockFace.SOUTH
-    };
+    private int breakChorusFruit(Player player, Block block, Consumer<ItemStack> onItemDrop, List<Block> alreadyBroken, int toolUsages, int toolDurability, boolean usingDurability){
+        int currentUsages = 0;
 
-    private void getChorusFruit(Player player, Block block, List<Block> removeBlocks, List<Block> seededBlocks, Map<Block, List<ItemStack>> drops){
+        if(usingDurability && toolUsages >= toolDurability)
+            return currentUsages;
+
         if(block.getType().name().contains("FLOWER") && block.getRelative(BlockFace.DOWN).getType().name().contains("END")){
-            seededBlocks.add(block);
+            BukkitUtils.breakNaturally(player, block, this, onCropsBreak, onItemDrop);
+            currentUsages++;
         }
+
         else {
-            removeBlocks.add(block);
+            BukkitUtils.breakNaturally(player, block, this, null);
+            List<ItemStack> drops = new ArrayList<>();
+
+            currentUsages++;
 
             if(block.getType().name().contains("FLOWER"))
-                drops.put(block, Collections.singletonList(new ItemStack(Material.matchMaterial("CHORUS_FLOWER"))));
+                drops.add(new ItemStack(Material.matchMaterial("CHORUS_FLOWER")));
             else
-                drops.put(block, BukkitUtils.getBlockDrops(player, block));
-        }
+                drops.addAll(BukkitUtils.getBlockDrops(player, block));
 
-        for(BlockFace blockFace : nearby){
-            Block nearbyBlock = block.getRelative(blockFace);
-            if(nearbyBlock.getType().name().contains("CHORUS") && !removeBlocks.contains(nearbyBlock) && !seededBlocks.contains(nearbyBlock)){
-                getChorusFruit(player, nearbyBlock, removeBlocks, seededBlocks, drops);
+            drops = filterDrops(drops);
+
+            for (ItemStack is : drops) {
+                if (is != null && is.getType() != Material.AIR) {
+                    onItemDrop.accept(is);
+                }
             }
         }
+
+        alreadyBroken.add(block);
+
+        for(BlockFace blockFace : nearbyBlocks){
+            Block nearbyBlock = block.getRelative(blockFace);
+            if(nearbyBlock.getType().name().contains("CHORUS") && !alreadyBroken.contains(nearbyBlock)){
+                currentUsages += breakChorusFruit(player, nearbyBlock, onItemDrop, alreadyBroken, toolUsages + currentUsages, toolDurability, usingDurability);
+            }
+        }
+
+        return currentUsages;
+    }
+
+    private int breakTallCrop(Player player, Block block, Consumer<ItemStack> onItemDrop, int toolUsages, int toolDurability, boolean usingDurability){
+        int currentUsages = 0;
+
+        Block aboveBlock = block.getRelative(BlockFace.UP);
+
+        if(aboveBlock.getType() == block.getType())
+            currentUsages += breakTallCrop(player, aboveBlock, onItemDrop, toolUsages + currentUsages, toolDurability, usingDurability);
+
+        if(usingDurability && (toolUsages + currentUsages) >= toolDurability)
+            return currentUsages;
+
+        BukkitUtils.breakNaturally(player, block, this, onItemDrop);
+        currentUsages++;
+
+        return currentUsages;
+    }
+
+    private static final class ChangeableDouble{
+
+        private double value = 0;
+
+        void add(double value){
+            this.value += value;
+        }
+
     }
 
 }

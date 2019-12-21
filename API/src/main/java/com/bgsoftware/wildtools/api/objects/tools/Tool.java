@@ -111,7 +111,9 @@ public interface Tool {
 
     double getMultiplier();
 
-    void reduceDurablility(Player pl, UUID taskId);
+    void reduceDurablility(Player pl, int amount, UUID taskId);
+
+    int getDurability(Player player, UUID taskId);
 
     boolean canBreakBlock(Block block, Material firstType, short data);
 

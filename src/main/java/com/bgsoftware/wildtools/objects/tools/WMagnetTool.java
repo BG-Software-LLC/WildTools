@@ -13,6 +13,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -58,15 +59,24 @@ public final class WMagnetTool extends WTool implements MagnetTool {
                 ItemStack itemStack = Bukkit.getPluginManager().isPluginEnabled("WildStacker") ?
                         WildStackerHook.getItemStack(item) : item.getItemStack();
 
-                if (player.getInventory().addItem(itemStack).isEmpty()) {
+                Map<Integer, ItemStack> additionalItems = player.getInventory().addItem(itemStack);
+
+                if (additionalItems.isEmpty()) {
                     item.remove();
                     plugin.getNMSAdapter().playPickupAnimation(player, item);
                     reduceDurability = true;
                 }
+                else{
+                    ItemStack additionalItem = additionalItems.get(0);
+                    if(additionalItem.getAmount() < item.getItemStack().getAmount()) {
+                        item.setItemStack(additionalItem);
+                        reduceDurability = true;
+                    }
+                }
             }
 
             if(reduceDurability)
-                reduceDurablility(player, taskId);
+                reduceDurablility(player, 1, taskId);
 
             ToolTaskManager.removeTask(taskId);
         });
