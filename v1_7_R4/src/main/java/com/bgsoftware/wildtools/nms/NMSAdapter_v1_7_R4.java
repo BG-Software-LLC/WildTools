@@ -1,5 +1,6 @@
 package com.bgsoftware.wildtools.nms;
 
+import net.minecraft.server.v1_7_R4.AxisAlignedBB;
 import net.minecraft.server.v1_7_R4.Block;
 import net.minecraft.server.v1_7_R4.BlockCarrots;
 import net.minecraft.server.v1_7_R4.BlockCocoa;
@@ -16,7 +17,7 @@ import net.minecraft.server.v1_7_R4.ItemStack;
 import net.minecraft.server.v1_7_R4.Items;
 import net.minecraft.server.v1_7_R4.NBTTagCompound;
 import net.minecraft.server.v1_7_R4.PacketPlayOutCollect;
-import net.minecraft.server.v1_7_R4.PacketPlayOutMapChunk;
+import net.minecraft.server.v1_7_R4.PacketPlayOutMultiBlockChange;
 import net.minecraft.server.v1_7_R4.PlayerInventory;
 import net.minecraft.server.v1_7_R4.World;
 
@@ -38,6 +39,7 @@ import org.bukkit.craftbukkit.v1_7_R4.inventory.CraftItemStack;
 import org.bukkit.CropState;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.enchantments.EnchantmentTarget;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.material.CocoaPlant;
@@ -49,6 +51,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 @SuppressWarnings({"unused", "deprecation"})
 public final class NMSAdapter_v1_7_R4 implements NMSAdapter {
@@ -308,16 +311,31 @@ public final class NMSAdapter_v1_7_R4 implements NMSAdapter {
     }
 
     @Override
-    public void refreshChunks(List<org.bukkit.Chunk> chunksList) {
-        if(chunksList.size() == 0)
-            return;
+    public void refreshChunk(org.bukkit.Chunk bukkitChunk, Set<Location> blocksList) {
+        Chunk chunk = ((CraftChunk) bukkitChunk).getHandle();
+        int blocksAmount = blocksList.size();
+        short[] values = new short[blocksAmount];
 
-        World world = ((CraftWorld) chunksList.get(0).getWorld()).getHandle();
-        for(org.bukkit.Chunk bukkitChunk : chunksList){
-            Chunk chunk = ((CraftChunk) bukkitChunk).getHandle();
-            for(Object entityHuman : world.players)
-                ((EntityPlayer) entityHuman).playerConnection.sendPacket(new PacketPlayOutMapChunk(chunk, true, 65535,
-                        ((EntityPlayer) entityHuman).playerConnection.networkManager.getVersion()));
+        Location firstLocation = null;
+
+        int counter = 0;
+        for(Location location : blocksList) {
+            if(firstLocation == null)
+                firstLocation = location;
+
+            values[counter++] = (short) ((location.getBlockX() & 15) << 12 | (location.getBlockZ() & 15) << 8 | location.getBlockY());
+        }
+
+        PacketPlayOutMultiBlockChange multiBlockChange = new PacketPlayOutMultiBlockChange(blocksAmount, values, chunk);
+
+        assert firstLocation != null;
+        AxisAlignedBB bb = AxisAlignedBB.a(firstLocation.getX() - 60, firstLocation.getY() - 200, firstLocation.getZ() - 60,
+                firstLocation.getX() + 60, firstLocation.getY() + 200, firstLocation.getZ() + 60);
+
+        //noinspection unchecked
+        for(Entity entity : (List<Entity>) ((CraftWorld) bukkitChunk.getWorld()).getHandle().getEntities(null, bb)){
+            if(entity instanceof EntityPlayer)
+                ((EntityPlayer) entity).playerConnection.sendPacket(multiBlockChange);
         }
     }
 

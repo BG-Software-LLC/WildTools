@@ -5,16 +5,16 @@ import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 
+import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 public final class BlocksController {
 
     private static final WildToolsPlugin plugin = WildToolsPlugin.getPlugin();
-    private static final Set<CachedChunk> cachedChunks = new HashSet<>();
+    private static final Map<CachedChunk, Set<Location>> cachedChunks = new HashMap<>();
 
     private static Location blockToUpdate = null;
     private static int combinedId = 0;
@@ -30,13 +30,13 @@ public final class BlocksController {
         }
 
         plugin.getNMSAdapter().setBlockFast(location, blockId);
-        cachedChunks.add(new CachedChunk(location.getWorld().getName(), location.getBlockX() >> 4, location.getBlockZ() >> 4));
+        cachedChunks.computeIfAbsent(new CachedChunk(location), map -> new HashSet<>()).add(location);
     }
 
     public static void updateSession(){
         //Refreshing chunks
-        List<Chunk> chunksList = cachedChunks.stream().map(CachedChunk::buildChunk).collect(Collectors.toList());
-        plugin.getNMSAdapter().refreshChunks(chunksList);
+        for(Map.Entry<CachedChunk, Set<Location>> entry : cachedChunks.entrySet())
+            plugin.getNMSAdapter().refreshChunk(entry.getKey().buildChunk(), entry.getValue());
 
         //Method to recalculate light
         if(blockToUpdate != null && combinedId != 0) {
@@ -56,10 +56,10 @@ public final class BlocksController {
         private final String world;
         private final int x, z;
 
-        CachedChunk(String world, int x, int z){
-            this.world = world;
-            this.x = x;
-            this.z = z;
+        CachedChunk(Location location){
+            this.world = location.getWorld().getName();
+            this.x = location.getBlockX() >> 4;
+            this.z = location.getBlockZ() >> 4;
         }
 
         Chunk buildChunk(){

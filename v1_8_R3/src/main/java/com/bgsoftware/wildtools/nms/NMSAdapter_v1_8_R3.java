@@ -9,7 +9,6 @@ import net.minecraft.server.v1_8_R3.BlockPosition;
 import net.minecraft.server.v1_8_R3.BlockPotatoes;
 import net.minecraft.server.v1_8_R3.Chunk;
 import net.minecraft.server.v1_8_R3.EnchantmentManager;
-import net.minecraft.server.v1_8_R3.EntityHuman;
 import net.minecraft.server.v1_8_R3.EntityItem;
 import net.minecraft.server.v1_8_R3.EntityLiving;
 import net.minecraft.server.v1_8_R3.EntityPlayer;
@@ -20,7 +19,7 @@ import net.minecraft.server.v1_8_R3.ItemStack;
 import net.minecraft.server.v1_8_R3.Items;
 import net.minecraft.server.v1_8_R3.NBTTagCompound;
 import net.minecraft.server.v1_8_R3.PacketPlayOutCollect;
-import net.minecraft.server.v1_8_R3.PacketPlayOutMapChunk;
+import net.minecraft.server.v1_8_R3.PacketPlayOutMultiBlockChange;
 import net.minecraft.server.v1_8_R3.PlayerInventory;
 import net.minecraft.server.v1_8_R3.World;
 
@@ -42,6 +41,7 @@ import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftItemStack;
 import org.bukkit.CropState;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.enchantments.EnchantmentTarget;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.material.CocoaPlant;
@@ -51,6 +51,7 @@ import org.bukkit.material.NetherWarts;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 @SuppressWarnings({"unused", "deprecation"})
 public final class NMSAdapter_v1_8_R3 implements NMSAdapter {
@@ -299,15 +300,26 @@ public final class NMSAdapter_v1_8_R3 implements NMSAdapter {
     }
 
     @Override
-    public void refreshChunks(List<org.bukkit.Chunk> chunksList) {
-        if(chunksList.size() == 0)
-            return;
+    public void refreshChunk(org.bukkit.Chunk bukkitChunk, Set<Location> blocksList) {
+        Chunk chunk = ((CraftChunk) bukkitChunk).getHandle();
+        int blocksAmount = blocksList.size();
+        short[] values = new short[blocksAmount];
 
-        World world = ((CraftWorld) chunksList.get(0).getWorld()).getHandle();
-        for(org.bukkit.Chunk bukkitChunk : chunksList){
-            Chunk chunk = ((CraftChunk) bukkitChunk).getHandle();
-            for(EntityHuman entityHuman : world.players)
-                ((EntityPlayer) entityHuman).playerConnection.sendPacket(new PacketPlayOutMapChunk(chunk, true, 65535));
+        Location firstLocation = null;
+
+        int counter = 0;
+        for(Location location : blocksList) {
+            if(firstLocation == null)
+                firstLocation = location;
+
+            values[counter++] = (short) ((location.getBlockX() & 15) << 12 | (location.getBlockZ() & 15) << 8 | location.getBlockY());
+        }
+
+        PacketPlayOutMultiBlockChange multiBlockChange = new PacketPlayOutMultiBlockChange(blocksAmount, values, chunk);
+
+        for(Entity player : bukkitChunk.getWorld().getNearbyEntities(firstLocation, 60, 200, 60)) {
+            if(player instanceof Player)
+                ((CraftPlayer) player).getHandle().playerConnection.sendPacket(multiBlockChange);
         }
     }
 

@@ -14,6 +14,7 @@ import org.bukkit.inventory.Recipe;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 public interface NMSAdapter {
 
@@ -49,7 +50,7 @@ public interface NMSAdapter {
 
     void setBlockFast(Location location, int combinedId);
 
-    void refreshChunks(List<Chunk> chunksList);
+    void refreshChunk(Chunk chunk, Set<Location> blocksList);
 
     int getCombinedId(Location location);
 
