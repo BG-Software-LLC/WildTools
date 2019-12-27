@@ -52,7 +52,7 @@ public final class BlocksListener implements Listener {
         this.plugin = plugin;
     }
 
-    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
     public void onBlockBreak(BlockBreakEvent e){
         //One of the blocks that were broken by a tool
         if(WTool.toolBlockBreak.contains(e.getPlayer().getUniqueId()))
@@ -99,7 +99,7 @@ public final class BlocksListener implements Listener {
         WTool.toolBlockBreak.remove(e.getPlayer().getUniqueId());
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.LOW)
     public void onBlockInteract(PlayerInteractEvent e){
         //One of the blocks that were broken by a tool
         if(WTool.toolBlockBreak.contains(e.getPlayer().getUniqueId()) || e.getItem() == null)
