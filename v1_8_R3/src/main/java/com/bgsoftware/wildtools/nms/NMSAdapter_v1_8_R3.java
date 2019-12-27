@@ -7,6 +7,7 @@ import net.minecraft.server.v1_8_R3.BlockCrops;
 import net.minecraft.server.v1_8_R3.BlockNetherWart;
 import net.minecraft.server.v1_8_R3.BlockPosition;
 import net.minecraft.server.v1_8_R3.BlockPotatoes;
+import net.minecraft.server.v1_8_R3.Blocks;
 import net.minecraft.server.v1_8_R3.Chunk;
 import net.minecraft.server.v1_8_R3.EnchantmentManager;
 import net.minecraft.server.v1_8_R3.EntityItem;
@@ -296,7 +297,7 @@ public final class NMSAdapter_v1_8_R3 implements NMSAdapter {
     public void setBlockFast(Location location, int combinedId) {
         World world = ((CraftWorld) location.getWorld()).getHandle();
         Chunk chunk = world.getChunkAt(location.getChunk().getX(), location.getChunk().getZ());
-        chunk.a(new BlockPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ()), Block.getByCombinedId(0));
+        chunk.a(new BlockPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ()), Block.getByCombinedId(combinedId));
     }
 
     @Override
@@ -328,6 +329,11 @@ public final class NMSAdapter_v1_8_R3 implements NMSAdapter {
         World world = ((CraftWorld) location.getWorld()).getHandle();
         BlockPosition blockPosition = new BlockPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ());
         return Block.getCombinedId(world.getType(blockPosition));
+    }
+
+    @Override
+    public int getFarmlandId() {
+        return Block.getCombinedId(Blocks.FARMLAND.getBlockData());
     }
 
     @Override

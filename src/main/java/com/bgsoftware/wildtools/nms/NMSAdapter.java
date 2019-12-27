@@ -54,6 +54,8 @@ public interface NMSAdapter {
 
     int getCombinedId(Location location);
 
+    int getFarmlandId();
+
     void setCombinedId(Location location, int combinedId);
 
     Enchantment getGlowEnchant();

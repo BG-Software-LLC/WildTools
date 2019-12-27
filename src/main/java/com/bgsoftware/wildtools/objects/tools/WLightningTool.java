@@ -1,7 +1,9 @@
 package com.bgsoftware.wildtools.objects.tools;
 
+import com.bgsoftware.wildtools.api.events.LightningWandUseEvent;
 import com.bgsoftware.wildtools.utils.Executor;
 import com.bgsoftware.wildtools.utils.items.ToolTaskManager;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -73,6 +75,9 @@ public final class WLightningTool extends WTool implements LightningTool {
             }
 
             Executor.sync(() -> {
+                LightningWandUseEvent lightningWandUseEvent = new LightningWandUseEvent(player, this, creeperList);
+                Bukkit.getPluginManager().callEvent(lightningWandUseEvent);
+
                 player.getWorld().strikeLightningEffect(entity.getLocation());
                 for(Creeper creeper : creeperList)
                     creeper.setPowered(true);

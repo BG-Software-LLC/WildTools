@@ -3,6 +3,7 @@ package com.bgsoftware.wildtools.nms;
 import com.bgsoftware.wildtools.objects.WMaterial;
 import net.minecraft.server.v1_15_R1.Block;
 import net.minecraft.server.v1_15_R1.BlockPosition;
+import net.minecraft.server.v1_15_R1.Blocks;
 import net.minecraft.server.v1_15_R1.Chunk;
 import net.minecraft.server.v1_15_R1.EntityItem;
 import net.minecraft.server.v1_15_R1.EntityLiving;
@@ -247,6 +248,11 @@ public final class NMSAdapter_v1_15_R1 implements NMSAdapter {
         World world = ((CraftWorld) location.getWorld()).getHandle();
         BlockPosition blockPosition = new BlockPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ());
         return Block.getCombinedId(world.getType(blockPosition));
+    }
+
+    @Override
+    public int getFarmlandId() {
+        return Block.getCombinedId(Blocks.FARMLAND.getBlockData());
     }
 
     @Override

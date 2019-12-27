@@ -1,5 +1,6 @@
 package com.bgsoftware.wildtools.objects.tools;
 
+import com.bgsoftware.wildtools.api.events.CraftingWandUseEvent;
 import com.bgsoftware.wildtools.utils.Executor;
 import com.bgsoftware.wildtools.utils.items.ToolTaskManager;
 import com.bgsoftware.wildtools.utils.recipes.RecipeChoice;
@@ -27,6 +28,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 public final class WCraftingTool extends WTool implements CraftingTool {
 
@@ -104,6 +106,12 @@ public final class WCraftingTool extends WTool implements CraftingTool {
                         }
                     }
                 }
+
+                Executor.sync(() -> {
+                    CraftingWandUseEvent craftingWandUseEvent = new CraftingWandUseEvent(e.getPlayer(), this,
+                            toAdd.stream().map(ItemStack::clone).collect(Collectors.toList()));
+                    Bukkit.getPluginManager().callEvent(craftingWandUseEvent);
+                });
 
                 WildChestsHook.addItems(chest.getLocation(), chestInventory, toAdd);
 

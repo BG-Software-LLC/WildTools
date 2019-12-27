@@ -1,7 +1,11 @@
 package com.bgsoftware.wildtools.objects.tools;
 
+import com.bgsoftware.wildtools.api.events.BuilderWandUseEvent;
+import com.bgsoftware.wildtools.utils.blocks.BlocksController;
 import com.bgsoftware.wildtools.utils.inventory.InventoryUtils;
 import com.bgsoftware.wildtools.utils.items.ToolTaskManager;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -58,9 +62,12 @@ public final class WBuilderTool extends WTool implements BuilderTool {
         Material firstType = e.getClickedBlock().getType();
         short firstData = e.getClickedBlock().getState().getData().toItemStack().getDurability();
 
+        BlocksController blocksController = new BlocksController();
         boolean usingDurability = isUsingDurability();
         int toolIterations = Math.min(usingDurability ? getDurability(e.getPlayer(), taskId) : length, Math.min(amountOfBlocks, length));
         int iter;
+
+        Location block = e.getClickedBlock().getLocation();
 
         Block nextBlock = e.getClickedBlock();
         for(iter = 0; iter < toolIterations; iter++){
@@ -69,8 +76,13 @@ public final class WBuilderTool extends WTool implements BuilderTool {
             if(nextBlock.getType() != Material.AIR || !plugin.getProviders().canBreak(e.getPlayer(), nextBlock, firstType, firstData, this))
                 break;
 
-            plugin.getNMSAdapter().copyBlock(e.getClickedBlock(), nextBlock);
+            blocksController.setType(nextBlock.getLocation(), block);
         }
+
+        BuilderWandUseEvent builderWandUseEvent = new BuilderWandUseEvent(e.getPlayer(), this, blocksController.getAffectedBlocks());
+        Bukkit.getPluginManager().callEvent(builderWandUseEvent);
+
+        blocksController.updateSession();
 
         blockItemStack.setAmount(iter);
         e.getPlayer().getInventory().removeItem(blockItemStack);

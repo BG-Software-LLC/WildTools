@@ -1,8 +1,10 @@
 package com.bgsoftware.wildtools.objects.tools;
 
+import com.bgsoftware.wildtools.api.events.CuboidWandUseEvent;
 import com.bgsoftware.wildtools.utils.BukkitUtils;
 import com.bgsoftware.wildtools.utils.blocks.BlocksController;
 import com.bgsoftware.wildtools.utils.items.ToolTaskManager;
+import org.bukkit.Bukkit;
 import org.bukkit.event.block.BlockBreakEvent;
 import com.bgsoftware.wildtools.api.objects.tools.CuboidTool;
 import com.bgsoftware.wildtools.api.objects.ToolMode;
@@ -37,6 +39,7 @@ public final class WCuboidTool extends WTool implements CuboidTool {
         Material firstType = e.getBlock().getType();
         short firstData = e.getBlock().getState().getData().toItemStack().getDurability();
 
+        BlocksController blocksController = new BlocksController();
         int toolDurability = getDurability(e.getPlayer(), taskId);
         boolean usingDurability = isUsingDurability();
         int toolUsages = 0;
@@ -54,13 +57,16 @@ public final class WCuboidTool extends WTool implements CuboidTool {
                             !plugin.getProviders().canBreak(e.getPlayer(), targetBlock, firstType, firstData, this))
                         continue;
 
-                    BukkitUtils.breakNaturally(e.getPlayer(), targetBlock, this);
+                    BukkitUtils.breakNaturally(e.getPlayer(), blocksController, targetBlock, this);
                     toolUsages++;
                 }
             }
         }
 
-        BlocksController.updateSession();
+        CuboidWandUseEvent cuboidWandUseEvent = new CuboidWandUseEvent(e.getPlayer(), this, blocksController.getAffectedBlocks());
+        Bukkit.getPluginManager().callEvent(cuboidWandUseEvent);
+
+        blocksController.updateSession();
 
         if(toolUsages > 0)
             reduceDurablility(e.getPlayer(), usingDurability ? toolUsages : 1, taskId);

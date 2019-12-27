@@ -9,6 +9,7 @@ import net.minecraft.server.v1_13_R1.BlockCrops;
 import net.minecraft.server.v1_13_R1.BlockNetherWart;
 import net.minecraft.server.v1_13_R1.BlockPosition;
 import net.minecraft.server.v1_13_R1.BlockPotatoes;
+import net.minecraft.server.v1_13_R1.Blocks;
 import net.minecraft.server.v1_13_R1.Chunk;
 import net.minecraft.server.v1_13_R1.EnchantmentManager;
 import net.minecraft.server.v1_13_R1.Enchantments;
@@ -345,6 +346,11 @@ public final class NMSAdapter_v1_13_R1 implements NMSAdapter {
         World world = ((CraftWorld) location.getWorld()).getHandle();
         BlockPosition blockPosition = new BlockPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ());
         return Block.getCombinedId(world.getType(blockPosition));
+    }
+
+    @Override
+    public int getFarmlandId() {
+        return Block.getCombinedId(Blocks.FARMLAND.getBlockData());
     }
 
     @Override

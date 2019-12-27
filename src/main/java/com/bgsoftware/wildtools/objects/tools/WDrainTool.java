@@ -1,9 +1,11 @@
 package com.bgsoftware.wildtools.objects.tools;
 
+import com.bgsoftware.wildtools.api.events.DrainWandUseEvent;
 import com.bgsoftware.wildtools.api.objects.ToolMode;
 import com.bgsoftware.wildtools.api.objects.tools.DrainTool;
 import com.bgsoftware.wildtools.utils.blocks.BlocksController;
 import com.bgsoftware.wildtools.utils.items.ToolTaskManager;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -43,6 +45,7 @@ public final class WDrainTool extends WTool implements DrainTool {
 
         UUID taskId = ToolTaskManager.generateTaskId(usedItem, player.getInventory());
 
+        BlocksController blocksController = new BlocksController();
         int toolDurability = getDurability(player, taskId);
         boolean usingDurability = isUsingDurability();
         int toolUsages = 0;
@@ -58,14 +61,17 @@ public final class WDrainTool extends WTool implements DrainTool {
                     if(targetBlock.getType() != Material.ICE || !plugin.getProviders().canBreak(player, targetBlock, this))
                         continue;
 
-                    BlocksController.setAir(targetBlock.getLocation());
+                    blocksController.setAir(targetBlock.getLocation());
 
                     toolUsages++;
                 }
             }
         }
 
-        BlocksController.updateSession();
+        DrainWandUseEvent drainWandUseEvent = new DrainWandUseEvent(player, this, blocksController.getAffectedBlocks());
+        Bukkit.getPluginManager().callEvent(drainWandUseEvent);
+
+        blocksController.updateSession();
 
         if(toolUsages > 0)
             reduceDurablility(player, usingDurability ? toolUsages : 1, taskId);

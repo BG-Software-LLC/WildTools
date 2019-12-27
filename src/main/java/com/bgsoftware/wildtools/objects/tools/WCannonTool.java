@@ -1,8 +1,10 @@
 package com.bgsoftware.wildtools.objects.tools;
 
+import com.bgsoftware.wildtools.api.events.CannonWandUseEvent;
 import com.bgsoftware.wildtools.objects.WSelection;
 import com.bgsoftware.wildtools.utils.items.ItemUtils;
 import com.bgsoftware.wildtools.utils.items.ToolTaskManager;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Dispenser;
@@ -17,8 +19,10 @@ import com.bgsoftware.wildtools.api.objects.ToolMode;
 import com.bgsoftware.wildtools.api.objects.tools.CannonTool;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @SuppressWarnings("WeakerAccess")
 public final class WCannonTool extends WTool implements CannonTool {
@@ -67,10 +71,12 @@ public final class WCannonTool extends WTool implements CannonTool {
 
         UUID taskId = ToolTaskManager.generateTaskId(e.getItem(), e.getPlayer().getInventory());
 
+        List<Dispenser> dispenserList = selection.getDispensers(this);
+
         int filledDispensers = 0;
         int totalTNT = 0;
 
-        for(Dispenser dispenser : selection.getDispensers(this)){
+        for(Dispenser dispenser : dispenserList){
             int amount = tntAmount, freeSpace;
 
             if((freeSpace = getFreeSpace(dispenser.getInventory(), new ItemStack(Material.TNT))) < amount)
@@ -93,6 +99,10 @@ public final class WCannonTool extends WTool implements CannonTool {
             }
             else break;
         }
+
+        CannonWandUseEvent cannonWandUseEvent = new CannonWandUseEvent(e.getPlayer(), this,
+                dispenserList.subList(0, filledDispensers).stream().map(Dispenser::getLocation).collect(Collectors.toList()));
+        Bukkit.getPluginManager().callEvent(cannonWandUseEvent);
 
         if(filledDispensers > 0){
             reduceDurablility(e.getPlayer(), 1, taskId);

@@ -7,6 +7,7 @@ import net.minecraft.server.v1_7_R3.BlockCocoa;
 import net.minecraft.server.v1_7_R3.BlockCrops;
 import net.minecraft.server.v1_7_R3.BlockNetherWart;
 import net.minecraft.server.v1_7_R3.BlockPotatoes;
+import net.minecraft.server.v1_7_R3.Blocks;
 import net.minecraft.server.v1_7_R3.Chunk;
 import net.minecraft.server.v1_7_R3.EnchantmentManager;
 import net.minecraft.server.v1_7_R3.EntityItem;
@@ -329,6 +330,11 @@ public final class NMSAdapter_v1_7_R3 implements NMSAdapter {
     public int getCombinedId(Location location) {
         World world = ((CraftWorld) location.getWorld()).getHandle();
         return Block.b(world.getType(location.getBlockX(), location.getBlockY(), location.getBlockZ()));
+    }
+
+    @Override
+    public int getFarmlandId() {
+        return Block.b(Blocks.SOIL);
     }
 
     @Override

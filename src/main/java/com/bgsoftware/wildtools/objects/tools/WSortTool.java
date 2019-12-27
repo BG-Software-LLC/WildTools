@@ -1,5 +1,6 @@
 package com.bgsoftware.wildtools.objects.tools;
 
+import com.bgsoftware.wildtools.api.events.SortWandUseEvent;
 import com.bgsoftware.wildtools.hooks.WildChestsHook;
 import com.bgsoftware.wildtools.Locale;
 import com.bgsoftware.wildtools.api.objects.ToolMode;
@@ -7,6 +8,7 @@ import com.bgsoftware.wildtools.api.objects.tools.SortTool;
 
 import com.bgsoftware.wildtools.utils.Executor;
 import com.bgsoftware.wildtools.utils.items.ToolTaskManager;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Chest;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -61,7 +63,15 @@ public final class WSortTool extends WTool implements SortTool {
 
                 Collections.sort(inventoryItems);
 
-                WildChestsHook.addItems(chest.getLocation(), chestInventory, convert(inventoryItems));
+                List<ItemStack> affectedItems = convert(inventoryItems);
+
+                Executor.sync(() -> {
+                    SortWandUseEvent sortWandUseEvent = new SortWandUseEvent(e.getPlayer(), this,
+                            affectedItems.stream().map(ItemStack::clone).collect(Collectors.toList()));
+                    Bukkit.getPluginManager().callEvent(sortWandUseEvent);
+                });
+
+                WildChestsHook.addItems(chest.getLocation(), chestInventory, affectedItems);
 
                 for (Inventory inventory : inventories) {
                     if (!Arrays.equals(originContents.get(inventory), inventory.getContents())) {

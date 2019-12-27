@@ -22,14 +22,7 @@ public final class BukkitUtils {
 
     private static WildToolsPlugin plugin = WildToolsPlugin.getPlugin();
 
-    private static final Consumer<Block> onBlockBreak = blockConsumer -> {
-        if(blockConsumer.getRelative(BlockFace.UP).getType().name().contains("WATER") || blockConsumer.getType().hasGravity())
-            blockConsumer.setType(Material.AIR);
-        else
-            BlocksController.setAir(blockConsumer.getLocation());
-    };
-
-    public static void breakNaturally(Player player, Block block, Tool tool){
+    public static void breakNaturally(Player player, BlocksController blocksController, Block block, Tool tool){
         boolean autoCollect = tool.isAutoCollect();
 
         Consumer<ItemStack> onItemDrop = itemConsumer -> {
@@ -39,10 +32,24 @@ public final class BukkitUtils {
                 block.getWorld().dropItemNaturally(block.getLocation(), itemConsumer);
         };
 
+        Consumer<Block> onBlockBreak = blockConsumer -> {
+            if(blockConsumer.getRelative(BlockFace.UP).getType().name().contains("WATER") || blockConsumer.getType().hasGravity())
+                blockConsumer.setType(Material.AIR);
+            else
+                blocksController.setAir(blockConsumer.getLocation());
+        };
+
         breakNaturally(player, block, tool, onBlockBreak, onItemDrop);
     }
 
-    public static void breakNaturally(Player player, Block block, Tool tool, Consumer<ItemStack> onItemDrop){
+    public static void breakNaturally(Player player, BlocksController blocksController, Block block, Tool tool, Consumer<ItemStack> onItemDrop){
+        Consumer<Block> onBlockBreak = blockConsumer -> {
+            if(blockConsumer.getRelative(BlockFace.UP).getType().name().contains("WATER") || blockConsumer.getType().hasGravity())
+                blockConsumer.setType(Material.AIR);
+            else
+                blocksController.setAir(blockConsumer.getLocation());
+        };
+
         breakNaturally(player, block, tool, onBlockBreak, onItemDrop);
     }
 
