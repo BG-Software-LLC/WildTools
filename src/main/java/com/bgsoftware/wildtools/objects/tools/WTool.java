@@ -44,7 +44,7 @@ public abstract class WTool implements Tool {
     private ItemStack is;
     private int usesLeft;
     private String name, toolMode;
-    private boolean onlySameType, onlyInsideClaim, unbreakable, autoCollect, silkTouch, keepInventory, omni, privateTool;
+    private boolean onlySameType, onlyInsideClaim, unbreakable, autoCollect, instantBreak, silkTouch, keepInventory, omni, privateTool;
     private long cooldown;
     private double multiplier;
 
@@ -61,6 +61,7 @@ public abstract class WTool implements Tool {
         this.onlySameType = false;
         this.onlyInsideClaim = false;
         this.autoCollect = false;
+        this.instantBreak = false;
         this.silkTouch = false;
         this.unbreakable = false;
         this.omni = false;
@@ -114,6 +115,11 @@ public abstract class WTool implements Tool {
     @Override
     public void setAutoCollect(boolean autoCollect){
         this.autoCollect = autoCollect;
+    }
+
+    @Override
+    public void setInstantBreak(boolean instantBreak) {
+        this.instantBreak = instantBreak;
     }
 
     @Override
@@ -224,6 +230,11 @@ public abstract class WTool implements Tool {
     @Override
     public boolean isAutoCollect(){
         return autoCollect;
+    }
+
+    @Override
+    public boolean isInstantBreak() {
+        return instantBreak;
     }
 
     @Override
@@ -509,6 +520,9 @@ public abstract class WTool implements Tool {
 
     @Override
     public boolean onBlockHit(PlayerInteractEvent e){
+        if(isInstantBreak() && e.getClickedBlock().getType() != Material.BEDROCK)
+            return onBlockBreak(new BlockBreakEvent(e.getClickedBlock(), e.getPlayer()));
+
         return false;
     }
 

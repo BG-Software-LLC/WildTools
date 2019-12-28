@@ -38,16 +38,25 @@ import com.bgsoftware.wildtools.objects.tools.WDrainTool;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 
 @SuppressWarnings("unchecked")
 public final class ToolsHandler implements ToolsManager {
 
-    private WildToolsPlugin plugin;
+    private static final Comparator<Tool> toolComparator = (o1, o2) -> {
+        int compare = Integer.compare(o1.getToolMode().ordinal(), o2.getToolMode().ordinal());
+        return compare == 0 ? o1.getName().compareToIgnoreCase(o2.getName()) : compare;
+    };
 
-    private Set<Tool> tools = new HashSet<>();
+    private final WildToolsPlugin plugin;
+
+    private final Map<String, Tool> toolsByName = new HashMap<>();
+    private final List<Tool> tools = new ArrayList<>();
 
     public ToolsHandler(WildToolsPlugin plugin){
         this.plugin = plugin;
@@ -110,11 +119,7 @@ public final class ToolsHandler implements ToolsManager {
 
     @Override
     public Tool getTool(String name){
-        for(Tool tool : tools)
-            if (tool.getName().equalsIgnoreCase(name))
-                return tool;
-
-        return null;
+        return toolsByName.get(name.toLowerCase());
     }
 
     @Override
@@ -128,7 +133,7 @@ public final class ToolsHandler implements ToolsManager {
 
     @Override
     public List<Tool> getTools(){
-        return new ArrayList<>(tools);
+        return Collections.unmodifiableList(tools);
     }
 
     @Override
@@ -172,9 +177,13 @@ public final class ToolsHandler implements ToolsManager {
             tool = new WSortTool(type, name);
         }else throw new IllegalArgumentException("Couldn't find tool class " + toolClass.getName());
 
-        tools.removeIf(_tool -> _tool.getName().equals(tool.getName()));
+        if(toolsByName.containsKey(tool.getName().toLowerCase()))
+            tools.remove(toolsByName.get(tool.getName().toLowerCase()));
 
         tools.add(tool);
+        toolsByName.put(tool.getName().toLowerCase(), tool);
+
+        tools.sort(toolComparator);
 
         return toolClass.cast(tool);
     }

@@ -27,6 +27,8 @@ public interface Tool {
 
     void setAutoCollect(boolean autoCollect);
 
+    void setInstantBreak(boolean instantBreak);
+
     void setSilkTouch(boolean silkTouch);
 
     void setUnbreakable(boolean unbreakable);
@@ -66,6 +68,8 @@ public interface Tool {
     boolean isUnbreakable();
 
     boolean isAutoCollect();
+
+    boolean isInstantBreak();
 
     boolean hasSilkTouch();
 

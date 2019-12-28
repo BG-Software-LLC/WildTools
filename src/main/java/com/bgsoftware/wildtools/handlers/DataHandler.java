@@ -170,6 +170,9 @@ public final class DataHandler {
             if(cfg.contains("tools." + name + ".auto-collect"))
                 tool.setAutoCollect(cfg.getBoolean("tools." + name + ".auto-collect"));
 
+            if(cfg.contains("tools." + name + ".instant-break"))
+                tool.setInstantBreak(cfg.getBoolean("tools." + name + ".instant-break"));
+
             if(cfg.contains("tools." + name + ".silk-touch"))
                 tool.setSilkTouch(cfg.getBoolean("tools." + name + ".silk-touch"));
 
