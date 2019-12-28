@@ -22,6 +22,21 @@ prices-list:
 # Required sections:
 # length: The length of the pillar (INTEGER)
 #
+# *** Cannon Tool-Mode ***
+# Tools in this mode will fill all dispensers in a selected area with tnt. This mode is used for cannon-wands.
+# Right-click and left-click to select an area.
+# Required sections:
+# tnt-amount: How many tnt will be filled in each dispenser? (INTEGER)
+#
+# *** Crafting Tool-Mode ***
+# Tools in this mode will auto-craft items in a container.
+# Required sections:
+# craftings: All the crafting *results* for the tool (LIST)
+#      Please follow the "TYPE" or "TYPE:DATA" format for results.
+#
+# *** Crowbar Tool-Mode ***
+# Tools in this mode will break spawners and drop them.
+#
 # *** Cuboid Tool-Mode ***
 # Tools in this mode will dig a cuboid-area (for example, 3x3x3). This mode is used for trench and tray pickaxes.
 # Required sections:
@@ -31,22 +46,6 @@ prices-list:
 # Tools in this mode will remove all ice blocks in the checking area.
 # Required sections:
 # radius: What is the radius of the checking area? (3 will check a 7x7 area) (INTEGER)
-#
-# *** Pillar Tool-Mode ***
-# Tools in this mode will dig a pillar of blocks with the same type. This mode is used for sand-wands.
-#
-# *** Sell Tool-Mode ***
-# Tools in this mode will sell all the container's contents. This mode is used for sell-wands.
-# Optional sections:
-# multiplier: Multiply the earnings from a chest.
-#
-# *** Lightning Tool-Mode ***
-# Tools in this mode will strike a lightning to charge creepers. This mode is used for lightning-wands.
-#
-# *** Magnet Tool-Mode ***
-# Tools in this mode will suction items into the player's inventory.
-# Required sections:
-# radius: What is the radius of the checking area? (INTEGER)
 #
 # *** Harvester Tool-Mode ***
 # Tools in this mode will harvest seeds and replant them automatically. This mode is used for harvester-hoes.
@@ -63,17 +62,21 @@ prices-list:
 # Required sections:
 # radius: What is the radius of the checking area? (3 will check a 7x7 area) (INTEGER)
 #
-# *** Cannon Tool-Mode ***
-# Tools in this mode will fill all dispensers in a selected area with tnt. This mode is used for cannon-wands.
-# Right-click and left-click to select an area.
-# Required sections:
-# tnt-amount: How many tnt will be filled in each dispenser? (INTEGER)
+# *** Lightning Tool-Mode ***
+# Tools in this mode will strike a lightning to charge creepers. This mode is used for lightning-wands.
 #
-# *** Crafting Tool-Mode ***
-# Tools in this mode will auto-craft items in a container.
+# *** Magnet Tool-Mode ***
+# Tools in this mode will suction items into the player's inventory.
 # Required sections:
-# craftings: All the crafting *results* for the tool (LIST)
-#      Please follow the "TYPE" or "TYPE:DATA" format for results.
+# radius: What is the radius of the checking area? (INTEGER)
+#
+# *** Pillar Tool-Mode ***
+# Tools in this mode will dig a pillar of blocks with the same type. This mode is used for sand-wands.
+#
+# *** Sell Tool-Mode ***
+# Tools in this mode will sell all the container's contents. This mode is used for sell-wands.
+# Optional sections:
+# multiplier: Multiply the earnings from a chest.
 #
 # *** Sort Tool-Mode ***
 # Tools in this mode will sort all the clicked chest's contents.
@@ -81,10 +84,12 @@ prices-list:
 # There are sections that can be applied for all the tools:
 # cooldown: Cool-down between uses in milliseconds (INTEGER) (Default 0)
 # auto-collect: Drops will go straight into the inventory (BOOLEAN) (Default false)
+# instant-break: Blocks will be broken instantly (BOOLEAN) (Default false)
 # silk-touch: Tool will have a hidden silk-touch enchantment (BOOLEAN) (Default false)
 # only-same-type: Only blocks with the same type will be dug. (BOOLEAN) (Default false)
 # only-inside-claim: Will only work on blocks inside claim land.
 # unbreakable: Tool will never be broken (BOOLEAN) (Default false)
+# spigot-unbreakable: Set spigot's unbreakable flag (BOOLEAN) (Default false)
 # omni-tool: Tool will change it's type depends on broken block (BOOLEAN) (Default false)
 #      Tool's default type must be a tool, such as pickaxe, shovel or axe.
 # uses: Custom durability for the tool (INTEGER)
@@ -336,9 +341,22 @@ tools:
     name: '&f --{ &1&lSorter Wand &f}-- '
     lore:
     - '&8&m---------------------------------------'
-    - '&7 Right click a chest to sort it''s contects'
+    - '&7 Right click a chest to sort it''s contents.'
     - '&f'
     - '&1&l Uses:'
     - '&f   {}'
     - '&f'
     - '&8&m---------------------------------------'
+  crowbar_tool:
+    tool-mode: CROWBAR
+    type: GOLD_HOE
+    uses: 25
+    name: '&f --{ &1&lCrowbar Tool &f}-- '
+    lore:
+      - '&8&m---------------------------------------'
+      - '&7 Right click a spawner to break it.'
+      - '&f'
+      - '&1&l Uses:'
+      - '&f   {}'
+      - '&f'
+      - '&8&m---------------------------------------'

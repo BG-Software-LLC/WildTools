@@ -4,7 +4,6 @@ import com.bgsoftware.wildtools.WildToolsPlugin;
 import com.bgsoftware.wildtools.api.objects.tools.CrowbarTool;
 import com.bgsoftware.wildtools.api.objects.tools.MagnetTool;
 import com.bgsoftware.wildtools.config.CommentedConfiguration;
-import com.bgsoftware.wildtools.config.ConfigComments;
 import com.bgsoftware.wildtools.api.objects.tools.BuilderTool;
 import com.bgsoftware.wildtools.api.objects.tools.CannonTool;
 import com.bgsoftware.wildtools.api.objects.tools.CraftingTool;
@@ -41,9 +40,8 @@ public final class DataHandler {
         if(!file.exists())
             plugin.saveResource("config.yml", false);
 
-        CommentedConfiguration cfg = new CommentedConfiguration(ConfigComments.class, file);
-
-        cfg.resetYamlFile(plugin, "config.yml");
+        CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(file);
+        cfg.syncWithConfig(file, plugin.getResource("config.yml"), "tools");
 
         ProvidersHandler.pricesPlugin = cfg.getString("prices-plugin", "ShopGUIPlus");
 

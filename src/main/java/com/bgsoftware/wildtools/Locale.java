@@ -1,7 +1,6 @@
 package com.bgsoftware.wildtools;
 
 import com.bgsoftware.wildtools.config.CommentedConfiguration;
-import com.bgsoftware.wildtools.config.LangComments;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 
@@ -11,6 +10,7 @@ import java.util.Map;
 
 public final class Locale {
 
+    private static final WildToolsPlugin plugin = WildToolsPlugin.getPlugin();
     private static Map<String, Locale> localeMap = new HashMap<>();
 
     public static Locale BUILDER_NO_BLOCK = new Locale("BUILDER_NO_BLOCK");
@@ -111,9 +111,8 @@ public final class Locale {
         if(!file.exists())
             WildToolsPlugin.getPlugin().saveResource("lang.yml", false);
 
-        CommentedConfiguration cfg = new CommentedConfiguration(LangComments.class, file);
-
-        cfg.resetYamlFile(WildToolsPlugin.getPlugin(), "lang.yml");
+        CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(file);
+        cfg.syncWithConfig(file, plugin.getResource("lang.yml"));
 
         for(String identifier : localeMap.keySet())
             localeMap.get(identifier).setMessage(ChatColor.translateAlternateColorCodes('&', cfg.getString(identifier, "")));

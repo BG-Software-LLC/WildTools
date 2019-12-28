@@ -1,7 +1,6 @@
 package com.bgsoftware.wildtools.handlers;
 
 import com.bgsoftware.wildtools.config.CommentedConfiguration;
-import com.bgsoftware.wildtools.config.ConfigComments;
 import com.bgsoftware.wildtools.objects.WMaterial;
 import com.bgsoftware.wildtools.utils.items.ItemBuilder;
 import org.bukkit.Bukkit;
@@ -29,7 +28,12 @@ public final class EditorHandler {
 
     public EditorHandler(WildToolsPlugin plugin){
         this.plugin = plugin;
-        this.config = new CommentedConfiguration(ConfigComments.class, new File(plugin.getDataFolder(), "config.yml"));
+
+        File file = new File(plugin.getDataFolder(), "config.yml");
+
+        this.config = CommentedConfiguration.loadConfiguration(file);
+        this.config.syncWithConfig(file, plugin.getResource("config.yml"), "tools");
+
         loadSettingsEditor();
     }
 
@@ -40,7 +44,11 @@ public final class EditorHandler {
     }
 
     public void reloadConfiguration(){
-        config.load(new File(plugin.getDataFolder(), "config.yml"));
+        try {
+            config.load(new File(plugin.getDataFolder(), "config.yml"));
+        }catch(Exception ex){
+            ex.printStackTrace();
+        }
     }
 
     public Inventory getSettingsEditor(){
