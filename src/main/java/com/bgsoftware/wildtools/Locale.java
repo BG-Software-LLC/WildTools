@@ -67,6 +67,10 @@ public final class Locale {
     public static Locale TOOL_INFO_RADIUS = new Locale("TOOL_INFO_RADIUS");
     public static Locale TOOL_INFO_TNT_AMOUNT = new Locale("TOOL_INFO_TNT_AMOUNT");
     public static Locale TOOL_INFO_FOOTER = new Locale("TOOL_INFO_FOOTER");
+    public static Locale TOOL_LIST_HEADER = new Locale("TOOL_LIST_HEADER");
+    public static Locale TOOL_LIST_TYPE = new Locale("TOOL_LIST_TYPE");
+    public static Locale TOOL_LIST_LINE = new Locale("TOOL_LIST_LINE");
+    public static Locale TOOL_LIST_FOOTER = new Locale("TOOL_LIST_FOOTER");
 
     private Locale(String identifier){
         localeMap.put(identifier, this);

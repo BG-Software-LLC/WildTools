@@ -4,6 +4,7 @@ import com.bgsoftware.wildtools.command.commands.CommandGive;
 import com.bgsoftware.wildtools.Locale;
 import com.bgsoftware.wildtools.WildToolsPlugin;
 import com.bgsoftware.wildtools.command.commands.CommandInfo;
+import com.bgsoftware.wildtools.command.commands.CommandList;
 import com.bgsoftware.wildtools.command.commands.CommandReload;
 
 import org.bukkit.command.CommandExecutor;
@@ -24,6 +25,7 @@ public final class CommandsHandler implements CommandExecutor, TabCompleter {
         cmds = new ArrayList<>();
         cmds.add(new CommandGive());
         cmds.add(new CommandInfo());
+        cmds.add(new CommandList());
         cmds.add(new CommandReload());
         cmds.add(new CommandSettings());
     }

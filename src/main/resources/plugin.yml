@@ -17,6 +17,7 @@ permissions:
       wildtools.use: true
       wildtools.give: true
       wildtools.info: true
+      wildtools.list: true
       wildtools.reload: true
       wildtools.sellmode: true
       wildtools.settings: true
@@ -27,6 +28,8 @@ permissions:
     description: Gives access to give tools to other players.
   wildtools.info:
     description: Gives access to get information about tools.
+  wildtools.list:
+    description: Gives access to see all tools.
   wildtools.reload:
     description: Gives access to reload all configuration files.
   wildtools.sellmode:

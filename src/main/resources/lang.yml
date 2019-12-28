@@ -113,3 +113,11 @@ TOOL_INFO_BREAK_LEVEL: '&b Break Level&7: &f{0}'
 TOOL_INFO_RADIUS: '&b Radius&7: &f{0}'
 TOOL_INFO_TNT_AMOUNT: '&b TNT-Amount&7: &f{0}'
 TOOL_INFO_FOOTER: '&8&m---------------&b&l WildTools &8&m---------------'
+
+# Called when a player runs the list sub-command.
+TOOL_LIST_HEADER: '&8&m---------------&b&l WildTools &8&m---------------'
+TOOL_LIST_TYPE: |
+  &b {0}&7:
+  {1}
+TOOL_LIST_LINE: '&7  - {0}'
+TOOL_LIST_FOOTER: '&8&m---------------&b&l WildTools &8&m---------------'
