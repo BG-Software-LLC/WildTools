@@ -1,9 +1,11 @@
 package com.bgsoftware.wildtools.handlers;
 
+import com.bgsoftware.wildtools.api.objects.tools.CrowbarTool;
 import com.bgsoftware.wildtools.api.objects.tools.MagnetTool;
 import com.bgsoftware.wildtools.objects.tools.WBuilderTool;
 import com.bgsoftware.wildtools.objects.tools.WCannonTool;
 import com.bgsoftware.wildtools.objects.tools.WCraftingTool;
+import com.bgsoftware.wildtools.objects.tools.WCrowbarTool;
 import com.bgsoftware.wildtools.objects.tools.WCuboidTool;
 import com.bgsoftware.wildtools.objects.tools.WHarvesterTool;
 import com.bgsoftware.wildtools.objects.tools.WIceTool;
@@ -148,6 +150,8 @@ public final class ToolsHandler implements ToolsManager {
             tool = new WCannonTool(type, name, (int) arg);
         }else if(toolClass.isAssignableFrom(CraftingTool.class)){
             tool = new WCraftingTool(type, name, (List<String>) arg);
+        }else if(toolClass.isAssignableFrom(CrowbarTool.class)){
+            tool = new WCrowbarTool(type, name);
         }else if(toolClass.isAssignableFrom(CuboidTool.class)){
             tool = new WCuboidTool(type, name, (int) arg);
         }else if(toolClass.isAssignableFrom(DrainTool.class)){
@@ -168,10 +172,7 @@ public final class ToolsHandler implements ToolsManager {
             tool = new WSortTool(type, name);
         }else throw new IllegalArgumentException("Couldn't find tool class " + toolClass.getName());
 
-        for(Tool _tool : new ArrayList<>(tools)){
-            if(_tool.getName().equals(tool.getName()))
-                tools.remove(_tool);
-        }
+        tools.removeIf(_tool -> _tool.getName().equals(tool.getName()));
 
         tools.add(tool);
 

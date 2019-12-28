@@ -1,6 +1,7 @@
 package com.bgsoftware.wildtools.handlers;
 
 import com.bgsoftware.wildtools.WildToolsPlugin;
+import com.bgsoftware.wildtools.api.objects.tools.CrowbarTool;
 import com.bgsoftware.wildtools.api.objects.tools.MagnetTool;
 import com.bgsoftware.wildtools.config.CommentedConfiguration;
 import com.bgsoftware.wildtools.config.ConfigComments;
@@ -105,6 +106,9 @@ public final class DataHandler {
                     }
 
                     tool = plugin.getToolsManager().registerTool(type, name, CraftingTool.class, cfg.getStringList("tools." + name + ".craftings"));
+                    break;
+                case "CROWBAR":
+                    tool = plugin.getToolsManager().registerTool(type, name, CrowbarTool.class, null);
                     break;
                 case "CUBOID":
                     if(!cfg.contains("tools." + name + ".break-level")){

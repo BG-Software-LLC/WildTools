@@ -5,6 +5,7 @@ public enum ToolMode {
     BUILDER,
     CANNON,
     CRAFTING,
+    CROWBAR,
     CUBOID,
     DRAIN,
     HARVESTER,

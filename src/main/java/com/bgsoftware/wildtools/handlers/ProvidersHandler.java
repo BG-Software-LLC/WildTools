@@ -20,12 +20,16 @@ import com.bgsoftware.wildtools.hooks.BlocksProvider_Villages;
 import com.bgsoftware.wildtools.hooks.BlocksProvider_WorldGuard;
 
 import com.bgsoftware.wildtools.hooks.PricesProvider_CMI;
+import com.bgsoftware.wildtools.hooks.SpawnersProvider;
+import com.bgsoftware.wildtools.hooks.SpawnersProvider_Default;
+import com.bgsoftware.wildtools.hooks.SpawnersProvider_WildStacker;
 import com.google.common.collect.Lists;
 import net.milkbowl.vault.economy.Economy;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.CreatureSpawner;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -52,6 +56,7 @@ public final class ProvidersHandler {
     private List<BlocksProvider> blocksProviders = Lists.newArrayList();
     private PricesProvider pricesProvider;
     private FactionsProvider factionsProvider;
+    private SpawnersProvider spawnersProvider;
 
     public ProvidersHandler(){
         //Prices Plugin Hookup
@@ -105,7 +110,10 @@ public final class ProvidersHandler {
                 blocksProviders.add(new BlocksProvider_PlotSquared());
             }
         }
-
+        //Spawners Plugin Hook
+        if(Bukkit.getPluginManager().isPluginEnabled("WildStacker"))
+            spawnersProvider = new SpawnersProvider_WildStacker();
+        else spawnersProvider = new SpawnersProvider_Default();
     }
 
     /*
@@ -158,6 +166,10 @@ public final class ProvidersHandler {
                 return false;
         }
         return true;
+    }
+
+    public ItemStack getItem(CreatureSpawner creatureSpawner){
+        return spawnersProvider.getItem(creatureSpawner);
     }
 
     /*
