@@ -137,8 +137,9 @@ public final class EditorHandler {
                         getFromConfig(toolName, "blacklisted-drops", List.class, new ArrayList<>())).build());
         editor.setItem(30, new ItemBuilder(Material.SUGAR)
                 .withName("&bTool Instant-Break").withLore("&7Instant-Break: " + getFromConfig(toolName, "instant-break", Boolean.class, false)).build());
+        editor.setItem(31, new ItemBuilder(WMaterial.EXPERIENCE_BOTTLE.parseMaterial())
+                .withName("&bTool Anvil Combine Exp").withLore("&7Anvil Combine Exp: " + getFromConfig(toolName, "anvil-combine-exp", Integer.class, -1)).build());
 
-        editor.setItem(31, new ItemStack(Material.AIR));
         editor.setItem(32, new ItemStack(Material.AIR));
         editor.setItem(33, new ItemStack(Material.AIR));
         editor.setItem(34, new ItemStack(Material.AIR));

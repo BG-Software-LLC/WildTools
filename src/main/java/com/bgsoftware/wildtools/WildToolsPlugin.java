@@ -6,6 +6,7 @@ import com.bgsoftware.wildtools.command.CommandsHandler;
 import com.bgsoftware.wildtools.handlers.EditorHandler;
 import com.bgsoftware.wildtools.handlers.ToolsHandler;
 import com.bgsoftware.wildtools.hooks.SuperMobCoinsHook;
+import com.bgsoftware.wildtools.listeners.AnvilListener;
 import com.bgsoftware.wildtools.metrics.Metrics;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
@@ -47,6 +48,7 @@ public final class WildToolsPlugin extends JavaPlugin implements WildTools {
 
         log("******** ENABLE START ********");
 
+        getServer().getPluginManager().registerEvents(new AnvilListener(this), this);
         getServer().getPluginManager().registerEvents(new BlocksListener(this), this);
         getServer().getPluginManager().registerEvents(new PlayerListener(this), this);
         getServer().getPluginManager().registerEvents(new EditorListener(this), this);

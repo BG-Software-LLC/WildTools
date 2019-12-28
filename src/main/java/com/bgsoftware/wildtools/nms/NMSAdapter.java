@@ -9,6 +9,7 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.Recipe;
 
@@ -69,4 +70,17 @@ public interface NMSAdapter {
     default ItemStack[] parseChoice(Recipe recipe, ItemStack itemStack){
         return new ItemStack[] {itemStack};
     }
+
+    default void setExpCost(InventoryView inventoryView, int expCost){
+
+    }
+
+    default int getExpCost(InventoryView inventoryView){
+        return 0;
+    }
+
+    default String getRenameText(InventoryView inventoryView){
+        return "";
+    }
+
 }

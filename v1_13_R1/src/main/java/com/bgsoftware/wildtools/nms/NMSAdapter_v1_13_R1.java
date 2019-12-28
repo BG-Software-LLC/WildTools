@@ -11,6 +11,7 @@ import net.minecraft.server.v1_13_R1.BlockPosition;
 import net.minecraft.server.v1_13_R1.BlockPotatoes;
 import net.minecraft.server.v1_13_R1.Blocks;
 import net.minecraft.server.v1_13_R1.Chunk;
+import net.minecraft.server.v1_13_R1.ContainerAnvil;
 import net.minecraft.server.v1_13_R1.EnchantmentManager;
 import net.minecraft.server.v1_13_R1.Enchantments;
 import net.minecraft.server.v1_13_R1.EntityItem;
@@ -42,6 +43,7 @@ import org.bukkit.craftbukkit.v1_13_R1.entity.CraftItem;
 import org.bukkit.craftbukkit.v1_13_R1.entity.CraftLivingEntity;
 import org.bukkit.craftbukkit.v1_13_R1.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_13_R1.inventory.CraftInventoryPlayer;
+import org.bukkit.craftbukkit.v1_13_R1.inventory.CraftInventoryView;
 import org.bukkit.craftbukkit.v1_13_R1.inventory.CraftItemStack;
 
 import org.bukkit.CropState;
@@ -52,6 +54,7 @@ import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.InventoryView;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -423,6 +426,22 @@ public final class NMSAdapter_v1_13_R1 implements NMSAdapter {
         EntityLiving entityLiving = ((CraftLivingEntity) livingEntity).getHandle();
         EntityItem entityItem = (EntityItem) ((CraftItem) item).getHandle();
         ((WorldServer) entityLiving.world).getTracker().a(entityItem, new PacketPlayOutCollect(entityItem.getId(), entityLiving.getId(), item.getItemStack().getAmount()));
+    }
+
+    @Override
+    public void setExpCost(InventoryView inventoryView, int expCost) {
+        ContainerAnvil container = (ContainerAnvil) ((CraftInventoryView) inventoryView).getHandle();
+        container.levelCost = expCost;
+    }
+
+    @Override
+    public int getExpCost(InventoryView inventoryView) {
+        return ((ContainerAnvil) ((CraftInventoryView) inventoryView).getHandle()).levelCost;
+    }
+
+    @Override
+    public String getRenameText(InventoryView inventoryView) {
+        return ((ContainerAnvil) ((CraftInventoryView) inventoryView).getHandle()).renameText;
     }
 
 }

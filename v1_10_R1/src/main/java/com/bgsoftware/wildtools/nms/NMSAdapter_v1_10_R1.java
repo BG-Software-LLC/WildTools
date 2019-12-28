@@ -10,6 +10,7 @@ import net.minecraft.server.v1_10_R1.BlockPosition;
 import net.minecraft.server.v1_10_R1.BlockPotatoes;
 import net.minecraft.server.v1_10_R1.Blocks;
 import net.minecraft.server.v1_10_R1.Chunk;
+import net.minecraft.server.v1_10_R1.ContainerAnvil;
 import net.minecraft.server.v1_10_R1.EnchantmentManager;
 import net.minecraft.server.v1_10_R1.Enchantments;
 import net.minecraft.server.v1_10_R1.EntityItem;
@@ -39,6 +40,7 @@ import org.bukkit.craftbukkit.v1_10_R1.entity.CraftItem;
 import org.bukkit.craftbukkit.v1_10_R1.entity.CraftLivingEntity;
 import org.bukkit.craftbukkit.v1_10_R1.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_10_R1.inventory.CraftInventoryPlayer;
+import org.bukkit.craftbukkit.v1_10_R1.inventory.CraftInventoryView;
 import org.bukkit.craftbukkit.v1_10_R1.inventory.CraftItemStack;
 
 import org.bukkit.CropState;
@@ -48,10 +50,12 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
+import org.bukkit.inventory.InventoryView;
 import org.bukkit.material.CocoaPlant;
 import org.bukkit.material.Crops;
 import org.bukkit.material.NetherWarts;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -412,6 +416,30 @@ public final class NMSAdapter_v1_10_R1 implements NMSAdapter {
         EntityLiving entityLiving = ((CraftLivingEntity) livingEntity).getHandle();
         EntityItem entityItem = (EntityItem) ((CraftItem) item).getHandle();
         ((WorldServer) entityLiving.world).getTracker().a(entityItem, new PacketPlayOutCollect(entityItem.getId(), entityLiving.getId()));
+    }
+
+    @Override
+    public void setExpCost(InventoryView inventoryView, int expCost) {
+        ContainerAnvil container = (ContainerAnvil) ((CraftInventoryView) inventoryView).getHandle();
+        container.a = expCost;
+    }
+
+    @Override
+    public int getExpCost(InventoryView inventoryView) {
+        return ((ContainerAnvil) ((CraftInventoryView) inventoryView).getHandle()).a;
+    }
+
+    @Override
+    public String getRenameText(InventoryView inventoryView) {
+        ContainerAnvil containerAnvil = (ContainerAnvil) ((CraftInventoryView) inventoryView).getHandle();
+        try{
+            Field renameText = ContainerAnvil.class.getDeclaredField("l");
+            renameText.setAccessible(true);
+            return (String) renameText.get(containerAnvil);
+        }catch(Exception ex){
+            ex.printStackTrace();
+            return "";
+        }
     }
 
 }

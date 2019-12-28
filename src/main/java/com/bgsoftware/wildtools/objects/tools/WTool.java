@@ -47,6 +47,7 @@ public abstract class WTool implements Tool {
     private boolean onlySameType, onlyInsideClaim, unbreakable, autoCollect, instantBreak, silkTouch, keepInventory, omni, privateTool;
     private long cooldown;
     private double multiplier;
+    private int anvilCombineExp, anvilCombineLimit;
 
     private Set<String> blacklistedMaterials, whitelistedMaterials, blacklistedDrops, whitelistedDrops;
 
@@ -71,6 +72,7 @@ public abstract class WTool implements Tool {
         this.whitelistedDrops = new HashSet<>();
         this.lastUses = new HashMap<>();
         this.multiplier = 1;
+        this.anvilCombineExp = -1;
         toolBlockBreak = new HashSet<>();
     }
 
@@ -189,6 +191,16 @@ public abstract class WTool implements Tool {
         this.multiplier = multiplier;
     }
 
+    @Override
+    public void setAnvilCombineExp(int anvilCombineExp) {
+        this.anvilCombineExp = anvilCombineExp;
+    }
+
+    @Override
+    public void setAnvilCombineLimit(int anvilCombineLimit) {
+        this.anvilCombineLimit = anvilCombineLimit;
+    }
+
     /***********************************************************************************/
 
     @Override
@@ -283,6 +295,16 @@ public abstract class WTool implements Tool {
     }
 
     @Override
+    public boolean isAnvilCombine() {
+        return anvilCombineExp > 0;
+    }
+
+    @Override
+    public boolean hasAnvilCombineLimit() {
+        return anvilCombineLimit > 0;
+    }
+
+    @Override
     public Set<String> getBlacklistedMaterials() {
         return new HashSet<>(blacklistedMaterials);
     }
@@ -345,6 +367,16 @@ public abstract class WTool implements Tool {
     @Override
     public double getMultiplier() {
         return multiplier;
+    }
+
+    @Override
+    public int getAnvilCombineExp() {
+        return anvilCombineExp;
+    }
+
+    @Override
+    public int getAnvilCombineLimit() {
+        return anvilCombineLimit;
     }
 
     /***********************************************************************************/

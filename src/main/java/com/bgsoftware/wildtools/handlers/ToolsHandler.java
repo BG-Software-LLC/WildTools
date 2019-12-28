@@ -124,6 +124,9 @@ public final class ToolsHandler implements ToolsManager {
 
     @Override
     public Tool getTool(ItemStack itemStack){
+        if(itemStack == null)
+            return null;
+
         for(Tool tool : tools)
             if (tool.isSimilar(itemStack))
                 return tool;
@@ -204,7 +207,7 @@ public final class ToolsHandler implements ToolsManager {
         try{
             Field field = ToolsHandler.class.getDeclaredField("tools");
             field.setAccessible(true);
-            ((HashSet<Tool>) field.get(WildToolsPlugin.getPlugin().getToolsManager())).clear();
+            ((List<Tool>) field.get(WildToolsPlugin.getPlugin().getToolsManager())).clear();
         }catch(Exception ex){
             ex.printStackTrace();
         }

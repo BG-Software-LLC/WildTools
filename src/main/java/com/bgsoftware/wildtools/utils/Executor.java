@@ -11,6 +11,10 @@ public final class Executor {
     private static java.util.concurrent.Executor executor = Executors.newFixedThreadPool(2, new ThreadFactoryBuilder().setNameFormat("WildTools Thread - %d").build());
     private static WildToolsPlugin plugin = WildToolsPlugin.getPlugin();
 
+    public static void sync(Runnable runnable, long delay){
+        Bukkit.getScheduler().runTaskLater(plugin, runnable, delay);
+    }
+
     public static void sync(Runnable runnable){
         if(!Bukkit.isPrimaryThread()){
             Bukkit.getScheduler().runTask(plugin, runnable);

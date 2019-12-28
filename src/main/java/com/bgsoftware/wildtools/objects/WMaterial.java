@@ -15,7 +15,8 @@ public enum WMaterial {
     REDSTONE_TORCH("REDSTONE_TORCH_ON"),
     IRON_BARS("IRON_FENCE"),
     CRAFTING_TABLE("WORKBENCH"),
-    CAULDRON("CAULDRON_ITEM");
+    CAULDRON("CAULDRON_ITEM"),
+    EXPERIENCE_BOTTLE("EXP_BOTTLE");
 
     private static final boolean isLegacy = WildToolsPlugin.getPlugin().getNMSAdapter().isLegacy();
     private final String legacy;

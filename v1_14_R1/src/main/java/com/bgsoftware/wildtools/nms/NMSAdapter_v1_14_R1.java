@@ -5,6 +5,7 @@ import net.minecraft.server.v1_14_R1.Block;
 import net.minecraft.server.v1_14_R1.BlockPosition;
 import net.minecraft.server.v1_14_R1.Blocks;
 import net.minecraft.server.v1_14_R1.Chunk;
+import net.minecraft.server.v1_14_R1.ContainerAnvil;
 import net.minecraft.server.v1_14_R1.EntityItem;
 import net.minecraft.server.v1_14_R1.EntityLiving;
 import net.minecraft.server.v1_14_R1.EntityPlayer;
@@ -33,6 +34,7 @@ import org.bukkit.craftbukkit.v1_14_R1.entity.CraftItem;
 import org.bukkit.craftbukkit.v1_14_R1.entity.CraftLivingEntity;
 import org.bukkit.craftbukkit.v1_14_R1.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_14_R1.inventory.CraftInventoryPlayer;
+import org.bukkit.craftbukkit.v1_14_R1.inventory.CraftInventoryView;
 import org.bukkit.craftbukkit.v1_14_R1.inventory.CraftItemStack;
 import org.bukkit.craftbukkit.v1_14_R1.util.CraftMagicNumbers;
 import org.bukkit.enchantments.Enchantment;
@@ -41,6 +43,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.Recipe;
 import org.bukkit.inventory.RecipeChoice;
 import org.bukkit.inventory.ShapedRecipe;
@@ -353,6 +356,22 @@ public final class NMSAdapter_v1_14_R1 implements NMSAdapter {
         }
 
         return ingredients.toArray(new org.bukkit.inventory.ItemStack[0]);
+    }
+
+    @Override
+    public void setExpCost(InventoryView inventoryView, int expCost) {
+        ContainerAnvil container = (ContainerAnvil) ((CraftInventoryView) inventoryView).getHandle();
+        container.levelCost.set(expCost);
+    }
+
+    @Override
+    public int getExpCost(InventoryView inventoryView) {
+        return ((ContainerAnvil) ((CraftInventoryView) inventoryView).getHandle()).levelCost.get();
+    }
+
+    @Override
+    public String getRenameText(InventoryView inventoryView) {
+        return ((ContainerAnvil) ((CraftInventoryView) inventoryView).getHandle()).renameText;
     }
 
 }

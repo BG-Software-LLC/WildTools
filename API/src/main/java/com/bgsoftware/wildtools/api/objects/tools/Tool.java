@@ -55,6 +55,10 @@ public interface Tool {
 
     void setMultiplier(double multiplier);
 
+    void setAnvilCombineExp(int anvilCombineExp);
+
+    void setAnvilCombineLimit(int anvilCombineMax);
+
     ItemStack getItemStack();
 
     ItemStack getFormattedItemStack();
@@ -89,6 +93,10 @@ public interface Tool {
 
     boolean isPrivate();
 
+    boolean isAnvilCombine();
+
+    boolean hasAnvilCombineLimit();
+
     Set<String> getBlacklistedMaterials();
 
     Set<String> getWhitelistedMaterials();
@@ -114,6 +122,10 @@ public interface Tool {
     boolean isWhitelistedDrop(Material type, short data);
 
     double getMultiplier();
+
+    int getAnvilCombineExp();
+
+    int getAnvilCombineLimit();
 
     void reduceDurablility(Player pl, int amount, UUID taskId);
 

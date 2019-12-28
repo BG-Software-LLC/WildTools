@@ -10,6 +10,7 @@ import net.minecraft.server.v1_12_R1.BlockPosition;
 import net.minecraft.server.v1_12_R1.BlockPotatoes;
 import net.minecraft.server.v1_12_R1.Blocks;
 import net.minecraft.server.v1_12_R1.Chunk;
+import net.minecraft.server.v1_12_R1.ContainerAnvil;
 import net.minecraft.server.v1_12_R1.EnchantmentManager;
 import net.minecraft.server.v1_12_R1.Enchantments;
 import net.minecraft.server.v1_12_R1.EntityItem;
@@ -26,13 +27,8 @@ import net.minecraft.server.v1_12_R1.PlayerInventory;
 import net.minecraft.server.v1_12_R1.TileEntityShulkerBox;
 import net.minecraft.server.v1_12_R1.World;
 import net.minecraft.server.v1_12_R1.NBTTagCompound;
-
 import net.minecraft.server.v1_12_R1.WorldServer;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.NetherWartsState;
-import org.bukkit.WorldBorder;
+
 import org.bukkit.craftbukkit.v1_12_R1.CraftChunk;
 import org.bukkit.craftbukkit.v1_12_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_12_R1.block.CraftBlock;
@@ -40,15 +36,21 @@ import org.bukkit.craftbukkit.v1_12_R1.entity.CraftItem;
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftLivingEntity;
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftInventoryPlayer;
+import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftInventoryView;
 import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack;
 
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.NetherWartsState;
+import org.bukkit.WorldBorder;
 import org.bukkit.CropState;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-
+import org.bukkit.inventory.InventoryView;
 import org.bukkit.material.CocoaPlant;
 import org.bukkit.material.Crops;
 import org.bukkit.material.NetherWarts;
@@ -441,4 +443,19 @@ public final class NMSAdapter_v1_12_R1 implements NMSAdapter {
         ((WorldServer) entityLiving.world).getTracker().a(entityItem, new PacketPlayOutCollect(entityItem.getId(), entityLiving.getId(), item.getItemStack().getAmount()));
     }
 
+    @Override
+    public void setExpCost(InventoryView inventoryView, int expCost) {
+        ContainerAnvil container = (ContainerAnvil) ((CraftInventoryView) inventoryView).getHandle();
+        container.levelCost = expCost;
+    }
+
+    @Override
+    public int getExpCost(InventoryView inventoryView) {
+        return ((ContainerAnvil) ((CraftInventoryView) inventoryView).getHandle()).levelCost;
+    }
+
+    @Override
+    public String getRenameText(InventoryView inventoryView) {
+        return ((ContainerAnvil) ((CraftInventoryView) inventoryView).getHandle()).renameText;
+    }
 }
