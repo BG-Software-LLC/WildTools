@@ -7,7 +7,6 @@ import org.bukkit.Location;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -17,7 +16,7 @@ public final class BlocksController {
 
     private static final WildToolsPlugin plugin = WildToolsPlugin.getPlugin();
 
-    private final Map<CachedChunk, Set<Location>> cachedChunks = new HashMap<>();
+    private final Map<CachedChunk, Map<Location, Integer>> cachedChunks = new HashMap<>();
     private final List<Location> affectedBlocks = new ArrayList<>();
 
     private Location blockToUpdate = null;
@@ -33,9 +32,8 @@ public final class BlocksController {
             combinedId = blockId;
         }
 
-        plugin.getNMSAdapter().setBlockFast(location, blockId);
         affectedBlocks.add(location);
-        cachedChunks.computeIfAbsent(new CachedChunk(location), map -> new HashSet<>()).add(location);
+        cachedChunks.computeIfAbsent(new CachedChunk(location), map -> new HashMap<>()).put(location, blockId);
     }
 
     public void setType(Location target, Location block){
@@ -48,8 +46,12 @@ public final class BlocksController {
 
     public void updateSession(){
         //Refreshing chunks
-        for(Map.Entry<CachedChunk, Set<Location>> entry : cachedChunks.entrySet())
-            plugin.getNMSAdapter().refreshChunk(entry.getKey().buildChunk(), entry.getValue());
+        for(Map.Entry<CachedChunk, Map<Location, Integer>> entry : cachedChunks.entrySet()) {
+            Set<Location> locations = entry.getValue().keySet();
+            for(Map.Entry<Location, Integer> blockEntry : entry.getValue().entrySet())
+                plugin.getNMSAdapter().setBlockFast(blockEntry.getKey(), blockEntry.getValue());
+            plugin.getNMSAdapter().refreshChunk(entry.getKey().buildChunk(), locations);
+        }
 
         //Method to recalculate light
         if(blockToUpdate != null && combinedId != 0) {
