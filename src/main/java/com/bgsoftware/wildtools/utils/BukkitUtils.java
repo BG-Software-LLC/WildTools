@@ -57,7 +57,7 @@ public final class BukkitUtils {
         List<ItemStack> drops = new ArrayList<>();
 
         if(onItemDrop != null)
-            drops.addAll(getBlockDrops(player, block));
+            drops.addAll(getBlockDrops(player, block, tool));
 
         if(onBlockBreak != null)
             onBlockBreak.accept(block);
@@ -77,7 +77,7 @@ public final class BukkitUtils {
             CoreProtectHook.recordBlockChange(player, block);
     }
 
-    public static List<ItemStack> getBlockDrops(Player player, Block block){
+    public static List<ItemStack> getBlockDrops(Player player, Block block, Tool tool){
         if(!Boolean.parseBoolean(block.getWorld().getGameRuleValue("doTileDrops")))
             return new ArrayList<>();
 
@@ -87,13 +87,7 @@ public final class BukkitUtils {
             return plugin.getNMSAdapter().getCropDrops(player, block);
         }
 
-        boolean silkTouch = false;
-
-        Tool tool;
-        if((tool = plugin.getToolsManager().getTool(plugin.getNMSAdapter().getItemInHand(player))) != null)
-            silkTouch = tool.hasSilkTouch();
-
-        return plugin.getNMSAdapter().getBlockDrops(player, block, silkTouch);
+        return plugin.getNMSAdapter().getBlockDrops(player, block, tool.hasSilkTouch());
     }
 
 }

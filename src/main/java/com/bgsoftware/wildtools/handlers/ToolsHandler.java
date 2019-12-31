@@ -41,7 +41,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -126,6 +125,12 @@ public final class ToolsHandler implements ToolsManager {
     public Tool getTool(ItemStack itemStack){
         if(itemStack == null)
             return null;
+
+        String toolName = plugin.getNMSAdapter().getTag(itemStack, "tool-type", "");
+        Tool toolByName = getTool(toolName);
+
+        if(toolByName != null)
+            return toolByName;
 
         for(Tool tool : tools)
             if (tool.isSimilar(itemStack))

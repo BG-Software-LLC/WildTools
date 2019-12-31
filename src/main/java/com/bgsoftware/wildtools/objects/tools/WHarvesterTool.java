@@ -284,7 +284,7 @@ public final class WHarvesterTool extends WTool implements HarvesterTool {
             if(block.getType().name().contains("FLOWER"))
                 drops.add(new ItemStack(Material.matchMaterial("CHORUS_FLOWER")));
             else
-                drops.addAll(BukkitUtils.getBlockDrops(player, block));
+                drops.addAll(BukkitUtils.getBlockDrops(player, block, this));
 
             drops = filterDrops(drops);
 
