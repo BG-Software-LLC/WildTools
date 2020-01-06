@@ -73,11 +73,14 @@ public final class WMagnetTool extends WTool implements MagnetTool {
                 }
                 else{
                     ItemStack additionalItem = additionalItems.get(0);
-                    if(additionalItem.getAmount() < item.getItemStack().getAmount()) {
-                        affectedItems.add(item);
-                        item.setItemStack(additionalItem);
-                        reduceDurability = true;
+                    affectedItems.add(item);
+                    if(Bukkit.getPluginManager().isPluginEnabled("WildStacker")){
+                        WildStackerHook.setItemStack(item, additionalItem);
                     }
+                    else {
+                        item.setItemStack(additionalItem);
+                    }
+                    reduceDurability = true;
                 }
             }
 

@@ -10,4 +10,8 @@ public final class WildStackerHook {
         return WildStackerAPI.getStackedItem(item).getItemStack();
     }
 
+    public static void setItemStack(Item item, ItemStack itemStack){
+        WildStackerAPI.getStackedItem(item).setStackAmount(itemStack.getAmount(), true);
+    }
+
 }
