@@ -57,7 +57,7 @@ public final class WMagnetTool extends WTool implements MagnetTool {
             List<Item> affectedItems = new ArrayList<>();
 
             for(Item item : nearbyItems) {
-                if (!item.isValid() || item.isDead())
+                if (!item.isValid() || item.isDead() || !plugin.getProviders().canPickupItem(player, item))
                     continue;
 
                 ItemStack itemStack = Bukkit.getPluginManager().isPluginEnabled("WildStacker") ?

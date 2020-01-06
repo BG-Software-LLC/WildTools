@@ -6,6 +6,7 @@ import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
 import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
 import org.bukkit.block.Sign;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.InventoryHolder;
 
@@ -32,5 +33,11 @@ public final class BlocksProvider_SuperiorSkyblock implements BlocksProvider {
         if(onlyInClaim && island == null) return false;
 
         return island == null || (island.isInsideRange(block.getLocation()) && island.hasPermission(SuperiorSkyblockAPI.getPlayer(player), islandPermission));
+    }
+
+    @Override
+    public boolean canPickupItem(Player player, Item item) {
+        Island island = SuperiorSkyblockAPI.getIslandAt(item.getLocation());
+        return island == null || island.hasPermission(SuperiorSkyblockAPI.getPlayer(player), IslandPermission.PICKUP_DROPS);
     }
 }

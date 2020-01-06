@@ -30,6 +30,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.CreatureSpawner;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -163,6 +164,14 @@ public final class ProvidersHandler {
 
         for(BlocksProvider blocksProvider : blocksProviders) {
             if (!blocksProvider.canInteract(player, block, tool.isOnlyInsideClaim()))
+                return false;
+        }
+        return true;
+    }
+
+    public boolean canPickupItem(Player player, Item item){
+        for(BlocksProvider blocksProvider : blocksProviders) {
+            if (!blocksProvider.canPickupItem(player, item))
                 return false;
         }
         return true;
