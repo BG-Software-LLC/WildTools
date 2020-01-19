@@ -1,5 +1,6 @@
 package com.bgsoftware.wildtools.objects.tools;
 
+import com.bgsoftware.wildtools.api.events.CrowbarWandUseEvent;
 import com.bgsoftware.wildtools.api.objects.ToolMode;
 import com.bgsoftware.wildtools.api.objects.tools.CrowbarTool;
 import com.bgsoftware.wildtools.utils.BukkitUtils;
@@ -48,6 +49,9 @@ public final class WCrowbarTool extends WTool implements CrowbarTool {
             ItemUtils.addItem(dropItem, e.getPlayer().getInventory(), e.getClickedBlock().getLocation());
         else
             e.getClickedBlock().getWorld().dropItemNaturally(e.getClickedBlock().getLocation(), dropItem);
+
+        CrowbarWandUseEvent crowbarWandUseEvent = new CrowbarWandUseEvent(e.getPlayer(), this, e.getClickedBlock());
+        Bukkit.getPluginManager().callEvent(crowbarWandUseEvent);
 
         reduceDurablility(e.getPlayer(), 1, taskId);
 
