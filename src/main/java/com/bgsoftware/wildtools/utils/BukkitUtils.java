@@ -1,6 +1,7 @@
 package com.bgsoftware.wildtools.utils;
 
 import com.bgsoftware.wildtools.hooks.CoreProtectHook;
+import com.bgsoftware.wildtools.hooks.WildStackerHook;
 import com.bgsoftware.wildtools.utils.blocks.BlocksController;
 import com.bgsoftware.wildtools.utils.items.ItemUtils;
 import org.bukkit.Bukkit;
@@ -56,11 +57,17 @@ public final class BukkitUtils {
     public static void breakNaturally(Player player, Block block, Tool tool, Consumer<Block> onBlockBreak, Consumer<ItemStack> onItemDrop){
         List<ItemStack> drops = new ArrayList<>();
 
-        if(onItemDrop != null)
+        if(onItemDrop != null) {
             drops.addAll(getBlockDrops(player, block, tool));
+        }
 
-        if(onBlockBreak != null)
+        if(block.getType().name().endsWith("SPAWNER") && Bukkit.getPluginManager().isPluginEnabled("WildStacker")) {
+            WildStackerHook.removeSpawner(block);
+        }
+
+        else if(onBlockBreak != null) {
             onBlockBreak.accept(block);
+        }
 
         if(!drops.isEmpty()) {
             if (tool != null)

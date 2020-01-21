@@ -35,15 +35,12 @@ public final class WCrowbarTool extends WTool implements CrowbarTool {
 
         ItemStack dropItem = plugin.getProviders().getItem(creatureSpawner);
 
+        BukkitUtils.breakNaturally(e.getPlayer(), e.getClickedBlock(), this, null, null);
+        e.getClickedBlock().setType(Material.AIR);
+
         //We're telling all the other plugins that the block was broken.
         BlockBreakEvent blockBreakEvent = new BlockBreakEvent(e.getClickedBlock(), e.getPlayer());
         Bukkit.getPluginManager().callEvent(blockBreakEvent);
-
-        if(blockBreakEvent.isCancelled())
-            return true;
-
-        BukkitUtils.breakNaturally(e.getPlayer(), e.getClickedBlock(), this, null, null);
-        e.getClickedBlock().setType(Material.AIR);
 
         if (isAutoCollect())
             ItemUtils.addItem(dropItem, e.getPlayer().getInventory(), e.getClickedBlock().getLocation());
