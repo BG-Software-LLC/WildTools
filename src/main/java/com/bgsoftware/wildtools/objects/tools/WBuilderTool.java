@@ -44,6 +44,9 @@ public final class WBuilderTool extends WTool implements BuilderTool {
 
     @Override
     public boolean onBlockInteract(PlayerInteractEvent e) {
+        if(!e.getClickedBlock().getType().isSolid())
+            return false;
+
         UUID taskId = ToolTaskManager.generateTaskId(e.getItem(), e.getPlayer().getInventory());
         BlockFace blockFace = e.getBlockFace();
 
