@@ -1,5 +1,6 @@
 package com.bgsoftware.wildtools.nms;
 
+import com.bgsoftware.wildtools.hooks.PaperHook;
 import com.bgsoftware.wildtools.objects.WMaterial;
 import net.minecraft.server.v1_13_R2.Block;
 import net.minecraft.server.v1_13_R2.BlockBeetroot;
@@ -17,6 +18,7 @@ import net.minecraft.server.v1_13_R2.Enchantments;
 import net.minecraft.server.v1_13_R2.EntityItem;
 import net.minecraft.server.v1_13_R2.EntityLiving;
 import net.minecraft.server.v1_13_R2.EntityPlayer;
+import net.minecraft.server.v1_13_R2.EnumDirection;
 import net.minecraft.server.v1_13_R2.IBlockData;
 import net.minecraft.server.v1_13_R2.Item;
 import net.minecraft.server.v1_13_R2.ItemStack;
@@ -319,10 +321,13 @@ public final class NMSAdapter_v1_13_R2 implements NMSAdapter {
     }
 
     @Override
-    public void setBlockFast(Location location, int combinedId) {
+    public void setBlockFast(Player player, Location location, int combinedId) {
         World world = ((CraftWorld) location.getWorld()).getHandle();
         Chunk chunk = world.getChunkAt(location.getChunk().getX(), location.getChunk().getZ());
-        chunk.setType(new BlockPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ()), Block.getByCombinedId(combinedId), false);
+        BlockPosition blockPosition = new BlockPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ());
+        chunk.setType(blockPosition, Block.getByCombinedId(combinedId), false);
+        if(PaperHook.isAntiXRayAvailable())
+            PaperHook.handleLeftClickBlockMethod(world, ((CraftPlayer) player).getHandle().playerInteractManager, blockPosition, EnumDirection.NORTH);
     }
 
     @Override

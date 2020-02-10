@@ -49,7 +49,7 @@ public interface NMSAdapter {
 
     Collection<Player> getOnlinePlayers();
 
-    void setBlockFast(Location location, int combinedId);
+    void setBlockFast(Player player, Location location, int combinedId);
 
     void refreshChunk(Chunk chunk, Set<Location> blocksList);
 

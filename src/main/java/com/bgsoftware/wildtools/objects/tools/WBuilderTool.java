@@ -62,7 +62,7 @@ public final class WBuilderTool extends WTool implements BuilderTool {
         Material firstType = e.getClickedBlock().getType();
         short firstData = e.getClickedBlock().getState().getData().toItemStack().getDurability();
 
-        BlocksController blocksController = new BlocksController();
+        BlocksController blocksController = new BlocksController(e.getPlayer());
         boolean usingDurability = isUsingDurability();
         int toolIterations = Math.min(usingDurability ? getDurability(e.getPlayer(), taskId) : length, Math.min(amountOfBlocks, length));
         int iter;

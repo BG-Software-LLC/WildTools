@@ -39,7 +39,7 @@ public final class WCuboidTool extends WTool implements CuboidTool {
         Material firstType = e.getBlock().getType();
         short firstData = e.getBlock().getState().getData().toItemStack().getDurability();
 
-        BlocksController blocksController = new BlocksController();
+        BlocksController blocksController = new BlocksController(e.getPlayer());
         int toolDurability = getDurability(e.getPlayer(), taskId);
         boolean usingDurability = isUsingDurability();
         int toolUsages = 0;
