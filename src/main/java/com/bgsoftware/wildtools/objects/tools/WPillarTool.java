@@ -31,7 +31,7 @@ public final class WPillarTool extends WTool implements PillarTool {
         Material firstType = e.getClickedBlock().getType();
         short firstData = e.getClickedBlock().getState().getData().toItemStack().getDurability();
 
-        BlocksController blocksController = new BlocksController(e.getPlayer());
+        BlocksController blocksController = new BlocksController();
         int toolDurability = getDurability(e.getPlayer(), taskId);
         boolean usingDurability = isUsingDurability();
         int toolUsages = 0;

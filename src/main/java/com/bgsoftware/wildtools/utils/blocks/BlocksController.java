@@ -4,7 +4,6 @@ import com.bgsoftware.wildtools.WildToolsPlugin;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
-import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -19,14 +18,9 @@ public final class BlocksController {
 
     private final Map<CachedChunk, Map<Location, Integer>> cachedChunks = new HashMap<>();
     private final List<Location> affectedBlocks = new ArrayList<>();
-    private final Player asker;
 
     private Location blockToUpdate = null;
     private int combinedId = 0;
-
-    public BlocksController(Player asker){
-        this.asker = asker;
-    }
 
     public void setAir(Location location){
         setType(location, 0);
@@ -55,7 +49,7 @@ public final class BlocksController {
         for(Map.Entry<CachedChunk, Map<Location, Integer>> entry : cachedChunks.entrySet()) {
             Set<Location> locations = entry.getValue().keySet();
             for(Map.Entry<Location, Integer> blockEntry : entry.getValue().entrySet())
-                plugin.getNMSAdapter().setBlockFast(asker, blockEntry.getKey(), blockEntry.getValue());
+                plugin.getNMSAdapter().setBlockFast(blockEntry.getKey(), blockEntry.getValue());
             plugin.getNMSAdapter().refreshChunk(entry.getKey().buildChunk(), locations);
         }
 
@@ -63,8 +57,6 @@ public final class BlocksController {
         if(blockToUpdate != null && combinedId != 0) {
             Location toUpdate = blockToUpdate;
             plugin.getNMSAdapter().setCombinedId(toUpdate, combinedId);
-
-            //this.world.chunkPacketBlockController.onPlayerLeftClickBlock(this, blockposition, enumdirection);
         }
 
         //Defaults

@@ -149,7 +149,7 @@ public final class WHarvesterTool extends WTool implements HarvesterTool {
         Location absoluteMin = new Location(farmlandMin.getWorld(), Math.min(farmlandMin.getBlockX(), cropsMin.getBlockX()),
                 Math.min(farmlandMin.getBlockY(), cropsMin.getBlockY()), Math.min(farmlandMin.getBlockZ(), cropsMin.getBlockZ()));
 
-        BlocksController blocksController = new BlocksController(player);
+        BlocksController blocksController = new BlocksController();
         List<ItemStack> toSell = new ArrayList<>();
         ChangeableDouble _totalPrice = new ChangeableDouble();
 

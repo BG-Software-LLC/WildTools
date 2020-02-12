@@ -45,7 +45,7 @@ public final class WDrainTool extends WTool implements DrainTool {
 
         UUID taskId = ToolTaskManager.generateTaskId(usedItem, player.getInventory());
 
-        BlocksController blocksController = new BlocksController(player);
+        BlocksController blocksController = new BlocksController();
         int toolDurability = getDurability(player, taskId);
         boolean usingDurability = isUsingDurability();
         int toolUsages = 0;

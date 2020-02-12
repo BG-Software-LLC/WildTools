@@ -15,19 +15,18 @@ public final class PaperHook {
     public static void init(){
         try{
             Class<?> worldClass = getNMSClass("World"),
-                    interactManagerClass = getNMSClass("PlayerInteractManager"),
                     blockPositionClass = getNMSClass("BlockPosition"),
-                    enumDirectionClass = getNMSClass("EnumDirection"),
                     antiXRayClass = Class.forName("com.destroystokyo.paper.antixray.ChunkPacketBlockControllerAntiXray");
 
             blockControllerField = worldClass.getDeclaredField("chunkPacketBlockController");
-            leftClickBlockMethod = antiXRayClass.getMethod("onPlayerLeftClickBlock", interactManagerClass, blockPositionClass, enumDirectionClass);
+            leftClickBlockMethod = antiXRayClass.getDeclaredMethod("updateNearbyBlocks", worldClass, blockPositionClass);
+            leftClickBlockMethod.setAccessible(true);
         }catch(Throwable ignored){}
     }
 
-    public static void handleLeftClickBlockMethod(Object world, Object playerInteractManager, Object blockPosition, Object enumDirection){
+    public static void handleLeftClickBlockMethod(Object world, Object blockPosition){
         try {
-            leftClickBlockMethod.invoke(blockControllerField.get(world), playerInteractManager, blockPosition, enumDirection);
+            leftClickBlockMethod.invoke(blockControllerField.get(world), world, blockPosition);
         }catch(Throwable ignored){}
     }
 

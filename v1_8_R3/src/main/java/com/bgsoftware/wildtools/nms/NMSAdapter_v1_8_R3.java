@@ -15,7 +15,6 @@ import net.minecraft.server.v1_8_R3.EntityItem;
 import net.minecraft.server.v1_8_R3.EntityLiving;
 import net.minecraft.server.v1_8_R3.EntityPlayer;
 import net.minecraft.server.v1_8_R3.EnumColor;
-import net.minecraft.server.v1_8_R3.EnumDirection;
 import net.minecraft.server.v1_8_R3.IBlockData;
 import net.minecraft.server.v1_8_R3.Item;
 import net.minecraft.server.v1_8_R3.ItemStack;
@@ -296,13 +295,13 @@ public final class NMSAdapter_v1_8_R3 implements NMSAdapter {
     }
 
     @Override
-    public void setBlockFast(Player player, Location location, int combinedId) {
+    public void setBlockFast(Location location, int combinedId) {
         World world = ((CraftWorld) location.getWorld()).getHandle();
         Chunk chunk = world.getChunkAt(location.getChunk().getX(), location.getChunk().getZ());
         BlockPosition blockPosition = new BlockPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ());
         chunk.a(blockPosition, Block.getByCombinedId(combinedId));
         if(PaperHook.isAntiXRayAvailable())
-            PaperHook.handleLeftClickBlockMethod(world, ((CraftPlayer) player).getHandle().playerInteractManager, blockPosition, EnumDirection.NORTH);
+            PaperHook.handleLeftClickBlockMethod(world, blockPosition);
     }
 
     @Override
