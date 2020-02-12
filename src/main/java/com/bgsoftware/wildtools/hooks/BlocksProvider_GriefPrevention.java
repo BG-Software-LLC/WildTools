@@ -15,6 +15,6 @@ public final class BlocksProvider_GriefPrevention implements BlocksProvider {
         PlayerData playerData = dataStore.getPlayerData(player.getUniqueId());
         Claim claim = dataStore.getClaimAt(block.getLocation(), false, playerData.lastClaim);
         if(onlyInClaim && claim == null) return false;
-        return claim == null || playerData.ignoreClaims || playerData.getClaims().contains(claim);
+        return claim == null || playerData.ignoreClaims || claim.allowAccess(player) == null;
     }
 }
