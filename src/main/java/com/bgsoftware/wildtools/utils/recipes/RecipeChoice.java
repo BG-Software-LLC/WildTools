@@ -15,6 +15,8 @@ public interface RecipeChoice extends Predicate<ItemStack> {
     @Override
     boolean test(ItemStack itemStack);
 
+    boolean test(String material);
+
     void setAmount(int amount);
 
     int getAmount();
@@ -36,6 +38,11 @@ public interface RecipeChoice extends Predicate<ItemStack> {
         @Override
         public boolean test(ItemStack itemStack) {
             return itemStacks.stream().anyMatch(_itemStack -> _itemStack.isSimilar(itemStack));
+        }
+
+        @Override
+        public boolean test(String material) {
+            return itemStacks.stream().anyMatch(_itemStack -> _itemStack.getType().name().contains(material));
         }
 
         @Override
@@ -88,6 +95,11 @@ public interface RecipeChoice extends Predicate<ItemStack> {
         @Override
         public boolean test(ItemStack itemStack) {
             return this.itemStack.isSimilar(itemStack);
+        }
+
+        @Override
+        public boolean test(String material) {
+            return this.itemStack.getType().name().contains(material);
         }
 
         @Override
