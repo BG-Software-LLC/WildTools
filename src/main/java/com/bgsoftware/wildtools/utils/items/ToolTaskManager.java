@@ -1,19 +1,19 @@
 package com.bgsoftware.wildtools.utils.items;
 
 import com.bgsoftware.wildtools.WildToolsPlugin;
+import com.google.common.collect.Maps;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
 public final class ToolTaskManager {
 
     private static final WildToolsPlugin plugin = WildToolsPlugin.getPlugin();
-    private static final Map<UUID, Object> runningTasks = new HashMap<>();
+    private static final Map<UUID, Object> runningTasks = Maps.newConcurrentMap();
 
     public static UUID generateTaskId(ItemStack itemStack, Player player){
         UUID generatedTaskId;
