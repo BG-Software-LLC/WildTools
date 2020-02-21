@@ -383,7 +383,7 @@ public abstract class WTool implements Tool {
 
     @Override
     public void reduceDurablility(Player pl, int amount, UUID taskId) {
-        ItemStack is = ToolTaskManager.getItemFromTask(pl.getInventory(), taskId);
+        ItemStack is = ToolTaskManager.getItemFromTask(taskId);
 
         if(isUnbreakable() || pl.getGameMode() == GameMode.CREATIVE)
             return;
@@ -430,7 +430,7 @@ public abstract class WTool implements Tool {
                         getDefaultUses(),
                         this instanceof HarvesterTool && ((WHarvesterTool) this).hasSellMode(is),
                         () -> {
-                            ToolTaskManager.setItemOfTask(pl, taskId, ITEM_STACK);
+                            ToolTaskManager.setItemOfTask(taskId, ITEM_STACK);
                             if(giveOriginal)
                                 ItemUtils.addItem(originalItem, pl.getInventory(), pl.getLocation());
                         }
@@ -439,7 +439,7 @@ public abstract class WTool implements Tool {
             }
         }
 
-        ToolTaskManager.setItemOfTask(pl, taskId, is);
+        ToolTaskManager.setItemOfTask(taskId, is);
 
         if(giveOriginal)
             ItemUtils.addItem(originalItem, pl.getInventory(), pl.getLocation());
@@ -450,7 +450,7 @@ public abstract class WTool implements Tool {
         if(isUnbreakable() || player.getGameMode() == GameMode.CREATIVE)
             return Integer.MAX_VALUE;
 
-        ItemStack is = ToolTaskManager.getItemFromTask(player.getInventory(), taskId);
+        ItemStack is = ToolTaskManager.getItemFromTask(taskId);
 
         return isUsingDurability() ? is.getType().getMaxDurability() - is.getDurability() + 1 : plugin.getNMSAdapter().getTag(is, "tool-uses", getDefaultUses());
     }

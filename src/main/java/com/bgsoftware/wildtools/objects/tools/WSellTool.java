@@ -46,7 +46,7 @@ public final class WSellTool extends WTool implements SellTool {
 
         Chest chest = (Chest) e.getClickedBlock().getState();
         Inventory inventory = ((InventoryHolder) e.getClickedBlock().getState()).getInventory();
-        UUID taskId = ToolTaskManager.generateTaskId(e.getItem(), e.getPlayer().getInventory());
+        UUID taskId = ToolTaskManager.generateTaskId(e.getItem(), e.getPlayer());
 
         Executor.async(() -> {
             synchronized (getToolMutex(e.getClickedBlock())) {

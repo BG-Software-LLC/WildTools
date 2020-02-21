@@ -47,7 +47,7 @@ public final class WBuilderTool extends WTool implements BuilderTool {
         if(!e.getClickedBlock().getType().isSolid())
             return false;
 
-        UUID taskId = ToolTaskManager.generateTaskId(e.getItem(), e.getPlayer().getInventory());
+        UUID taskId = ToolTaskManager.generateTaskId(e.getItem(), e.getPlayer());
         BlockFace blockFace = e.getBlockFace();
 
         ItemStack blockItemStack;

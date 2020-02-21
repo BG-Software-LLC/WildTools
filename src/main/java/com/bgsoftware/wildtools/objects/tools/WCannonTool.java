@@ -69,7 +69,7 @@ public final class WCannonTool extends WTool implements CannonTool {
             return false;
         }
 
-        UUID taskId = ToolTaskManager.generateTaskId(e.getItem(), e.getPlayer().getInventory());
+        UUID taskId = ToolTaskManager.generateTaskId(e.getItem(), e.getPlayer());
 
         List<Dispenser> dispenserList = selection.getDispensers(this);
 

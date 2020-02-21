@@ -42,7 +42,7 @@ public final class WSortTool extends WTool implements SortTool {
             return false;
         }
 
-        UUID taskId = ToolTaskManager.generateTaskId(e.getItem(), e.getPlayer().getInventory());
+        UUID taskId = ToolTaskManager.generateTaskId(e.getItem(), e.getPlayer());
 
         Chest chest = (Chest) e.getClickedBlock().getState();
         Inventory chestInventory = ((InventoryHolder) e.getClickedBlock().getState()).getInventory();

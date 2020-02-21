@@ -49,7 +49,7 @@ public final class WMagnetTool extends WTool implements MagnetTool {
         List<Item> nearbyItems = player.getNearbyEntities(radius, radius, radius).stream()
                 .filter(entity -> entity instanceof Item).map(entity -> (Item) entity).collect(Collectors.toList());
 
-        UUID taskId = ToolTaskManager.generateTaskId(usedItem, player.getInventory());
+        UUID taskId = ToolTaskManager.generateTaskId(usedItem, player);
 
         Executor.async(() -> {
             boolean reduceDurability = false;

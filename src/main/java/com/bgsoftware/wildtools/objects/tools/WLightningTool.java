@@ -53,7 +53,7 @@ public final class WLightningTool extends WTool implements LightningTool {
     private void handleUse(Player player, ItemStack usedItem, Entity entity){
         List<Entity> nearbyEntities = entity.getNearbyEntities(3, 3, 3);
 
-        UUID taskId = ToolTaskManager.generateTaskId(usedItem, player.getInventory());
+        UUID taskId = ToolTaskManager.generateTaskId(usedItem, player);
 
         Executor.async(() -> {
             List<Creeper> creeperList = new ArrayList<>();

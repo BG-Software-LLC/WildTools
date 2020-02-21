@@ -43,7 +43,7 @@ public final class WDrainTool extends WTool implements DrainTool {
         Location max = block.getLocation().clone().add(radius, radius, radius),
                 min = block.getLocation().clone().subtract(radius, radius, radius);
 
-        UUID taskId = ToolTaskManager.generateTaskId(usedItem, player.getInventory());
+        UUID taskId = ToolTaskManager.generateTaskId(usedItem, player);
 
         BlocksController blocksController = new BlocksController();
         int toolDurability = getDurability(player, taskId);

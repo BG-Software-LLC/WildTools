@@ -54,7 +54,7 @@ public final class WCraftingTool extends WTool implements CraftingTool {
             return false;
         }
 
-        UUID taskId = ToolTaskManager.generateTaskId(e.getItem(), e.getPlayer().getInventory());
+        UUID taskId = ToolTaskManager.generateTaskId(e.getItem(), e.getPlayer());
 
         Iterator<Recipe> craftings = getCraftings();
 

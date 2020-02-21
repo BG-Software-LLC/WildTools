@@ -26,7 +26,7 @@ public final class WCrowbarTool extends WTool implements CrowbarTool {
         if(!e.getClickedBlock().getType().name().contains("SPAWNER"))
             return false;
 
-        UUID taskId = ToolTaskManager.generateTaskId(e.getItem(), e.getPlayer().getInventory());
+        UUID taskId = ToolTaskManager.generateTaskId(e.getItem(), e.getPlayer());
 
         if(!plugin.getProviders().canBreak(e.getPlayer(), e.getClickedBlock(), this))
             return true;

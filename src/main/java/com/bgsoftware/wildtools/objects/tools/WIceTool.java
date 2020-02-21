@@ -41,7 +41,7 @@ public final class WIceTool extends WTool implements IceTool {
     }
 
     private boolean handleUse(Player player, ItemStack usedItem, Block block){
-        UUID taskId = ToolTaskManager.generateTaskId(usedItem, player.getInventory());
+        UUID taskId = ToolTaskManager.generateTaskId(usedItem, player);
 
         Location max = block.getLocation().clone().add(radius, radius, radius),
                 min = block.getLocation().clone().subtract(radius, radius, radius);

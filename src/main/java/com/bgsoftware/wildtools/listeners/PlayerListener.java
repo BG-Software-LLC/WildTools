@@ -5,11 +5,14 @@ import com.bgsoftware.wildtools.WildToolsPlugin;
 import com.bgsoftware.wildtools.objects.WSelection;
 import com.bgsoftware.wildtools.objects.tools.WCannonTool;
 import com.bgsoftware.wildtools.utils.items.ItemUtils;
+import com.bgsoftware.wildtools.utils.items.ToolTaskManager;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.player.PlayerDropItemEvent;
+import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.ChatColor;
 import org.bukkit.event.EventHandler;
@@ -96,6 +99,20 @@ public final class PlayerListener implements Listener {
             keepInventoryTools.remove(e.getPlayer().getUniqueId());
             toAdd.forEach(itemStack -> ItemUtils.addItem(itemStack, e.getPlayer().getInventory(), e.getPlayer().getLocation()));
         }
+    }
+
+    @EventHandler
+    public void onToolDrop(PlayerDropItemEvent e){
+        String taskId = plugin.getNMSAdapter().getTag(e.getItemDrop().getItemStack(), "task-id", "");
+        if(!taskId.isEmpty())
+            ToolTaskManager.handleDropItem(UUID.fromString(taskId), e.getItemDrop());
+    }
+
+    @EventHandler
+    public void onToolDrop(PlayerPickupItemEvent e){
+        String taskId = plugin.getNMSAdapter().getTag(e.getItem().getItemStack(), "task-id", "");
+        if(!taskId.isEmpty())
+            ToolTaskManager.handlePickupItem(UUID.fromString(taskId), e.getPlayer());
     }
 
     private void sendMessage(Player player, String message){

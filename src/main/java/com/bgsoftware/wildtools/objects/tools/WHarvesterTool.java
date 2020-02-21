@@ -137,7 +137,7 @@ public final class WHarvesterTool extends WTool implements HarvesterTool {
     }
 
     private boolean handleUse(Player player, Block block, ItemStack usedItem){
-        UUID taskId = ToolTaskManager.generateTaskId(usedItem, player.getInventory());
+        UUID taskId = ToolTaskManager.generateTaskId(usedItem, player);
 
         Location farmlandMax = block.getLocation().add(farmlandRadius, farmlandRadius, farmlandRadius);
         Location farmlandMin = block.getLocation().subtract(farmlandRadius, farmlandRadius, farmlandRadius);

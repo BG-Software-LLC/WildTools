@@ -30,7 +30,7 @@ public final class WCuboidTool extends WTool implements CuboidTool {
 
     @Override
     public boolean onBlockBreak(BlockBreakEvent e) {
-        UUID taskId = ToolTaskManager.generateTaskId(e.getPlayer().getItemInHand(), e.getPlayer().getInventory());
+        UUID taskId = ToolTaskManager.generateTaskId(e.getPlayer().getItemInHand(), e.getPlayer());
         int radius = breakLevel / 2;
 
         Location max = e.getBlock().getLocation().add(radius, radius, radius),
