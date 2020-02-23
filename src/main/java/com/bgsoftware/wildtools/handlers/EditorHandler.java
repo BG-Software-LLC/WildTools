@@ -139,8 +139,9 @@ public final class EditorHandler {
                 .withName("&bTool Instant-Break").withLore("&7Instant-Break: " + getFromConfig(toolName, "instant-break", Boolean.class, false)).build());
         editor.setItem(31, new ItemBuilder(WMaterial.EXPERIENCE_BOTTLE.parseMaterial())
                 .withName("&bTool Anvil Combine Exp").withLore("&7Anvil Combine Exp: " + getFromConfig(toolName, "anvil-combine-exp", Integer.class, -1)).build());
+        editor.setItem(32, new ItemBuilder(Material.GOLD_INGOT)
+                .withName("&bTool Anvil Combine Limit").withLore("&7Anvil Combine Limit: " + getFromConfig(toolName, "anvil-combine-limit", Integer.class, -1)).build());
 
-        editor.setItem(32, new ItemStack(Material.AIR));
         editor.setItem(33, new ItemStack(Material.AIR));
         editor.setItem(34, new ItemStack(Material.AIR));
 

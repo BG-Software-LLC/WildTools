@@ -35,10 +35,10 @@ public final class EditorListener implements Listener {
     private Map<UUID, String> toolValues = new HashMap<>();
 
     private String[] integerValues = new String[] {"length", "break-level", "radius", "farmland-radius", "tnt-amount",
-            "cooldown", "uses"};
+            "cooldown", "uses", "anvil-combine-exp", "anvil-combine-limit"};
     private String[] doubleValues = new String[] {"multiplier"};
     private String[] booleanValues = new String[] {"auto-collect", "silk-touch", "only-same-type", "only-inside-claim",
-            "unbreakable", "keep-inventory", "glow", "omni-tool", "spigot-unbreakable"};
+            "unbreakable", "keep-inventory", "glow", "omni-tool", "spigot-unbreakable", "instant-break"};
     private String[] listValues = new String[] {"prices-list", "craftings", "enchants", "whitelisted-blocks", "blacklisted-blocks",
             "whitelisted-drops", "blacklisted-drops"};
 
@@ -136,63 +136,72 @@ public final class EditorListener implements Listener {
 
             switch (e.getRawSlot()){
                 case 10:
-                    toolValues.put(player.getUniqueId(), "type");
-                    break;
-                case 11:
-                    toolValues.put(player.getUniqueId(), "name");
-                    break;
-                case 12:
-                    toolValues.put(player.getUniqueId(), "lore");
-                    break;
-                case 14:
                     toolValues.put(player.getUniqueId(), "cooldown");
                     break;
-                case 15:
+                case 11:
                     toolValues.put(player.getUniqueId(), "unbreakable");
                     break;
-                case 16:
+                case 12:
                     toolValues.put(player.getUniqueId(), "keep-inventory");
                     break;
-                case 17:
+                case 13:
                     toolValues.put(player.getUniqueId(), "whitelisted-blocks");
                     break;
-                case 23:
+                case 14:
                     toolValues.put(player.getUniqueId(), "auto-collect");
                     break;
-                case 24:
+                case 15:
                     toolValues.put(player.getUniqueId(), "uses");
                     break;
-                case 25:
+                case 16:
                     toolValues.put(player.getUniqueId(), "enchants");
                     break;
-                case 26:
+                case 19:
                     toolValues.put(player.getUniqueId(), "whitelisted-drops");
                     break;
-                case 32:
+                case 20:
                     toolValues.put(player.getUniqueId(), "silk-touch");
                     break;
-                case 33:
+                case 21:
                     toolValues.put(player.getUniqueId(), "only-inside-claim");
                     break;
-                case 34:
+                case 22:
                     toolValues.put(player.getUniqueId(), "omni-tool");
                     break;
-                case 35:
+                case 23:
                     toolValues.put(player.getUniqueId(), "blacklisted-blocks");
                     break;
-                case 41:
+                case 24:
                     toolValues.put(player.getUniqueId(), "only-same-type");
                     break;
-                case 42:
+                case 25:
                     toolValues.put(player.getUniqueId(), "glow");
                     break;
-                case 43:
+                case 28:
                     toolValues.put(player.getUniqueId(), "spigot-unbreakable");
                     break;
-                case 44:
+                case 29:
                     toolValues.put(player.getUniqueId(), "blacklisted-drops");
                     break;
-                case 28:
+                case 30:
+                    toolValues.put(player.getUniqueId(), "instant-break");
+                    break;
+                case 31:
+                    toolValues.put(player.getUniqueId(), "anvil-combine-exp");
+                    break;
+                case 32:
+                    toolValues.put(player.getUniqueId(), "anvil-combine-limit");
+                    break;
+                case 46:
+                    toolValues.put(player.getUniqueId(), "type");
+                    break;
+                case 47:
+                    toolValues.put(player.getUniqueId(), "name");
+                    break;
+                case 48:
+                    toolValues.put(player.getUniqueId(), "lore");
+                    break;
+                case 50:
                     if(toolMode == ToolMode.BUILDER)
                         toolValues.put(player.getUniqueId(), "length");
                     else if(toolMode == ToolMode.CUBOID)
@@ -209,17 +218,17 @@ public final class EditorListener implements Listener {
                         toolValues.put(player.getUniqueId(), "multiplier");
                     else return;
                     break;
-                case 29:
+                case 51:
                     if(toolMode == ToolMode.HARVESTER)
                         toolValues.put(player.getUniqueId(), "farmland-radius");
                     else return;
                     break;
-                case 37:
+                case 52:
                     if(toolMode == ToolMode.HARVESTER)
                         toolValues.put(player.getUniqueId(), "active-action");
                     else return;
                     break;
-                case 38:
+                case 53:
                     if(toolMode == ToolMode.HARVESTER)
                         toolValues.put(player.getUniqueId(), "multiplier");
                     else return;
