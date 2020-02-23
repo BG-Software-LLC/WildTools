@@ -433,6 +433,7 @@ public abstract class WTool implements Tool {
                             ToolTaskManager.setItemOfTask(taskId, ITEM_STACK);
                             if(giveOriginal)
                                 ItemUtils.addItem(originalItem, pl.getInventory(), pl.getLocation());
+                            ToolTaskManager.removeTask(taskId);
                         }
                 );
                 return;
@@ -443,6 +444,8 @@ public abstract class WTool implements Tool {
 
         if(giveOriginal)
             ItemUtils.addItem(originalItem, pl.getInventory(), pl.getLocation());
+
+        ToolTaskManager.removeTask(taskId);
     }
 
     @Override

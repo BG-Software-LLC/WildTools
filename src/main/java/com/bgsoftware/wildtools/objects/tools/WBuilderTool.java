@@ -93,10 +93,11 @@ public final class WBuilderTool extends WTool implements BuilderTool {
         if(amountOfBlocks < length)
             Locale.BUILDER_NO_BLOCK.send(e.getPlayer(), e.getClickedBlock().getType().name());
 
-        if(iter > 0)
+        if(iter > 0) {
             reduceDurablility(e.getPlayer(), usingDurability ? iter : 1, taskId);
-
-        ToolTaskManager.removeTask(taskId);
+        } else {
+            ToolTaskManager.removeTask(taskId);
+        }
 
         return true;
     }

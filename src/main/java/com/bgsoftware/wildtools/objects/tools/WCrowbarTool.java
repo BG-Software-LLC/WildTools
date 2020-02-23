@@ -52,8 +52,6 @@ public final class WCrowbarTool extends WTool implements CrowbarTool {
 
         reduceDurablility(e.getPlayer(), 1, taskId);
 
-        ToolTaskManager.removeTask(taskId);
-
         return true;
     }
 }

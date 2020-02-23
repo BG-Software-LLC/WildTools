@@ -89,10 +89,12 @@ public final class WMagnetTool extends WTool implements MagnetTool {
                 Bukkit.getPluginManager().callEvent(magnetWandUseEvent);
             });
 
-            if(reduceDurability)
+            if(reduceDurability) {
                 reduceDurablility(player, 1, taskId);
+            } else {
+                ToolTaskManager.removeTask(taskId);
+            }
 
-            ToolTaskManager.removeTask(taskId);
         });
     }
 

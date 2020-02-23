@@ -123,10 +123,9 @@ public final class WCraftingTool extends WTool implements CraftingTool {
                     reduceDurablility(e.getPlayer(), 1, taskId);
                     Locale.CRAFT_SUCCESS.send(e.getPlayer(), craftedItemsAmount);
                 } else {
+                    ToolTaskManager.removeTask(taskId);
                     Locale.NO_CRAFT_ITEMS.send(e.getPlayer());
                 }
-
-                ToolTaskManager.removeTask(taskId);
             }
         });
 

@@ -54,10 +54,11 @@ public final class WPillarTool extends WTool implements PillarTool {
 
         blocksController.updateSession();
 
-        if(toolUsages > 0)
+        if(toolUsages > 0) {
             reduceDurablility(e.getPlayer(), usingDurability ? toolUsages : 1, taskId);
-
-        ToolTaskManager.removeTask(taskId);
+        } else {
+            ToolTaskManager.removeTask(taskId);
+        }
 
         return true;
     }

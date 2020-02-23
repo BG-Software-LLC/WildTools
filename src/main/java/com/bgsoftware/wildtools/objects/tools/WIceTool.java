@@ -73,10 +73,11 @@ public final class WIceTool extends WTool implements IceTool {
         IceWandUseEvent iceWandUseEvent = new IceWandUseEvent(player, this, affectedBlocks);
         Bukkit.getPluginManager().callEvent(iceWandUseEvent);
 
-        if(toolUsages > 0)
+        if(toolUsages > 0) {
             reduceDurablility(player, usingDurability ? toolUsages : 1, taskId);
-
-        ToolTaskManager.removeTask(taskId);
+        } else {
+            ToolTaskManager.removeTask(taskId);
+        }
 
         return true;
     }
