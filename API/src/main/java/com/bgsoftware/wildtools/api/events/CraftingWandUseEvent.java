@@ -9,17 +9,29 @@ import java.util.Collections;
 import java.util.List;
 
 @SuppressWarnings("unused")
+/**
+ * CraftingWandUseEvent is called when a crafting wand is used.
+ */
 public final class CraftingWandUseEvent extends ToolUseEvent<CraftingTool> {
 
     private static final HandlerList HANDLERS = new HandlerList();
 
     private final List<ItemStack> items;
 
+    /**
+     * The constructor of the event.
+     * @param player The player who used the wand.
+     * @param tool The wand that was used.
+     * @param items All the affected items by the wand.
+     */
     public CraftingWandUseEvent(Player player, CraftingTool tool, List<ItemStack> items){
         super(player, tool);
         this.items = Collections.unmodifiableList(items);
     }
 
+    /**
+     * Get all the affected items by the wand.
+     */
     public List<ItemStack> getItems() {
         return items;
     }

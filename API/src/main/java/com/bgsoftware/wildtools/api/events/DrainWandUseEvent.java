@@ -9,17 +9,29 @@ import java.util.Collections;
 import java.util.List;
 
 @SuppressWarnings("unused")
+/**
+ * DrainWandUseEvent is called when a drain wand is used.
+ */
 public final class DrainWandUseEvent extends ToolUseEvent<DrainTool> {
 
     private static final HandlerList HANDLERS = new HandlerList();
 
     private final List<Location> blocks;
 
+    /**
+     * The constructor of the event.
+     * @param player The player who used the wand.
+     * @param tool The wand that was used.
+     * @param blocks All the affected blocks by the wand.
+     */
     public DrainWandUseEvent(Player player, DrainTool tool, List<Location> blocks){
         super(player, tool);
         this.blocks = Collections.unmodifiableList(blocks);
     }
 
+    /**
+     * Get all the affected blocks by the wand.
+     */
     public List<Location> getBlocks() {
         return blocks;
     }
