@@ -20,6 +20,8 @@ import net.minecraft.server.v1_8_R3.Item;
 import net.minecraft.server.v1_8_R3.ItemStack;
 import net.minecraft.server.v1_8_R3.Items;
 import net.minecraft.server.v1_8_R3.NBTTagCompound;
+import net.minecraft.server.v1_8_R3.NBTTagList;
+import net.minecraft.server.v1_8_R3.NBTTagString;
 import net.minecraft.server.v1_8_R3.PacketPlayOutCollect;
 import net.minecraft.server.v1_8_R3.PacketPlayOutMultiBlockChange;
 import net.minecraft.server.v1_8_R3.PlayerInventory;
@@ -54,6 +56,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 @SuppressWarnings({"unused", "deprecation"})
 public final class NMSAdapter_v1_8_R3 implements NMSAdapter {
@@ -226,6 +229,82 @@ public final class NMSAdapter_v1_8_R3 implements NMSAdapter {
         nmsStack.setTag(tag);
 
         return CraftItemStack.asBukkitCopy(nmsStack);
+    }
+
+    @Override
+    public List<UUID> getTasks(org.bukkit.inventory.ItemStack itemStack) {
+        ItemStack nmsStack = CraftItemStack.asNMSCopy(itemStack);
+        NBTTagCompound tag = nmsStack.hasTag() ? nmsStack.getTag() : new NBTTagCompound();
+        List<UUID> taskIds = new ArrayList<>();
+
+        if(tag.hasKeyOfType("task-id", 8)){
+            try {
+                taskIds.add(UUID.fromString(tag.getString("task-id")));
+            }catch(Exception ignored){}
+        }
+        else if(tag.hasKeyOfType("task-id", 9)){
+            NBTTagList nbtTagList = tag.getList("task-id", 8);
+            for(int i = 0; i < nbtTagList.size(); i++){
+                try {
+                    taskIds.add(UUID.fromString(nbtTagList.getString(i)));
+                }catch(Exception ignored){}
+            }
+        }
+
+        return taskIds;
+    }
+
+    @Override
+    public org.bukkit.inventory.ItemStack addTask(org.bukkit.inventory.ItemStack itemStack, UUID taskId) {
+        ItemStack nmsStack = CraftItemStack.asNMSCopy(itemStack);
+        NBTTagCompound tag = nmsStack.hasTag() ? nmsStack.getTag() : new NBTTagCompound();
+        NBTTagList nbtTagList;
+
+        if(tag.hasKeyOfType("task-id", 9)){
+            nbtTagList = tag.getList("task-id", 8);
+        }
+        else{
+            nbtTagList = new NBTTagList();
+            if(tag.hasKeyOfType("task-id", 8))
+                nbtTagList.add(tag.get("task-id"));
+        }
+
+        nbtTagList.add(new NBTTagString(taskId.toString()));
+        tag.set("task-id", nbtTagList);
+
+        nmsStack.setTag(tag);
+
+        return CraftItemStack.asCraftMirror(nmsStack);
+    }
+
+    @Override
+    public org.bukkit.inventory.ItemStack removeTask(org.bukkit.inventory.ItemStack itemStack, UUID taskId) {
+        ItemStack nmsStack = CraftItemStack.asNMSCopy(itemStack);
+        NBTTagCompound tag = nmsStack.hasTag() ? nmsStack.getTag() : new NBTTagCompound();
+        NBTTagList nbtTagList = new NBTTagList();
+
+        if(tag.hasKeyOfType("task-id", 9)){
+            NBTTagList currentTaskIds = tag.getList("task-id", 8);
+            for(int i = 0; i < currentTaskIds.size(); i++){
+                NBTTagString nbtTagString = (NBTTagString) currentTaskIds.g(i);
+                if(!nbtTagString.a_().equals(taskId.toString())) {
+                    nbtTagList.add(nbtTagString);
+                }
+            }
+        }
+        else{
+            if(tag.hasKeyOfType("task-id", 8)) {
+                NBTTagString tagString = (NBTTagString) tag.get("task-id");
+                if(!tagString.a_().equals(taskId.toString()))
+                    nbtTagList.add(tagString);
+            }
+        }
+
+        tag.set("task-id", nbtTagList);
+
+        nmsStack.setTag(tag);
+
+        return CraftItemStack.asCraftMirror(nmsStack);
     }
 
     @Override

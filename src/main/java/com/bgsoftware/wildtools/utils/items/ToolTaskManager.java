@@ -25,7 +25,7 @@ public final class ToolTaskManager {
         runningTasks.put(generatedTaskId, player);
 
         int heldItem = ItemUtils.getItemSlot(player.getInventory(), itemStack);
-        player.getInventory().setItem(heldItem, plugin.getNMSAdapter().setTag(itemStack, "task-id", generatedTaskId.toString()));
+        player.getInventory().setItem(heldItem, plugin.getNMSAdapter().addTask(itemStack, generatedTaskId));
 
         return generatedTaskId;
     }
@@ -68,6 +68,8 @@ public final class ToolTaskManager {
 
     public static void setItemOfTask(UUID taskId, ItemStack newItem){
         Object itemHolder = runningTasks.get(taskId);
+
+        newItem = plugin.getNMSAdapter().removeTask(newItem, taskId);
 
         if(itemHolder instanceof Player) {
             Player player = (Player) itemHolder;
@@ -121,7 +123,7 @@ public final class ToolTaskManager {
     }
 
     private static boolean isSameTask(ItemStack itemStack, UUID taskId){
-        return itemStack != null && plugin.getNMSAdapter().getTag(itemStack, "task-id", "").equals(taskId.toString());
+        return itemStack != null && plugin.getNMSAdapter().getTasks(itemStack).contains(taskId);
     }
 
 }

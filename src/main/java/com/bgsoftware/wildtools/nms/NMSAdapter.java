@@ -13,9 +13,11 @@ import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.Recipe;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 public interface NMSAdapter {
 
@@ -38,6 +40,12 @@ public interface NMSAdapter {
     ItemStack setTag(ItemStack is, String key, String value);
 
     ItemStack getItemInHand(Player player);
+
+    List<UUID> getTasks(ItemStack itemStack);
+
+    ItemStack addTask(ItemStack itemStack, UUID taskId);
+
+    ItemStack removeTask(ItemStack itemStack, UUID taskId);
 
     void setItemInHand(Player player, ItemStack itemStack);
 
