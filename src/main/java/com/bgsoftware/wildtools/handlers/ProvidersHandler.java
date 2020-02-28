@@ -60,61 +60,7 @@ public final class ProvidersHandler {
     private SpawnersProvider spawnersProvider;
 
     public ProvidersHandler(){
-        //Prices Plugin Hookup
-        if(pricesPlugin.equalsIgnoreCase("ShopGUIPlus") && Bukkit.getPluginManager().isPluginEnabled("ShopGUIPlus"))
-            pricesProvider = new PricesProvider_ShopGUIPlus();
-        else if(pricesPlugin.equalsIgnoreCase("Essentials") && Bukkit.getPluginManager().isPluginEnabled("Essentials"))
-            pricesProvider = new PricesProvider_Essentials();
-        else if(pricesPlugin.equals("CMI") && Bukkit.getPluginManager().isPluginEnabled("CMI"))
-            pricesProvider = new PricesProvider_CMI();
-        else pricesProvider = new PricesProvider_Default();
-        //Factions Hookup
-        if(Bukkit.getPluginManager().isPluginEnabled("Factions") &&
-                Bukkit.getPluginManager().getPlugin("Factions").getDescription().getAuthors().contains("ProSavage"))
-            factionsProvider = new FactionsProvider_SavageFactions();
-        else factionsProvider = new FactionsProvider_Default();
-        //Claim Hookup
-        if(Bukkit.getPluginManager().isPluginEnabled("AcidIsland"))
-            blocksProviders.add(new BlocksProvider_AcidIsland());
-        if(Bukkit.getPluginManager().isPluginEnabled("ASkyBlock"))
-            blocksProviders.add(new BlocksProvider_ASkyblock());
-        if(Bukkit.getPluginManager().isPluginEnabled("BentoBox"))
-            blocksProviders.add(new BlocksProvider_BentoBox());
-        if(Bukkit.getPluginManager().isPluginEnabled("FabledSkyBlock"))
-            blocksProviders.add(new BlocksProvider_FabledSkyblock());
-        if(Bukkit.getPluginManager().isPluginEnabled("Factions")){
-            Plugin factionsPlugin = Bukkit.getPluginManager().getPlugin("Factions");
-            if(factionsPlugin.getDescription().getAuthors().contains("Daniel Saukel"))
-                blocksProviders.add(new BlocksProvider_FactionsOne());
-            else if(factionsPlugin.getDescription().getAuthors().contains("drtshock"))
-                blocksProviders.add(new BlocksProvider_FactionsUUID());
-            else
-                blocksProviders.add(new BlocksProvider_MassiveFactions());
-        }
-        if(Bukkit.getPluginManager().isPluginEnabled("GriefPrevention"))
-            blocksProviders.add(new BlocksProvider_GriefPrevention());
-        if(Bukkit.getPluginManager().isPluginEnabled("SuperiorSkyblock2"))
-            blocksProviders.add(new BlocksProvider_SuperiorSkyblock());
-        if(Bukkit.getPluginManager().isPluginEnabled("Towny"))
-            blocksProviders.add(new BlocksProvider_Towny());
-        if(Bukkit.getPluginManager().isPluginEnabled("Villages"))
-            blocksProviders.add(new BlocksProvider_Villages());
-        if(Bukkit.getPluginManager().isPluginEnabled("WorldGuard"))
-            blocksProviders.add(new BlocksProvider_WorldGuard());
-        if(Bukkit.getPluginManager().isPluginEnabled("Lands"))
-            blocksProviders.add(new BlocksProvider_Lands());
-        if(Bukkit.getPluginManager().isPluginEnabled("PlotSquared")) {
-            try {
-                Class.forName("com.intellectualcrafters.plot.api.PlotAPI");
-                blocksProviders.add(new BlocksProvider_PlotSquaredLegacy());
-            }catch(ClassNotFoundException ex){
-                blocksProviders.add(new BlocksProvider_PlotSquared());
-            }
-        }
-        //Spawners Plugin Hook
-        if(Bukkit.getPluginManager().isPluginEnabled("WildStacker"))
-            spawnersProvider = new SpawnersProvider_WildStacker();
-        else spawnersProvider = new SpawnersProvider_Default();
+        loadData();
     }
 
     /*
@@ -200,6 +146,68 @@ public final class ProvidersHandler {
 
     public boolean isVaultEnabled(){
         return isVaultEnabled;
+    }
+
+    private void loadData(){
+        //Prices Plugin Hookup
+        if(pricesPlugin.equalsIgnoreCase("ShopGUIPlus") && Bukkit.getPluginManager().isPluginEnabled("ShopGUIPlus"))
+            pricesProvider = new PricesProvider_ShopGUIPlus();
+        else if(pricesPlugin.equalsIgnoreCase("Essentials") && Bukkit.getPluginManager().isPluginEnabled("Essentials"))
+            pricesProvider = new PricesProvider_Essentials();
+        else if(pricesPlugin.equals("CMI") && Bukkit.getPluginManager().isPluginEnabled("CMI"))
+            pricesProvider = new PricesProvider_CMI();
+        else pricesProvider = new PricesProvider_Default();
+        //Factions Hookup
+        if(Bukkit.getPluginManager().isPluginEnabled("Factions") &&
+                Bukkit.getPluginManager().getPlugin("Factions").getDescription().getAuthors().contains("ProSavage"))
+            factionsProvider = new FactionsProvider_SavageFactions();
+        else factionsProvider = new FactionsProvider_Default();
+        //Claim Hookup
+        if(Bukkit.getPluginManager().isPluginEnabled("AcidIsland"))
+            blocksProviders.add(new BlocksProvider_AcidIsland());
+        if(Bukkit.getPluginManager().isPluginEnabled("ASkyBlock"))
+            blocksProviders.add(new BlocksProvider_ASkyblock());
+        if(Bukkit.getPluginManager().isPluginEnabled("BentoBox"))
+            blocksProviders.add(new BlocksProvider_BentoBox());
+        if(Bukkit.getPluginManager().isPluginEnabled("FabledSkyBlock"))
+            blocksProviders.add(new BlocksProvider_FabledSkyblock());
+        if(Bukkit.getPluginManager().isPluginEnabled("Factions")){
+            Plugin factionsPlugin = Bukkit.getPluginManager().getPlugin("Factions");
+            if(factionsPlugin.getDescription().getAuthors().contains("Daniel Saukel"))
+                blocksProviders.add(new BlocksProvider_FactionsOne());
+            else if(factionsPlugin.getDescription().getAuthors().contains("drtshock"))
+                blocksProviders.add(new BlocksProvider_FactionsUUID());
+            else
+                blocksProviders.add(new BlocksProvider_MassiveFactions());
+        }
+        if(Bukkit.getPluginManager().isPluginEnabled("GriefPrevention"))
+            blocksProviders.add(new BlocksProvider_GriefPrevention());
+        if(Bukkit.getPluginManager().isPluginEnabled("SuperiorSkyblock2"))
+            blocksProviders.add(new BlocksProvider_SuperiorSkyblock());
+        if(Bukkit.getPluginManager().isPluginEnabled("Towny"))
+            blocksProviders.add(new BlocksProvider_Towny());
+        if(Bukkit.getPluginManager().isPluginEnabled("Villages"))
+            blocksProviders.add(new BlocksProvider_Villages());
+        if(Bukkit.getPluginManager().isPluginEnabled("WorldGuard"))
+            blocksProviders.add(new BlocksProvider_WorldGuard());
+        if(Bukkit.getPluginManager().isPluginEnabled("Lands"))
+            blocksProviders.add(new BlocksProvider_Lands());
+        if(Bukkit.getPluginManager().isPluginEnabled("PlotSquared")) {
+            try {
+                Class.forName("com.intellectualcrafters.plot.api.PlotAPI");
+                blocksProviders.add(new BlocksProvider_PlotSquaredLegacy());
+            }catch(ClassNotFoundException ex){
+                blocksProviders.add(new BlocksProvider_PlotSquared());
+            }
+        }
+        //Spawners Plugin Hook
+        if(Bukkit.getPluginManager().isPluginEnabled("WildStacker"))
+            spawnersProvider = new SpawnersProvider_WildStacker();
+        else spawnersProvider = new SpawnersProvider_Default();
+    }
+
+    public static void reload(){
+        plugin.getProviders().loadData();
     }
 
 }
