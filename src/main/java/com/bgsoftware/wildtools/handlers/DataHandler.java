@@ -37,8 +37,16 @@ public final class DataHandler {
         int toolsAmount = 0;
         File file = new File(plugin.getDataFolder(), "config.yml");
 
-        if(!file.exists())
-            plugin.saveResource("config.yml", false);
+        if(!file.exists()) {
+            try{
+                Material.valueOf("GOLD_HOE");
+                plugin.saveResource("config.yml", false);
+            }catch(Exception ex){
+                plugin.saveResource("config1_13.yml", false);
+                File config113 = new File(plugin.getDataFolder(), "config1_13.yml");
+                config113.renameTo(file);
+            }
+        }
 
         CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(file);
         cfg.syncWithConfig(file, plugin.getResource("config.yml"), "tools");

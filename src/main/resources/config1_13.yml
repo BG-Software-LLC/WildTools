@@ -1,0 +1,364 @@
+####################################################
+##                                                ##
+##            WildTools Configuration             ##
+##               Developed by Ome_R               ##
+##                                                ##
+####################################################
+
+# Choose which prices plugin to check for prices (ShopGUIPlus, Essentials, CMI, WildTools).
+prices-plugin: 'ShopGUIPlus'
+
+# A list of prices. Use "TYPE" and "TYPE:DATA" formats.
+prices-list:
+- 'STONE:5' #Each stone will cost $5
+- 'LOG:0:5' #Only oak logs will cost $5
+
+# The plugin brings a lot of options and features for making tools easily with rich-configuration options.
+# The default config has basic trench-pickaxe, tray-pickaxe, sand-wand, sell-wand, lightning-wand, harvester-hoe
+# and cannon-wand examples. Each tool-mode has it's own configuration options, make sure you don't mix them.
+#
+# *** Builder Tool-Mode ***
+# Tools in this mode will create a pillar of the same block as the clicked one.
+# Required sections:
+# length: The length of the pillar (INTEGER)
+#
+# *** Cannon Tool-Mode ***
+# Tools in this mode will fill all dispensers in a selected area with tnt. This mode is used for cannon-wands.
+# Right-click and left-click to select an area.
+# Required sections:
+# tnt-amount: How many tnt will be filled in each dispenser? (INTEGER)
+#
+# *** Crafting Tool-Mode ***
+# Tools in this mode will auto-craft items in a container.
+# Required sections:
+# craftings: All the crafting *results* for the tool (LIST)
+#      Please follow the "TYPE" or "TYPE:DATA" format for results.
+#
+# *** Crowbar Tool-Mode ***
+# Tools in this mode will break spawners and drop them.
+#
+# *** Cuboid Tool-Mode ***
+# Tools in this mode will dig a cuboid-area (for example, 3x3x3). This mode is used for trench and tray pickaxes.
+# Required sections:
+# break-level: How big the cuboid-area gonna be (3 will be 3x3x3 area) [INTEGER]
+#
+# *** Drain Tool-Mode ***
+# Tools in this mode will remove all ice blocks in the checking area.
+# Required sections:
+# radius: What is the radius of the checking area? (3 will check a 7x7 area) (INTEGER)
+#
+# *** Harvester Tool-Mode ***
+# Tools in this mode will harvest seeds and replant them automatically. This mode is used for harvester-hoes.
+# Drops support silk-touch and fortune.
+# Required sections:
+# radius: What is the radius of the checking area? (3 will check a 7x7 area) (INTEGER)
+# Optional sections:
+# farmland-radius: What is the radius of the checking for dirt area? (Same as radius)
+# active-action: Which action should activate the harvester? (RIGHT_CLICK or LEFT_CLICK)
+# multiplier: Multiply the earnings from the sell mode.
+#
+# *** Ice Tool-Mode ***
+# Tools in this mode will smelt all ice blocks in the checking area.
+# Required sections:
+# radius: What is the radius of the checking area? (3 will check a 7x7 area) (INTEGER)
+#
+# *** Lightning Tool-Mode ***
+# Tools in this mode will strike a lightning to charge creepers. This mode is used for lightning-wands.
+#
+# *** Magnet Tool-Mode ***
+# Tools in this mode will suction items into the player's inventory.
+# Required sections:
+# radius: What is the radius of the checking area? (INTEGER)
+#
+# *** Pillar Tool-Mode ***
+# Tools in this mode will dig a pillar of blocks with the same type. This mode is used for sand-wands.
+#
+# *** Sell Tool-Mode ***
+# Tools in this mode will sell all the container's contents. This mode is used for sell-wands.
+# Optional sections:
+# multiplier: Multiply the earnings from a chest.
+#
+# *** Sort Tool-Mode ***
+# Tools in this mode will sort all the clicked chest's contents.
+#
+# There are sections that can be applied for all the tools:
+# cooldown: Cool-down between uses in milliseconds (INTEGER) (Default 0)
+# auto-collect: Drops will go straight into the inventory (BOOLEAN) (Default false)
+# instant-break: Blocks will be broken instantly (BOOLEAN) (Default false)
+# silk-touch: Tool will have a hidden silk-touch enchantment (BOOLEAN) (Default false)
+# only-same-type: Only blocks with the same type will be dug. (BOOLEAN) (Default false)
+# only-inside-claim: Will only work on blocks inside claim land.
+# unbreakable: Tool will never be broken (BOOLEAN) (Default false)
+# spigot-unbreakable: Set spigot's unbreakable flag (BOOLEAN) (Default false)
+# omni-tool: Tool will change it's type depends on broken block (BOOLEAN) (Default false)
+#      Tool's default type must be a tool, such as pickaxe, shovel or axe.
+# uses: Custom durability for the tool (INTEGER)
+#      If both unbreakable and uses are not set, tool will use the vanilla durability (supports unbreaking enchantment)
+# keep-inventory: Tool won't get dropped from players inventory (BOOLEAN) (Default false)
+# private: Should tool be assigned to only one player? (BOOLEAN) (Default false)
+# anvil-combine-exp: Amount of exp required to combine tool with another (INTEGER) (Default -1)
+# anvil-combine-limit: Maximum uses for the combined tool (INTEGER) (Default -1)
+# type: Material type (Check https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Material.html)
+# name: Custom name for the tool (STRING)
+# lore: Custom lore for the tool (LIST)
+# glow: Glow effect for the tool (BOOLEAN)
+# enchants: Enchantments for the tool (LIST)
+#      Please follow the "ENCHANTMENT:LEVEL" format for enchantments.
+#      (Check https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/enchantments/Enchantment.html)
+# whitelisted-blocks: Which blocks will be dug by the tool? [LIST]
+# blacklisted-blocks: Which blocks won't be dug by the tool? [LIST]
+# whitelisted-drops: Which items will be dropped by the tool? [LIST]
+# blacklisted-drops: Which items won't be dropped by the tool? [LIST]
+#      Please follow the "TYPE" or "TYPE:DATA" format for drops and blocks.
+
+tools:
+  trench_pickaxe:
+    tool-mode: CUBOID
+    break-level: 3
+    only-same-type: false
+    unbreakable: true
+    type: DIAMOND_PICKAXE
+    name: '&f --{ &a&lTrench Pickaxe &f}-- '
+    lore:
+    - '&8&m---------------------------------------'
+    - '&7 This pickaxe breaks a tunnel of 3x3.'
+    - '&f'
+    - '&a&l Blacklisted Blocks:'
+    - '&f - &7Mob Spawner'
+    - '&f'
+    - '&7 Only ore-drops will be dropped.'
+    - '&8&m---------------------------------------'
+    enchants:
+    - 'DIG_SPEED:5'
+    blacklisted-blocks:
+    - 'MOB_SPAWNER'
+    whitelisted-drops:
+    - 'COAL'
+    - 'IRON_ORE'
+    - 'GOLD_ORE'
+    - 'REDSTONE'
+    - 'INK_SACK:4'
+    - 'DIAMOND'
+    - 'EMERALD'
+    - 'QUARTZ'
+  tray_pickaxe:
+    tool-mode: CUBOID
+    break-level: 3
+    only-same-type: false
+    unbreakable: true
+    type: DIAMOND_PICKAXE
+    name: '&f --{ &c&lTray Pickaxe &f}-- '
+    lore:
+    - '&8&m---------------------------------------'
+    - '&7 This pickaxe breaks all the dirt and'
+    - '&7 netherrack blocks around you.'
+    - '&f'
+    - '&c&l Whitelisted Blocks:'
+    - '&f - &7Dirt'
+    - '&f - &7Netherrack'
+    - '&f'
+    - '&8&m---------------------------------------'
+    enchants:
+    - 'DIG_SPEED:5'
+    whitelisted-blocks:
+    - 'DIRT'
+    - 'NETHERRACK'
+  sand_wand:
+    tool-mode: PILLAR
+    cooldown: 2000
+    uses: 500
+    type: DIAMOND_HOE
+    name: '&f --{ &e&lSand Wand &f}-- '
+    lore:
+    - '&8&m---------------------------------------'
+    - '&7 This wand breaks a sand pillar.'
+    - '&f'
+    - '&e&l Whitelisted Blocks:'
+    - '&f - &7Sand'
+    - '&f'
+    - '&e&l Uses:'
+    - '&f   {}'
+    - '&f'
+    - '&8&m---------------------------------------'
+    whitelisted-blocks:
+    - 'SAND'
+  sell_wand1:
+    tool-mode: SELL
+    cooldown: 5000
+    uses: 50
+    type: STICK
+    name: '&f --{ &6&lSell Wand &7(Tier I) &f}-- '
+    lore:
+    - '&8&m---------------------------------------'
+    - '&7 This wand sells all of the contents of'
+    - '&7 a container (chest or trapped-chest).'
+    - '&7'
+    - '&6&l Uses:'
+    - '&f   {}'
+    - '&f'
+    - '&8&m---------------------------------------'
+  sell_wand2:
+    tool-mode: SELL
+    cooldown: 5000
+    uses: 50
+    multiplier: 1.5
+    type: STICK
+    name: '&f --{ &6&lSell Wand &7(Tier II) &f}-- '
+    lore:
+      - '&8&m---------------------------------------'
+      - '&7 This wand sells all of the contents of'
+      - '&7 a container (chest or trapped-chest).'
+      - '&7'
+      - '&6&lMultiplier:'
+      - '&f   x1.5'
+      - '&6&l Uses:'
+      - '&f   {}'
+      - '&f'
+      - '&8&m---------------------------------------'
+  lightning_wand:
+    tool-mode: LIGHTNING
+    type: STICK
+    uses: 5
+    name: '&f --{ &b&lLightning Wand &f}-- '
+    lore:
+    - '&8&m---------------------------------------'
+    - '&7 This wand creates a lightning which'
+    - '&7 powers all the creeper around it.'
+    - '&7'
+    - '&b&l Uses:'
+    - '&f   {}'
+    - '&f'
+    - '&8&m---------------------------------------'
+  magnet_wand:
+    tool-mode: MAGNET
+    type: STICK
+    radius: 5
+    uses: 500
+    name: '&f --{ &4&lMagnet Wand &f}-- '
+    lore:
+      - '&8&m---------------------------------------'
+      - '&7 This wand suction all nearby items in the'
+      - '&7 radius of 5 blocks into your inventory.'
+      - '&7'
+      - '&b&l Uses:'
+      - '&f   {}'
+      - '&f'
+      - '&8&m---------------------------------------'
+  harvester_hoe:
+    tool-mode: HARVESTER
+    radius: 3
+    auto-collect: true
+    type: DIAMOND_HOE
+    uses: 500
+    name: '&f --{ &d&lHarvester Hoe &f}-- '
+    lore:
+    - '&8&m---------------------------------------'
+    - '&7 Click on a block to harvest, replant'
+    - '&7 seeds and turn dirt into farmlands.'
+    - '&7'
+    - '&d&l Uses:'
+    - '&f   {}'
+    - '&f'
+    - '&8&m---------------------------------------'
+  cannon_wand:
+    tool-mode: CANNON
+    tnt-amount: 64
+    type: DIAMOND_AXE
+    uses: 30
+    name: '&f --{ &5&lCannon Wand &f}-- '
+    lore:
+    - '&8&m---------------------------------------'
+    - '&7 Fill all the dispensers in a selection'
+    - '&7 with 64 TNT from inventory or bank.'
+    - '&f'
+    - '&5&l Uses:'
+    - '&f   {}'
+    - '&f'
+    - '&8&m---------------------------------------'
+  crafting_wand:
+    tool-mode: CRAFTING
+    type: STICK
+    uses: 3000
+    name: '&f --{ &9&lCrafting Wand &f}-- '
+    lore:
+    - '&8&m---------------------------------------'
+    - '&7 Hit a chest to auto-craft TNT!'
+    - '&f'
+    - '&9&l Uses:'
+    - '&f   {}'
+    - '&f'
+    - '&8&m---------------------------------------'
+    craftings:
+    - 'TNT'
+  builder_wand:
+    tool-mode: BUILDER
+    type: DIAMOND_AXE
+    uses: 1000
+    length: 5
+    name: '&f --{ &2&lBuilder Wand &f}-- '
+    lore:
+    - '&8&m---------------------------------------'
+    - '&7 Right click a block to create a pillar'
+    - '&7 of the same to the clicked side.'
+    - '&f'
+    - '&2&l Uses:'
+    - '&f   {}'
+    - '&f'
+    - '&8&m---------------------------------------'
+  ice_wand:
+    tool-mode: ICE
+    type: STICK
+    uses: 300
+    radius: 10
+    name: '&f --{ &3&lIce Melter &f}-- '
+    lore:
+    - '&8&m---------------------------------------'
+    - '&7 Right click to smelt all ice in a'
+    - '&7 radius of 10 blocks to water.'
+    - '&f'
+    - '&3&l Uses:'
+    - '&f   {}'
+    - '&f'
+    - '&8&m---------------------------------------'
+  drain_wand:
+    tool-mode: DRAIN
+    type: STICK
+    uses: 300
+    radius: 10
+    name: '&f --{ &3&lDrain Wand &f}-- '
+    lore:
+      - '&8&m---------------------------------------'
+      - '&7 Right click to remove all ice in a'
+      - '&7 radius of 10 blocks.'
+      - '&f'
+      - '&3&l Uses:'
+      - '&f   {}'
+      - '&f'
+      - '&8&m---------------------------------------'
+  sort_wand:
+    tool-mode: SORT
+    type: STICK
+    uses: 300
+    radius: 10
+    name: '&f --{ &1&lSorter Wand &f}-- '
+    lore:
+    - '&8&m---------------------------------------'
+    - '&7 Right click a chest to sort it''s contents.'
+    - '&f'
+    - '&1&l Uses:'
+    - '&f   {}'
+    - '&f'
+    - '&8&m---------------------------------------'
+  crowbar_tool:
+    tool-mode: CROWBAR
+    type: GOLDEN_HOE
+    uses: 25
+    name: '&f --{ &1&lCrowbar Tool &f}-- '
+    lore:
+      - '&8&m---------------------------------------'
+      - '&7 Right click a spawner to break it.'
+      - '&f'
+      - '&1&l Uses:'
+      - '&f   {}'
+      - '&f'
+      - '&8&m---------------------------------------'
