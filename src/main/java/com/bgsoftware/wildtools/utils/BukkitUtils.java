@@ -16,12 +16,16 @@ import com.bgsoftware.wildtools.objects.WMaterial;
 import com.bgsoftware.wildtools.objects.tools.WHarvesterTool;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 
 public final class BukkitUtils {
 
     private static WildToolsPlugin plugin = WildToolsPlugin.getPlugin();
+    private static BlockFace[] blockFaces = new BlockFace[] {
+            BlockFace.UP, BlockFace.DOWN, BlockFace.WEST, BlockFace.EAST, BlockFace.SOUTH, BlockFace.NORTH
+    };
 
     public static void breakNaturally(Player player, BlocksController blocksController, Block block, Tool tool){
         boolean autoCollect = tool.isAutoCollect();
@@ -34,7 +38,8 @@ public final class BukkitUtils {
         };
 
         Consumer<Block> onBlockBreak = blockConsumer -> {
-            if(blockConsumer.getRelative(BlockFace.UP).getType().name().contains("WATER") || blockConsumer.getType().hasGravity())
+            if(blockConsumer.getType().hasGravity() || Arrays.stream(blockFaces)
+                    .anyMatch(blockFace -> blockConsumer.getRelative(blockFace).getType().name().contains("WATER")))
                 blockConsumer.setType(Material.AIR);
             else
                 blocksController.setAir(blockConsumer.getLocation());
