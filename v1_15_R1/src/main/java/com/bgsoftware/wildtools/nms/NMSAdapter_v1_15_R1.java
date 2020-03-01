@@ -2,6 +2,7 @@ package com.bgsoftware.wildtools.nms;
 
 import com.bgsoftware.wildtools.hooks.PaperHook;
 import com.bgsoftware.wildtools.objects.WMaterial;
+import com.bgsoftware.wildtools.utils.items.ToolTaskManager;
 import net.minecraft.server.v1_15_R1.Block;
 import net.minecraft.server.v1_15_R1.BlockPosition;
 import net.minecraft.server.v1_15_R1.Blocks;
@@ -224,7 +225,7 @@ public final class NMSAdapter_v1_15_R1 implements NMSAdapter {
             NBTTagList currentTaskIds = tag.getList("task-id", 8);
             for (NBTBase currentTaskId : currentTaskIds) {
                 NBTTagString nbtTagString = (NBTTagString) currentTaskId;
-                if (!nbtTagString.asString().equals(taskId.toString())) {
+                if (!nbtTagString.asString().equals(taskId.toString()) && ToolTaskManager.isTaskActive(UUID.fromString(nbtTagString.asString()))) {
                     nbtTagList.add(nbtTagString);
                 }
             }
@@ -232,7 +233,7 @@ public final class NMSAdapter_v1_15_R1 implements NMSAdapter {
         else{
             if(tag.hasKeyOfType("task-id", 8)) {
                 NBTTagString tagString = (NBTTagString) tag.get("task-id");
-                if(!tagString.asString().equals(taskId.toString()))
+                if(!tagString.asString().equals(taskId.toString()) && ToolTaskManager.isTaskActive(UUID.fromString(tagString.asString())))
                     nbtTagList.add(tagString);
             }
         }

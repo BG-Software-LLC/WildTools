@@ -385,8 +385,11 @@ public abstract class WTool implements Tool {
     public void reduceDurablility(Player pl, int amount, UUID taskId) {
         ItemStack is = ToolTaskManager.getItemFromTask(taskId);
 
-        if(isUnbreakable() || pl.getGameMode() == GameMode.CREATIVE)
+        if(isUnbreakable() || pl.getGameMode() == GameMode.CREATIVE) {
+            ToolTaskManager.setItemOfTask(taskId, is);
+            ToolTaskManager.removeTask(taskId);
             return;
+        }
 
         ItemStack originalItem = is.clone();
         boolean giveOriginal = is.getAmount() > 1;
@@ -402,8 +405,11 @@ public abstract class WTool implements Tool {
             // Durability Reduce Chance: (100/(Level+1))%
             if (unbLevel != 0) {
                 int chance = new Random().nextInt(100);
-                if (chance > (100 / (unbLevel + 1)))
+                if (chance > (100 / (unbLevel + 1))) {
+                    ToolTaskManager.setItemOfTask(taskId, is);
+                    ToolTaskManager.removeTask(taskId);
                     return;
+                }
             }
 
             is.setDurability((short) (is.getDurability() + amount));

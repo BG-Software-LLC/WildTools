@@ -20,7 +20,7 @@ public final class ToolTaskManager {
 
         //Generate ids until not found.
         //noinspection StatementWithEmptyBody
-        while(runningTasks.containsKey((generatedTaskId = UUID.randomUUID())));
+        while(isTaskActive((generatedTaskId = UUID.randomUUID())));
 
         runningTasks.put(generatedTaskId, player);
 
@@ -112,6 +112,10 @@ public final class ToolTaskManager {
 
     public static void removeTask(UUID taskId){
         runningTasks.remove(taskId);
+    }
+
+    public static boolean isTaskActive(UUID taskId){
+        return runningTasks.containsKey(taskId);
     }
 
     public static void handleDropItem(UUID taskId, Item item){

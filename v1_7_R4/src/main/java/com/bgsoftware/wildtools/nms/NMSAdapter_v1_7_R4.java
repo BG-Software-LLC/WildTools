@@ -1,5 +1,6 @@
 package com.bgsoftware.wildtools.nms;
 
+import com.bgsoftware.wildtools.utils.items.ToolTaskManager;
 import net.minecraft.server.v1_7_R4.AxisAlignedBB;
 import net.minecraft.server.v1_7_R4.Block;
 import net.minecraft.server.v1_7_R4.BlockCarrots;
@@ -288,7 +289,7 @@ public final class NMSAdapter_v1_7_R4 implements NMSAdapter {
             NBTTagList currentTaskIds = tag.getList("task-id", 8);
             for(int i = 0; i < currentTaskIds.size(); i++){
                 String tagString = currentTaskIds.getString(i);
-                if(!tagString.equals(taskId.toString())) {
+                if(!tagString.equals(taskId.toString()) && ToolTaskManager.isTaskActive(UUID.fromString(tagString))) {
                     nbtTagList.add(new NBTTagString(tagString));
                 }
             }
@@ -296,7 +297,7 @@ public final class NMSAdapter_v1_7_R4 implements NMSAdapter {
         else{
             if(tag.hasKeyOfType("task-id", 8)) {
                 NBTTagString tagString = (NBTTagString) tag.get("task-id");
-                if(!tagString.a_().equals(taskId.toString()))
+                if(!tagString.a_().equals(taskId.toString()) && ToolTaskManager.isTaskActive(UUID.fromString(tagString.a_())))
                     nbtTagList.add(tagString);
             }
         }
