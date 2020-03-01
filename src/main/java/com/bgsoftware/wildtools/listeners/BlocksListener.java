@@ -79,24 +79,28 @@ public final class BlocksListener implements Listener {
             return;
         }
 
-        WTool.toolBlockBreak.add(e.getPlayer().getUniqueId());
+        try {
+            WTool.toolBlockBreak.add(e.getPlayer().getUniqueId());
 
-        if(tool.onBlockBreak(e)){
-            e.setCancelled(true);
-            tool.setLastUse(e.getPlayer().getUniqueId());
-        }
-
-        if(tool.isPrivate()) {
-            String owner = plugin.getNMSAdapter().getTag(inHand, "tool-owner", "");
-            if(owner.isEmpty()) {
-                inHand = plugin.getNMSAdapter().setTag(inHand, "tool-owner", e.getPlayer().getUniqueId().toString());
-                final ItemStack IN_HAND = inHand;
-                ItemUtils.formatItemStack(tool, IN_HAND, tool.getDefaultUses(), false, () ->
-                        plugin.getNMSAdapter().setItemInHand(e.getPlayer(), IN_HAND));
+            if (tool.onBlockBreak(e)) {
+                e.setCancelled(true);
+                tool.setLastUse(e.getPlayer().getUniqueId());
             }
-        }
 
-        WTool.toolBlockBreak.remove(e.getPlayer().getUniqueId());
+            if (tool.isPrivate()) {
+                String owner = plugin.getNMSAdapter().getTag(inHand, "tool-owner", "");
+                if (owner.isEmpty()) {
+                    inHand = plugin.getNMSAdapter().setTag(inHand, "tool-owner", e.getPlayer().getUniqueId().toString());
+                    final ItemStack IN_HAND = inHand;
+                    ItemUtils.formatItemStack(tool, IN_HAND, tool.getDefaultUses(), false, () ->
+                            plugin.getNMSAdapter().setItemInHand(e.getPlayer(), IN_HAND));
+                }
+            }
+        }catch(Exception ex){
+            ex.printStackTrace();
+        }finally {
+            WTool.toolBlockBreak.remove(e.getPlayer().getUniqueId());
+        }
     }
 
     @EventHandler(priority = EventPriority.LOW)
@@ -126,40 +130,44 @@ public final class BlocksListener implements Listener {
             return;
         }
 
-        WTool.toolBlockBreak.add(e.getPlayer().getUniqueId());
+        try {
+            WTool.toolBlockBreak.add(e.getPlayer().getUniqueId());
 
-        boolean toolInteract = false;
+            boolean toolInteract = false;
 
-        switch (e.getAction()){
-            case RIGHT_CLICK_AIR:
-                toolInteract = tool.onAirInteract(e);
-                break;
-            case RIGHT_CLICK_BLOCK:
-                if(!e.isCancelled())
-                    toolInteract = tool.onBlockInteract(e);
-                break;
-            case LEFT_CLICK_BLOCK:
-                if(!e.isCancelled())
-                    toolInteract = tool.onBlockHit(e);
-                break;
-        }
-
-        if(toolInteract){
-            e.setCancelled(true);
-            tool.setLastUse(e.getPlayer().getUniqueId());
-        }
-
-        if(tool.isPrivate()) {
-            String owner = plugin.getNMSAdapter().getTag(inHand, "tool-owner", "");
-            if(owner.isEmpty()) {
-                inHand = plugin.getNMSAdapter().setTag(inHand, "tool-owner", e.getPlayer().getUniqueId().toString());
-                final ItemStack IN_HAND = inHand;
-                ItemUtils.formatItemStack(tool, inHand, tool.getDefaultUses(), false, () ->
-                        plugin.getNMSAdapter().setItemInHand(e.getPlayer(), IN_HAND));
+            switch (e.getAction()) {
+                case RIGHT_CLICK_AIR:
+                    toolInteract = tool.onAirInteract(e);
+                    break;
+                case RIGHT_CLICK_BLOCK:
+                    if (!e.isCancelled())
+                        toolInteract = tool.onBlockInteract(e);
+                    break;
+                case LEFT_CLICK_BLOCK:
+                    if (!e.isCancelled())
+                        toolInteract = tool.onBlockHit(e);
+                    break;
             }
-        }
 
-        WTool.toolBlockBreak.remove(e.getPlayer().getUniqueId());
+            if (toolInteract) {
+                e.setCancelled(true);
+                tool.setLastUse(e.getPlayer().getUniqueId());
+            }
+
+            if (tool.isPrivate()) {
+                String owner = plugin.getNMSAdapter().getTag(inHand, "tool-owner", "");
+                if (owner.isEmpty()) {
+                    inHand = plugin.getNMSAdapter().setTag(inHand, "tool-owner", e.getPlayer().getUniqueId().toString());
+                    final ItemStack IN_HAND = inHand;
+                    ItemUtils.formatItemStack(tool, inHand, tool.getDefaultUses(), false, () ->
+                            plugin.getNMSAdapter().setItemInHand(e.getPlayer(), IN_HAND));
+                }
+            }
+        }catch(Exception ex){
+            ex.printStackTrace();
+        }finally {
+            WTool.toolBlockBreak.remove(e.getPlayer().getUniqueId());
+        }
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
