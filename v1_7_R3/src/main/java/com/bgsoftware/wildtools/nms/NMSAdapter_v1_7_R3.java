@@ -305,6 +305,17 @@ public final class NMSAdapter_v1_7_R3 implements NMSAdapter {
     }
 
     @Override
+    public org.bukkit.inventory.ItemStack clearTasks(org.bukkit.inventory.ItemStack itemStack) {
+        ItemStack nmsStack = CraftItemStack.asNMSCopy(itemStack);
+        NBTTagCompound tag = nmsStack.getTag();
+
+        if(tag != null)
+            tag.remove("task-id");
+
+        return CraftItemStack.asCraftMirror(nmsStack);
+    }
+
+    @Override
     public org.bukkit.inventory.ItemStack getItemInHand(Player player) {
         ItemStack itemStack = ((CraftInventoryPlayer) player.getInventory()).getInventory().getItemInHand();
         return CraftItemStack.asBukkitCopy(itemStack);

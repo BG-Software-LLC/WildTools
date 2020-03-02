@@ -23,6 +23,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import com.bgsoftware.wildtools.api.objects.tools.Tool;
+import org.bukkit.inventory.PlayerInventory;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -64,6 +65,17 @@ public final class PlayerListener implements Listener {
 
         if(selection != null)
             selection.remove();
+
+        PlayerInventory playerInventory = e.getPlayer().getInventory();
+
+        for(int i = 0; i < playerInventory.getSize(); i++){
+            ItemStack itemStack = playerInventory.getItem(i);
+            if(itemStack != null){
+                ItemStack newItem = ToolTaskManager.clearTasks(itemStack);
+                if(!itemStack.equals(newItem))
+                    playerInventory.setItem(i, newItem);
+            }
+        }
     }
 
     private Map<UUID, List<ItemStack>> keepInventoryTools = new HashMap<>();

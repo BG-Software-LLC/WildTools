@@ -66,6 +66,10 @@ public final class ToolTaskManager {
         throw new IllegalArgumentException("The item wasn't found in the inventory.");
     }
 
+    public static ItemStack clearTasks(ItemStack itemStack){
+        return plugin.getNMSAdapter().clearTasks(itemStack);
+    }
+
     public static void setItemOfTask(UUID taskId, ItemStack newItem){
         Object itemHolder = runningTasks.get(taskId);
 
