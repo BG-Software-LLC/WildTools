@@ -164,7 +164,7 @@ public final class ToolsHandler implements ToolsManager {
         }else if(toolClass.isAssignableFrom(CraftingTool.class)){
             tool = new WCraftingTool(type, name, (List<String>) arg);
         }else if(toolClass.isAssignableFrom(CrowbarTool.class)){
-            tool = new WCrowbarTool(type, name);
+            tool = new WCrowbarTool(type, name, (List<String>) arg);
         }else if(toolClass.isAssignableFrom(CuboidTool.class)){
             tool = new WCuboidTool(type, name, (int) arg);
         }else if(toolClass.isAssignableFrom(DrainTool.class)){

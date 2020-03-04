@@ -13,12 +13,21 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.List;
 import java.util.UUID;
 
 public final class WCrowbarTool extends WTool implements CrowbarTool {
 
-    public WCrowbarTool(Material type, String name){
+    private final List<String> commandsOnUse;
+
+    public WCrowbarTool(Material type, String name, List<String> commandsOnUse){
         super(type, name, ToolMode.CROWBAR);
+        this.commandsOnUse = commandsOnUse;
+    }
+
+    @Override
+    public List<String> getCommandsOnUse() {
+        return commandsOnUse;
     }
 
     @Override
@@ -33,8 +42,6 @@ public final class WCrowbarTool extends WTool implements CrowbarTool {
 
         CreatureSpawner creatureSpawner = (CreatureSpawner) e.getClickedBlock().getState();
 
-        ItemStack dropItem = plugin.getProviders().getItem(creatureSpawner);
-
         BukkitUtils.breakNaturally(e.getPlayer(), e.getClickedBlock(), this, null, null);
         e.getClickedBlock().setType(Material.AIR);
 
@@ -42,10 +49,20 @@ public final class WCrowbarTool extends WTool implements CrowbarTool {
         BlockBreakEvent blockBreakEvent = new BlockBreakEvent(e.getClickedBlock(), e.getPlayer());
         Bukkit.getPluginManager().callEvent(blockBreakEvent);
 
-        if (isAutoCollect())
-            ItemUtils.addItem(dropItem, e.getPlayer().getInventory(), e.getClickedBlock().getLocation());
-        else
-            e.getClickedBlock().getWorld().dropItemNaturally(e.getClickedBlock().getLocation(), dropItem);
+        if(commandsOnUse.isEmpty()) {
+            ItemStack dropItem = plugin.getProviders().getItem(creatureSpawner);
+
+            if (isAutoCollect())
+                ItemUtils.addItem(dropItem, e.getPlayer().getInventory(), e.getClickedBlock().getLocation());
+            else
+                e.getClickedBlock().getWorld().dropItemNaturally(e.getClickedBlock().getLocation(), dropItem);
+        }
+        else{
+            commandsOnUse.forEach(commandOnUse -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), commandOnUse
+                    .replace("%player%", e.getPlayer().getName())
+                    .replace("%entity%", creatureSpawner.getSpawnedType().name())
+            ));
+        }
 
         CrowbarWandUseEvent crowbarWandUseEvent = new CrowbarWandUseEvent(e.getPlayer(), this, e.getClickedBlock());
         Bukkit.getPluginManager().callEvent(crowbarWandUseEvent);

@@ -36,6 +36,9 @@ prices-list:
 #
 # *** Crowbar Tool-Mode ***
 # Tools in this mode will break spawners and drop them.
+# Optional sections:
+# commands-on-use: A command that will be ran when using the crowbar on a spawner.
+#                 Use %player% for player's name and %entity% for entity's type.
 #
 # *** Cuboid Tool-Mode ***
 # Tools in this mode will dig a cuboid-area (for example, 3x3x3). This mode is used for trench and tray pickaxes.
