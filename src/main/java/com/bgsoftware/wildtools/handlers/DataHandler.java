@@ -114,7 +114,7 @@ public final class DataHandler {
                     tool = plugin.getToolsManager().registerTool(type, name, CraftingTool.class, cfg.getStringList("tools." + name + ".craftings"));
                     break;
                 case "CROWBAR":
-                    tool = plugin.getToolsManager().registerTool(type, name, CrowbarTool.class, cfg.getString("tools." + name + ".command-on-use", ""));
+                    tool = plugin.getToolsManager().registerTool(type, name, CrowbarTool.class, cfg.getStringList("tools." + name + ".commands-on-use"));
                     break;
                 case "CUBOID":
                     if(!cfg.contains("tools." + name + ".break-level")){
