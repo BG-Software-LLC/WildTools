@@ -2,6 +2,7 @@ package com.bgsoftware.wildtools.utils.items;
 
 import com.bgsoftware.wildtools.WildToolsPlugin;
 import com.google.common.collect.Maps;
+import org.bukkit.Material;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -131,7 +132,7 @@ public final class ToolTaskManager {
     }
 
     private static boolean isSameTask(ItemStack itemStack, UUID taskId){
-        return itemStack != null && plugin.getNMSAdapter().getTasks(itemStack).contains(taskId);
+        return itemStack != null && itemStack.getType() != Material.AIR && plugin.getNMSAdapter().getTasks(itemStack).contains(taskId);
     }
 
 }
