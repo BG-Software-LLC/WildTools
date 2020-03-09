@@ -8,6 +8,7 @@ import com.bgsoftware.wildtools.utils.items.ItemUtils;
 import com.bgsoftware.wildtools.utils.items.ToolTaskManager;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.entity.PlayerDeathEvent;
@@ -113,18 +114,33 @@ public final class PlayerListener implements Listener {
         }
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onToolDrop(PlayerDropItemEvent e){
-        String taskId = plugin.getNMSAdapter().getTag(e.getItemDrop().getItemStack(), "task-id", "");
-        if(!taskId.isEmpty())
-            ToolTaskManager.handleDropItem(UUID.fromString(taskId), e.getItemDrop());
+        List<UUID> taskIds = plugin.getNMSAdapter().getTasks(e.getItemDrop().getItemStack());
+        if(!taskIds.isEmpty())
+            taskIds.forEach(taskId -> ToolTaskManager.handleDropItem(taskId, e.getItemDrop()));
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onToolDrop(PlayerPickupItemEvent e){
-        String taskId = plugin.getNMSAdapter().getTag(e.getItem().getItemStack(), "task-id", "");
-        if(!taskId.isEmpty())
-            ToolTaskManager.handlePickupItem(UUID.fromString(taskId), e.getPlayer());
+        List<UUID> taskIds = plugin.getNMSAdapter().getTasks(e.getItem().getItemStack());
+        if(!taskIds.isEmpty())
+            taskIds.forEach(taskId -> ToolTaskManager.handlePickupItem(taskId, e.getPlayer()));
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onToolDrop(PlayerDeathEvent e){
+        List<ItemStack>  drops = new ArrayList<>(e.getDrops());
+        for(ItemStack itemStack : drops) {
+            if(itemStack != null) {
+                List<UUID> taskIds = plugin.getNMSAdapter().getTasks(itemStack);
+                if (!taskIds.isEmpty()) {
+                    e.getDrops().remove(itemStack);
+                    Item droppedItem = e.getEntity().getWorld().dropItemNaturally(e.getEntity().getLocation(), itemStack);
+                    taskIds.forEach(taskId -> ToolTaskManager.handleDropItem(taskId, droppedItem));
+                }
+            }
+        }
     }
 
     private void sendMessage(Player player, String message){
