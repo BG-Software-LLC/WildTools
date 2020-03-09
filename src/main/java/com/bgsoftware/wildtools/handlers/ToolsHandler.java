@@ -36,7 +36,6 @@ import com.bgsoftware.wildtools.api.objects.tools.SortTool;
 import com.bgsoftware.wildtools.api.objects.tools.Tool;
 import com.bgsoftware.wildtools.objects.tools.WDrainTool;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -144,6 +143,10 @@ public final class ToolsHandler implements ToolsManager {
         return Collections.unmodifiableList(tools);
     }
 
+    public void clearTools(){
+        tools.clear();
+    }
+
     @Override
     public Selection getSelection(Player player){
         return WCannonTool.getSelection(player);
@@ -209,13 +212,7 @@ public final class ToolsHandler implements ToolsManager {
     }
 
     public static void reload(){
-        try{
-            Field field = ToolsHandler.class.getDeclaredField("tools");
-            field.setAccessible(true);
-            ((List<Tool>) field.get(WildToolsPlugin.getPlugin().getToolsManager())).clear();
-        }catch(Exception ex){
-            ex.printStackTrace();
-        }
+        WildToolsPlugin.getPlugin().getToolsManager().clearTools();
     }
 
     private <T extends Tool> T getTool(ItemStack itemStack, ToolMode mode, Class<T> clazz){

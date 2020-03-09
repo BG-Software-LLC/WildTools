@@ -10,7 +10,7 @@ import java.util.Map;
 public final class PricesProvider_Default implements PricesProvider {
 
     @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
-    private static Map<String, Double> prices = new HashMap<>();
+    public static Map<String, Double> prices = new HashMap<>();
 
     public PricesProvider_Default(){
         WildToolsPlugin.log(" - Couldn't find any prices providers, using default one.");

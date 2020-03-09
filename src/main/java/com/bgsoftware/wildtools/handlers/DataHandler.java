@@ -22,7 +22,6 @@ import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 
 import java.io.File;
-import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -68,13 +67,7 @@ public final class DataHandler {
             }
         }
 
-        try{
-            Field pricesMap = PricesProvider_Default.class.getDeclaredField("prices");
-            pricesMap.setAccessible(true);
-            pricesMap.set(null, prices);
-        } catch (NoSuchFieldException | IllegalAccessException e){
-            e.printStackTrace();
-        }
+        PricesProvider_Default.prices = prices;
 
         for(String name : cfg.getConfigurationSection("tools").getKeys(false)){
             Material type;
