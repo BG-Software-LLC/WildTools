@@ -33,9 +33,8 @@ public final class WLightningTool extends WTool implements LightningTool {
 
         for(Entity entity : e.getPlayer().getNearbyEntities(10, 10, 10)){
             if(entity instanceof Creeper && !((Creeper) entity).isPowered()){
-                Vector toEntity = ((LivingEntity) entity).getEyeLocation().toVector().subtract(eye.toVector());
-                double dot = toEntity.normalize().dot(eye.getDirection());
-                if(dot > 0.99D){
+                if(checkVector(((LivingEntity) entity).getEyeLocation(), eye) ||
+                        checkVector(entity.getLocation(), eye) || checkVector(entity.getLocation().subtract(0, 1, 0), eye)){
                     handleUse(e.getPlayer(), e.getItem(), entity);
                     break;
                 }
@@ -48,6 +47,12 @@ public final class WLightningTool extends WTool implements LightningTool {
     @Override
     public boolean onBlockInteract(PlayerInteractEvent e) {
         return onAirInteract(e);
+    }
+
+    private boolean checkVector(Location location, Location eye){
+        Vector toEntity = location.toVector().subtract(eye.toVector());
+        double dot = toEntity.normalize().dot(eye.getDirection());
+        return dot > 0.9D;
     }
 
     private void handleUse(Player player, ItemStack usedItem, Entity entity){
