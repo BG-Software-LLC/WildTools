@@ -74,7 +74,8 @@ public final class ToolTaskManager {
     public static void setItemOfTask(UUID taskId, ItemStack newItem){
         Object itemHolder = runningTasks.get(taskId);
 
-        newItem = plugin.getNMSAdapter().removeTask(newItem, taskId);
+        if(newItem.getType() != Material.AIR)
+            newItem = plugin.getNMSAdapter().removeTask(newItem, taskId);
 
         if(itemHolder instanceof Player) {
             Player player = (Player) itemHolder;
