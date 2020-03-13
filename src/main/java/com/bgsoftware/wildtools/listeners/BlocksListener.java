@@ -6,11 +6,13 @@ import com.bgsoftware.wildtools.objects.tools.WTool;
 
 import com.bgsoftware.wildtools.utils.items.ItemUtils;
 import org.bukkit.Material;
+import org.bukkit.block.BlockFace;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 
 import com.bgsoftware.wildtools.api.objects.tools.Tool;
@@ -150,6 +152,57 @@ public final class BlocksListener implements Listener {
             }
 
             if (toolInteract) {
+                e.setCancelled(true);
+                tool.setLastUse(e.getPlayer().getUniqueId());
+            }
+
+            if (tool.isPrivate()) {
+                String owner = plugin.getNMSAdapter().getTag(inHand, "tool-owner", "");
+                if (owner.isEmpty()) {
+                    inHand = plugin.getNMSAdapter().setTag(inHand, "tool-owner", e.getPlayer().getUniqueId().toString());
+                    final ItemStack IN_HAND = inHand;
+                    ItemUtils.formatItemStack(tool, inHand, tool.getDefaultUses(), false, () ->
+                            plugin.getNMSAdapter().setItemInHand(e.getPlayer(), IN_HAND));
+                }
+            }
+        }catch(Exception ex){
+            ex.printStackTrace();
+        }finally {
+            WTool.toolBlockBreak.remove(e.getPlayer().getUniqueId());
+        }
+    }
+
+    @EventHandler(priority = EventPriority.LOW)
+    public void onEntityInteract(PlayerInteractAtEntityEvent e){
+        //One of the blocks that were broken by a tool
+        if(WTool.toolBlockBreak.contains(e.getPlayer().getUniqueId()))
+            return;
+
+        if(!e.getPlayer().hasPermission("wildtools.use"))
+            return;
+
+        ItemStack inHand = plugin.getNMSAdapter().getItemInHand(e.getPlayer());
+        Tool tool = plugin.getToolsManager().getTool(inHand);
+
+        if(tool == null)
+            return;
+
+        if(!tool.canUse(e.getPlayer().getUniqueId())){
+            e.setCancelled(true);
+            Locale.COOLDOWN_TIME.send(e.getPlayer(), getTime(tool.getTimeLeft(e.getPlayer().getUniqueId())));
+            return;
+        }
+
+        if(!plugin.getToolsManager().isOwningTool(inHand, e.getPlayer())){
+            e.setCancelled(true);
+            Locale.NOT_OWNER.send(e.getPlayer());
+            return;
+        }
+
+        try {
+            WTool.toolBlockBreak.add(e.getPlayer().getUniqueId());
+
+            if (tool.onAirInteract(new PlayerInteractEvent(e.getPlayer(), Action.RIGHT_CLICK_AIR, inHand, null, BlockFace.UP))) {
                 e.setCancelled(true);
                 tool.setLastUse(e.getPlayer().getUniqueId());
             }
