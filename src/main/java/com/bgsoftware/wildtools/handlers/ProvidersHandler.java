@@ -18,24 +18,11 @@ import com.bgsoftware.wildtools.hooks.BlocksProvider_SuperiorSkyblock;
 import com.bgsoftware.wildtools.hooks.BlocksProvider_Towny;
 import com.bgsoftware.wildtools.hooks.BlocksProvider_Villages;
 import com.bgsoftware.wildtools.hooks.BlocksProvider_WorldGuard;
-
 import com.bgsoftware.wildtools.hooks.DropsProvider;
 import com.bgsoftware.wildtools.hooks.DropsProvider_VoidChest;
+import com.bgsoftware.wildtools.hooks.DropsProvider_WildStacker;
+import com.bgsoftware.wildtools.hooks.DropsProviders_WildToolsSpawners;
 import com.bgsoftware.wildtools.hooks.PricesProvider_CMI;
-import com.bgsoftware.wildtools.hooks.SpawnersProvider;
-import com.bgsoftware.wildtools.hooks.SpawnersProvider_Default;
-import com.bgsoftware.wildtools.hooks.SpawnersProvider_WildStacker;
-import com.google.common.collect.Lists;
-import net.milkbowl.vault.economy.Economy;
-
-import org.bukkit.Bukkit;
-import org.bukkit.Material;
-import org.bukkit.block.Block;
-import org.bukkit.block.CreatureSpawner;
-import org.bukkit.entity.Item;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-
 import com.bgsoftware.wildtools.hooks.FactionsProvider;
 import com.bgsoftware.wildtools.hooks.FactionsProvider_Default;
 import com.bgsoftware.wildtools.hooks.FactionsProvider_SavageFactions;
@@ -43,6 +30,17 @@ import com.bgsoftware.wildtools.hooks.PricesProvider;
 import com.bgsoftware.wildtools.hooks.PricesProvider_Default;
 import com.bgsoftware.wildtools.hooks.PricesProvider_Essentials;
 import com.bgsoftware.wildtools.hooks.PricesProvider_ShopGUIPlus;
+
+import com.google.common.collect.Lists;
+
+import net.milkbowl.vault.economy.Economy;
+
+import org.bukkit.Bukkit;
+import org.bukkit.Material;
+import org.bukkit.block.Block;
+import org.bukkit.entity.Item;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 
 import java.util.ArrayList;
@@ -61,7 +59,6 @@ public final class ProvidersHandler {
     private List<DropsProvider> dropsProviders = Lists.newArrayList();
     private PricesProvider pricesProvider;
     private FactionsProvider factionsProvider;
-    private SpawnersProvider spawnersProvider;
 
     public ProvidersHandler(){
         loadData();
@@ -127,13 +124,10 @@ public final class ProvidersHandler {
         return true;
     }
 
-    public ItemStack getItem(CreatureSpawner creatureSpawner){
-        return spawnersProvider.getItem(creatureSpawner);
-    }
-
-    public List<ItemStack> getBlockDrops(Block block){
+    public List<ItemStack> getBlockDrops(Block block, boolean onlySpawner){
         List<ItemStack> drops = new ArrayList<>();
-        dropsProviders.forEach(dropsProvider -> drops.addAll(dropsProvider.getBlockDrops(block)));
+        dropsProviders.stream().filter(dropsProvider -> onlySpawner == dropsProvider.isSpawnersOnly())
+                .forEach(dropsProvider -> drops.addAll(dropsProvider.getBlockDrops(block)));
         return drops;
     }
 
@@ -210,13 +204,14 @@ public final class ProvidersHandler {
                 blocksProviders.add(new BlocksProvider_PlotSquared());
             }
         }
-        //Spawners Plugin Hook
-        if(Bukkit.getPluginManager().isPluginEnabled("WildStacker"))
-            spawnersProvider = new SpawnersProvider_WildStacker();
-        else spawnersProvider = new SpawnersProvider_Default();
         //Drops Plugin hook
         if(Bukkit.getPluginManager().isPluginEnabled("VoidChest"))
             dropsProviders.add(new DropsProvider_VoidChest());
+        //Drops for spawners
+        if(Bukkit.getPluginManager().isPluginEnabled("WildStacker"))
+            dropsProviders.add(new DropsProvider_WildStacker());
+        else
+            dropsProviders.add(new DropsProviders_WildToolsSpawners());
     }
 
     public static void reload(){

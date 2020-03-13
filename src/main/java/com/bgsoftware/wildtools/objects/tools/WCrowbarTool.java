@@ -42,15 +42,8 @@ public final class WCrowbarTool extends WTool implements CrowbarTool {
 
         CreatureSpawner creatureSpawner = (CreatureSpawner) e.getClickedBlock().getState();
 
-        BukkitUtils.breakNaturally(e.getPlayer(), e.getClickedBlock(), this, null, null);
-        e.getClickedBlock().setType(Material.AIR);
-
-        //We're telling all the other plugins that the block was broken.
-        BlockBreakEvent blockBreakEvent = new BlockBreakEvent(e.getClickedBlock(), e.getPlayer());
-        Bukkit.getPluginManager().callEvent(blockBreakEvent);
-
         if(commandsOnUse.isEmpty()) {
-            ItemStack dropItem = plugin.getProviders().getItem(creatureSpawner);
+            ItemStack dropItem = plugin.getProviders().getBlockDrops(e.getClickedBlock(), true).get(0);
 
             if (isAutoCollect())
                 ItemUtils.addItem(dropItem, e.getPlayer().getInventory(), e.getClickedBlock().getLocation());
@@ -63,6 +56,9 @@ public final class WCrowbarTool extends WTool implements CrowbarTool {
                     .replace("%entity%", creatureSpawner.getSpawnedType().name())
             ));
         }
+
+        BukkitUtils.breakNaturally(e.getPlayer(), e.getClickedBlock(), this, null, null);
+        e.getClickedBlock().setType(Material.AIR);
 
         CrowbarWandUseEvent crowbarWandUseEvent = new CrowbarWandUseEvent(e.getPlayer(), this, e.getClickedBlock());
         Bukkit.getPluginManager().callEvent(crowbarWandUseEvent);

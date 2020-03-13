@@ -9,4 +9,8 @@ public interface DropsProvider {
 
     List<ItemStack> getBlockDrops(Block block);
 
+    default boolean isSpawnersOnly(){
+        return false;
+    }
+
 }

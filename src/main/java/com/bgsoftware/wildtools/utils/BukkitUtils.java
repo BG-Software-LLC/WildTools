@@ -91,7 +91,7 @@ public final class BukkitUtils {
     }
 
     public static List<ItemStack> getBlockDrops(Player player, Block block, Tool tool){
-        List<ItemStack> drops = plugin.getProviders().getBlockDrops(block);
+        List<ItemStack> drops = plugin.getProviders().getBlockDrops(block, false);
 
         if(!drops.isEmpty())
             return drops;
