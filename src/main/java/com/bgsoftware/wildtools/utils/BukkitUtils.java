@@ -91,6 +91,11 @@ public final class BukkitUtils {
     }
 
     public static List<ItemStack> getBlockDrops(Player player, Block block, Tool tool){
+        List<ItemStack> drops = plugin.getProviders().getBlockDrops(block);
+
+        if(!drops.isEmpty())
+            return drops;
+
         if(!Boolean.parseBoolean(block.getWorld().getGameRuleValue("doTileDrops")))
             return new ArrayList<>();
 

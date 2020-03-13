@@ -19,6 +19,8 @@ import com.bgsoftware.wildtools.hooks.BlocksProvider_Towny;
 import com.bgsoftware.wildtools.hooks.BlocksProvider_Villages;
 import com.bgsoftware.wildtools.hooks.BlocksProvider_WorldGuard;
 
+import com.bgsoftware.wildtools.hooks.DropsProvider;
+import com.bgsoftware.wildtools.hooks.DropsProvider_VoidChest;
 import com.bgsoftware.wildtools.hooks.PricesProvider_CMI;
 import com.bgsoftware.wildtools.hooks.SpawnersProvider;
 import com.bgsoftware.wildtools.hooks.SpawnersProvider_Default;
@@ -43,6 +45,7 @@ import com.bgsoftware.wildtools.hooks.PricesProvider_Essentials;
 import com.bgsoftware.wildtools.hooks.PricesProvider_ShopGUIPlus;
 import org.bukkit.plugin.Plugin;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public final class ProvidersHandler {
@@ -55,6 +58,7 @@ public final class ProvidersHandler {
     private Economy economy;
 
     private List<BlocksProvider> blocksProviders = Lists.newArrayList();
+    private List<DropsProvider> dropsProviders = Lists.newArrayList();
     private PricesProvider pricesProvider;
     private FactionsProvider factionsProvider;
     private SpawnersProvider spawnersProvider;
@@ -125,6 +129,12 @@ public final class ProvidersHandler {
 
     public ItemStack getItem(CreatureSpawner creatureSpawner){
         return spawnersProvider.getItem(creatureSpawner);
+    }
+
+    public List<ItemStack> getBlockDrops(Block block){
+        List<ItemStack> drops = new ArrayList<>();
+        dropsProviders.forEach(dropsProvider -> drops.addAll(dropsProvider.getBlockDrops(block)));
+        return drops;
     }
 
     /*
@@ -204,6 +214,9 @@ public final class ProvidersHandler {
         if(Bukkit.getPluginManager().isPluginEnabled("WildStacker"))
             spawnersProvider = new SpawnersProvider_WildStacker();
         else spawnersProvider = new SpawnersProvider_Default();
+        //Drops Plugin hook
+        if(Bukkit.getPluginManager().isPluginEnabled("VoidChest"))
+            dropsProviders.add(new DropsProvider_VoidChest());
     }
 
     public static void reload(){
