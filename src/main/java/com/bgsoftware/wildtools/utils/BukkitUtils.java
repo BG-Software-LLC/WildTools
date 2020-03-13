@@ -29,6 +29,7 @@ public final class BukkitUtils {
 
     public static void breakNaturally(Player player, BlocksController blocksController, Block block, Tool tool){
         boolean autoCollect = tool.isAutoCollect();
+        boolean omniTool = tool.isOmni();
 
         Consumer<ItemStack> onItemDrop = itemConsumer -> {
             if (autoCollect)
@@ -38,7 +39,7 @@ public final class BukkitUtils {
         };
 
         Consumer<Block> onBlockBreak = blockConsumer -> {
-            if(blockConsumer.getType().hasGravity() || Arrays.stream(blockFaces)
+            if(omniTool || blockConsumer.getType().hasGravity() || Arrays.stream(blockFaces)
                     .anyMatch(blockFace -> blockConsumer.getRelative(blockFace).getType().name().contains("WATER")))
                 blockConsumer.setType(Material.AIR);
             else
