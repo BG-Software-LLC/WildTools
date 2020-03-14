@@ -1,6 +1,7 @@
 package com.bgsoftware.wildtools.utils.blocks;
 
 import com.bgsoftware.wildtools.WildToolsPlugin;
+import com.bgsoftware.wildtools.hooks.McMMOHook;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
@@ -48,8 +49,11 @@ public final class BlocksController {
         //Refreshing chunks
         for(Map.Entry<CachedChunk, Map<Location, Integer>> entry : cachedChunks.entrySet()) {
             Set<Location> locations = entry.getValue().keySet();
-            for(Map.Entry<Location, Integer> blockEntry : entry.getValue().entrySet())
+            for(Map.Entry<Location, Integer> blockEntry : entry.getValue().entrySet()) {
                 plugin.getNMSAdapter().setBlockFast(blockEntry.getKey(), blockEntry.getValue());
+                if(blockEntry.getValue() != 0)
+                    McMMOHook.markAsPlaced(blockEntry.getKey());
+            }
             plugin.getNMSAdapter().refreshChunk(entry.getKey().buildChunk(), locations);
         }
 
