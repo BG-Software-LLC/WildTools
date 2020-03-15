@@ -29,6 +29,7 @@ import com.bgsoftware.wildtools.hooks.FactionsProvider_SavageFactions;
 import com.bgsoftware.wildtools.hooks.PricesProvider;
 import com.bgsoftware.wildtools.hooks.PricesProvider_Default;
 import com.bgsoftware.wildtools.hooks.PricesProvider_Essentials;
+import com.bgsoftware.wildtools.hooks.PricesProvider_GUIShop;
 import com.bgsoftware.wildtools.hooks.PricesProvider_ShopGUIPlus;
 
 import com.google.common.collect.Lists;
@@ -156,6 +157,8 @@ public final class ProvidersHandler {
         //Prices Plugin Hookup
         if(pricesPlugin.equalsIgnoreCase("ShopGUIPlus") && Bukkit.getPluginManager().isPluginEnabled("ShopGUIPlus"))
             pricesProvider = new PricesProvider_ShopGUIPlus();
+        else if(pricesPlugin.equalsIgnoreCase("GUIShop") && Bukkit.getPluginManager().isPluginEnabled("GUIShop"))
+            pricesProvider = new PricesProvider_GUIShop();
         else if(pricesPlugin.equalsIgnoreCase("Essentials") && Bukkit.getPluginManager().isPluginEnabled("Essentials"))
             pricesProvider = new PricesProvider_Essentials();
         else if(pricesPlugin.equals("CMI") && Bukkit.getPluginManager().isPluginEnabled("CMI"))
