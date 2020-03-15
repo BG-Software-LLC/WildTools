@@ -37,6 +37,12 @@ public final class DropsProvider_VoidChest implements DropsProvider {
             drops.add(itemStack);
         });
 
+        voidStorage.getInventoryHandler().closeInventories();
+        voidStorage.getVoidStorageAbilities().setHologramActivated(false);
+        voidStorage.getVoidStorageHologram().updateHologram();
+        voidStorage.getPlayerData().getVoidStorages().remove(voidStorage);
+        voidStorage.getPlayerData().loadStatsToFile(false);
+
         return drops;
     }
 }
