@@ -57,30 +57,30 @@ public final class WMagnetTool extends WTool implements MagnetTool {
             List<Item> affectedItems = new ArrayList<>();
 
             for(Item item : nearbyItems) {
-                if (!item.isValid() || item.isDead() || !plugin.getProviders().canPickupItem(player, item))
-                    continue;
+                synchronized (item) {
+                    if (!item.isValid() || item.isDead() || !plugin.getProviders().canPickupItem(player, item))
+                        continue;
 
-                ItemStack itemStack = Bukkit.getPluginManager().isPluginEnabled("WildStacker") ?
-                        WildStackerHook.getItemStack(item) : item.getItemStack();
+                    ItemStack itemStack = Bukkit.getPluginManager().isPluginEnabled("WildStacker") ?
+                            WildStackerHook.getItemStack(item) : item.getItemStack();
 
-                Map<Integer, ItemStack> additionalItems = player.getInventory().addItem(itemStack);
+                    Map<Integer, ItemStack> additionalItems = player.getInventory().addItem(itemStack);
 
-                if (additionalItems.isEmpty()) {
-                    affectedItems.add(item);
-                    item.remove();
-                    plugin.getNMSAdapter().playPickupAnimation(player, item);
-                    reduceDurability = true;
-                }
-                else{
-                    ItemStack additionalItem = additionalItems.get(0);
-                    affectedItems.add(item);
-                    if(Bukkit.getPluginManager().isPluginEnabled("WildStacker")){
-                        WildStackerHook.setItemStack(item, additionalItem);
+                    if (additionalItems.isEmpty()) {
+                        affectedItems.add(item);
+                        item.remove();
+                        plugin.getNMSAdapter().playPickupAnimation(player, item);
+                        reduceDurability = true;
+                    } else {
+                        ItemStack additionalItem = additionalItems.get(0);
+                        affectedItems.add(item);
+                        if (Bukkit.getPluginManager().isPluginEnabled("WildStacker")) {
+                            WildStackerHook.setItemStack(item, additionalItem);
+                        } else {
+                            item.setItemStack(additionalItem);
+                        }
+                        reduceDurability = true;
                     }
-                    else {
-                        item.setItemStack(additionalItem);
-                    }
-                    reduceDurability = true;
                 }
             }
 
