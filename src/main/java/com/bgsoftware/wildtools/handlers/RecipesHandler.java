@@ -1,7 +1,10 @@
 package com.bgsoftware.wildtools.handlers;
 
 import com.bgsoftware.wildtools.WildToolsPlugin;
+import com.bgsoftware.wildtools.api.objects.tools.Tool;
+import com.bgsoftware.wildtools.recipes.AdvancedShapedRecipe;
 import com.bgsoftware.wildtools.utils.items.ItemBuilder;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.inventory.ItemStack;
@@ -12,8 +15,6 @@ import java.util.List;
 import java.util.Map;
 
 public final class RecipesHandler {
-
-    private Map<String, ItemStack[]> recipes = new HashMap<>();
 
     public RecipesHandler(WildToolsPlugin plugin){
         File file = new File(plugin.getDataFolder(), "recipes.yml");
@@ -28,28 +29,57 @@ public final class RecipesHandler {
 
         if(cfg.contains("items")){
             for(String name : cfg.getConfigurationSection("items").getKeys(false)){
-                recipeItems.put(name.toLowerCase(), new ItemBuilder(cfg.getConfigurationSection("items." + name)).build());
+                recipeItems.put(name.toUpperCase(), new ItemBuilder(cfg.getConfigurationSection("items." + name)).build());
             }
         }
 
         if(cfg.contains("recipes")){
-            outerLoop: for(String name : cfg.getConfigurationSection("recipes").getKeys(false)){
+            outerLoop:
+            for(String name : cfg.getConfigurationSection("recipes").getKeys(false)){
+                Tool tool = plugin.getToolsManager().getTool(name);
+
+                if(tool == null) {
+                    WildToolsPlugin.log("Couldn't find the tool " + name + ", skipping recipe...");
+                    continue;
+                }
+
+                Map<String, Character> typeToChar = new HashMap<>();
+                Map<Character, ItemStack> charToItem = new HashMap<>();
+
                 List<String> configRecipe = cfg.getStringList("recipes." + name);
-                ItemStack[] recipe = new ItemStack[9];
+
+                char[][] shape = new char[][] {
+                        new char[] {' ', ' ', ' '},
+                        new char[] {' ', ' ', ' '},
+                        new char[] {' ', ' ', ' '}
+                };
 
                 for(int i = 0; i < 3; i++){
                     String[] types = configRecipe.get(i).split(", ");
                     for(int j = 0; j < 3; j++){
+                        String type = types[j].toUpperCase();
+
+                        Character ch = typeToChar.get(type);
+
+                        if(ch != null) {
+                            shape[i][j] = ch;
+                            continue;
+                        }
+
+                        ch = generateChar(type, typeToChar);
+                        shape[i][j] = ch;
+
                         ItemStack itemStack;
 
                         try {
-                            if (recipeItems.containsKey(types[j].toLowerCase())) {
-                                itemStack = recipeItems.get(types[j].toLowerCase());
+                            if (recipeItems.containsKey(type)) {
+                                itemStack = recipeItems.get(type);
                             } else {
-                                if (types[j].contains(":")) {
-                                    itemStack = new ItemStack(Material.valueOf(types[j].split(":")[0]), 1, Short.valueOf(types[j].split(":")[1]));
+                                if (type.contains(":")) {
+                                    String[] typeSections = type.split(":");
+                                    itemStack = new ItemStack(Material.valueOf(typeSections[0]), 1, Short.parseShort(typeSections[1]));
                                 } else {
-                                    itemStack = new ItemStack(Material.valueOf(types[j]));
+                                    itemStack = new ItemStack(Material.valueOf(type));
                                 }
                             }
                         }catch(Exception ex){
@@ -57,22 +87,35 @@ public final class RecipesHandler {
                             continue outerLoop;
                         }
 
-                        recipe[3*i + j] = itemStack;
+                        charToItem.put(ch, itemStack);
                     }
                 }
 
-                for(int i = 0; i < 9; i++){
-                    if(recipe[i] == null)
-                        recipe[i] = new ItemStack(Material.AIR);
-                }
+                AdvancedShapedRecipe recipe = new AdvancedShapedRecipe(tool.getFormattedItemStack());
+                recipe.shape(new String(shape[0]), new String(shape[1]), new String(shape[2]));
 
-                recipes.put(name, recipe);
+                for(Map.Entry<Character, ItemStack> entry : charToItem.entrySet())
+                    recipe.setIngredient(entry.getKey(), entry.getValue());
+
+                Bukkit.addRecipe(recipe);
             }
         }
 
     }
 
-    public Map<String, ItemStack[]> getRecipes() {
-        return new HashMap<>(recipes);
+    private char[] charsToGenerate = new char[]{
+            'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H','I'
+    };
+
+    private char generateChar(String type, Map<String, Character> typeToChar){
+        for(char ch : charsToGenerate){
+            if(!typeToChar.containsValue(ch)){
+                typeToChar.put(type, ch);
+                return ch;
+            }
+        }
+
+        throw new RuntimeException("Failed to find a character to generate!");
     }
+
 }

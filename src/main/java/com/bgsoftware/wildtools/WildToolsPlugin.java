@@ -20,7 +20,6 @@ import com.bgsoftware.wildtools.listeners.BlocksListener;
 import com.bgsoftware.wildtools.listeners.EditorListener;
 import com.bgsoftware.wildtools.listeners.McMMOListener;
 import com.bgsoftware.wildtools.listeners.PlayerListener;
-import com.bgsoftware.wildtools.listeners.RecipesListener;
 import com.bgsoftware.wildtools.nms.NMSAdapter;
 
 import net.milkbowl.vault.economy.Economy;
@@ -53,7 +52,6 @@ public final class WildToolsPlugin extends JavaPlugin implements WildTools {
         getServer().getPluginManager().registerEvents(new BlocksListener(this), this);
         getServer().getPluginManager().registerEvents(new PlayerListener(this), this);
         getServer().getPluginManager().registerEvents(new EditorListener(this), this);
-        getServer().getPluginManager().registerEvents(new RecipesListener(this), this);
         if(getServer().getPluginManager().isPluginEnabled("mcMMO"))
             getServer().getPluginManager().registerEvents(new McMMOListener(this), this);
 
