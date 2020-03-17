@@ -58,6 +58,9 @@ public final class WBuilderTool extends WTool implements BuilderTool {
             blockItemStack = new ItemStack(blockData.getMaterial());
         }catch(Exception ex){
             blockItemStack = e.getClickedBlock().getState().getData().toItemStack(1);
+            if((blockItemStack.getType().name().contains("STEP") || blockItemStack.getType().name().contains("SLAB")) &&
+                    blockItemStack.getDurability() >= 8)
+                blockItemStack.setDurability((short) (blockItemStack.getDurability() - 8));
         }
 
         int amountOfBlocks = InventoryUtils.countItems(e.getPlayer().getInventory(), blockItemStack);
