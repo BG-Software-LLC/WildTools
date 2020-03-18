@@ -1,5 +1,7 @@
 package com.bgsoftware.wildtools.nms;
 
+import com.bgsoftware.wildtools.recipes.AdvancedShapedRecipe;
+import org.apache.commons.lang.Validate;
 import org.bukkit.Chunk;
 import org.bukkit.CropState;
 import org.bukkit.Location;
@@ -12,9 +14,12 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.Recipe;
+import org.bukkit.inventory.ShapedRecipe;
 
+import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -90,6 +95,60 @@ public interface NMSAdapter {
 
     default String getRenameText(InventoryView inventoryView){
         return "";
+    }
+
+    default AdvancedShapedRecipe createRecipe(String toolName, ItemStack result){
+        return new AdvancedRecipeClassImpl(result);
+    }
+
+    class AdvancedRecipeClassImpl extends ShapedRecipe implements AdvancedShapedRecipe {
+
+        private static Field ingredientsField;
+
+        static {
+            try{
+                ingredientsField = ShapedRecipe.class.getDeclaredField("ingredients");
+                ingredientsField.setAccessible(true);
+            }catch(Exception ex){
+                ex.printStackTrace();
+            }
+        }
+
+        private Map<Character, ItemStack> ingredients;
+
+        public AdvancedRecipeClassImpl(org.bukkit.inventory.ItemStack result){
+            super(result);
+            updateIngredients();
+        }
+
+        @Override
+        public AdvancedRecipeClassImpl shape(String... shape) {
+            super.shape(shape);
+            updateIngredients();
+            return this;
+        }
+
+        @Override
+        public AdvancedRecipeClassImpl setIngredient(char key, org.bukkit.inventory.ItemStack itemStack) {
+            Validate.isTrue(this.ingredients.containsKey(key), "Symbol does not appear in the shape: ", key);
+            this.ingredients.put(key, itemStack);
+            return this;
+        }
+
+        @Override
+        public ShapedRecipe toRecipe() {
+            return this;
+        }
+
+        private void updateIngredients(){
+            try{
+                //noinspection unchecked
+                ingredients = (Map<Character, org.bukkit.inventory.ItemStack>) ingredientsField.get(this);
+            }catch(Exception ex){
+                throw new RuntimeException(ex);
+            }
+        }
+
     }
 
 }

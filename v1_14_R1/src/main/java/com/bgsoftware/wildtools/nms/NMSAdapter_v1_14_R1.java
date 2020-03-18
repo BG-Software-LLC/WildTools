@@ -1,7 +1,9 @@
 package com.bgsoftware.wildtools.nms;
 
+import com.bgsoftware.wildtools.WildToolsPlugin;
 import com.bgsoftware.wildtools.hooks.PaperHook;
 import com.bgsoftware.wildtools.objects.WMaterial;
+import com.bgsoftware.wildtools.recipes.AdvancedShapedRecipe;
 import com.bgsoftware.wildtools.utils.items.ToolTaskManager;
 import net.minecraft.server.v1_14_R1.Block;
 import net.minecraft.server.v1_14_R1.BlockPosition;
@@ -23,6 +25,7 @@ import net.minecraft.server.v1_14_R1.PlayerInventory;
 import net.minecraft.server.v1_14_R1.TileEntity;
 import net.minecraft.server.v1_14_R1.World;
 import net.minecraft.server.v1_14_R1.WorldServer;
+import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.CropState;
 import org.bukkit.Location;
@@ -54,9 +57,11 @@ import org.bukkit.inventory.RecipeChoice;
 import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.inventory.ShapelessRecipe;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -467,6 +472,61 @@ public final class NMSAdapter_v1_14_R1 implements NMSAdapter {
     @Override
     public String getRenameText(InventoryView inventoryView) {
         return ((ContainerAnvil) ((CraftInventoryView) inventoryView).getHandle()).renameText;
+    }
+
+    @Override
+    public AdvancedShapedRecipe createRecipe(String toolName, org.bukkit.inventory.ItemStack result) {
+        return new AdvancedRecipeClassImpl(toolName, result);
+    }
+
+    public static class AdvancedRecipeClassImpl extends ShapedRecipe implements AdvancedShapedRecipe {
+
+        private static Field ingredientsField;
+
+        static {
+            try{
+                ingredientsField = ShapedRecipe.class.getDeclaredField("ingredients");
+                ingredientsField.setAccessible(true);
+            }catch(Exception ex){
+                ex.printStackTrace();
+            }
+        }
+
+        private Map<Character, RecipeChoice> ingredients;
+
+        public AdvancedRecipeClassImpl(String toolName, org.bukkit.inventory.ItemStack result){
+            super(new NamespacedKey(WildToolsPlugin.getPlugin(), "recipe_" + toolName), result);
+            updateIngredients();
+        }
+
+        @Override
+        public AdvancedRecipeClassImpl shape(String... shape) {
+            super.shape(shape);
+            updateIngredients();
+            return this;
+        }
+
+        @Override
+        public AdvancedRecipeClassImpl setIngredient(char key, org.bukkit.inventory.ItemStack itemStack) {
+            Validate.isTrue(this.ingredients.containsKey(key), "Symbol does not appear in the shape: ", key);
+            this.ingredients.put(key, new RecipeChoice.MaterialChoice(itemStack.getType()));
+            return this;
+        }
+
+        @Override
+        public ShapedRecipe toRecipe() {
+            return this;
+        }
+
+        private void updateIngredients(){
+            try{
+                //noinspection unchecked
+                ingredients = (Map<Character, RecipeChoice>) ingredientsField.get(this);
+            }catch(Exception ex){
+                throw new RuntimeException(ex);
+            }
+        }
+
     }
 
 }

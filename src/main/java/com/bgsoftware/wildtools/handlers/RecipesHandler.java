@@ -91,13 +91,13 @@ public final class RecipesHandler {
                     }
                 }
 
-                AdvancedShapedRecipe recipe = new AdvancedShapedRecipe(tool.getFormattedItemStack());
+                AdvancedShapedRecipe recipe =  plugin.getNMSAdapter().createRecipe(tool.getName(), tool.getFormattedItemStack());
                 recipe.shape(new String(shape[0]), new String(shape[1]), new String(shape[2]));
 
                 for(Map.Entry<Character, ItemStack> entry : charToItem.entrySet())
                     recipe.setIngredient(entry.getKey(), entry.getValue());
 
-                Bukkit.addRecipe(recipe);
+                Bukkit.addRecipe(recipe.toRecipe());
             }
         }
 
