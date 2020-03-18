@@ -250,6 +250,14 @@ public final class DataHandler {
             if(cfg.contains("tools." + name + ".anvil-combine-limit"))
                 tool.setAnvilCombineLimit(cfg.getInt("tools." + name + ".anvil-combine-limit"));
 
+            if(cfg.contains("tools." + name + ".blacklisted-worlds")){
+                tool.setBlacklistedWorlds(cfg.getStringList("tools." + name + ".blacklisted-worlds"));
+            }
+
+            if(cfg.contains("tools." + name + ".whitelisted-worlds")){
+                tool.setBlacklistedWorlds(cfg.getStringList("tools." + name + ".whitelisted-worlds"));
+            }
+
             toolsAmount++;
         }
 

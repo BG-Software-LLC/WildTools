@@ -162,6 +162,20 @@ public interface Tool {
     void setAnvilCombineLimit(int anvilCombineMax);
 
     /**
+     * Set the blacklisted worlds of the tool.
+     * The tool will not work in these worlds.
+     * @param worlds The blacklisted worlds.
+     */
+    void setBlacklistedWorlds(List<String> worlds);
+
+    /**
+     * Set the whitelisted worlds of the tool.
+     * The tool will only work in these worlds.
+     * @param worlds The whitelisted worlds.
+     */
+    void setWhitelistedWorlds(List<String> worlds);
+
+    /**
      * Get the raw item stack of the tool.
      * This item will not have parsed placeholders, or injected data.
      */
@@ -344,6 +358,18 @@ public interface Tool {
      * Get the maximum uses a new tool can have from combining two tools in an anvil.
      */
     int getAnvilCombineLimit();
+
+    /**
+     * Check whether or not a world is blacklisted.
+     * @param world The world to check.
+     */
+    boolean isBlacklistedWorld(String world);
+
+    /**
+     * Check whether or not a world is whitelisted.
+     * @param world The world to check.
+     */
+    boolean isWhitelistedWorld(String world);
 
     /**
      * Reduce durability of an item of this tool.

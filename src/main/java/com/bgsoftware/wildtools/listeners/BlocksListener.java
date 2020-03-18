@@ -69,6 +69,13 @@ public final class BlocksListener implements Listener {
         if(tool == null)
             return;
 
+        String world = e.getBlock().getWorld().getName();
+
+        if(!tool.isWhitelistedWorld(world) || tool.isBlacklistedWorld(world)){
+            e.setCancelled(true);
+            return;
+        }
+
         if(!tool.canUse(e.getPlayer().getUniqueId())){
             e.setCancelled(true);
             Locale.COOLDOWN_TIME.send(e.getPlayer(), getTime(tool.getTimeLeft(e.getPlayer().getUniqueId())));
@@ -119,6 +126,13 @@ public final class BlocksListener implements Listener {
 
         if(tool == null)
             return;
+
+        String world = e.getPlayer().getWorld().getName();
+
+        if(!tool.isWhitelistedWorld(world) || tool.isBlacklistedWorld(world)){
+            e.setCancelled(true);
+            return;
+        }
 
         if(!tool.canUse(e.getPlayer().getUniqueId())){
             e.setCancelled(true);
@@ -187,6 +201,13 @@ public final class BlocksListener implements Listener {
         if(tool == null)
             return;
 
+        String world = e.getRightClicked().getWorld().getName();
+
+        if(!tool.isWhitelistedWorld(world) || tool.isBlacklistedWorld(world)){
+            e.setCancelled(true);
+            return;
+        }
+
         if(!tool.canUse(e.getPlayer().getUniqueId())){
             e.setCancelled(true);
             Locale.COOLDOWN_TIME.send(e.getPlayer(), getTime(tool.getTimeLeft(e.getPlayer().getUniqueId())));
@@ -233,6 +254,13 @@ public final class BlocksListener implements Listener {
 
         if(tool == null || !tool.isOmni())
             return;
+
+        String world = e.getClickedBlock().getWorld().getName();
+
+        if(!tool.isWhitelistedWorld(world) || tool.isBlacklistedWorld(world)){
+            e.setCancelled(true);
+            return;
+        }
 
         lastClickedType.put(e.getPlayer().getUniqueId(), e.getClickedBlock().getType());
 

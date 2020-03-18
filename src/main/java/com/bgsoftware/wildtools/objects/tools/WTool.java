@@ -49,7 +49,7 @@ public abstract class WTool implements Tool {
     private double multiplier;
     private int anvilCombineExp, anvilCombineLimit;
 
-    private Set<String> blacklistedMaterials, whitelistedMaterials, blacklistedDrops, whitelistedDrops;
+    private Set<String> blacklistedMaterials, whitelistedMaterials, blacklistedDrops, whitelistedDrops, blacklistedWorlds, whitelistedWorlds;
 
     /***********************************************************************************/
 
@@ -70,6 +70,8 @@ public abstract class WTool implements Tool {
         this.whitelistedMaterials = new HashSet<>();
         this.blacklistedDrops = new HashSet<>();
         this.whitelistedDrops = new HashSet<>();
+        this.blacklistedWorlds = new HashSet<>();
+        this.whitelistedWorlds = new HashSet<>();
         this.lastUses = new HashMap<>();
         this.multiplier = 1;
         this.anvilCombineExp = -1;
@@ -199,6 +201,16 @@ public abstract class WTool implements Tool {
     @Override
     public void setAnvilCombineLimit(int anvilCombineLimit) {
         this.anvilCombineLimit = anvilCombineLimit;
+    }
+
+    @Override
+    public void setBlacklistedWorlds(List<String> worlds) {
+        this.blacklistedWorlds.addAll(worlds);
+    }
+
+    @Override
+    public void setWhitelistedWorlds(List<String> worlds) {
+        this.whitelistedWorlds.addAll(worlds);
     }
 
     /***********************************************************************************/
@@ -377,6 +389,16 @@ public abstract class WTool implements Tool {
     @Override
     public int getAnvilCombineLimit() {
         return anvilCombineLimit;
+    }
+
+    @Override
+    public boolean isBlacklistedWorld(String world) {
+        return blacklistedWorlds.contains(world);
+    }
+
+    @Override
+    public boolean isWhitelistedWorld(String world) {
+        return whitelistedWorlds.isEmpty() || whitelistedWorlds.contains(world);
     }
 
     /***********************************************************************************/

@@ -113,6 +113,8 @@ prices-list:
 # whitelisted-drops: Which items will be dropped by the tool? [LIST]
 # blacklisted-drops: Which items won't be dropped by the tool? [LIST]
 #      Please follow the "TYPE" or "TYPE:DATA" format for drops and blocks.
+# blacklisted-worlds: A list of worlds that the tool will not work inside. [LIST]
+# whitelisted-worlds: A list of worlds that the tool will only work inside. [LIST]
 
 tools:
   trench_pickaxe:
