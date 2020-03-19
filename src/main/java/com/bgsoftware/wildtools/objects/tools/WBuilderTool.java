@@ -44,6 +44,8 @@ public final class WBuilderTool extends WTool implements BuilderTool {
 
     @Override
     public boolean onBlockInteract(PlayerInteractEvent e) {
+        e.setCancelled(true);
+
         if(!e.getClickedBlock().getType().isSolid())
             return false;
 
