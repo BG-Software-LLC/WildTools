@@ -77,7 +77,7 @@ public final class AnvilListener implements Listener {
                 firstSlot.isUnbreakable() || firstSlot.isUsingDurability())
             return;
 
-        if(firstSlot.getAnvilCombineExp() != plugin.getNMSAdapter().getExpCost(e.getView()))
+        if(Math.abs(firstSlot.getAnvilCombineExp() - plugin.getNMSAdapter().getExpCost(e.getView())) > 1)
             e.setCancelled(true);
     }
 
