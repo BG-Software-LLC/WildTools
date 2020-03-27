@@ -41,8 +41,9 @@ public final class BlocksProvider_WorldGuard implements BlocksProvider {
             LocalPlayer localPlayer = worldGuard.wrapPlayer(player);
             BlockVector3 blockVector3 = BlockVector3.at(block.getX(), block.getY(), block.getZ());
             ApplicableRegionSet set = regionManager.getApplicableRegions(blockVector3);
+
             return worldGuardPlatform.getSessionManager().hasBypass(localPlayer, world) ||
-                    set.testState(localPlayer, Flags.BUILD) || set.testState(localPlayer, Flags.BLOCK_BREAK);
+                    set.testState(localPlayer, Flags.BLOCK_PLACE) || set.testState(localPlayer, Flags.BLOCK_BREAK);
         }catch(Throwable ex){
             try {
                 return (boolean) worldGuard.getClass().getMethod("canBuild", Player.class, Block.class).invoke(worldGuard, player, block);
