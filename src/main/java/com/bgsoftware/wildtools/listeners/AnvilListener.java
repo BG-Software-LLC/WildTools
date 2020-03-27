@@ -101,6 +101,8 @@ public final class AnvilListener implements Listener {
         recentPrepares.add(anvilInventory);
         Executor.sync(() -> recentPrepares.remove(anvilInventory), 5L);
 
+        result = plugin.getNMSAdapter().setTag(result, "tool-uses", finalUses);
+
         e.setResult(result);
     }
 
