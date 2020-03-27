@@ -3,7 +3,6 @@ package com.bgsoftware.wildtools.listeners;
 import com.bgsoftware.wildtools.WildToolsPlugin;
 import com.bgsoftware.wildtools.api.objects.tools.Tool;
 import com.bgsoftware.wildtools.utils.Executor;
-import org.bukkit.ChatColor;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -14,13 +13,51 @@ import org.bukkit.inventory.AnvilInventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
 @SuppressWarnings("unused")
 public final class AnvilListener implements Listener {
 
+    private final Map<AnvilInventory, String> renameTexts = new HashMap<>();
+    private final Set<AnvilInventory> recentPrepares = new HashSet<>();
     private final WildToolsPlugin plugin;
 
     public AnvilListener(WildToolsPlugin plugin){
         this.plugin = plugin;
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onAnvilAdd(InventoryClickEvent e){
+        if(!(e.getClickedInventory() instanceof AnvilInventory) || e.getRawSlot() != 0)
+            return;
+
+        ItemStack itemStack = null;
+
+        switch (e.getClick()){
+            case LEFT:
+                itemStack = e.getCursor();
+                break;
+            case SHIFT_LEFT:
+                itemStack = e.getCurrentItem();
+                break;
+            case NUMBER_KEY:
+                itemStack = e.getView().getBottomInventory().getItem(e.getHotbarButton());
+                break;
+        }
+
+        Tool tool = plugin.getToolsManager().getTool(itemStack);
+
+        AnvilInventory inventory = (AnvilInventory) e.getClickedInventory();
+
+        if(tool == null) {
+            renameTexts.remove(inventory);
+            return;
+        }
+
+        renameTexts.put(inventory, plugin.getNMSAdapter().getRenameText(e.getView()));
     }
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
@@ -36,29 +73,33 @@ public final class AnvilListener implements Listener {
                 firstSlot.isUnbreakable() || firstSlot.isUsingDurability())
             return;
 
-        String renameText = plugin.getNMSAdapter().getRenameText(e.getView()).trim();
+        String originalRenameText = renameTexts.remove(e.getInventory());
+        String renameText = plugin.getNMSAdapter().getRenameText(e.getView());
 
         int firstUses = plugin.getNMSAdapter().getTag(firstItem, "tool-uses", firstSlot.getDefaultUses());
-        int secondUses = plugin.getNMSAdapter().getTag(secondItem, "tool-uses", firstSlot.getDefaultUses());
+        int secondUses = plugin.getNMSAdapter().getTag(secondItem, "tool-uses", secondSlot.getDefaultUses());
         int finalUses = firstSlot.hasAnvilCombineLimit() ?
                 Math.min(firstSlot.getAnvilCombineLimit(), firstUses + secondUses) : firstUses + secondUses;
 
         ItemStack result = firstSlot.getFormattedItemStack(finalUses);
         ItemMeta itemMeta = result.getItemMeta();
 
-        String displayName = itemMeta.getDisplayName() == null ? "" : ChatColor.stripColor(itemMeta.getDisplayName()).trim();
         int expCost = firstSlot.getAnvilCombineExp();
 
-        if(!renameText.equals(displayName)){
-            itemMeta.setDisplayName(renameText);
-            result.setItemMeta(itemMeta);
-            //We must set the exp 1 tick later - or renaming the item won't refresh exp
-            Executor.sync(() -> plugin.getNMSAdapter().setExpCost(e.getView(), expCost + 1), 1L);
+        if(!recentPrepares.contains(anvilInventory)) {
+            if (!renameText.equals(originalRenameText)) {
+                itemMeta.setDisplayName(renameText);
+                result.setItemMeta(itemMeta);
+                //We must set the exp 1 tick later - or renaming the item won't refresh exp
+                Executor.sync(() -> plugin.getNMSAdapter().setExpCost(e.getView(), expCost + 1), 1L);
+            } else {
+                //We must set the exp 1 tick later - or renaming the item won't refresh exp
+                Executor.sync(() -> plugin.getNMSAdapter().setExpCost(e.getView(), expCost), 1L);
+            }
         }
-        else{
-            //We must set the exp 1 tick later - or renaming the item won't refresh exp
-            Executor.sync(() -> plugin.getNMSAdapter().setExpCost(e.getView(), expCost), 1L);
-        }
+
+        recentPrepares.add(anvilInventory);
+        Executor.sync(() -> recentPrepares.remove(anvilInventory), 5L);
 
         e.setResult(result);
     }
