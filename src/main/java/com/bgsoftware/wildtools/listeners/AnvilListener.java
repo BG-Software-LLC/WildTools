@@ -31,15 +31,26 @@ public final class AnvilListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onAnvilAdd(InventoryClickEvent e){
-        if(!(e.getClickedInventory() instanceof AnvilInventory) || e.getRawSlot() != 0)
+        if(!(e.getClickedInventory() instanceof AnvilInventory))
+            return;
+
+        AnvilInventory inventory = (AnvilInventory) e.getClickedInventory();
+
+        if(e.getRawSlot() != 0 && inventory.getItem(0) == null)
             return;
 
         ItemStack itemStack = null;
 
-        switch (e.getClick()){
+        if(e.getRawSlot() != 0){
+            itemStack = inventory.getItem(0);
+        }
+
+        else switch (e.getClick()){
+            case RIGHT:
             case LEFT:
                 itemStack = e.getCursor();
                 break;
+            case SHIFT_RIGHT:
             case SHIFT_LEFT:
                 itemStack = e.getCurrentItem();
                 break;
@@ -49,8 +60,6 @@ public final class AnvilListener implements Listener {
         }
 
         Tool tool = plugin.getToolsManager().getTool(itemStack);
-
-        AnvilInventory inventory = (AnvilInventory) e.getClickedInventory();
 
         if(tool == null) {
             renameTexts.remove(inventory);
