@@ -14,6 +14,7 @@ import com.bgsoftware.wildtools.hooks.BlocksProvider_Lands;
 import com.bgsoftware.wildtools.hooks.BlocksProvider_MassiveFactions;
 import com.bgsoftware.wildtools.hooks.BlocksProvider_PlotSquared;
 import com.bgsoftware.wildtools.hooks.BlocksProvider_PlotSquaredLegacy;
+import com.bgsoftware.wildtools.hooks.BlocksProvider_Residence;
 import com.bgsoftware.wildtools.hooks.BlocksProvider_SuperiorSkyblock;
 import com.bgsoftware.wildtools.hooks.BlocksProvider_Towny;
 import com.bgsoftware.wildtools.hooks.BlocksProvider_Villages;
@@ -207,6 +208,8 @@ public final class ProvidersHandler {
                 blocksProviders.add(new BlocksProvider_PlotSquared());
             }
         }
+        if(Bukkit.getPluginManager().isPluginEnabled("Residence"))
+            blocksProviders.add(new BlocksProvider_Residence());
         //Drops Plugin hook
         if(Bukkit.getPluginManager().isPluginEnabled("VoidChest"))
             dropsProviders.add(new DropsProvider_VoidChest());
