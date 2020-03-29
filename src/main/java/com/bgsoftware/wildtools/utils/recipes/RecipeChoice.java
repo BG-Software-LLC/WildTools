@@ -92,9 +92,11 @@ public interface RecipeChoice extends Predicate<ItemStack> {
             this.itemStack = itemStack.clone();
         }
 
+        @SuppressWarnings("deprecation")
         @Override
         public boolean test(ItemStack itemStack) {
-            return this.itemStack.isSimilar(itemStack);
+            return this.itemStack.getData().getData() < 0 ?
+                    itemStack != null && this.itemStack.getType() == itemStack.getType() : this.itemStack.isSimilar(itemStack);
         }
 
         @Override
@@ -114,7 +116,19 @@ public interface RecipeChoice extends Predicate<ItemStack> {
 
         @Override
         public void remove(Inventory inventory) {
-            inventory.removeItem(itemStack);
+            for(int i = 0; i < inventory.getSize(); i++){
+                ItemStack itemStack = inventory.getItem(i);
+                if(test(itemStack)) {
+                    int leftOvers = itemStack.getAmount() - this.itemStack.getAmount();
+                    if(leftOvers <= 0) {
+                        inventory.setItem(i, null);
+                    }
+                    else{
+                        itemStack.setAmount(itemStack.getAmount() - this.itemStack.getAmount());
+                        inventory.setItem(i, itemStack);
+                    }
+                }
+            }
         }
 
         @Override
