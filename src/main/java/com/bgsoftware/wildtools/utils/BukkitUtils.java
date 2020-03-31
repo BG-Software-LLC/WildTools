@@ -9,6 +9,7 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
+import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.inventory.ItemStack;
 import com.bgsoftware.wildtools.WildToolsPlugin;
 import com.bgsoftware.wildtools.api.objects.tools.Tool;
@@ -39,6 +40,13 @@ public final class BukkitUtils {
         };
 
         Consumer<Block> onBlockBreak = blockConsumer -> {
+            if(omniTool){
+                BlockBreakEvent blockBreakEvent = new BlockBreakEvent(block, player);
+                Bukkit.getPluginManager().callEvent(blockBreakEvent);
+                if(blockBreakEvent.isCancelled())
+                    return;
+            }
+
             if(omniTool || blockConsumer.getType().hasGravity() || Arrays.stream(blockFaces)
                     .anyMatch(blockFace -> blockConsumer.getRelative(blockFace).getType().name().contains("WATER")))
                 blockConsumer.setType(Material.AIR);
