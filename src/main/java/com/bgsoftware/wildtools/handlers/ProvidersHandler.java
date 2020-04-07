@@ -20,6 +20,7 @@ import com.bgsoftware.wildtools.hooks.BlocksProvider_Towny;
 import com.bgsoftware.wildtools.hooks.BlocksProvider_Villages;
 import com.bgsoftware.wildtools.hooks.BlocksProvider_WorldGuard;
 import com.bgsoftware.wildtools.hooks.DropsProvider;
+import com.bgsoftware.wildtools.hooks.DropsProvider_SilkSpawners;
 import com.bgsoftware.wildtools.hooks.DropsProvider_VoidChest;
 import com.bgsoftware.wildtools.hooks.DropsProvider_WildStacker;
 import com.bgsoftware.wildtools.hooks.DropsProviders_WildToolsSpawners;
@@ -216,6 +217,8 @@ public final class ProvidersHandler {
         //Drops for spawners
         if(Bukkit.getPluginManager().isPluginEnabled("WildStacker"))
             dropsProviders.add(new DropsProvider_WildStacker());
+        else if(Bukkit.getPluginManager().isPluginEnabled("SilkSpawners"))
+            dropsProviders.add(new DropsProvider_SilkSpawners());
         else
             dropsProviders.add(new DropsProviders_WildToolsSpawners());
     }
