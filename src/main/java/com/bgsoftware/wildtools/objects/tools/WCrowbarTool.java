@@ -61,7 +61,7 @@ public final class WCrowbarTool extends WTool implements CrowbarTool {
         BlockBreakEvent blockBreakEvent = new BlockBreakEvent(e.getClickedBlock(), e.getPlayer());
         Bukkit.getPluginManager().callEvent(blockBreakEvent);
 
-        BukkitUtils.breakNaturally(e.getPlayer(), e.getClickedBlock(), this, null, null);
+        BukkitUtils.breakNaturally(e.getPlayer(), e.getClickedBlock(), e.getItem(), this, null, null);
         e.getClickedBlock().setType(Material.AIR);
 
         CrowbarWandUseEvent crowbarWandUseEvent = new CrowbarWandUseEvent(e.getPlayer(), this, e.getClickedBlock());

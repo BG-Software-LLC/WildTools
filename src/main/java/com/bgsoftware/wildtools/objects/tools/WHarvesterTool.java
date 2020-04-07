@@ -198,7 +198,7 @@ public final class WHarvesterTool extends WTool implements HarvesterTool {
                         continue;
 
                     if(targetBlock.getType().name().contains("CHORUS")){
-                        toolUsages += breakChorusFruit(player, blocksController, targetBlock, onItemDrop, new ArrayList<>(), toolUsages, toolDurability, usingDurability);
+                        toolUsages += breakChorusFruit(player, blocksController, targetBlock, usedItem, onItemDrop, new ArrayList<>(), toolUsages, toolDurability, usingDurability);
                         continue;
                     }
 
@@ -207,7 +207,7 @@ public final class WHarvesterTool extends WTool implements HarvesterTool {
 
                     if (blockType == Material.CACTUS || blockType == WMaterial.SUGAR_CANE.parseMaterial() || blockType.name().equals("BAMBOO")) {
                         if(y == cropsMax.getBlockY()) {
-                            toolUsages += breakTallCrop(player, blocksController, targetBlock, onItemDrop, toolUsages, toolDurability, usingDurability);
+                            toolUsages += breakTallCrop(player, blocksController, targetBlock, usedItem, onItemDrop, toolUsages, toolDurability, usingDurability);
                             continue;
                         }
 
@@ -215,12 +215,12 @@ public final class WHarvesterTool extends WTool implements HarvesterTool {
                         if(targetBlock.getRelative(BlockFace.DOWN).getType() != blockType)
                             continue;
 
-                        BukkitUtils.breakNaturally(player, blocksController, targetBlock, this, onItemDrop);
+                        BukkitUtils.breakNaturally(player, blocksController, targetBlock, usedItem, this, onItemDrop);
                         toolUsages++;
                         continue;
                     }
 
-                    BukkitUtils.breakNaturally(player, targetBlock, this, onCropsBreak, onItemDrop);
+                    BukkitUtils.breakNaturally(player, targetBlock, usedItem, this, onCropsBreak, onItemDrop);
                     toolUsages++;
                 }
             }
@@ -265,19 +265,19 @@ public final class WHarvesterTool extends WTool implements HarvesterTool {
         return true;
     }
 
-    private int breakChorusFruit(Player player, BlocksController blocksController, Block block, Consumer<ItemStack> onItemDrop, List<Block> alreadyBroken, int toolUsages, int toolDurability, boolean usingDurability){
+    private int breakChorusFruit(Player player, BlocksController blocksController, Block block, ItemStack usedItem, Consumer<ItemStack> onItemDrop, List<Block> alreadyBroken, int toolUsages, int toolDurability, boolean usingDurability){
         int currentUsages = 0;
 
         if(usingDurability && toolUsages >= toolDurability)
             return currentUsages;
 
         if(block.getType().name().contains("FLOWER") && block.getRelative(BlockFace.DOWN).getType().name().contains("END")){
-            BukkitUtils.breakNaturally(player, block, this, onCropsBreak, onItemDrop);
+            BukkitUtils.breakNaturally(player, block, usedItem, this, onCropsBreak, onItemDrop);
             currentUsages++;
         }
 
         else {
-            BukkitUtils.breakNaturally(player, blocksController, block, this, null);
+            BukkitUtils.breakNaturally(player, blocksController, block, usedItem, this, null);
             List<ItemStack> drops = new ArrayList<>();
 
             currentUsages++;
@@ -301,25 +301,25 @@ public final class WHarvesterTool extends WTool implements HarvesterTool {
         for(BlockFace blockFace : nearbyBlocks){
             Block nearbyBlock = block.getRelative(blockFace);
             if(nearbyBlock.getType().name().contains("CHORUS") && !alreadyBroken.contains(nearbyBlock)){
-                currentUsages += breakChorusFruit(player, blocksController, nearbyBlock, onItemDrop, alreadyBroken, toolUsages + currentUsages, toolDurability, usingDurability);
+                currentUsages += breakChorusFruit(player, blocksController, nearbyBlock, usedItem, onItemDrop, alreadyBroken, toolUsages + currentUsages, toolDurability, usingDurability);
             }
         }
 
         return currentUsages;
     }
 
-    private int breakTallCrop(Player player, BlocksController blocksController, Block block, Consumer<ItemStack> onItemDrop, int toolUsages, int toolDurability, boolean usingDurability){
+    private int breakTallCrop(Player player, BlocksController blocksController, Block block, ItemStack usedItem, Consumer<ItemStack> onItemDrop, int toolUsages, int toolDurability, boolean usingDurability){
         int currentUsages = 0;
 
         Block aboveBlock = block.getRelative(BlockFace.UP);
 
         if(aboveBlock.getType() == block.getType())
-            currentUsages += breakTallCrop(player, blocksController, aboveBlock, onItemDrop, toolUsages + currentUsages, toolDurability, usingDurability);
+            currentUsages += breakTallCrop(player, blocksController, aboveBlock, usedItem, onItemDrop, toolUsages + currentUsages, toolDurability, usingDurability);
 
         if(usingDurability && (toolUsages + currentUsages) >= toolDurability)
             return currentUsages;
 
-        BukkitUtils.breakNaturally(player, blocksController, block, this, onItemDrop);
+        BukkitUtils.breakNaturally(player, blocksController, block, usedItem, this, onItemDrop);
         currentUsages++;
 
         return currentUsages;

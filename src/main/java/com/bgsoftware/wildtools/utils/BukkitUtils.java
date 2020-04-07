@@ -1,6 +1,7 @@
 package com.bgsoftware.wildtools.utils;
 
 import com.bgsoftware.wildtools.hooks.CoreProtectHook;
+import com.bgsoftware.wildtools.hooks.McMMOHook;
 import com.bgsoftware.wildtools.hooks.WildStackerHook;
 import com.bgsoftware.wildtools.utils.blocks.BlocksController;
 import com.bgsoftware.wildtools.utils.items.ItemUtils;
@@ -28,7 +29,7 @@ public final class BukkitUtils {
             BlockFace.UP, BlockFace.DOWN, BlockFace.WEST, BlockFace.EAST, BlockFace.SOUTH, BlockFace.NORTH
     };
 
-    public static void breakNaturally(Player player, BlocksController blocksController, Block block, Tool tool){
+    public static void breakNaturally(Player player, BlocksController blocksController, Block block, ItemStack usedItem, Tool tool){
         boolean autoCollect = tool.isAutoCollect();
         boolean omniTool = tool.isOmni();
 
@@ -54,10 +55,10 @@ public final class BukkitUtils {
                 blocksController.setAir(blockConsumer.getLocation());
         };
 
-        breakNaturally(player, block, tool, onBlockBreak, onItemDrop);
+        breakNaturally(player, block, usedItem, tool, onBlockBreak, onItemDrop);
     }
 
-    public static void breakNaturally(Player player, BlocksController blocksController, Block block, Tool tool, Consumer<ItemStack> onItemDrop){
+    public static void breakNaturally(Player player, BlocksController blocksController, Block block, ItemStack usedItem, Tool tool, Consumer<ItemStack> onItemDrop){
         Consumer<Block> onBlockBreak = blockConsumer -> {
             if(blockConsumer.getRelative(BlockFace.UP).getType().name().contains("WATER") || blockConsumer.getType().hasGravity())
                 blockConsumer.setType(Material.AIR);
@@ -65,10 +66,10 @@ public final class BukkitUtils {
                 blocksController.setAir(blockConsumer.getLocation());
         };
 
-        breakNaturally(player, block, tool, onBlockBreak, onItemDrop);
+        breakNaturally(player, block, usedItem, tool, onBlockBreak, onItemDrop);
     }
 
-    public static void breakNaturally(Player player, Block block, Tool tool, Consumer<Block> onBlockBreak, Consumer<ItemStack> onItemDrop){
+    public static void breakNaturally(Player player, Block block, ItemStack usedItem, Tool tool, Consumer<Block> onBlockBreak, Consumer<ItemStack> onItemDrop){
         List<ItemStack> drops = new ArrayList<>();
 
         if(onItemDrop != null) {
@@ -80,6 +81,7 @@ public final class BukkitUtils {
         }
 
         else if(onBlockBreak != null) {
+            McMMOHook.handleBlockBreak(player, usedItem, block);
             onBlockBreak.accept(block);
         }
 
