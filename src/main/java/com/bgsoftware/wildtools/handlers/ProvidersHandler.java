@@ -134,6 +134,10 @@ public final class ProvidersHandler {
         return drops;
     }
 
+    public boolean callEvent(){
+        return dropsProviders.stream().allMatch(DropsProvider::callEvent);
+    }
+
     /*
      * Handler' methods
      */

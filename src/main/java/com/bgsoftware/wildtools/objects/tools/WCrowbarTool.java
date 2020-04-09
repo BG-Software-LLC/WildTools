@@ -57,9 +57,11 @@ public final class WCrowbarTool extends WTool implements CrowbarTool {
             ));
         }
 
-        //We're telling all the other plugins that the block was broken.
-        BlockBreakEvent blockBreakEvent = new BlockBreakEvent(e.getClickedBlock(), e.getPlayer());
-        Bukkit.getPluginManager().callEvent(blockBreakEvent);
+        if(plugin.getProviders().callEvent()) {
+            //We're telling all the other plugins that the block was broken.
+            BlockBreakEvent blockBreakEvent = new BlockBreakEvent(e.getClickedBlock(), e.getPlayer());
+            Bukkit.getPluginManager().callEvent(blockBreakEvent);
+        }
 
         BukkitUtils.breakNaturally(e.getPlayer(), e.getClickedBlock(), e.getItem(), this, null, null);
         e.getClickedBlock().setType(Material.AIR);

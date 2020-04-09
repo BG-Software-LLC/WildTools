@@ -13,4 +13,8 @@ public interface DropsProvider {
         return false;
     }
 
+    default boolean callEvent(){
+        return true;
+    }
+
 }

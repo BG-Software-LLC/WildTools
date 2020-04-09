@@ -35,4 +35,9 @@ public final class DropsProvider_SilkSpawners implements DropsProvider {
     public boolean isSpawnersOnly() {
         return true;
     }
+
+    @Override
+    public boolean callEvent() {
+        return false;
+    }
 }
