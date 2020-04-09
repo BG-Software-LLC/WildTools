@@ -9,6 +9,7 @@ import com.bgsoftware.wildtools.hooks.BlocksProvider_BentoBox;
 import com.bgsoftware.wildtools.hooks.BlocksProvider_FabledSkyblock;
 import com.bgsoftware.wildtools.hooks.BlocksProvider_FactionsOne;
 import com.bgsoftware.wildtools.hooks.BlocksProvider_FactionsUUID;
+import com.bgsoftware.wildtools.hooks.BlocksProvider_FactionsX;
 import com.bgsoftware.wildtools.hooks.BlocksProvider_GriefPrevention;
 import com.bgsoftware.wildtools.hooks.BlocksProvider_Lands;
 import com.bgsoftware.wildtools.hooks.BlocksProvider_MassiveFactions;
@@ -193,6 +194,8 @@ public final class ProvidersHandler {
             else
                 blocksProviders.add(new BlocksProvider_MassiveFactions());
         }
+        if(Bukkit.getPluginManager().isPluginEnabled("FactionsX"))
+            blocksProviders.add(new BlocksProvider_FactionsX());
         if(Bukkit.getPluginManager().isPluginEnabled("GriefPrevention"))
             blocksProviders.add(new BlocksProvider_GriefPrevention());
         if(Bukkit.getPluginManager().isPluginEnabled("SuperiorSkyblock2"))
