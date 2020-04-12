@@ -48,13 +48,13 @@ prices-list:
 # *** Drain Tool-Mode ***
 # Tools in this mode will remove all ice blocks in the checking area.
 # Required sections:
-# radius: What is the radius of the checking area? (3 will check a 7x7 area) (INTEGER)
+# radius: What is the radius of the checking area? (3 will check a 7x7x7 area) (INTEGER)
 #
 # *** Harvester Tool-Mode ***
 # Tools in this mode will harvest seeds and replant them automatically. This mode is used for harvester-hoes.
 # Drops support silk-touch and fortune.
 # Required sections:
-# radius: What is the radius of the checking area? (3 will check a 7x7 area) (INTEGER)
+# radius: What is the radius of the checking area? (3 will check a 7x7x7 area) (INTEGER)
 # Optional sections:
 # farmland-radius: What is the radius of the checking for dirt area? (Same as radius)
 # active-action: Which action should activate the harvester? (RIGHT_CLICK or LEFT_CLICK)
@@ -63,7 +63,7 @@ prices-list:
 # *** Ice Tool-Mode ***
 # Tools in this mode will smelt all ice blocks in the checking area.
 # Required sections:
-# radius: What is the radius of the checking area? (3 will check a 7x7 area) (INTEGER)
+# radius: What is the radius of the checking area? (3 will check a 7x7x7 area) (INTEGER)
 #
 # *** Lightning Tool-Mode ***
 # Tools in this mode will strike a lightning to charge creepers. This mode is used for lightning-wands.
