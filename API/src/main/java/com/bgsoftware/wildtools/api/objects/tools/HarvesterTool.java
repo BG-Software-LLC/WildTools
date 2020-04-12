@@ -31,4 +31,14 @@ public interface HarvesterTool extends Tool {
      */
     void setActivationAction(String activateAction);
 
+    /**
+     * Should the radius be only for one layer?
+     */
+    boolean isOneLayerOnly();
+
+    /**
+     * Set whether or not the radius should be only for one layer.
+     */
+    void setOneLayerOnly(boolean oneLayerOnly);
+
 }

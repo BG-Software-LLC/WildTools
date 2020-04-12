@@ -59,6 +59,7 @@ prices-list:
 # farmland-radius: What is the radius of the checking for dirt area? (Same as radius)
 # active-action: Which action should activate the harvester? (RIGHT_CLICK or LEFT_CLICK)
 # multiplier: Multiply the earnings from the sell mode.
+# one-layer-only: Make the radius only affect the x and z axis, without the y axis.
 #
 # *** Ice Tool-Mode ***
 # Tools in this mode will smelt all ice blocks in the checking area.

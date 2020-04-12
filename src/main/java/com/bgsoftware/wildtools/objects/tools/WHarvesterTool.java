@@ -52,11 +52,13 @@ public final class WHarvesterTool extends WTool implements HarvesterTool {
 
     private int radius, farmlandRadius;
     private String activateAction;
+    private boolean oneLayerOnly;
 
     public WHarvesterTool(Material type, String name, int radius){
         super(type, name, ToolMode.HARVESTER);
         this.radius = radius;
         this.farmlandRadius = 0;
+        this.oneLayerOnly = false;
     }
 
     @Override
@@ -83,6 +85,16 @@ public final class WHarvesterTool extends WTool implements HarvesterTool {
     public void setActivationAction(String activateAction) {
         if(activateAction.equals("RIGHT_CLICK") || activateAction.equals("LEFT_CLICK"))
             this.activateAction = activateAction;
+    }
+
+    @Override
+    public boolean isOneLayerOnly() {
+        return oneLayerOnly;
+    }
+
+    @Override
+    public void setOneLayerOnly(boolean oneLayerOnly) {
+        this.oneLayerOnly = oneLayerOnly;
     }
 
     @Override
@@ -139,10 +151,10 @@ public final class WHarvesterTool extends WTool implements HarvesterTool {
     private boolean handleUse(Player player, Block block, ItemStack usedItem){
         UUID taskId = ToolTaskManager.generateTaskId(usedItem, player);
 
-        Location farmlandMax = block.getLocation().add(farmlandRadius, farmlandRadius, farmlandRadius);
-        Location farmlandMin = block.getLocation().subtract(farmlandRadius, farmlandRadius, farmlandRadius);
-        Location cropsMax = block.getLocation().add(radius, radius, radius);
-        Location cropsMin = block.getLocation().subtract(radius, radius, radius);
+        Location farmlandMax = block.getLocation().add(farmlandRadius, oneLayerOnly ? 0 : farmlandRadius, farmlandRadius);
+        Location farmlandMin = block.getLocation().subtract(farmlandRadius, oneLayerOnly ? 0 : farmlandRadius, farmlandRadius);
+        Location cropsMax = block.getLocation().add(radius, oneLayerOnly ? 0 : radius, radius);
+        Location cropsMin = block.getLocation().subtract(radius, oneLayerOnly ? 0 : radius, radius);
 
         Location absoluteMax = new Location(farmlandMax.getWorld(), Math.max(farmlandMax.getBlockX(), cropsMax.getBlockX()),
                 Math.max(farmlandMax.getBlockY(), cropsMax.getBlockY()), Math.max(farmlandMax.getBlockZ(), cropsMax.getBlockZ()));

@@ -135,6 +135,7 @@ public final class DataHandler {
 
                     ((HarvesterTool) tool).setActivationAction(cfg.getString("tools." + name + ".active-action", "RIGHT_CLICK"));
                     ((HarvesterTool) tool).setFarmlandRadius(cfg.getInt("tools." + name + ".farmland-radius", 0));
+                    ((HarvesterTool) tool).setOneLayerOnly(cfg.getBoolean("tools." + name + ".one-layer-only", false));
                     break;
                 case "ICE":
                     if(!cfg.contains("tools." + name + ".radius")){
