@@ -19,11 +19,7 @@ import org.bukkit.inventory.ItemStack;
 
 public final class McMMOHook {
 
-    private static final boolean isEnabled;
-
-    static {
-        isEnabled = Bukkit.getPluginManager().isPluginEnabled("mcMMO");
-    }
+    private static final boolean isEnabled = isSupportedBuild();
 
     public static void markAsPlaced(Location loc){
         if(isEnabled)
@@ -67,6 +63,15 @@ public final class McMMOHook {
 
                 mcMMO.getPlaceStore().setFalse(blockState);
             }
+        }
+    }
+
+    private static boolean isSupportedBuild(){
+        try{
+            Class.forName("com.gmail.nossr50.datatypes.skills.PrimarySkillType");
+            return true;
+        }catch(ClassNotFoundException ex){
+            return false;
         }
     }
 
