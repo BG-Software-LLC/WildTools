@@ -30,7 +30,6 @@ import net.minecraft.server.v1_13_R2.NBTTagList;
 import net.minecraft.server.v1_13_R2.NBTTagString;
 import net.minecraft.server.v1_13_R2.PacketPlayOutCollect;
 import net.minecraft.server.v1_13_R2.PacketPlayOutMultiBlockChange;
-import net.minecraft.server.v1_13_R2.PlayerInventory;
 import net.minecraft.server.v1_13_R2.TileEntityShulkerBox;
 import net.minecraft.server.v1_13_R2.World;
 
@@ -46,7 +45,6 @@ import org.bukkit.craftbukkit.v1_13_R2.block.data.CraftBlockData;
 import org.bukkit.craftbukkit.v1_13_R2.entity.CraftItem;
 import org.bukkit.craftbukkit.v1_13_R2.entity.CraftLivingEntity;
 import org.bukkit.craftbukkit.v1_13_R2.entity.CraftPlayer;
-import org.bukkit.craftbukkit.v1_13_R2.inventory.CraftInventoryPlayer;
 import org.bukkit.craftbukkit.v1_13_R2.inventory.CraftInventoryView;
 import org.bukkit.craftbukkit.v1_13_R2.inventory.CraftItemStack;
 
@@ -61,6 +59,10 @@ import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Event;
+import org.bukkit.event.player.PlayerInteractEntityEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.Recipe;
 import org.bukkit.inventory.RecipeChoice;
@@ -365,14 +367,43 @@ public final class NMSAdapter_v1_13_R2 implements NMSAdapter {
 
     @Override
     public org.bukkit.inventory.ItemStack getItemInHand(Player player) {
-        ItemStack itemStack = ((CraftInventoryPlayer) player.getInventory()).getInventory().getItemInHand();
-        return CraftItemStack.asBukkitCopy(itemStack);
+        return player.getInventory().getItemInMainHand();
+    }
+
+    @Override
+    public org.bukkit.inventory.ItemStack getItemInHand(Player player, Event e) {
+        boolean offHand = false;
+
+        if(e instanceof PlayerInteractEvent) {
+            offHand = ((PlayerInteractEvent) e).getHand() == EquipmentSlot.OFF_HAND;
+        }else if(e instanceof PlayerInteractEntityEvent){
+            offHand = ((PlayerInteractEntityEvent) e).getHand() == EquipmentSlot.OFF_HAND;
+        }
+
+        return offHand ? player.getInventory().getItemInOffHand() : getItemInHand(player);
     }
 
     @Override
     public void setItemInHand(Player player, org.bukkit.inventory.ItemStack itemStack) {
-        PlayerInventory playerInventory = ((CraftInventoryPlayer) player.getInventory()).getInventory();
-        playerInventory.setItem(playerInventory.itemInHandIndex, CraftItemStack.asNMSCopy(itemStack));
+        player.getInventory().setItemInMainHand(itemStack);
+    }
+
+    @Override
+    public void setItemInHand(Player player, org.bukkit.inventory.ItemStack itemStack, Event e) {
+        boolean offHand = false;
+
+        if(e instanceof PlayerInteractEvent) {
+            offHand = ((PlayerInteractEvent) e).getHand() == EquipmentSlot.OFF_HAND;
+        }else if(e instanceof PlayerInteractEntityEvent){
+            offHand = ((PlayerInteractEntityEvent) e).getHand() == EquipmentSlot.OFF_HAND;
+        }
+
+        if(offHand){
+            player.getInventory().setItemInOffHand(itemStack);
+        }
+        else{
+            setItemInHand(player, itemStack);
+        }
     }
 
     @Override

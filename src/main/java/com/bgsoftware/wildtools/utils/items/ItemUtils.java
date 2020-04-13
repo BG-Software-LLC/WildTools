@@ -5,6 +5,8 @@ import com.bgsoftware.wildtools.utils.Executor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
@@ -96,6 +98,17 @@ public final class ItemUtils {
         }
 
         throw new IllegalArgumentException("The item wasn't found in the inventory.");
+    }
+
+    public static ItemStack getUsedItem(PlayerInteractEvent e){
+        try{
+            //noinspection JavaReflectionMemberAccess
+            if(("" + PlayerInteractEvent.class.getMethod("getHand").invoke(e)).equals("OFF_HAND")){
+                return e.getPlayer().getInventory().getItem(42);
+            }
+        }catch(Throwable ignored){ }
+
+        return e.getItem();
     }
 
 }

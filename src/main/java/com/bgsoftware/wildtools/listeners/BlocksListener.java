@@ -121,7 +121,7 @@ public final class BlocksListener implements Listener {
         if(!e.getPlayer().hasPermission("wildtools.use"))
             return;
 
-        ItemStack inHand = plugin.getNMSAdapter().getItemInHand(e.getPlayer());
+        ItemStack inHand = plugin.getNMSAdapter().getItemInHand(e.getPlayer(), e);
         Tool tool = plugin.getToolsManager().getTool(inHand);
 
         if(tool == null)
@@ -176,7 +176,7 @@ public final class BlocksListener implements Listener {
                     inHand = plugin.getNMSAdapter().setTag(inHand, "tool-owner", e.getPlayer().getUniqueId().toString());
                     final ItemStack IN_HAND = inHand;
                     ItemUtils.formatItemStack(tool, inHand, tool.getDefaultUses(), false, () ->
-                            plugin.getNMSAdapter().setItemInHand(e.getPlayer(), IN_HAND));
+                            plugin.getNMSAdapter().setItemInHand(e.getPlayer(), IN_HAND, e));
                 }
             }
         }catch(Exception ex){
@@ -195,7 +195,7 @@ public final class BlocksListener implements Listener {
         if(!e.getPlayer().hasPermission("wildtools.use"))
             return;
 
-        ItemStack inHand = plugin.getNMSAdapter().getItemInHand(e.getPlayer());
+        ItemStack inHand = plugin.getNMSAdapter().getItemInHand(e.getPlayer(), e);
         Tool tool = plugin.getToolsManager().getTool(inHand);
 
         if(tool == null)
@@ -234,7 +234,7 @@ public final class BlocksListener implements Listener {
                     inHand = plugin.getNMSAdapter().setTag(inHand, "tool-owner", e.getPlayer().getUniqueId().toString());
                     final ItemStack IN_HAND = inHand;
                     ItemUtils.formatItemStack(tool, inHand, tool.getDefaultUses(), false, () ->
-                            plugin.getNMSAdapter().setItemInHand(e.getPlayer(), IN_HAND));
+                            plugin.getNMSAdapter().setItemInHand(e.getPlayer(), IN_HAND, e));
                 }
             }
         }catch(Exception ex){
@@ -250,7 +250,8 @@ public final class BlocksListener implements Listener {
                 (lastClickedType.containsKey(e.getPlayer().getUniqueId()) && lastClickedType.get(e.getPlayer().getUniqueId()) == e.getClickedBlock().getType()))
             return;
 
-        Tool tool = plugin.getToolsManager().getTool(plugin.getNMSAdapter().getItemInHand(e.getPlayer()));
+        ItemStack itemStack = plugin.getNMSAdapter().getItemInHand(e.getPlayer(), e);
+        Tool tool = plugin.getToolsManager().getTool(itemStack);
 
         if(tool == null || !tool.isOmni())
             return;
@@ -272,14 +273,13 @@ public final class BlocksListener implements Listener {
             replaceType = "AXE";
         }
 
-        ItemStack itemStack = plugin.getNMSAdapter().getItemInHand(e.getPlayer());
         replaceType = itemStack.getType().name().split("_")[0] + "_" + replaceType;
 
         if(itemStack.getType().name().equals(replaceType))
             return;
 
         itemStack.setType(Material.valueOf(replaceType));
-        plugin.getNMSAdapter().setItemInHand(e.getPlayer(), itemStack);
+        plugin.getNMSAdapter().setItemInHand(e.getPlayer(), itemStack, e);
     }
 
     private String getTime(long timeLeft){

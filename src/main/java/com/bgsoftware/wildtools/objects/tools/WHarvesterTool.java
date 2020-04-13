@@ -115,7 +115,7 @@ public final class WHarvesterTool extends WTool implements HarvesterTool {
         }
 
         ItemUtils.formatItemStack(this, itemStack, getDefaultUses(), !sellMode, () ->
-            plugin.getNMSAdapter().setItemInHand(e.getPlayer(), itemStack));
+            plugin.getNMSAdapter().setItemInHand(e.getPlayer(), itemStack, e));
 
         return true;
     }

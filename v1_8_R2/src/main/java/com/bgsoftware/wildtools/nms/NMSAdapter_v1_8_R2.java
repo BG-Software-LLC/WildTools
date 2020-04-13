@@ -49,6 +49,7 @@ import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Event;
 import org.bukkit.material.CocoaPlant;
 import org.bukkit.material.Crops;
 import org.bukkit.material.NetherWarts;
@@ -330,9 +331,19 @@ public final class NMSAdapter_v1_8_R2 implements NMSAdapter {
     }
 
     @Override
+    public org.bukkit.inventory.ItemStack getItemInHand(Player player, Event e) {
+        return getItemInHand(player);
+    }
+
+    @Override
     public void setItemInHand(Player player, org.bukkit.inventory.ItemStack itemStack) {
         PlayerInventory playerInventory = ((CraftInventoryPlayer) player.getInventory()).getInventory();
         playerInventory.setItem(playerInventory.itemInHandIndex, CraftItemStack.asNMSCopy(itemStack));
+    }
+
+    @Override
+    public void setItemInHand(Player player, org.bukkit.inventory.ItemStack itemStack, Event event) {
+        setItemInHand(player, itemStack);
     }
 
     @Override

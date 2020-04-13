@@ -11,6 +11,8 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Event;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.Recipe;
@@ -45,6 +47,8 @@ public interface NMSAdapter {
 
     ItemStack getItemInHand(Player player);
 
+    ItemStack getItemInHand(Player player, Event e);
+
     List<UUID> getTasks(ItemStack itemStack);
 
     ItemStack addTask(ItemStack itemStack, UUID taskId);
@@ -54,6 +58,8 @@ public interface NMSAdapter {
     ItemStack clearTasks(ItemStack itemStack);
 
     void setItemInHand(Player player, ItemStack itemStack);
+
+    void setItemInHand(Player player, ItemStack itemStack, Event event);
 
     boolean isFullyGrown(Block block);
 
