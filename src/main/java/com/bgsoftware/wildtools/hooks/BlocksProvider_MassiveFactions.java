@@ -32,4 +32,26 @@ public final class BlocksProvider_MassiveFactions implements BlocksProvider {
         return faction.getId().equals(Factions.ID_NONE) || overriding || (mPlayer.hasFaction() && (mPlayer.getFaction().equals(faction) ||
                 faction.getPermitted(MPerm.getPermAccess()).contains(faction.getRelationWish(mPlayer.getFaction()))));
     }
+
+    @Override
+    public boolean canInteract(Player player, Block block, boolean onlyInClaim) {
+        MPlayer mPlayer = MPlayer.get(player);
+        boolean overriding = false;
+
+        try {
+            overriding = mPlayer.isOverriding();
+        } catch (Throwable ex) {
+            try {
+                overriding = (boolean) mPlayer.getClass().getMethod("isUsingAdminMode").invoke(mPlayer);
+            } catch (Exception ignored) { }
+        }
+
+        Faction faction = BoardColl.get().getFactionAt(PS.valueOf(block.getLocation()));
+
+        if(onlyInClaim && faction.getId().equals(Factions.ID_NONE)) return false;
+
+
+        return faction.getId().equals(Factions.ID_NONE) || overriding || (mPlayer.hasFaction() && (mPlayer.getFaction().equals(faction) ||
+                faction.getPermitted(MPerm.getPermContainer()).contains(faction.getRelationWish(mPlayer.getFaction()))));
+    }
 }

@@ -20,4 +20,14 @@ public final class BlocksProvider_FactionsX implements BlocksProvider {
         return faction.isWilderness() || overriding || (fPlayer.hasFaction() && (fPlayer.getFaction().equals(faction) ||
                 faction.getRelationPerms().getPermForRelation(faction.getRelationTo(fPlayer.getFaction()), PlayerAction.BREAK_BLOCK)));
     }
+
+    @Override
+    public boolean canInteract(Player player, Block block, boolean onlyInClaim) {
+        FPlayer fPlayer = PlayerManager.INSTANCE.getFPlayer(player);
+        boolean overriding = fPlayer.getInBypass();
+        Faction faction = GridManager.INSTANCE.getFactionAt(FactionsKt.getFLocation(block.getLocation()));
+        if(onlyInClaim && faction.isWilderness()) return false;
+        return faction.isWilderness() || overriding || (fPlayer.hasFaction() && (fPlayer.getFaction().equals(faction) ||
+                faction.getRelationPerms().getPermForRelation(faction.getRelationTo(fPlayer.getFaction()), PlayerAction.CHEST)));
+    }
 }

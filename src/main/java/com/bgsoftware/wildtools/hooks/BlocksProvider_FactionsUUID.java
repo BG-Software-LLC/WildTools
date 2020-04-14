@@ -31,17 +31,26 @@ public final class BlocksProvider_FactionsUUID implements BlocksProvider {
         Faction faction = Board.getInstance().getFactionAt(new FLocation(block.getLocation()));
         if(onlyInClaim && faction.isWilderness()) return false;
         return faction.isWilderness() || fPlayer.isAdminBypassing() || (fPlayer.hasFaction() && (fPlayer.getFaction().equals(faction) ||
-                hasRelation(faction, fPlayer)));
+                hasRelation(faction, fPlayer, "DESTROY")));
+    }
+
+    @Override
+    public boolean canInteract(Player player, Block block, boolean onlyInClaim) {
+        FPlayer fPlayer = FPlayers.getInstance().getByPlayer(player);
+        Faction faction = Board.getInstance().getFactionAt(new FLocation(block.getLocation()));
+        if(onlyInClaim && faction.isWilderness()) return false;
+        return faction.isWilderness() || fPlayer.isAdminBypassing() || (fPlayer.hasFaction() && (fPlayer.getFaction().equals(faction) ||
+                hasRelation(faction, fPlayer, "CONTAINER")));
     }
 
     @SuppressWarnings("all")
-    private boolean hasRelation(Faction faction, FPlayer fPlayer){
+    private boolean hasRelation(Faction faction, FPlayer fPlayer, String permission){
         try {
             Permissible permissible = (Permissible) getRelationWithMethod.invoke(faction, fPlayer.getFaction());
-            return (Boolean) ((Map) faction.getPermissions().get(permissible)).get(PermissibleAction.DESTROY);
+            return (Boolean) ((Map) faction.getPermissions().get(permissible)).get(PermissibleAction.valueOf(permission));
         }catch(Throwable ex){
             return faction.getPermissions().get(faction.getRelationWish(fPlayer.getFaction()))
-                    .get(PermissableAction.DESTROY) == Access.ALLOW;
+                    .get(PermissableAction.valueOf(permission)) == Access.ALLOW;
         }
     }
 

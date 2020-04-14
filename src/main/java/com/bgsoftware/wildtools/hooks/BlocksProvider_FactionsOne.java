@@ -28,4 +28,21 @@ public final class BlocksProvider_FactionsOne implements BlocksProvider {
         return faction == null || overriding || (fPlayer.hasFaction() && (fPlayer.getFaction().equals(faction) ||
                 faction.getPermissions().get(faction.getRelationWish(fPlayer.getFaction())).get(PermissableAction.DESTROY) == Access.ALLOW));
     }
+
+    @Override
+    public boolean canInteract(Player player, Block block, boolean onlyInClaim) {
+        FPlayer fPlayer = FactionsOneAPI.getFPlayer(player.getUniqueId());
+        boolean overriding = fPlayer.isAdminBypassing();
+        Faction faction = null;
+
+        try{
+            //noinspection JavaReflectionMemberAccess
+            faction = (Faction) Board.class.getMethod("getFactionAt", Location.class).invoke(null, block.getLocation());
+        }catch(Throwable ignored){}
+
+        if(onlyInClaim && faction == null) return false;
+
+        return faction == null || overriding || (fPlayer.hasFaction() && (fPlayer.getFaction().equals(faction) ||
+                faction.getPermissions().get(faction.getRelationWish(fPlayer.getFaction())).get(PermissableAction.CONTAINER) == Access.ALLOW));
+    }
 }
