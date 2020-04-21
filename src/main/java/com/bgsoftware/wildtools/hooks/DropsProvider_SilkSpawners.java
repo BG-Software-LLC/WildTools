@@ -5,10 +5,22 @@ import org.bukkit.block.Block;
 import org.bukkit.block.CreatureSpawner;
 import org.bukkit.inventory.ItemStack;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
+@SuppressWarnings("JavaReflectionMemberAccess")
 public final class DropsProvider_SilkSpawners implements DropsProvider {
+
+    private static Method getSpawnerEntityIDMethod = null, getCreatureNameMethod = null, newSpawnerItemMethod;
+
+    static {
+        try{
+            getSpawnerEntityIDMethod = SilkUtil.class.getMethod("getSpawnerEntityID", Block.class);
+            getCreatureNameMethod = SilkUtil.class.getMethod("getCreatureName", String.class);
+            newSpawnerItemMethod = SilkUtil.class.getMethod("newSpawnerItem", String.class, String.class, int.class, boolean.class);
+        }catch(Exception ignored){}
+    }
 
     private SilkUtil silkUtil;
 
@@ -23,10 +35,10 @@ public final class DropsProvider_SilkSpawners implements DropsProvider {
         if(!(block.getState() instanceof CreatureSpawner))
             return drops;
 
-        short entityId = silkUtil.getSpawnerEntityID(block);
-        String mobName = silkUtil.getCreatureName(entityId).toLowerCase().replace(" ", "");
+        Object entityId = getSpawnerEntityID((CreatureSpawner) block.getState());
+        String mobName = getCreatureName(entityId).toLowerCase().replace(" ", "");
 
-        drops.add(silkUtil.newSpawnerItem(entityId, silkUtil.getCustomSpawnerName(mobName), 1, false));
+        drops.add(newSpawnerItem(entityId, silkUtil.getCustomSpawnerName(mobName)));
 
         return drops;
     }
@@ -40,4 +52,31 @@ public final class DropsProvider_SilkSpawners implements DropsProvider {
     public boolean callEvent() {
         return false;
     }
+
+    private Object getSpawnerEntityID(CreatureSpawner spawner){
+        Object entityId;
+        try{
+            entityId = getSpawnerEntityIDMethod.invoke(silkUtil, spawner.getBlock());
+        }catch(Exception ex){
+            throw new IllegalStateException("Couldn't process the getCreatureName of SilkSpawners.");
+        }
+        return entityId == null || entityId.equals(0) ? silkUtil.getDefaultEntityID() : entityId;
+    }
+
+    private String getCreatureName(Object entityId){
+        try{
+            return (String) getCreatureNameMethod.invoke(silkUtil, entityId);
+        }catch(Exception ex){
+            return silkUtil.getCreatureName((short) entityId);
+        }
+    }
+
+    private ItemStack newSpawnerItem(Object entityId, String customName){
+        try{
+            return (ItemStack) newSpawnerItemMethod.invoke(silkUtil, entityId, customName, 1, false);
+        }catch(Exception ex){
+            return silkUtil.newSpawnerItem((short) entityId, customName, 1, false);
+        }
+    }
+
 }
