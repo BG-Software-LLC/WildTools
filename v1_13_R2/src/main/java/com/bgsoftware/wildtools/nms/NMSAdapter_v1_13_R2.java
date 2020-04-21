@@ -207,6 +207,16 @@ public final class NMSAdapter_v1_13_R2 implements NMSAdapter {
     }
 
     @Override
+    public int getExpFromBlock(org.bukkit.block.Block block, Player player) {
+        World world = ((CraftWorld) block.getWorld()).getHandle();
+        EntityPlayer entityPlayer = ((CraftPlayer) player).getHandle();
+        BlockPosition blockPosition = new BlockPosition(block.getX(), block.getY(), block.getZ());
+        IBlockData blockData = world.getType(blockPosition);
+        return blockData.getBlock().getExpDrop(blockData, world, blockPosition,
+                EnchantmentManager.getEnchantmentLevel(Enchantments.LOOT_BONUS_BLOCKS, entityPlayer.getItemInMainHand()));
+    }
+
+    @Override
     public int getTag(org.bukkit.inventory.ItemStack is, String key, int def) {
         ItemStack nmsStack = CraftItemStack.asNMSCopy(is);
 

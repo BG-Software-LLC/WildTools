@@ -37,6 +37,8 @@ public interface NMSAdapter {
 
     List<ItemStack> getCropDrops(Player pl, Block bl);
 
+    int getExpFromBlock(Block block, Player player);
+
     int getTag(ItemStack is, String key, int def);
 
     ItemStack setTag(ItemStack is, String key, int value);

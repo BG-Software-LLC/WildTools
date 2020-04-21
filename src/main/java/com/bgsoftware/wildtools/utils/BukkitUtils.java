@@ -9,6 +9,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.ExperienceOrb;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.inventory.ItemStack;
@@ -71,6 +73,14 @@ public final class BukkitUtils {
 
     public static void breakNaturally(Player player, Block block, ItemStack usedItem, Tool tool, Consumer<Block> onBlockBreak, Consumer<ItemStack> onItemDrop){
         List<ItemStack> drops = new ArrayList<>();
+
+        if((tool == null || !tool.hasSilkTouch()) && usedItem.getEnchantmentLevel(Enchantment.SILK_TOUCH) == 0) {
+            int expFromBlock = plugin.getNMSAdapter().getExpFromBlock(block, player);
+            if (expFromBlock > 0) {
+                ExperienceOrb orb = block.getWorld().spawn(block.getLocation(), ExperienceOrb.class);
+                orb.setExperience(expFromBlock);
+            }
+        }
 
         if(onItemDrop != null) {
             drops.addAll(getBlockDrops(player, block, tool));
