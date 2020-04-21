@@ -50,61 +50,64 @@ public final class WSellTool extends WTool implements SellTool {
 
         Executor.async(() -> {
             synchronized (getToolMutex(e.getClickedBlock())) {
-                double totalEarnings = 0.0;
-                boolean wildChest = false;
+                try {
+                    double totalEarnings = 0.0;
+                    boolean wildChest = false;
 
-                Map<Integer, ItemStack> toSell = new HashMap<>();
+                    Map<Integer, ItemStack> toSell = new HashMap<>();
 
-                if (WildChestsHook.isWildChest(chest)) {
-                    totalEarnings = WildChestsHook.getChestPrice(chest, e.getPlayer(), toSell);
-                    wildChest = true;
-                }
+                    if (WildChestsHook.isWildChest(chest)) {
+                        totalEarnings = WildChestsHook.getChestPrice(chest, e.getPlayer(), toSell);
+                        wildChest = true;
+                    }
 
-                if (!wildChest) {
-                    totalEarnings = 0;
-                    for (int slot = 0; slot < inventory.getSize(); slot++) {
-                        ItemStack itemStack = inventory.getItem(slot);
-                        if (itemStack != null && plugin.getProviders().canSellItem(e.getPlayer(), itemStack)) {
-                            toSell.put(slot, itemStack);
-                            totalEarnings += plugin.getProviders().getPrice(e.getPlayer(), itemStack);
+                    if (!wildChest) {
+                        totalEarnings = 0;
+                        for (int slot = 0; slot < inventory.getSize(); slot++) {
+                            ItemStack itemStack = inventory.getItem(slot);
+                            if (itemStack != null && plugin.getProviders().canSellItem(e.getPlayer(), itemStack)) {
+                                toSell.put(slot, itemStack);
+                                totalEarnings += plugin.getProviders().getPrice(e.getPlayer(), itemStack);
+                            }
                         }
                     }
+
+                    double multiplier = getMultiplier();
+
+                    String message = toSell.isEmpty() ? Locale.NO_SELL_ITEMS.getMessage() : Locale.SOLD_CHEST.getMessage();
+
+                    SellWandUseEvent sellWandUseEvent = new SellWandUseEvent(e.getPlayer(), chest, totalEarnings, multiplier, message);
+                    Bukkit.getPluginManager().callEvent(sellWandUseEvent);
+
+                    if (sellWandUseEvent.isCancelled())
+                        return;
+
+                    multiplier = sellWandUseEvent.getMultiplier();
+                    totalEarnings = sellWandUseEvent.getPrice() * multiplier;
+
+                    plugin.getProviders().depositPlayer(e.getPlayer(), totalEarnings);
+
+                    if (!wildChest) {
+                        toSell.keySet().forEach(slot -> inventory.setItem(slot, new ItemStack(Material.AIR)));
+                    } else {
+                        WildChestsHook.removeItems(chest, toSell);
+                    }
+
+                    //noinspection all
+                    message = sellWandUseEvent.getMessage().replace("{0}", NumberUtils.format(totalEarnings))
+                            .replace("{1}", multiplier != 1 && Locale.MULTIPLIER.getMessage() != null ? Locale.MULTIPLIER.getMessage(multiplier) : "");
+
+                    if (!toSell.isEmpty()) {
+                        reduceDurablility(e.getPlayer(), 1, taskId);
+                    } else {
+                        ToolTaskManager.removeTask(taskId);
+                    }
+
+                    if (!message.isEmpty())
+                        e.getPlayer().sendMessage(message);
+                } finally {
+                    removeToolMutex(e.getClickedBlock());
                 }
-
-                double multiplier = getMultiplier();
-
-                String message = toSell.isEmpty() ? Locale.NO_SELL_ITEMS.getMessage() : Locale.SOLD_CHEST.getMessage();
-
-                SellWandUseEvent sellWandUseEvent = new SellWandUseEvent(e.getPlayer(), chest, totalEarnings, multiplier, message);
-                Bukkit.getPluginManager().callEvent(sellWandUseEvent);
-
-                if (sellWandUseEvent.isCancelled())
-                    return;
-
-                multiplier = sellWandUseEvent.getMultiplier();
-                totalEarnings = sellWandUseEvent.getPrice() * multiplier;
-
-                plugin.getProviders().depositPlayer(e.getPlayer(), totalEarnings);
-
-                if(!wildChest){
-                    toSell.keySet().forEach(slot -> inventory.setItem(slot, new ItemStack(Material.AIR)));
-                }
-                else {
-                    WildChestsHook.removeItems(chest, toSell);
-                }
-
-                //noinspection all
-                message = sellWandUseEvent.getMessage().replace("{0}", NumberUtils.format(totalEarnings))
-                        .replace("{1}", multiplier != 1 && Locale.MULTIPLIER.getMessage() != null ? Locale.MULTIPLIER.getMessage(multiplier) : "");
-
-                if (!toSell.isEmpty()) {
-                    reduceDurablility(e.getPlayer(), 1, taskId);
-                } else {
-                    ToolTaskManager.removeTask(taskId);
-                }
-
-                if (!message.isEmpty())
-                    e.getPlayer().sendMessage(message);
             }
         });
 

@@ -65,66 +65,70 @@ public final class WCraftingTool extends WTool implements CraftingTool {
 
         Executor.async(() -> {
             synchronized (getToolMutex(e.getClickedBlock())) {
-                int craftedItemsAmount = 0;
+                try {
+                    int craftedItemsAmount = 0;
 
-                List<Inventory> inventories = WildChestsHook.getAllInventories(chest, chestInventory);
+                    List<Inventory> inventories = WildChestsHook.getAllInventories(chest, chestInventory);
 
-                while (craftings.hasNext()) {
-                    Recipe recipe = craftings.next();
-                    List<RecipeChoice> ingredients;
+                    while (craftings.hasNext()) {
+                        Recipe recipe = craftings.next();
+                        List<RecipeChoice> ingredients;
 
-                    //Get the ingredients for the recipe
-                    if (recipe instanceof ShapedRecipe) {
-                        ingredients = getIngredients(recipe, new ArrayList<>(((ShapedRecipe) recipe).getIngredientMap().values()));
-                    } else if (recipe instanceof ShapelessRecipe) {
-                        ingredients = getIngredients(recipe, ((ShapelessRecipe) recipe).getIngredientList());
-                    } else if (recipe instanceof FurnaceRecipe) {
-                        ingredients = Collections.singletonList(RecipeChoice.of(((FurnaceRecipe) recipe).getInput()));
-                    } else continue;
+                        //Get the ingredients for the recipe
+                        if (recipe instanceof ShapedRecipe) {
+                            ingredients = getIngredients(recipe, new ArrayList<>(((ShapedRecipe) recipe).getIngredientMap().values()));
+                        } else if (recipe instanceof ShapelessRecipe) {
+                            ingredients = getIngredients(recipe, ((ShapelessRecipe) recipe).getIngredientList());
+                        } else if (recipe instanceof FurnaceRecipe) {
+                            ingredients = Collections.singletonList(RecipeChoice.of(((FurnaceRecipe) recipe).getInput()));
+                        } else continue;
 
-                    if (ingredients.isEmpty())
-                        continue;
+                        if (ingredients.isEmpty())
+                            continue;
 
-                    for (Inventory inventory : inventories) {
-                        int amountOfRecipes = Integer.MAX_VALUE;
+                        for (Inventory inventory : inventories) {
+                            int amountOfRecipes = Integer.MAX_VALUE;
 
-                        for (RecipeChoice ingredient : ingredients) {
-                            amountOfRecipes = Math.min(amountOfRecipes, countItems(ingredient, inventory) / ingredient.getAmount());
-                        }
-
-                        if (amountOfRecipes > 0) {
                             for (RecipeChoice ingredient : ingredients) {
-                                ingredient.setAmount(ingredient.getAmount() * amountOfRecipes);
-                                ingredient.remove(inventory);
-                                if(ingredient.test("BOTTLE"))
-                                    toAdd.add(new ItemStack(Material.GLASS_BOTTLE, ingredient.getAmount()));
-                                else if(ingredient.test("BUCKET"))
-                                    toAdd.add(new ItemStack(Material.BUCKET, ingredient.getAmount()));
+                                amountOfRecipes = Math.min(amountOfRecipes, countItems(ingredient, inventory) / ingredient.getAmount());
                             }
 
-                            ItemStack result = recipe.getResult().clone();
-                            result.setAmount(result.getAmount() * amountOfRecipes);
-                            toAdd.add(result);
+                            if (amountOfRecipes > 0) {
+                                for (RecipeChoice ingredient : ingredients) {
+                                    ingredient.setAmount(ingredient.getAmount() * amountOfRecipes);
+                                    ingredient.remove(inventory);
+                                    if (ingredient.test("BOTTLE"))
+                                        toAdd.add(new ItemStack(Material.GLASS_BOTTLE, ingredient.getAmount()));
+                                    else if (ingredient.test("BUCKET"))
+                                        toAdd.add(new ItemStack(Material.BUCKET, ingredient.getAmount()));
+                                }
 
-                            craftedItemsAmount += (amountOfRecipes * recipe.getResult().getAmount());
+                                ItemStack result = recipe.getResult().clone();
+                                result.setAmount(result.getAmount() * amountOfRecipes);
+                                toAdd.add(result);
+
+                                craftedItemsAmount += (amountOfRecipes * recipe.getResult().getAmount());
+                            }
                         }
                     }
-                }
 
-                Executor.sync(() -> {
-                    CraftingWandUseEvent craftingWandUseEvent = new CraftingWandUseEvent(e.getPlayer(), this,
-                            toAdd.stream().map(ItemStack::clone).collect(Collectors.toList()));
-                    Bukkit.getPluginManager().callEvent(craftingWandUseEvent);
-                });
+                    Executor.sync(() -> {
+                        CraftingWandUseEvent craftingWandUseEvent = new CraftingWandUseEvent(e.getPlayer(), this,
+                                toAdd.stream().map(ItemStack::clone).collect(Collectors.toList()));
+                        Bukkit.getPluginManager().callEvent(craftingWandUseEvent);
+                    });
 
-                WildChestsHook.addItems(chest.getLocation(), chestInventory, toAdd);
+                    WildChestsHook.addItems(chest.getLocation(), chestInventory, toAdd);
 
-                if (craftedItemsAmount > 0) {
-                    reduceDurablility(e.getPlayer(), 1, taskId);
-                    Locale.CRAFT_SUCCESS.send(e.getPlayer(), craftedItemsAmount);
-                } else {
-                    ToolTaskManager.removeTask(taskId);
-                    Locale.NO_CRAFT_ITEMS.send(e.getPlayer());
+                    if (craftedItemsAmount > 0) {
+                        reduceDurablility(e.getPlayer(), 1, taskId);
+                        Locale.CRAFT_SUCCESS.send(e.getPlayer(), craftedItemsAmount);
+                    } else {
+                        ToolTaskManager.removeTask(taskId);
+                        Locale.NO_CRAFT_ITEMS.send(e.getPlayer());
+                    }
+                } finally {
+                    removeToolMutex(e.getClickedBlock());
                 }
             }
         });

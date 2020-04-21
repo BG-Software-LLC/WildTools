@@ -7,15 +7,18 @@ import com.bgsoftware.wildtools.objects.tools.WTool;
 import com.bgsoftware.wildtools.utils.items.ItemUtils;
 import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
+import org.bukkit.block.Chest;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 
 import com.bgsoftware.wildtools.api.objects.tools.Tool;
+import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Arrays;
@@ -280,6 +283,19 @@ public final class BlocksListener implements Listener {
 
         itemStack.setType(Material.valueOf(replaceType));
         plugin.getNMSAdapter().setItemInHand(e.getPlayer(), itemStack, e);
+    }
+
+    @EventHandler
+    public void onInventoryInteract(InventoryClickEvent e){
+        InventoryHolder inventoryHolder = e.getClickedInventory() == null ? null : e.getClickedInventory().getHolder();
+
+        if(!(inventoryHolder instanceof Chest))
+            return;
+
+        Chest chest = (Chest) inventoryHolder;
+
+        if(WTool.isToolMutex(chest.getBlock()))
+            e.setCancelled(true);
     }
 
     private String getTime(long timeLeft){

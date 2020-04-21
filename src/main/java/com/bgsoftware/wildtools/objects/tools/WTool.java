@@ -33,7 +33,7 @@ import java.util.stream.Collectors;
 public abstract class WTool implements Tool {
 
     protected static WildToolsPlugin plugin = WildToolsPlugin.getPlugin();
-    private final Map<Location, Object> toolMutexes = new HashMap<>();
+    private static final Map<Location, Object> toolMutexes = new HashMap<>();
 
     public static Set<UUID> toolBlockBreak;
 
@@ -596,11 +596,19 @@ public abstract class WTool implements Tool {
 
     /***********************************************************************************/
 
-    protected Object getToolMutex(Block block){
+    protected static Object getToolMutex(Block block){
         Location location = block.getLocation();
         if(!toolMutexes.containsKey(location))
             toolMutexes.put(location, new Object());
         return toolMutexes.get(location);
+    }
+
+    public static boolean isToolMutex(Block block){
+        return toolMutexes.containsKey(block.getLocation());
+    }
+
+    protected static void removeToolMutex(Block block){
+        toolMutexes.remove(block.getLocation());
     }
 
     private boolean isMaterialInList(Material type, short data, Set<String> list){
