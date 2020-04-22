@@ -11,12 +11,15 @@ public final class InventoryUtils {
         if(itemStack == null)
             return amount;
 
-        ItemStack[] content = inventory.getContents();
+        ItemStack[] contents = inventory.getContents();
 
-        for (ItemStack _itemStack : content) {
-            if (itemStack.isSimilar(_itemStack))
-                amount += _itemStack.getAmount();
+        for(int i = 0; i < 36; i++){
+            if (itemStack.isSimilar(contents[i]))
+                amount += contents[i].getAmount();
         }
+
+        if(contents.length == 41 && itemStack.isSimilar(contents[40]))
+            amount += contents[40].getAmount();
 
         return amount;
     }
