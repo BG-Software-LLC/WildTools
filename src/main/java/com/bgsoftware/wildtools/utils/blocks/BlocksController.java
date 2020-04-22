@@ -2,6 +2,7 @@ package com.bgsoftware.wildtools.utils.blocks;
 
 import com.bgsoftware.wildtools.WildToolsPlugin;
 import com.bgsoftware.wildtools.hooks.McMMOHook;
+import com.bgsoftware.wildtools.utils.NumberUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
@@ -15,6 +16,7 @@ import java.util.Set;
 
 public final class BlocksController {
 
+    private static final int MAX_BLOCK_LOCATION = 29999984;
     private static final WildToolsPlugin plugin = WildToolsPlugin.getPlugin();
 
     private final Map<CachedChunk, Map<Location, Integer>> cachedChunks = new HashMap<>();
@@ -28,6 +30,9 @@ public final class BlocksController {
     }
 
     public void setType(Location location, int blockId){
+        if(!isLocationValid(location))
+            return;
+
         if(blockToUpdate == null) {
             blockToUpdate = location;
             combinedId = blockId;
@@ -68,6 +73,12 @@ public final class BlocksController {
         combinedId = 0;
         affectedBlocks.clear();
         cachedChunks.clear();
+    }
+
+    private static boolean isLocationValid(Location location){
+        return NumberUtils.range(location.getBlockY(), 0, location.getWorld().getMaxHeight()) &&
+                NumberUtils.range(location.getBlockX(), -MAX_BLOCK_LOCATION, MAX_BLOCK_LOCATION) &&
+                NumberUtils.range(location.getBlockZ(), -MAX_BLOCK_LOCATION, MAX_BLOCK_LOCATION);
     }
 
     private static final class CachedChunk{

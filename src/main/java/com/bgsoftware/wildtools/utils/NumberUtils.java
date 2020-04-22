@@ -27,4 +27,8 @@ public final class NumberUtils {
         return s.endsWith(".00") ? s.replace(".00", "") : s;
     }
 
+    public static boolean range(int num, int min, int max){
+        return num >= min && num <= max;
+    }
+
 }
