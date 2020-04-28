@@ -16,6 +16,7 @@ import com.bgsoftware.wildtools.hooks.BlocksProvider_MassiveFactions;
 import com.bgsoftware.wildtools.hooks.BlocksProvider_PlotSquared;
 import com.bgsoftware.wildtools.hooks.BlocksProvider_PlotSquaredLegacy;
 import com.bgsoftware.wildtools.hooks.BlocksProvider_Residence;
+import com.bgsoftware.wildtools.hooks.BlocksProvider_SnowGearsShops;
 import com.bgsoftware.wildtools.hooks.BlocksProvider_SuperiorSkyblock;
 import com.bgsoftware.wildtools.hooks.BlocksProvider_Towny;
 import com.bgsoftware.wildtools.hooks.BlocksProvider_Villages;
@@ -52,15 +53,15 @@ import java.util.List;
 
 public final class ProvidersHandler {
 
-    private static WildToolsPlugin plugin = WildToolsPlugin.getPlugin();
+    private static final WildToolsPlugin plugin = WildToolsPlugin.getPlugin();
 
     static String pricesPlugin;
 
     private boolean isVaultEnabled = false;
     private Economy economy;
 
-    private List<BlocksProvider> blocksProviders = Lists.newArrayList();
-    private List<DropsProvider> dropsProviders = Lists.newArrayList();
+    private final List<BlocksProvider> blocksProviders = Lists.newArrayList();
+    private final List<DropsProvider> dropsProviders = Lists.newArrayList();
     private PricesProvider pricesProvider;
     private FactionsProvider factionsProvider;
 
@@ -218,6 +219,9 @@ public final class ProvidersHandler {
         }
         if(Bukkit.getPluginManager().isPluginEnabled("Residence"))
             blocksProviders.add(new BlocksProvider_Residence());
+        if(Bukkit.getPluginManager().isPluginEnabled("Shop") && Bukkit.getPluginManager().getPlugin("Shop")
+                .getDescription().getAuthors().stream().anyMatch(line -> line.contains("SnowGears")))
+            blocksProviders.add(new BlocksProvider_SnowGearsShops());
         //Drops Plugin hook
         if(Bukkit.getPluginManager().isPluginEnabled("VoidChest"))
             dropsProviders.add(new DropsProvider_VoidChest());
