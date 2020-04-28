@@ -14,6 +14,7 @@ import net.minecraft.server.v1_7_R4.EnchantmentManager;
 import net.minecraft.server.v1_7_R4.EntityItem;
 import net.minecraft.server.v1_7_R4.EntityLiving;
 import net.minecraft.server.v1_7_R4.EntityPlayer;
+import net.minecraft.server.v1_7_R4.GameProfileSerializer;
 import net.minecraft.server.v1_7_R4.Item;
 import net.minecraft.server.v1_7_R4.ItemStack;
 import net.minecraft.server.v1_7_R4.Items;
@@ -23,6 +24,8 @@ import net.minecraft.server.v1_7_R4.NBTTagString;
 import net.minecraft.server.v1_7_R4.PacketPlayOutCollect;
 import net.minecraft.server.v1_7_R4.PacketPlayOutMultiBlockChange;
 import net.minecraft.server.v1_7_R4.PlayerInventory;
+import net.minecraft.server.v1_7_R4.TileEntity;
+import net.minecraft.server.v1_7_R4.TileEntitySkull;
 import net.minecraft.server.v1_7_R4.World;
 
 import net.minecraft.server.v1_7_R4.WorldServer;
@@ -78,6 +81,23 @@ public final class NMSAdapter_v1_7_R4 implements NMSAdapter {
         //Checks if player cannot break the block or player in creative mode
         if(!player.a(block) || player.playerInteractManager.isCreative())
             return drops;
+
+        TileEntity tileEntity = world.getTileEntity(bl.getX(), bl.getY(), bl.getZ());
+
+        if(tileEntity instanceof TileEntitySkull){
+            TileEntitySkull tileEntitySkull = (TileEntitySkull) tileEntity;
+            if(tileEntitySkull.getSkullType() == 3){
+                ItemStack itemStack = new ItemStack(Items.SKULL, 1, 3);
+                NBTTagCompound nbtTagCompound = itemStack.hasTag() ? itemStack.getTag() : new NBTTagCompound();
+                assert nbtTagCompound != null;
+                NBTTagCompound skullOwnerTag = new NBTTagCompound();
+                GameProfileSerializer.serialize(skullOwnerTag, tileEntitySkull.getGameProfile());
+                nbtTagCompound.set("SkullOwner", skullOwnerTag);
+                itemStack.setTag(nbtTagCompound);
+                drops.add(CraftItemStack.asBukkitCopy(itemStack));
+                return drops;
+            }
+        }
 
         //Checks if player has silk touch
         if ((block.d() && !block.isTileEntity()) && (silkTouch || EnchantmentManager.hasSilkTouchEnchantment(player))) {

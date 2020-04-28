@@ -19,6 +19,7 @@ import net.minecraft.server.v1_9_R2.EntityItem;
 import net.minecraft.server.v1_9_R2.EntityLiving;
 import net.minecraft.server.v1_9_R2.EntityPlayer;
 import net.minecraft.server.v1_9_R2.EnumColor;
+import net.minecraft.server.v1_9_R2.GameProfileSerializer;
 import net.minecraft.server.v1_9_R2.IBlockData;
 import net.minecraft.server.v1_9_R2.Item;
 import net.minecraft.server.v1_9_R2.ItemStack;
@@ -28,6 +29,8 @@ import net.minecraft.server.v1_9_R2.NBTTagList;
 import net.minecraft.server.v1_9_R2.NBTTagString;
 import net.minecraft.server.v1_9_R2.PacketPlayOutCollect;
 import net.minecraft.server.v1_9_R2.PacketPlayOutMultiBlockChange;
+import net.minecraft.server.v1_9_R2.TileEntity;
+import net.minecraft.server.v1_9_R2.TileEntitySkull;
 import net.minecraft.server.v1_9_R2.World;
 
 import net.minecraft.server.v1_9_R2.WorldServer;
@@ -88,6 +91,23 @@ public final class NMSAdapter_v1_9_R2 implements NMSAdapter {
 
         if(!player.hasBlock(blockData) || player.playerInteractManager.isCreative())
             return drops;
+
+        TileEntity tileEntity = world.getTileEntity(blockPosition);
+
+        if(tileEntity instanceof TileEntitySkull){
+            TileEntitySkull tileEntitySkull = (TileEntitySkull) tileEntity;
+            if(tileEntitySkull.getSkullType() == 3){
+                ItemStack itemStack = new ItemStack(Items.SKULL, 1, 3);
+                NBTTagCompound nbtTagCompound = itemStack.hasTag() ? itemStack.getTag() : new NBTTagCompound();
+                assert nbtTagCompound != null;
+                NBTTagCompound skullOwnerTag = new NBTTagCompound();
+                GameProfileSerializer.serialize(skullOwnerTag, tileEntitySkull.getGameProfile());
+                nbtTagCompound.set("SkullOwner", skullOwnerTag);
+                itemStack.setTag(nbtTagCompound);
+                drops.add(CraftItemStack.asBukkitCopy(itemStack));
+                return drops;
+            }
+        }
 
         // Has silk touch enchant
         if (block.n() && !block.isTileEntity() && (silkTouch || EnchantmentManager.a(Enchantments.SILK_TOUCH, player) > 0)) {

@@ -21,6 +21,7 @@ import net.minecraft.server.v1_12_R1.EntityItem;
 import net.minecraft.server.v1_12_R1.EntityLiving;
 import net.minecraft.server.v1_12_R1.EntityPlayer;
 import net.minecraft.server.v1_12_R1.EnumColor;
+import net.minecraft.server.v1_12_R1.GameProfileSerializer;
 import net.minecraft.server.v1_12_R1.IBlockData;
 import net.minecraft.server.v1_12_R1.Item;
 import net.minecraft.server.v1_12_R1.ItemStack;
@@ -29,7 +30,9 @@ import net.minecraft.server.v1_12_R1.NBTTagList;
 import net.minecraft.server.v1_12_R1.NBTTagString;
 import net.minecraft.server.v1_12_R1.PacketPlayOutCollect;
 import net.minecraft.server.v1_12_R1.PacketPlayOutMultiBlockChange;
+import net.minecraft.server.v1_12_R1.TileEntity;
 import net.minecraft.server.v1_12_R1.TileEntityShulkerBox;
+import net.minecraft.server.v1_12_R1.TileEntitySkull;
 import net.minecraft.server.v1_12_R1.World;
 import net.minecraft.server.v1_12_R1.NBTTagCompound;
 import net.minecraft.server.v1_12_R1.WorldServer;
@@ -95,8 +98,10 @@ public final class NMSAdapter_v1_12_R1 implements NMSAdapter {
         if(!player.hasBlock(blockData) || player.playerInteractManager.isCreative())
             return drops;
 
-        if(world.getTileEntity(blockPosition) instanceof TileEntityShulkerBox){
-            TileEntityShulkerBox tileEntityShulkerBox = (TileEntityShulkerBox) world.getTileEntity(blockPosition);
+        TileEntity tileEntity = world.getTileEntity(blockPosition);
+
+        if(tileEntity instanceof TileEntityShulkerBox){
+            TileEntityShulkerBox tileEntityShulkerBox = (TileEntityShulkerBox) tileEntity;
             if (!tileEntityShulkerBox.r() && tileEntityShulkerBox.F()) {
                 ItemStack itemStack = new ItemStack(Item.getItemOf(block));
                 NBTTagCompound nbtTagCompound = new NBTTagCompound();
@@ -110,6 +115,21 @@ public final class NMSAdapter_v1_12_R1 implements NMSAdapter {
                 drops.add(CraftItemStack.asBukkitCopy(itemStack));
             }
             return drops;
+        }
+
+        else if(tileEntity instanceof TileEntitySkull){
+            TileEntitySkull tileEntitySkull = (TileEntitySkull) tileEntity;
+            if(tileEntitySkull.getSkullType() == 3){
+                ItemStack itemStack = new ItemStack(Items.SKULL, 1, 3);
+                NBTTagCompound nbtTagCompound = itemStack.hasTag() ? itemStack.getTag() : new NBTTagCompound();
+                assert nbtTagCompound != null;
+                NBTTagCompound skullOwnerTag = new NBTTagCompound();
+                GameProfileSerializer.serialize(skullOwnerTag, tileEntitySkull.getGameProfile());
+                nbtTagCompound.set("SkullOwner", skullOwnerTag);
+                itemStack.setTag(nbtTagCompound);
+                drops.add(CraftItemStack.asBukkitCopy(itemStack));
+                return drops;
+            }
         }
 
         // Has silk touch enchant
