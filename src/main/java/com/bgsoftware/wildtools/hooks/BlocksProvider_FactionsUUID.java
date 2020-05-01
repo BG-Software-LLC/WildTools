@@ -5,12 +5,14 @@ import com.massivecraft.factions.FLocation;
 import com.massivecraft.factions.FPlayer;
 import com.massivecraft.factions.FPlayers;
 import com.massivecraft.factions.Faction;
+import com.massivecraft.factions.FactionsPlugin;
 import com.massivecraft.factions.perms.Permissible;
 import com.massivecraft.factions.perms.PermissibleAction;
 import com.massivecraft.factions.zcore.fperms.Access;
 import com.massivecraft.factions.zcore.fperms.PermissableAction;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
 
 import java.lang.reflect.Method;
 import java.util.Map;
@@ -23,6 +25,11 @@ public final class BlocksProvider_FactionsUUID implements BlocksProvider {
         try{
             getRelationWithMethod = Faction.class.getDeclaredMethod("getRelationWish", Faction.class);
         }catch(Throwable ignored){}
+    }
+
+    @Override
+    public Plugin getPlugin() {
+        return FactionsPlugin.getInstance();
     }
 
     @Override

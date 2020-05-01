@@ -28,6 +28,7 @@ import com.bgsoftware.wildtools.hooks.DropsProvider_SilkSpawners;
 import com.bgsoftware.wildtools.hooks.DropsProvider_VoidChest;
 import com.bgsoftware.wildtools.hooks.DropsProvider_WildStacker;
 import com.bgsoftware.wildtools.hooks.DropsProviders_WildToolsSpawners;
+import com.bgsoftware.wildtools.hooks.PerWorldPluginsHook;
 import com.bgsoftware.wildtools.hooks.PricesProvider_CMI;
 import com.bgsoftware.wildtools.hooks.FactionsProvider;
 import com.bgsoftware.wildtools.hooks.FactionsProvider_Default;
@@ -101,7 +102,8 @@ public final class ProvidersHandler {
             return false;
 
         for(BlocksProvider blocksProvider : blocksProviders) {
-            if (!blocksProvider.canBreak(player, block, tool.isOnlyInsideClaim()))
+            if (PerWorldPluginsHook.isPluginEnabled(blocksProvider.getPlugin(), block.getWorld()) &&
+                    !blocksProvider.canBreak(player, block, tool.isOnlyInsideClaim()))
                 return false;
         }
         return true;
@@ -117,7 +119,8 @@ public final class ProvidersHandler {
             return false;
 
         for(BlocksProvider blocksProvider : blocksProviders) {
-            if (!blocksProvider.canInteract(player, block, tool.isOnlyInsideClaim()))
+            if (PerWorldPluginsHook.isPluginEnabled(blocksProvider.getPlugin(), block.getWorld()) &&
+                    !blocksProvider.canInteract(player, block, tool.isOnlyInsideClaim()))
                 return false;
         }
         return true;
@@ -125,7 +128,8 @@ public final class ProvidersHandler {
 
     public boolean canPickupItem(Player player, Item item){
         for(BlocksProvider blocksProvider : blocksProviders) {
-            if (!blocksProvider.canPickupItem(player, item))
+            if (PerWorldPluginsHook.isPluginEnabled(blocksProvider.getPlugin(), item.getWorld()) &&
+                    !blocksProvider.canPickupItem(player, item))
                 return false;
         }
         return true;

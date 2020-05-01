@@ -3,14 +3,21 @@ package com.bgsoftware.wildtools.hooks;
 import com.massivecraft.factions.Board;
 import com.massivecraft.factions.FPlayer;
 import com.massivecraft.factions.Faction;
+import com.massivecraft.factions.P;
 import com.massivecraft.factions.zcore.fperms.Access;
 import com.massivecraft.factions.zcore.fperms.PermissableAction;
 import de.erethon.factionsone.FactionsOneAPI;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
 
 public final class BlocksProvider_FactionsOne implements BlocksProvider {
+
+    @Override
+    public Plugin getPlugin() {
+        return P.p;
+    }
 
     @Override
     public boolean canBreak(Player player, Block block, boolean onlyInClaim) {

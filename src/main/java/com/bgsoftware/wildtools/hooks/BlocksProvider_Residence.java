@@ -1,13 +1,20 @@
 package com.bgsoftware.wildtools.hooks;
 
+import com.bekvon.bukkit.residence.Residence;
 import com.bekvon.bukkit.residence.api.ResidenceApi;
 import com.bekvon.bukkit.residence.containers.Flags;
 import com.bekvon.bukkit.residence.protection.ClaimedResidence;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
 
 public final class BlocksProvider_Residence implements BlocksProvider {
+
+    @Override
+    public Plugin getPlugin() {
+        return Residence.getInstance();
+    }
 
     @Override
     public boolean canBreak(Player player, Block block, boolean onlyInClaim) {

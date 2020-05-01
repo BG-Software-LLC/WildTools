@@ -5,8 +5,14 @@ import dev.warse.chunkhoppers.utils.ChunkHopper;
 import dev.warse.chunkhoppers.utils.other.Member;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
 
 public final class BlocksProvider_ChunkHoppers implements BlocksProvider {
+
+    @Override
+    public Plugin getPlugin() {
+        return ChunkHoppers.getInstance();
+    }
 
     @Override
     public boolean canBreak(Player player, Block block, boolean onlyInClaim) {

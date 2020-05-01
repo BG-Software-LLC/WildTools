@@ -1,11 +1,18 @@
 package com.bgsoftware.wildtools.hooks;
 
+import com.wasteofplastic.acidisland.ASkyBlock;
 import com.wasteofplastic.acidisland.ASkyBlockAPI;
 import com.wasteofplastic.acidisland.Island;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
 
 public final class BlocksProvider_AcidIsland implements BlocksProvider {
+
+    @Override
+    public Plugin getPlugin() {
+        return ASkyBlock.getPlugin();
+    }
 
     @Override
     public boolean canBreak(Player player, Block block, boolean onlyInClaim) {

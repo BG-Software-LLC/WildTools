@@ -2,12 +2,18 @@ package com.bgsoftware.wildtools.hooks;
 
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
 import world.bentobox.bentobox.BentoBox;
 import world.bentobox.bentobox.database.objects.Island;
 
 import java.util.Optional;
 
 public final class BlocksProvider_BentoBox implements BlocksProvider {
+
+    @Override
+    public Plugin getPlugin() {
+        return BentoBox.getInstance();
+    }
 
     @Override
     public boolean canBreak(Player player, Block block, boolean onlyInClaim) {

@@ -9,8 +9,14 @@ import org.bukkit.block.Sign;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.InventoryHolder;
+import org.bukkit.plugin.Plugin;
 
 public final class BlocksProvider_SuperiorSkyblock implements BlocksProvider {
+
+    @Override
+    public Plugin getPlugin() {
+        return (Plugin) SuperiorSkyblockAPI.getSuperiorSkyblock();
+    }
 
     @Override
     public boolean canBreak(Player player, Block block, boolean onlyInClaim) {

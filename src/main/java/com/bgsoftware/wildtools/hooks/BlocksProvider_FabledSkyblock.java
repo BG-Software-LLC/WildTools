@@ -1,12 +1,19 @@
 package com.bgsoftware.wildtools.hooks;
 
+import com.songoda.skyblock.SkyBlock;
 import com.songoda.skyblock.api.SkyBlockAPI;
 import com.songoda.skyblock.api.island.Island;
 import com.songoda.skyblock.api.island.IslandRole;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
 
 public final class BlocksProvider_FabledSkyblock implements BlocksProvider {
+
+    @Override
+    public Plugin getPlugin() {
+        return SkyBlock.getInstance();
+    }
 
     @Override
     public boolean canBreak(Player player, Block block, boolean onlyInClaim) {

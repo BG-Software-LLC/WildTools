@@ -6,8 +6,14 @@ import me.ryanhamshire.GriefPrevention.GriefPrevention;
 import me.ryanhamshire.GriefPrevention.PlayerData;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
 
 public final class BlocksProvider_GriefPrevention implements BlocksProvider {
+
+    @Override
+    public Plugin getPlugin() {
+        return GriefPrevention.instance;
+    }
 
     @Override
     public boolean canBreak(Player player, Block block, boolean onlyInClaim) {

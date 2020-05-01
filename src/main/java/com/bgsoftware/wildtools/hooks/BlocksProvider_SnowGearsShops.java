@@ -1,9 +1,11 @@
 package com.bgsoftware.wildtools.hooks;
 
+import com.snowgears.shop.Shop;
 import com.snowgears.shop.listener.MiscListener;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.RegisteredListener;
 
 public final class BlocksProvider_SnowGearsShops implements BlocksProvider {
@@ -15,6 +17,11 @@ public final class BlocksProvider_SnowGearsShops implements BlocksProvider {
             if(listener.getListener() instanceof MiscListener)
                 this.listener = (MiscListener) listener.getListener();
         }
+    }
+
+    @Override
+    public Plugin getPlugin() {
+        return Shop.getPlugin();
     }
 
     @Override

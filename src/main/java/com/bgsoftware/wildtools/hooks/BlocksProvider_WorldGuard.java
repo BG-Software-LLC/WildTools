@@ -14,10 +14,16 @@ import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
 
 public final class BlocksProvider_WorldGuard implements BlocksProvider {
 
-    private WorldGuardPlugin worldGuard = (WorldGuardPlugin) Bukkit.getPluginManager().getPlugin("WorldGuard");
+    private final WorldGuardPlugin worldGuard = (WorldGuardPlugin) Bukkit.getPluginManager().getPlugin("WorldGuard");
+
+    @Override
+    public Plugin getPlugin() {
+        return worldGuard;
+    }
 
     @Override
     public boolean canBreak(Player player, Block block, boolean onlyInClaim) {

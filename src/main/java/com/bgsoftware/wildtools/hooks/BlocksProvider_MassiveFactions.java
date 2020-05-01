@@ -8,8 +8,14 @@ import com.massivecraft.factions.entity.MPlayer;
 import com.massivecraft.massivecore.ps.PS;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
 
 public final class BlocksProvider_MassiveFactions implements BlocksProvider {
+
+    @Override
+    public Plugin getPlugin() {
+        return Factions.get();
+    }
 
     @Override
     public boolean canBreak(Player player, Block block, boolean onlyInClaim) {

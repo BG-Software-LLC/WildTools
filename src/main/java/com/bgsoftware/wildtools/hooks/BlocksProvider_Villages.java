@@ -4,8 +4,14 @@ import com.stefthedev.villages.Villages;
 import com.stefthedev.villages.villages.Village;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
 
 public final class BlocksProvider_Villages implements BlocksProvider {
+
+    @Override
+    public Plugin getPlugin() {
+        return Villages.getInstance();
+    }
 
     @Override
     public boolean canBreak(Player player, Block block, boolean onlyInClaim) {
