@@ -573,6 +573,11 @@ public final class NMSAdapter_v1_13_R2 implements NMSAdapter {
     }
 
     @Override
+    public Collection<Entity> getNearbyEntities(Location location, double range) {
+        return location.getWorld().getNearbyEntities(location, range, range, range);
+    }
+
+    @Override
     public org.bukkit.inventory.ItemStack[] parseChoice(Recipe recipe, org.bukkit.inventory.ItemStack itemStack) {
         List<org.bukkit.inventory.ItemStack> ingredients = Collections.singletonList(itemStack);
         List<RecipeChoice> recipeChoices = new ArrayList<>();

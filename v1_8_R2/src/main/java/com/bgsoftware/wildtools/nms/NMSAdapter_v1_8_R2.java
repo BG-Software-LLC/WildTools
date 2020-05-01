@@ -537,4 +537,8 @@ public final class NMSAdapter_v1_8_R2 implements NMSAdapter {
         ((WorldServer) entityLiving.world).getTracker().a(entityItem, new PacketPlayOutCollect(entityItem.getId(), entityLiving.getId()));
     }
 
+    @Override
+    public Collection<Entity> getNearbyEntities(Location location, double range) {
+        return location.getWorld().getNearbyEntities(location, range, range, range);
+    }
 }

@@ -571,6 +571,11 @@ public final class NMSAdapter_v1_13_R1 implements NMSAdapter {
     }
 
     @Override
+    public Collection<Entity> getNearbyEntities(Location location, double range) {
+        return location.getWorld().getNearbyEntities(location, range, range, range);
+    }
+
+    @Override
     public void setExpCost(InventoryView inventoryView, int expCost) {
         ContainerAnvil container = (ContainerAnvil) ((CraftInventoryView) inventoryView).getHandle();
         container.levelCost = expCost;

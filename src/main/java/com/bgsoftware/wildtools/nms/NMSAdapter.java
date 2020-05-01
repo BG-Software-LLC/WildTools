@@ -8,6 +8,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -19,6 +20,7 @@ import org.bukkit.inventory.Recipe;
 import org.bukkit.inventory.ShapedRecipe;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -88,6 +90,10 @@ public interface NMSAdapter {
     Object getBlockData(Material type, byte data);
 
     void playPickupAnimation(LivingEntity livingEntity, Item item);
+
+    default Collection<Entity> getNearbyEntities(Location location, double range){
+        return new ArrayList<>();
+    }
 
     default ItemStack[] parseChoice(Recipe recipe, ItemStack itemStack){
         return new ItemStack[] {itemStack};

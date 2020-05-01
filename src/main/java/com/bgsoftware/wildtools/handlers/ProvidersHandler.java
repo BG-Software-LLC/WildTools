@@ -6,6 +6,7 @@ import com.bgsoftware.wildtools.hooks.BlocksProvider;
 import com.bgsoftware.wildtools.hooks.BlocksProvider_ASkyblock;
 import com.bgsoftware.wildtools.hooks.BlocksProvider_AcidIsland;
 import com.bgsoftware.wildtools.hooks.BlocksProvider_BentoBox;
+import com.bgsoftware.wildtools.hooks.BlocksProvider_ChunkHoppers;
 import com.bgsoftware.wildtools.hooks.BlocksProvider_FabledSkyblock;
 import com.bgsoftware.wildtools.hooks.BlocksProvider_FactionsOne;
 import com.bgsoftware.wildtools.hooks.BlocksProvider_FactionsUUID;
@@ -22,6 +23,7 @@ import com.bgsoftware.wildtools.hooks.BlocksProvider_Towny;
 import com.bgsoftware.wildtools.hooks.BlocksProvider_Villages;
 import com.bgsoftware.wildtools.hooks.BlocksProvider_WorldGuard;
 import com.bgsoftware.wildtools.hooks.DropsProvider;
+import com.bgsoftware.wildtools.hooks.DropsProvider_ChunkHoppers;
 import com.bgsoftware.wildtools.hooks.DropsProvider_SilkSpawners;
 import com.bgsoftware.wildtools.hooks.DropsProvider_VoidChest;
 import com.bgsoftware.wildtools.hooks.DropsProvider_WildStacker;
@@ -225,6 +227,10 @@ public final class ProvidersHandler {
         //Drops Plugin hook
         if(Bukkit.getPluginManager().isPluginEnabled("VoidChest"))
             dropsProviders.add(new DropsProvider_VoidChest());
+        if(Bukkit.getPluginManager().isPluginEnabled("ChunkHoppers")) {
+            dropsProviders.add(new DropsProvider_ChunkHoppers());
+            blocksProviders.add(new BlocksProvider_ChunkHoppers());
+        }
         //Drops for spawners
         if(Bukkit.getPluginManager().isPluginEnabled("WildStacker"))
             dropsProviders.add(new DropsProvider_WildStacker());
