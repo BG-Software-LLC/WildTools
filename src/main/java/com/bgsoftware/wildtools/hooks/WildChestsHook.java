@@ -3,6 +3,7 @@ package com.bgsoftware.wildtools.hooks;
 import com.bgsoftware.wildchests.api.WildChestsAPI;
 import com.bgsoftware.wildchests.api.objects.chests.StorageChest;
 import com.bgsoftware.wildtools.WildToolsPlugin;
+import com.bgsoftware.wildtools.objects.tools.WSellTool;
 import com.bgsoftware.wildtools.utils.items.ItemUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -20,9 +21,9 @@ import java.util.Map;
 
 public final class WildChestsHook {
 
-    private static WildToolsPlugin plugin = WildToolsPlugin.getPlugin();
+    private static final WildToolsPlugin plugin = WildToolsPlugin.getPlugin();
 
-    public static double getChestPrice(Chest bukkitChest, Player player, Map<Integer, ItemStack> toSell){
+    public static double getChestPrice(Chest bukkitChest, Player player, Map<Integer, WSellTool.SoldItem> toSell){
         com.bgsoftware.wildchests.api.objects.chests.Chest chest = WildChestsAPI.getChest(bukkitChest.getLocation());
 
         double totalEarnings = 0;
@@ -35,15 +36,17 @@ public final class WildChestsHook {
             for(int i = 0; i < slots; i++){
                 itemStack.setAmount(Integer.MAX_VALUE);
                 if(plugin.getProviders().canSellItem(player, itemStack)) {
-                    toSell.put(0, itemStack.clone());
-                    totalEarnings += plugin.getProviders().getPrice(player, itemStack);
+                    WSellTool.SoldItem soldItem = new WSellTool.SoldItem(itemStack.clone(), plugin.getProviders().getPrice(player, itemStack));
+                    toSell.put(0, soldItem);
+                    totalEarnings += soldItem.getPrice();
                 }
             }
 
             itemStack.setAmount(amount.remainder(BigInteger.valueOf(Integer.MAX_VALUE)).intValue());
             if(plugin.getProviders().canSellItem(player, itemStack)) {
-                toSell.put(0, itemStack.clone());
-                totalEarnings += plugin.getProviders().getPrice(player, itemStack);
+                WSellTool.SoldItem soldItem = new WSellTool.SoldItem(itemStack.clone(), plugin.getProviders().getPrice(player, itemStack));
+                toSell.put(0, soldItem);
+                totalEarnings += soldItem.getPrice();
             }
 
             return totalEarnings;
@@ -56,8 +59,9 @@ public final class WildChestsHook {
                 for (int slot = 0; slot < inventory.getSize(); slot++) {
                     ItemStack itemStack = inventory.getItem(slot);
                     if (itemStack != null && plugin.getProviders().canSellItem(player, itemStack)) {
-                        toSell.put(i * 54 + slot, itemStack);
-                        totalEarnings += plugin.getProviders().getPrice(player, itemStack);
+                        WSellTool.SoldItem soldItem = new WSellTool.SoldItem(itemStack.clone(), plugin.getProviders().getPrice(player, itemStack));
+                        toSell.put(i * 54 + slot, soldItem);
+                        totalEarnings += soldItem.getPrice();
                     }
                 }
             }
@@ -65,7 +69,7 @@ public final class WildChestsHook {
         }
     }
 
-    public static void removeItems(Chest bukkitChest, Map<Integer, ItemStack> toSell){
+    public static void removeItems(Chest bukkitChest, Map<Integer, ?> toSell){
         com.bgsoftware.wildchests.api.objects.chests.Chest chest = WildChestsAPI.getChest(bukkitChest.getLocation());
 
         if(chest instanceof StorageChest){

@@ -8,6 +8,9 @@
 # Choose which prices plugin to check for prices (ShopGUIPlus, Essentials, CMI, WildTools).
 prices-plugin: 'ShopGUIPlus'
 
+# Path to the logs file.
+logs-file: 'logs.txt'
+
 # A list of prices. Use "TYPE" and "TYPE:DATA" formats.
 prices-list:
 - 'STONE:5' #Each stone will cost $5

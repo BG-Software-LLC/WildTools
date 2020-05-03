@@ -9,6 +9,8 @@ import com.bgsoftware.wildtools.hooks.PaperHook;
 import com.bgsoftware.wildtools.hooks.SuperMobCoinsHook;
 import com.bgsoftware.wildtools.listeners.AnvilListener;
 import com.bgsoftware.wildtools.metrics.Metrics;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryType;
@@ -91,6 +93,7 @@ public final class WildToolsPlugin extends JavaPlugin implements WildTools {
             while(player.getOpenInventory().getType() == InventoryType.CHEST)
                 player.closeInventory();
         }
+        SellWandLogger.close();
     }
 
     private void loadNMSAdapter(){

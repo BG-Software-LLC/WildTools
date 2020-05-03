@@ -1,5 +1,6 @@
 package com.bgsoftware.wildtools.handlers;
 
+import com.bgsoftware.wildtools.SellWandLogger;
 import com.bgsoftware.wildtools.WildToolsPlugin;
 import com.bgsoftware.wildtools.api.objects.tools.CrowbarTool;
 import com.bgsoftware.wildtools.api.objects.tools.MagnetTool;
@@ -28,7 +29,7 @@ import java.util.Map;
 
 public final class DataHandler {
 
-    private static WildToolsPlugin plugin = WildToolsPlugin.getPlugin();
+    private static final WildToolsPlugin plugin = WildToolsPlugin.getPlugin();
 
     public static void loadData(){
         WildToolsPlugin.log("Loading configuration started...");
@@ -43,6 +44,7 @@ public final class DataHandler {
             }catch(Exception ex){
                 plugin.saveResource("config1_13.yml", false);
                 File config113 = new File(plugin.getDataFolder(), "config1_13.yml");
+                //noinspection ResultOfMethodCallIgnored
                 config113.renameTo(file);
             }
         }
@@ -51,6 +53,8 @@ public final class DataHandler {
         cfg.syncWithConfig(file, plugin.getResource("config.yml"), "tools");
 
         ProvidersHandler.pricesPlugin = cfg.getString("prices-plugin", "ShopGUIPlus");
+
+        SellWandLogger.setLogsFile(cfg.getString("logs-file", "logs.txt"));
 
         Map<String, Double> prices = new HashMap<>();
 

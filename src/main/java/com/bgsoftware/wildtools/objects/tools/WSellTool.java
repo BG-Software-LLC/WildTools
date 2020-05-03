@@ -1,5 +1,6 @@
 package com.bgsoftware.wildtools.objects.tools;
 
+import com.bgsoftware.wildtools.SellWandLogger;
 import com.bgsoftware.wildtools.hooks.WildChestsHook;
 import com.bgsoftware.wildtools.utils.Executor;
 import com.bgsoftware.wildtools.utils.NumberUtils;
@@ -54,7 +55,7 @@ public final class WSellTool extends WTool implements SellTool {
                     double totalEarnings = 0.0;
                     boolean wildChest = false;
 
-                    Map<Integer, ItemStack> toSell = new HashMap<>();
+                    Map<Integer, SoldItem> toSell = new HashMap<>();
 
                     if (WildChestsHook.isWildChest(chest)) {
                         totalEarnings = WildChestsHook.getChestPrice(chest, e.getPlayer(), toSell);
@@ -66,8 +67,9 @@ public final class WSellTool extends WTool implements SellTool {
                         for (int slot = 0; slot < inventory.getSize(); slot++) {
                             ItemStack itemStack = inventory.getItem(slot);
                             if (itemStack != null && plugin.getProviders().canSellItem(e.getPlayer(), itemStack)) {
-                                toSell.put(slot, itemStack);
-                                totalEarnings += plugin.getProviders().getPrice(e.getPlayer(), itemStack);
+                                SoldItem soldItem = new SoldItem(itemStack, plugin.getProviders().getPrice(e.getPlayer(), itemStack));
+                                toSell.put(slot, soldItem);
+                                totalEarnings += soldItem.price;
                             }
                         }
                     }
@@ -103,6 +105,11 @@ public final class WSellTool extends WTool implements SellTool {
                         ToolTaskManager.removeTask(taskId);
                     }
 
+                    for(SoldItem soldItem : toSell.values()){
+                        SellWandLogger.log(e.getPlayer().getName() + " sold x" + soldItem.item.getAmount() + " " +
+                                soldItem.item.getType() + " for $" + soldItem.price + " (Multiplier: " + multiplier + ")");
+                    }
+
                     if (!message.isEmpty())
                         e.getPlayer().sendMessage(message);
                 } finally {
@@ -112,6 +119,21 @@ public final class WSellTool extends WTool implements SellTool {
         });
 
         return true;
+    }
+
+    public static final class SoldItem{
+
+        private final ItemStack item;
+        private final double price;
+
+        public SoldItem(ItemStack itemStack, double price){
+            this.item = itemStack;
+            this.price = price;
+        }
+
+        public double getPrice() {
+            return price;
+        }
     }
 
 }
