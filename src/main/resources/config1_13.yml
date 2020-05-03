@@ -5,7 +5,7 @@
 ##                                                ##
 ####################################################
 
-# Choose which prices plugin to check for prices (ShopGUIPlus, Essentials, CMI, WildTools).
+# Choose which prices plugin to check for prices (ShopGUIPlus, Essentials, CMI, newtShop, WildTools).
 prices-plugin: 'ShopGUIPlus'
 
 # A list of prices. Use "TYPE" and "TYPE:DATA" formats.
