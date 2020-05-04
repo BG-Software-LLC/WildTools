@@ -13,7 +13,7 @@ public final class PricesProvider_NewtShop implements PricesProvider {
 
     @Override
     public double getPrice(Player player, ItemStack itemStack) {
-        return newtShop.shop.getItemFromItemStack(itemStack).getSellPrice();
+        return newtShop.shop.getItemFromItemStack(itemStack).getSellPrice() * itemStack.getAmount();
     }
 
 }
