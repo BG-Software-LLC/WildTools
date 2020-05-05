@@ -6,10 +6,12 @@ import com.massivecraft.factions.FPlayer;
 import com.massivecraft.factions.FPlayers;
 import com.massivecraft.factions.Faction;
 import com.massivecraft.factions.FactionsPlugin;
+import com.massivecraft.factions.SavageFactions;
 import com.massivecraft.factions.perms.Permissible;
 import com.massivecraft.factions.perms.PermissibleAction;
 import com.massivecraft.factions.zcore.fperms.Access;
 import com.massivecraft.factions.zcore.fperms.PermissableAction;
+import net.prosavage.shade.baseplugin.SavagePlugin;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
@@ -29,7 +31,11 @@ public final class BlocksProvider_FactionsUUID implements BlocksProvider {
 
     @Override
     public Plugin getPlugin() {
-        return FactionsPlugin.getInstance();
+        try {
+            return FactionsPlugin.getInstance();
+        }catch(Throwable ex){
+            return SavageFactions.plugin;
+        }
     }
 
     @Override
