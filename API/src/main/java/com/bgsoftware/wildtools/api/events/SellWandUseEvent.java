@@ -1,5 +1,6 @@
 package com.bgsoftware.wildtools.api.events;
 
+import org.bukkit.block.BlockState;
 import org.bukkit.block.Chest;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
@@ -14,8 +15,10 @@ public final class SellWandUseEvent extends Event implements Cancellable {
 
     private static final HandlerList HANDLERS = new HandlerList();
 
-    private final Chest chest;
+    private final BlockState container;
     private final Player player;
+    @Deprecated
+    private final Chest chest = null;
 
     private boolean cancelled;
     private String sellMessage;
@@ -42,11 +45,26 @@ public final class SellWandUseEvent extends Event implements Cancellable {
      * @param price The total price for all the items.
      * @param multiplier The multiplier for the price.
      * @param sellMessage The message that will be sent to the player.
+     *
+     * @deprecated See SellWandUseEvent(Player, BlockState, Double, Double, String)
      */
+    @Deprecated
     public SellWandUseEvent(Player player, Chest chest, double price, double multiplier, String sellMessage){
+        this(player, (BlockState) chest, price, multiplier, sellMessage);
+    }
+
+    /**
+     * The constructor of the event.
+     * @param player The player who used the wand.
+     * @param container The container with the contents were sold.
+     * @param price The total price for all the items.
+     * @param multiplier The multiplier for the price.
+     * @param sellMessage The message that will be sent to the player.
+     */
+    public SellWandUseEvent(Player player, BlockState container, double price, double multiplier, String sellMessage){
         super(true);
         this.player = player;
-        this.chest = chest;
+        this.container = container;
         this.sellMessage = sellMessage;
         this.price = price;
         this.multiplier = multiplier;
@@ -62,9 +80,19 @@ public final class SellWandUseEvent extends Event implements Cancellable {
 
     /**
      * Get the chest its contents were sold.
+     *
+     * @deprecated See getContainer()
      */
+    @Deprecated
     public Chest getChest(){
         return chest;
+    }
+
+    /**
+     * Get the container its contents were sold.
+     */
+    public BlockState getContainer() {
+        return container;
     }
 
     /**

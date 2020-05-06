@@ -8,7 +8,6 @@ import com.bgsoftware.wildtools.utils.items.ToolTaskManager;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.block.BlockState;
-import org.bukkit.block.Chest;
 import org.bukkit.event.player.PlayerInteractEvent;
 import com.bgsoftware.wildtools.Locale;
 import com.bgsoftware.wildtools.api.events.SellWandUseEvent;
@@ -45,7 +44,6 @@ public final class WSellTool extends WTool implements SellTool {
             return false;
         }
 
-        Chest chest = blockState instanceof Chest ? (Chest) blockState : null;
         UUID taskId = ToolTaskManager.generateTaskId(e.getItem(), e.getPlayer());
 
         Executor.async(() -> {
@@ -59,7 +57,7 @@ public final class WSellTool extends WTool implements SellTool {
 
                     String message = toSell.isEmpty() ? Locale.NO_SELL_ITEMS.getMessage() : Locale.SOLD_CHEST.getMessage();
 
-                    SellWandUseEvent sellWandUseEvent = new SellWandUseEvent(e.getPlayer(), chest, totalEarnings, multiplier, message);
+                    SellWandUseEvent sellWandUseEvent = new SellWandUseEvent(e.getPlayer(), blockState, totalEarnings, multiplier, message);
                     Bukkit.getPluginManager().callEvent(sellWandUseEvent);
 
                     if (sellWandUseEvent.isCancelled())
