@@ -18,7 +18,7 @@ import java.util.UUID;
 
 public final class WIceTool extends WTool implements IceTool {
 
-    private int radius;
+    private final int radius;
 
     public WIceTool(Material type, String name, int radius){
         super(type, name, ToolMode.ICE);

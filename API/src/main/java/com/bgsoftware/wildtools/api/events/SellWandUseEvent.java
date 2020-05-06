@@ -28,7 +28,7 @@ public final class SellWandUseEvent extends Event implements Cancellable {
      * @param price The total price for all the items.
      * @param sellMessage The message that will be sent to the player.
      *
-     * @deprecated See HarvesterHoeSellEvent(Player, Chest, Double, Double, String)
+     * @deprecated See SellWandUseEvent(Player, Chest, Double, Double, String)
      */
     @Deprecated
     public SellWandUseEvent(Player player, Chest chest, double price, String sellMessage){
@@ -42,8 +42,6 @@ public final class SellWandUseEvent extends Event implements Cancellable {
      * @param price The total price for all the items.
      * @param multiplier The multiplier for the price.
      * @param sellMessage The message that will be sent to the player.
-     *
-     * @deprecated See HarvesterHoeSellEvent(Player, Chest, Double, Double, String)
      */
     public SellWandUseEvent(Player player, Chest chest, double price, double multiplier, String sellMessage){
         super(true);

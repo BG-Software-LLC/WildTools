@@ -22,6 +22,10 @@ import com.bgsoftware.wildtools.hooks.BlocksProvider_SuperiorSkyblock;
 import com.bgsoftware.wildtools.hooks.BlocksProvider_Towny;
 import com.bgsoftware.wildtools.hooks.BlocksProvider_Villages;
 import com.bgsoftware.wildtools.hooks.BlocksProvider_WorldGuard;
+import com.bgsoftware.wildtools.hooks.ContainerProvider;
+import com.bgsoftware.wildtools.hooks.ContainerProvider_ChunkCollectors;
+import com.bgsoftware.wildtools.hooks.ContainerProvider_Default;
+import com.bgsoftware.wildtools.hooks.ContainerProvider_WildChests;
 import com.bgsoftware.wildtools.hooks.DropsProvider;
 import com.bgsoftware.wildtools.hooks.DropsProvider_ChunkHoppers;
 import com.bgsoftware.wildtools.hooks.DropsProvider_SilkSpawners;
@@ -40,6 +44,7 @@ import com.bgsoftware.wildtools.hooks.PricesProvider_GUIShop;
 import com.bgsoftware.wildtools.hooks.PricesProvider_NewtShop;
 import com.bgsoftware.wildtools.hooks.PricesProvider_ShopGUIPlus;
 
+import com.bgsoftware.wildtools.utils.container.SellInfo;
 import com.google.common.collect.Lists;
 
 import net.milkbowl.vault.economy.Economy;
@@ -47,6 +52,7 @@ import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -66,6 +72,7 @@ public final class ProvidersHandler {
 
     private final List<BlocksProvider> blocksProviders = Lists.newArrayList();
     private final List<DropsProvider> dropsProviders = Lists.newArrayList();
+    private final List<ContainerProvider> containerProviders = Lists.newArrayList();
     private PricesProvider pricesProvider;
     private FactionsProvider factionsProvider;
 
@@ -145,6 +152,33 @@ public final class ProvidersHandler {
 
     public boolean callEvent(){
         return dropsProviders.stream().allMatch(DropsProvider::callEvent);
+    }
+
+    public boolean isContainer(BlockState blockState){
+        for(ContainerProvider containerProvider : containerProviders){
+            if(containerProvider.isContainer(blockState))
+                return true;
+        }
+
+        return false;
+    }
+
+    public SellInfo sellContainer(BlockState blockState, Player player){
+        for(ContainerProvider containerProvider : containerProviders){
+            if(containerProvider.isContainer(blockState))
+                return containerProvider.sellContainer(blockState, player);
+        }
+
+        return SellInfo.EMPTY;
+    }
+
+    public void removeContainer(BlockState blockState, SellInfo sellInfo){
+        for(ContainerProvider containerProvider : containerProviders){
+            if(containerProvider.isContainer(blockState)) {
+                containerProvider.removeContainer(blockState, sellInfo);
+                break;
+            }
+        }
     }
 
     /*
@@ -245,6 +279,15 @@ public final class ProvidersHandler {
             dropsProviders.add(new DropsProvider_SilkSpawners());
         else
             dropsProviders.add(new DropsProviders_WildToolsSpawners());
+        //Containers
+        if(Bukkit.getPluginManager().isPluginEnabled("ChunkCollectors")){
+            containerProviders.add(new ContainerProvider_ChunkCollectors());
+        }
+        if(Bukkit.getPluginManager().isPluginEnabled("WildChests")){
+            containerProviders.add(new ContainerProvider_WildChests(plugin));
+        }
+        containerProviders.add(new ContainerProvider_Default(plugin));
+
     }
 
     public static void reload(){

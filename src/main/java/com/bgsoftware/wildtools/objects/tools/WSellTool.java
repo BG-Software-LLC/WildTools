@@ -1,12 +1,13 @@
 package com.bgsoftware.wildtools.objects.tools;
 
 import com.bgsoftware.wildtools.SellWandLogger;
-import com.bgsoftware.wildtools.hooks.WildChestsHook;
 import com.bgsoftware.wildtools.utils.Executor;
 import com.bgsoftware.wildtools.utils.NumberUtils;
+import com.bgsoftware.wildtools.utils.container.SellInfo;
 import com.bgsoftware.wildtools.utils.items.ToolTaskManager;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.block.BlockState;
 import org.bukkit.block.Chest;
 import org.bukkit.event.player.PlayerInteractEvent;
 import com.bgsoftware.wildtools.Locale;
@@ -15,11 +16,8 @@ import com.bgsoftware.wildtools.api.objects.tools.SellTool;
 import com.bgsoftware.wildtools.api.objects.ToolMode;
 
 import org.bukkit.Material;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
@@ -40,40 +38,23 @@ public final class WSellTool extends WTool implements SellTool {
         if(!plugin.getProviders().canInteract(e.getPlayer(), e.getClickedBlock(), this))
             return false;
 
-        if(e.getClickedBlock().getType() != Material.CHEST && e.getClickedBlock().getType() != Material.TRAPPED_CHEST){
+        BlockState blockState = e.getClickedBlock().getState();
+
+        if(!plugin.getProviders().isContainer(blockState)){
             Locale.INVALID_CONTAINER_SELL_WAND.send(e.getPlayer());
             return false;
         }
 
-        Chest chest = (Chest) e.getClickedBlock().getState();
-        Inventory inventory = ((InventoryHolder) e.getClickedBlock().getState()).getInventory();
+        Chest chest = blockState instanceof Chest ? (Chest) blockState : null;
         UUID taskId = ToolTaskManager.generateTaskId(e.getItem(), e.getPlayer());
 
         Executor.async(() -> {
             synchronized (getToolMutex(e.getClickedBlock())) {
                 try {
-                    double totalEarnings = 0.0;
-                    boolean wildChest = false;
+                    SellInfo sellInfo = plugin.getProviders().sellContainer(blockState, e.getPlayer());
 
-                    Map<Integer, SoldItem> toSell = new HashMap<>();
-
-                    if (WildChestsHook.isWildChest(chest)) {
-                        totalEarnings = WildChestsHook.getChestPrice(chest, e.getPlayer(), toSell);
-                        wildChest = true;
-                    }
-
-                    if (!wildChest) {
-                        totalEarnings = 0;
-                        for (int slot = 0; slot < inventory.getSize(); slot++) {
-                            ItemStack itemStack = inventory.getItem(slot);
-                            if (itemStack != null && plugin.getProviders().canSellItem(e.getPlayer(), itemStack)) {
-                                SoldItem soldItem = new SoldItem(itemStack, plugin.getProviders().getPrice(e.getPlayer(), itemStack));
-                                toSell.put(slot, soldItem);
-                                totalEarnings += soldItem.price;
-                            }
-                        }
-                    }
-
+                    Map<Integer, SoldItem> toSell = sellInfo.getSoldItems();
+                    double totalEarnings = sellInfo.getTotalEarnings();
                     double multiplier = getMultiplier();
 
                     String message = toSell.isEmpty() ? Locale.NO_SELL_ITEMS.getMessage() : Locale.SOLD_CHEST.getMessage();
@@ -89,11 +70,7 @@ public final class WSellTool extends WTool implements SellTool {
 
                     plugin.getProviders().depositPlayer(e.getPlayer(), totalEarnings);
 
-                    if (!wildChest) {
-                        toSell.keySet().forEach(slot -> inventory.setItem(slot, new ItemStack(Material.AIR)));
-                    } else {
-                        WildChestsHook.removeItems(chest, toSell);
-                    }
+                    plugin.getProviders().removeContainer(blockState, sellInfo);
 
                     //noinspection all
                     message = sellWandUseEvent.getMessage().replace("{0}", NumberUtils.format(totalEarnings))
@@ -129,6 +106,10 @@ public final class WSellTool extends WTool implements SellTool {
         public SoldItem(ItemStack itemStack, double price){
             this.item = itemStack;
             this.price = price;
+        }
+
+        public ItemStack getItem() {
+            return item;
         }
 
         public double getPrice() {
