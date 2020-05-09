@@ -17,6 +17,7 @@ import com.bgsoftware.wildtools.hooks.BlocksProvider_FactionsUUID;
 import com.bgsoftware.wildtools.hooks.BlocksProvider_FactionsX;
 import com.bgsoftware.wildtools.hooks.BlocksProvider_GriefPrevention;
 import com.bgsoftware.wildtools.hooks.BlocksProvider_Lands;
+import com.bgsoftware.wildtools.hooks.BlocksProvider_LockettePro;
 import com.bgsoftware.wildtools.hooks.BlocksProvider_MassiveFactions;
 import com.bgsoftware.wildtools.hooks.BlocksProvider_PlotSquared;
 import com.bgsoftware.wildtools.hooks.BlocksProvider_PlotSquaredLegacy;
@@ -282,6 +283,8 @@ public final class ProvidersHandler {
             dropsProviders.add(new DropsProvider_ChunkHoppers());
             blocksProviders.add(new BlocksProvider_ChunkHoppers());
         }
+        if(Bukkit.getPluginManager().isPluginEnabled("LockettePro"))
+            blocksProviders.add(new BlocksProvider_LockettePro());
         //Drops for spawners
         if(Bukkit.getPluginManager().isPluginEnabled("WildStacker"))
             dropsProviders.add(new DropsProvider_WildStacker());
