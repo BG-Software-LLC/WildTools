@@ -1,8 +1,5 @@
 package com.bgsoftware.wildtools.utils;
 
-import com.bgsoftware.wildtools.hooks.CoreProtectHook;
-import com.bgsoftware.wildtools.hooks.McMMOHook;
-import com.bgsoftware.wildtools.hooks.WildStackerHook;
 import com.bgsoftware.wildtools.utils.blocks.BlocksController;
 import com.bgsoftware.wildtools.utils.items.ItemUtils;
 import org.bukkit.Bukkit;
@@ -26,8 +23,8 @@ import java.util.function.Consumer;
 
 public final class BukkitUtils {
 
-    private static WildToolsPlugin plugin = WildToolsPlugin.getPlugin();
-    private static BlockFace[] blockFaces = new BlockFace[] {
+    private static final WildToolsPlugin plugin = WildToolsPlugin.getPlugin();
+    private static final BlockFace[] blockFaces = new BlockFace[] {
             BlockFace.UP, BlockFace.DOWN, BlockFace.WEST, BlockFace.EAST, BlockFace.SOUTH, BlockFace.NORTH
     };
 
@@ -86,14 +83,10 @@ public final class BukkitUtils {
             drops.addAll(getBlockDrops(player, block, tool));
         }
 
-        if(block.getType().name().endsWith("SPAWNER") && Bukkit.getPluginManager().isPluginEnabled("WildStacker")) {
-            WildStackerHook.removeSpawner(block);
-        }
+        plugin.getProviders().onBlockBreak(player, block, usedItem);
 
-        else if(onBlockBreak != null) {
-            McMMOHook.handleBlockBreak(player, usedItem, block);
+        if(onBlockBreak != null)
             onBlockBreak.accept(block);
-        }
 
         if(!drops.isEmpty()) {
             if (tool != null)
@@ -105,9 +98,6 @@ public final class BukkitUtils {
                 }
             }
         }
-
-        if(Bukkit.getPluginManager().isPluginEnabled("CoreProtect"))
-            CoreProtectHook.recordBlockChange(player, block);
     }
 
     public static List<ItemStack> getBlockDrops(Player player, Block block, Tool tool){

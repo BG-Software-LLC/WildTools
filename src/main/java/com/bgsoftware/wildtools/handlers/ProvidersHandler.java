@@ -2,6 +2,10 @@ package com.bgsoftware.wildtools.handlers;
 
 import com.bgsoftware.wildtools.WildToolsPlugin;
 import com.bgsoftware.wildtools.api.objects.tools.Tool;
+import com.bgsoftware.wildtools.hooks.BlockActionProvider;
+import com.bgsoftware.wildtools.hooks.BlockActionProvider_CoreProtect;
+import com.bgsoftware.wildtools.hooks.BlockActionProvider_Jobs;
+import com.bgsoftware.wildtools.hooks.BlockActionProvider_WildStacker;
 import com.bgsoftware.wildtools.hooks.BlocksProvider;
 import com.bgsoftware.wildtools.hooks.BlocksProvider_ASkyblock;
 import com.bgsoftware.wildtools.hooks.BlocksProvider_AcidIsland;
@@ -32,6 +36,7 @@ import com.bgsoftware.wildtools.hooks.DropsProvider_SilkSpawners;
 import com.bgsoftware.wildtools.hooks.DropsProvider_VoidChest;
 import com.bgsoftware.wildtools.hooks.DropsProvider_WildStacker;
 import com.bgsoftware.wildtools.hooks.DropsProviders_WildToolsSpawners;
+import com.bgsoftware.wildtools.hooks.BlockActionProvider_mcMMO;
 import com.bgsoftware.wildtools.hooks.PerWorldPluginsHook;
 import com.bgsoftware.wildtools.hooks.PricesProvider_CMI;
 import com.bgsoftware.wildtools.hooks.FactionsProvider;
@@ -71,6 +76,7 @@ public final class ProvidersHandler {
     private Economy economy;
 
     private final List<BlocksProvider> blocksProviders = Lists.newArrayList();
+    private final List<BlockActionProvider> blockActionProviders = Lists.newArrayList();
     private final List<DropsProvider> dropsProviders = Lists.newArrayList();
     private final List<ContainerProvider> containerProviders = Lists.newArrayList();
     private PricesProvider pricesProvider;
@@ -181,6 +187,10 @@ public final class ProvidersHandler {
         }
     }
 
+    public void onBlockBreak(Player player, Block block, ItemStack usedItem){
+        blockActionProviders.forEach(blockActionProvider -> blockActionProvider.onBlockBreak(player, block, usedItem));
+    }
+
     /*
      * Handler' methods
      */
@@ -287,7 +297,15 @@ public final class ProvidersHandler {
             containerProviders.add(new ContainerProvider_WildChests(plugin));
         }
         containerProviders.add(new ContainerProvider_Default(plugin));
-
+        //Block Actions
+        if(Bukkit.getPluginManager().isPluginEnabled("CoreProtect"))
+            blockActionProviders.add(new BlockActionProvider_CoreProtect());
+        if(Bukkit.getPluginManager().isPluginEnabled("Jobs"))
+            blockActionProviders.add(new BlockActionProvider_Jobs());
+        if(Bukkit.getPluginManager().isPluginEnabled("mcMMO"))
+            blockActionProviders.add(new BlockActionProvider_mcMMO());
+        if(Bukkit.getPluginManager().isPluginEnabled("WildStacker"))
+            blockActionProviders.add(new BlockActionProvider_WildStacker());
     }
 
     public static void reload(){

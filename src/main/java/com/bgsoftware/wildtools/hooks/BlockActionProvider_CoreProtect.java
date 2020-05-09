@@ -8,32 +8,26 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.block.Block;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 @SuppressWarnings("deprecation")
-public final class CoreProtectHook {
+public final class BlockActionProvider_CoreProtect implements BlockActionProvider {
 
-    private static WildToolsPlugin plugin = WildToolsPlugin.getPlugin();
-    private static CoreProtect coreProtect;
+    private final WildToolsPlugin plugin = WildToolsPlugin.getPlugin();
+    private final CoreProtect coreProtect = CoreProtect.getInstance();
 
-    static {
-        coreProtect = (CoreProtect) Bukkit.getPluginManager().getPlugin("CoreProtect");
-    }
-
-    public static void recordBlockChange(OfflinePlayer offlinePlayer, Block block) {
-        if(!Bukkit.isPrimaryThread()){
-            Executor.sync(() -> recordBlockChange(offlinePlayer, block));
-            return;
-        }
-
+    @Override
+    public void onBlockBreak(Player player, Block block, ItemStack usedItem) {
         Location location = block.getLocation();
         Material type = block.getType();
         byte data = block.getData();
 
         if(coreProtect.getAPI().APIVersion() == 5) {
-            coreProtect.getAPI().logRemoval(offlinePlayer.getName(), location, type, data);
+            coreProtect.getAPI().logRemoval(player.getName(), location, type, data);
         }
         else if(coreProtect.getAPI().APIVersion() == 6) {
-            coreProtect.getAPI().logRemoval(offlinePlayer.getName(), location, type,
+            coreProtect.getAPI().logRemoval(player.getName(), location, type,
                     (org.bukkit.block.data.BlockData) plugin.getNMSAdapter().getBlockData(type, data));
         }
     }

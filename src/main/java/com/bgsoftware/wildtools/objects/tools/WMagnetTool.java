@@ -3,7 +3,7 @@ package com.bgsoftware.wildtools.objects.tools;
 import com.bgsoftware.wildtools.api.events.MagnetWandUseEvent;
 import com.bgsoftware.wildtools.api.objects.ToolMode;
 import com.bgsoftware.wildtools.api.objects.tools.MagnetTool;
-import com.bgsoftware.wildtools.hooks.WildStackerHook;
+import com.bgsoftware.wildtools.hooks.BlockActionProvider_WildStacker;
 import com.bgsoftware.wildtools.utils.Executor;
 import com.bgsoftware.wildtools.utils.items.ToolTaskManager;
 import org.bukkit.Bukkit;
@@ -62,7 +62,7 @@ public final class WMagnetTool extends WTool implements MagnetTool {
                         continue;
 
                     ItemStack itemStack = Bukkit.getPluginManager().isPluginEnabled("WildStacker") ?
-                            WildStackerHook.getItemStack(item) : item.getItemStack();
+                            BlockActionProvider_WildStacker.getItemStack(item) : item.getItemStack();
 
                     Map<Integer, ItemStack> additionalItems = player.getInventory().addItem(itemStack);
 
@@ -75,7 +75,7 @@ public final class WMagnetTool extends WTool implements MagnetTool {
                         ItemStack additionalItem = additionalItems.get(0);
                         affectedItems.add(item);
                         if (Bukkit.getPluginManager().isPluginEnabled("WildStacker")) {
-                            WildStackerHook.setItemStack(item, additionalItem);
+                            BlockActionProvider_WildStacker.setItemStack(item, additionalItem);
                         } else {
                             item.setItemStack(additionalItem);
                         }
