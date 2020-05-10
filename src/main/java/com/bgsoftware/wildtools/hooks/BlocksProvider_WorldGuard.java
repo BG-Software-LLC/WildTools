@@ -16,7 +16,17 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
+import java.lang.reflect.Method;
+
 public final class BlocksProvider_WorldGuard implements BlocksProvider {
+
+    private static Method canBuildMethod;
+
+    static {
+        try{
+            canBuildMethod = WorldGuardPlugin.class.getMethod("canBuild", Player.class, Block.class);
+        }catch(Throwable ignored){}
+    }
 
     private final WorldGuardPlugin worldGuard = (WorldGuardPlugin) Bukkit.getPluginManager().getPlugin("WorldGuard");
 
@@ -36,6 +46,8 @@ public final class BlocksProvider_WorldGuard implements BlocksProvider {
 
     private boolean canBuild(Player player, Block block) {
         try {
+            return (boolean) canBuildMethod.invoke(worldGuard, player, block);
+        }catch(Throwable ex){
             WorldGuardPlatform worldGuardPlatform = WorldGuard.getInstance().getPlatform();
             RegionContainer regionContainer = worldGuardPlatform.getRegionContainer();
             com.sk89q.worldedit.world.World world = BukkitAdapter.adapt(block.getWorld());
@@ -50,12 +62,7 @@ public final class BlocksProvider_WorldGuard implements BlocksProvider {
 
             return worldGuardPlatform.getSessionManager().hasBypass(localPlayer, world) ||
                     set.testState(localPlayer, Flags.BLOCK_PLACE, Flags.BLOCK_BREAK, Flags.BUILD);
-        }catch(Throwable ex){
-            try {
-                return (boolean) worldGuard.getClass().getMethod("canBuild", Player.class, Block.class).invoke(worldGuard, player, block);
-            }catch(Exception ignored){}
         }
-        return false;
     }
 
 }
