@@ -223,7 +223,7 @@ public final class ProvidersHandler {
             pricesProvider = new PricesProvider_Essentials();
         else if(pricesPlugin.equals("CMI") && Bukkit.getPluginManager().isPluginEnabled("CMI"))
             pricesProvider = new PricesProvider_CMI();
-        if(pricesPlugin.equalsIgnoreCase("newtShop") && Bukkit.getPluginManager().isPluginEnabled("newtShop"))
+        else if(pricesPlugin.equalsIgnoreCase("newtShop") && Bukkit.getPluginManager().isPluginEnabled("newtShop"))
             pricesProvider = new PricesProvider_NewtShop();
         else pricesProvider = new PricesProvider_Default();
         //Factions Hookup
