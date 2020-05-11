@@ -6,6 +6,7 @@ import dev.warse.chunkhoppers.utils.ChunkHopper;
 import org.bukkit.block.Block;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
@@ -16,7 +17,7 @@ public final class DropsProvider_ChunkHoppers implements DropsProvider {
     private static final WildToolsPlugin plugin = WildToolsPlugin.getPlugin();
 
     @Override
-    public List<ItemStack> getBlockDrops(Block block) {
+    public List<ItemStack> getBlockDrops(Player player, Block block) {
         List<ItemStack> drops = new ArrayList<>();
 
         if(!ChunkHoppers.getInstance().getChunks().contains(block.getChunk()))

@@ -4,6 +4,7 @@ import com.bgsoftware.wildstacker.api.WildStackerAPI;
 import com.bgsoftware.wildstacker.api.objects.StackedSpawner;
 import org.bukkit.block.Block;
 import org.bukkit.block.CreatureSpawner;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
@@ -12,7 +13,7 @@ import java.util.List;
 public final class DropsProvider_WildStacker implements DropsProvider {
 
     @Override
-    public List<ItemStack> getBlockDrops(Block block) {
+    public List<ItemStack> getBlockDrops(Player player, Block block) {
         List<ItemStack> drops = new ArrayList<>();
 
         if(!(block.getState() instanceof CreatureSpawner))

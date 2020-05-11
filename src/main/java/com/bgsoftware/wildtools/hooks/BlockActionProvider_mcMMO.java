@@ -1,8 +1,6 @@
 package com.bgsoftware.wildtools.hooks;
 
 import com.bgsoftware.wildtools.WildToolsPlugin;
-import com.bgsoftware.wildtools.api.objects.tools.Tool;
-import com.bgsoftware.wildtools.utils.Pair;
 import com.gmail.nossr50.datatypes.player.McMMOPlayer;
 import com.gmail.nossr50.datatypes.skills.PrimarySkillType;
 import com.gmail.nossr50.datatypes.skills.SkillType;
@@ -27,13 +25,13 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.lang.reflect.Method;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.HashSet;
+import java.util.Set;
 
 @SuppressWarnings("JavaReflectionMemberAccess")
 public final class BlockActionProvider_mcMMO implements BlockActionProvider {
 
-    private static final Map<Location, Pair<Player, ItemStack>> blockBreakTracking = new HashMap<>();
+    public static final Set<Location> doubleDropLocations = new HashSet<>();
     private static final WildToolsPlugin plugin = WildToolsPlugin.getPlugin();
 
     private static Method checkAbilityActivationMethod = null;
@@ -61,7 +59,6 @@ public final class BlockActionProvider_mcMMO implements BlockActionProvider {
     public void onBlockBreak(Player player, Block block, ItemStack usedItem){
         com.gmail.nossr50.datatypes.player.McMMOPlayer mcMMOPlayer = com.gmail.nossr50.util.player.UserManager.getPlayer(player);
         BlockState blockState = block.getState();
-        blockBreakTracking.put(block.getLocation(), new Pair<>(player, usedItem));
         try {
             if (BlockUtils.affectedByGreenTerra(block.getState())) {
                 HerbalismManager herbalismManager = mcMMOPlayer.getHerbalismManager();
@@ -98,7 +95,7 @@ public final class BlockActionProvider_mcMMO implements BlockActionProvider {
                 mcMMO.getPlaceStore().setFalse(blockState);
             }
         } finally {
-            blockBreakTracking.remove(block.getLocation());
+            doubleDropLocations.remove(block.getLocation());
         }
     }
 
@@ -131,14 +128,8 @@ public final class BlockActionProvider_mcMMO implements BlockActionProvider {
 
         @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
         public void onItemSpawn(McMMOItemSpawnEvent e){
-            Pair<Player, ItemStack> pair = blockBreakTracking.remove(e.getLocation());
-            if(pair != null){
-                Tool usedTool = plugin.getToolsManager().getTool(pair.getY());
-                if(usedTool != null && usedTool.isAutoCollect()){
-                    e.setCancelled(true);
-                    pair.getX().getInventory().addItem(e.getItemStack());
-                }
-            }
+            if(doubleDropLocations.remove(e.getLocation()))
+                e.setCancelled(true);
         }
 
     }

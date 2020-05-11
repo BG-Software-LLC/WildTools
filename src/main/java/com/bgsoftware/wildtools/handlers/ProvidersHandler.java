@@ -36,6 +36,7 @@ import com.bgsoftware.wildtools.hooks.DropsProvider_ChunkHoppers;
 import com.bgsoftware.wildtools.hooks.DropsProvider_SilkSpawners;
 import com.bgsoftware.wildtools.hooks.DropsProvider_VoidChest;
 import com.bgsoftware.wildtools.hooks.DropsProvider_WildStacker;
+import com.bgsoftware.wildtools.hooks.DropsProvider_mcMMO;
 import com.bgsoftware.wildtools.hooks.DropsProviders_WildToolsSpawners;
 import com.bgsoftware.wildtools.hooks.BlockActionProvider_mcMMO;
 import com.bgsoftware.wildtools.hooks.PerWorldPluginsHook;
@@ -150,10 +151,10 @@ public final class ProvidersHandler {
         return true;
     }
 
-    public List<ItemStack> getBlockDrops(Block block, boolean onlySpawner){
+    public List<ItemStack> getBlockDrops(Player player, Block block, boolean onlySpawner){
         List<ItemStack> drops = new ArrayList<>();
         dropsProviders.stream().filter(dropsProvider -> onlySpawner == dropsProvider.isSpawnersOnly())
-                .forEach(dropsProvider -> drops.addAll(dropsProvider.getBlockDrops(block)));
+                .forEach(dropsProvider -> drops.addAll(dropsProvider.getBlockDrops(player, block)));
         return drops;
     }
 
@@ -283,6 +284,10 @@ public final class ProvidersHandler {
             dropsProviders.add(new DropsProvider_ChunkHoppers());
             blocksProviders.add(new BlocksProvider_ChunkHoppers());
         }
+        if(Bukkit.getPluginManager().isPluginEnabled("mcMMO")){
+            dropsProviders.add(new DropsProvider_mcMMO());
+            blockActionProviders.add(new BlockActionProvider_mcMMO());
+        }
         if(Bukkit.getPluginManager().isPluginEnabled("LockettePro"))
             blocksProviders.add(new BlocksProvider_LockettePro());
         //Drops for spawners
@@ -305,8 +310,6 @@ public final class ProvidersHandler {
             blockActionProviders.add(new BlockActionProvider_CoreProtect());
         if(Bukkit.getPluginManager().isPluginEnabled("Jobs"))
             blockActionProviders.add(new BlockActionProvider_Jobs());
-        if(Bukkit.getPluginManager().isPluginEnabled("mcMMO"))
-            blockActionProviders.add(new BlockActionProvider_mcMMO());
         if(Bukkit.getPluginManager().isPluginEnabled("WildStacker"))
             blockActionProviders.add(new BlockActionProvider_WildStacker());
     }

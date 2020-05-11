@@ -3,6 +3,7 @@ package com.bgsoftware.wildtools.hooks;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.CreatureSpawner;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BlockStateMeta;
 
@@ -12,7 +13,7 @@ import java.util.List;
 public final class DropsProviders_WildToolsSpawners implements DropsProvider {
 
     @Override
-    public List<ItemStack> getBlockDrops(Block block) {
+    public List<ItemStack> getBlockDrops(Player player, Block block) {
         List<ItemStack> drops = new ArrayList<>();
 
         if(!(block.getState() instanceof CreatureSpawner))

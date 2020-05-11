@@ -4,6 +4,7 @@ import com.bgsoftware.wildtools.api.events.HarvesterHoeSellEvent;
 import com.bgsoftware.wildtools.api.events.HarvesterHoeUseEvent;
 import com.bgsoftware.wildtools.api.objects.tools.HarvesterTool;
 import com.bgsoftware.wildtools.api.objects.ToolMode;
+import com.bgsoftware.wildtools.api.objects.tools.Tool;
 import com.bgsoftware.wildtools.objects.WMaterial;
 import com.bgsoftware.wildtools.utils.BukkitUtils;
 import com.bgsoftware.wildtools.utils.blocks.BlocksController;
@@ -345,6 +346,33 @@ public final class WHarvesterTool extends WTool implements HarvesterTool {
             this.value += value;
         }
 
+    }
+
+    public static void handleSellMode(Tool tool, Player player, List<ItemStack> toSell, double totalPrice){
+        if(!toSell.isEmpty()){
+            double multiplier = tool.getMultiplier();
+
+            String message = toSell.isEmpty() ? Locale.NO_SELL_ITEMS.getMessage() : Locale.HARVESTER_SELL_SUCCEED.getMessage();
+
+            HarvesterHoeSellEvent harvesterHoeSellEvent = new HarvesterHoeSellEvent(player, totalPrice, multiplier, message);
+            Bukkit.getPluginManager().callEvent(harvesterHoeSellEvent);
+
+            if(!harvesterHoeSellEvent.isCancelled()) {
+                multiplier = harvesterHoeSellEvent.getMultiplier();
+                totalPrice = harvesterHoeSellEvent.getPrice() * multiplier;
+
+                plugin.getProviders().depositPlayer(player, totalPrice);
+
+                //noinspection all
+                message = harvesterHoeSellEvent.getMessage()
+                        .replace("{0}", toSell.size() + "")
+                        .replace("{1}", totalPrice + "")
+                        .replace("{2}", multiplier != 1 && Locale.MULTIPLIER.getMessage() != null ? Locale.MULTIPLIER.getMessage(multiplier) : "");
+
+                if (!message.isEmpty())
+                    player.sendMessage(message);
+            }
+        }
     }
 
 }

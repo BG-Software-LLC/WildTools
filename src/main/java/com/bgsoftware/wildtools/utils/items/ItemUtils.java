@@ -1,6 +1,8 @@
 package com.bgsoftware.wildtools.utils.items;
 
 import com.bgsoftware.wildtools.Locale;
+import com.bgsoftware.wildtools.objects.WMaterial;
+import com.bgsoftware.wildtools.objects.tools.WHarvesterTool;
 import com.bgsoftware.wildtools.utils.Executor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -100,15 +102,10 @@ public final class ItemUtils {
         throw new IllegalArgumentException("The item wasn't found in the inventory.");
     }
 
-    public static ItemStack getUsedItem(PlayerInteractEvent e){
-        try{
-            //noinspection JavaReflectionMemberAccess
-            if(("" + PlayerInteractEvent.class.getMethod("getHand").invoke(e)).equals("OFF_HAND")){
-                return e.getPlayer().getInventory().getItem(42);
-            }
-        }catch(Throwable ignored){ }
-
-        return e.getItem();
+    public static boolean isCrops(Material type){
+        return WHarvesterTool.crops.contains(type.name()) && type != Material.CACTUS &&
+                type != WMaterial.SUGAR_CANE.parseMaterial() && type != WMaterial.MELON.parseMaterial() &&
+                type != Material.PUMPKIN && !type.name().equals("BAMBOO");
     }
 
 }

@@ -6,6 +6,7 @@ import me.shin1gamix.voidchest.datastorage.VoidStorage;
 import me.shin1gamix.voidchest.utilities.nbtapi.NBTItem;
 import me.shin1gamix.voidchest.voidmanager.VoidItemManager;
 import org.bukkit.block.Block;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
@@ -13,10 +14,10 @@ import java.util.List;
 
 public final class DropsProvider_VoidChest implements DropsProvider {
 
-    private VoidChestPlugin plugin = VoidChestPlugin.getInstance();
+    private final VoidChestPlugin plugin = VoidChestPlugin.getInstance();
 
     @Override
-    public List<ItemStack> getBlockDrops(Block block) {
+    public List<ItemStack> getBlockDrops(Player player, Block block) {
         List<ItemStack> drops = new ArrayList<>();
         VoidStorage voidStorage = plugin.getVoidManager().getVoidStorage(block);
 

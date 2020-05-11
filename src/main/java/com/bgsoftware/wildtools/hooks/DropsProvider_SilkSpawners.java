@@ -3,6 +3,7 @@ package com.bgsoftware.wildtools.hooks;
 import de.dustplanet.util.SilkUtil;
 import org.bukkit.block.Block;
 import org.bukkit.block.CreatureSpawner;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.lang.reflect.Method;
@@ -29,7 +30,7 @@ public final class DropsProvider_SilkSpawners implements DropsProvider {
     }
 
     @Override
-    public List<ItemStack> getBlockDrops(Block block) {
+    public List<ItemStack> getBlockDrops(Player player, Block block) {
         List<ItemStack> drops = new ArrayList<>();
 
         if(!(block.getState() instanceof CreatureSpawner))
