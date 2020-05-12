@@ -1,9 +1,10 @@
 package com.bgsoftware.wildtools.objects.tools;
 
 import com.bgsoftware.wildtools.SellWandLogger;
+import com.bgsoftware.wildtools.api.hooks.SoldItem;
 import com.bgsoftware.wildtools.utils.Executor;
 import com.bgsoftware.wildtools.utils.NumberUtils;
-import com.bgsoftware.wildtools.utils.container.SellInfo;
+import com.bgsoftware.wildtools.api.hooks.SellInfo;
 import com.bgsoftware.wildtools.utils.items.ToolTaskManager;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -81,8 +82,8 @@ public final class WSellTool extends WTool implements SellTool {
                     }
 
                     for(SoldItem soldItem : toSell.values()){
-                        SellWandLogger.log(e.getPlayer().getName() + " sold x" + soldItem.item.getAmount() + " " +
-                                soldItem.item.getType() + " for $" + soldItem.price + " (Multiplier: " + multiplier + ")");
+                        SellWandLogger.log(e.getPlayer().getName() + " sold x" + soldItem.getItem().getAmount() + " " +
+                                soldItem.getItem().getType() + " for $" + soldItem.getPrice() + " (Multiplier: " + multiplier + ")");
                     }
 
                     if (!message.isEmpty())
@@ -94,25 +95,6 @@ public final class WSellTool extends WTool implements SellTool {
         });
 
         return true;
-    }
-
-    public static final class SoldItem{
-
-        private final ItemStack item;
-        private final double price;
-
-        public SoldItem(ItemStack itemStack, double price){
-            this.item = itemStack;
-            this.price = price;
-        }
-
-        public ItemStack getItem() {
-            return item;
-        }
-
-        public double getPrice() {
-            return price;
-        }
     }
 
 }

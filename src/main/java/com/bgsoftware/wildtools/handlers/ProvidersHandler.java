@@ -1,6 +1,7 @@
 package com.bgsoftware.wildtools.handlers;
 
 import com.bgsoftware.wildtools.WildToolsPlugin;
+import com.bgsoftware.wildtools.api.handlers.ProvidersManager;
 import com.bgsoftware.wildtools.api.objects.tools.Tool;
 import com.bgsoftware.wildtools.hooks.BlockActionProvider;
 import com.bgsoftware.wildtools.hooks.BlockActionProvider_CoreProtect;
@@ -27,7 +28,7 @@ import com.bgsoftware.wildtools.hooks.BlocksProvider_SuperiorSkyblock;
 import com.bgsoftware.wildtools.hooks.BlocksProvider_Towny;
 import com.bgsoftware.wildtools.hooks.BlocksProvider_Villages;
 import com.bgsoftware.wildtools.hooks.BlocksProvider_WorldGuard;
-import com.bgsoftware.wildtools.hooks.ContainerProvider;
+import com.bgsoftware.wildtools.api.hooks.ContainerProvider;
 import com.bgsoftware.wildtools.hooks.ContainerProvider_ChunkCollectors;
 import com.bgsoftware.wildtools.hooks.ContainerProvider_Default;
 import com.bgsoftware.wildtools.hooks.ContainerProvider_WildChests;
@@ -51,7 +52,7 @@ import com.bgsoftware.wildtools.hooks.PricesProvider_GUIShop;
 import com.bgsoftware.wildtools.hooks.PricesProvider_NewtShop;
 import com.bgsoftware.wildtools.hooks.PricesProvider_ShopGUIPlus;
 
-import com.bgsoftware.wildtools.utils.container.SellInfo;
+import com.bgsoftware.wildtools.api.hooks.SellInfo;
 import com.google.common.collect.Lists;
 
 import net.milkbowl.vault.economy.Economy;
@@ -66,11 +67,13 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
-public final class ProvidersHandler {
+public final class ProvidersHandler implements ProvidersManager {
 
     private static final WildToolsPlugin plugin = WildToolsPlugin.getPlugin();
+    private static final SellInfo EMPTY_INFO = new SellInfo(new HashMap<>(), 0.0);
 
     static String pricesPlugin;
 
@@ -177,7 +180,7 @@ public final class ProvidersHandler {
                 return containerProvider.sellContainer(blockState, player);
         }
 
-        return SellInfo.EMPTY;
+        return EMPTY_INFO;
     }
 
     public void removeContainer(BlockState blockState, SellInfo sellInfo){
@@ -299,12 +302,12 @@ public final class ProvidersHandler {
             dropsProviders.add(new DropsProviders_WildToolsSpawners());
         //Containers
         if(Bukkit.getPluginManager().isPluginEnabled("ChunkCollectors")){
-            containerProviders.add(new ContainerProvider_ChunkCollectors());
+            addContainerProvider(new ContainerProvider_ChunkCollectors());
         }
         if(Bukkit.getPluginManager().isPluginEnabled("WildChests")){
-            containerProviders.add(new ContainerProvider_WildChests(plugin));
+            addContainerProvider(new ContainerProvider_WildChests(plugin));
         }
-        containerProviders.add(new ContainerProvider_Default(plugin));
+        addContainerProvider(new ContainerProvider_Default(plugin));
         //Block Actions
         if(Bukkit.getPluginManager().isPluginEnabled("CoreProtect"))
             blockActionProviders.add(new BlockActionProvider_CoreProtect());
@@ -312,6 +315,11 @@ public final class ProvidersHandler {
             blockActionProviders.add(new BlockActionProvider_Jobs());
         if(Bukkit.getPluginManager().isPluginEnabled("WildStacker"))
             blockActionProviders.add(new BlockActionProvider_WildStacker());
+    }
+
+    @Override
+    public void addContainerProvider(ContainerProvider containerProvider) {
+        containerProviders.add(containerProvider);
     }
 
     public static void reload(){

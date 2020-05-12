@@ -1,7 +1,8 @@
 package com.bgsoftware.wildtools.hooks;
 
-import com.bgsoftware.wildtools.objects.tools.WSellTool;
-import com.bgsoftware.wildtools.utils.container.SellInfo;
+import com.bgsoftware.wildtools.api.hooks.ContainerProvider;
+import com.bgsoftware.wildtools.api.hooks.SoldItem;
+import com.bgsoftware.wildtools.api.hooks.SellInfo;
 import com.cloth.ChunkCollectorPlugin;
 import com.cloth.collectors.ChunkCollector;
 import com.cloth.collectors.CollectorHandler;
@@ -25,7 +26,7 @@ public final class ContainerProvider_ChunkCollectors implements ContainerProvide
     @Override
     public SellInfo sellContainer(BlockState blockState, Player player) {
         ChunkCollector chunkCollector = ChunkCollectorPlugin.getInstance().getCollectorHandler().getCollectorAtLocation(blockState.getLocation());
-        Map<Integer, WSellTool.SoldItem> toSell = new HashMap<>();
+        Map<Integer, SoldItem> toSell = new HashMap<>();
         double totalEarnings = 0;
 
         CollectorInventory collectorInventory = chunkCollector.getInventory();
@@ -35,7 +36,7 @@ public final class ContainerProvider_ChunkCollectors implements ContainerProvide
             ItemStack itemStack = inventory.getItem(slot);
             double price = itemStack == null ? 0 : collectorInventory.getPrice(itemStack.getType()) * chunkCollector.getItemCollection().get(itemStack.getType());
             if(price > 0){
-                WSellTool.SoldItem soldItem = new WSellTool.SoldItem(itemStack, price);
+                SoldItem soldItem = new SoldItem(itemStack, price);
                 toSell.put(slot, soldItem);
                 totalEarnings += price;
             }
@@ -48,7 +49,7 @@ public final class ContainerProvider_ChunkCollectors implements ContainerProvide
     public void removeContainer(BlockState blockState, SellInfo sellInfo) {
         ChunkCollector chunkCollector = ChunkCollectorPlugin.getInstance().getCollectorHandler().getCollectorAtLocation(blockState.getLocation());
 
-        for(WSellTool.SoldItem soldItem : sellInfo.getSoldItems().values()){
+        for(SoldItem soldItem : sellInfo.getSoldItems().values()){
             chunkCollector.getItemCollection().put(soldItem.getItem().getType(), 0);
         }
 

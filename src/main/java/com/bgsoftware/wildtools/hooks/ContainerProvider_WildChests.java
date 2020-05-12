@@ -4,8 +4,9 @@ import com.bgsoftware.wildchests.api.WildChestsAPI;
 import com.bgsoftware.wildchests.api.objects.chests.Chest;
 import com.bgsoftware.wildchests.api.objects.chests.StorageChest;
 import com.bgsoftware.wildtools.WildToolsPlugin;
-import com.bgsoftware.wildtools.objects.tools.WSellTool;
-import com.bgsoftware.wildtools.utils.container.SellInfo;
+import com.bgsoftware.wildtools.api.hooks.ContainerProvider;
+import com.bgsoftware.wildtools.api.hooks.SoldItem;
+import com.bgsoftware.wildtools.api.hooks.SellInfo;
 import org.bukkit.Material;
 import org.bukkit.block.BlockState;
 import org.bukkit.entity.Player;
@@ -33,7 +34,7 @@ public final class ContainerProvider_WildChests implements ContainerProvider {
     public SellInfo sellContainer(BlockState blockState, Player player) {
         Chest chest = WildChestsAPI.getChest(blockState.getLocation());
 
-        Map<Integer, WSellTool.SoldItem> toSell = new HashMap<>();
+        Map<Integer, SoldItem> toSell = new HashMap<>();
         double totalEarnings = 0;
 
         if(chest instanceof StorageChest){
@@ -44,7 +45,7 @@ public final class ContainerProvider_WildChests implements ContainerProvider {
             for(int i = 0; i < slots; i++){
                 itemStack.setAmount(Integer.MAX_VALUE);
                 if(plugin.getProviders().canSellItem(player, itemStack)) {
-                    WSellTool.SoldItem soldItem = new WSellTool.SoldItem(itemStack.clone(), plugin.getProviders().getPrice(player, itemStack));
+                    SoldItem soldItem = new SoldItem(itemStack.clone(), plugin.getProviders().getPrice(player, itemStack));
                     toSell.put(0, soldItem);
                     totalEarnings += soldItem.getPrice();
                 }
@@ -52,7 +53,7 @@ public final class ContainerProvider_WildChests implements ContainerProvider {
 
             itemStack.setAmount(amount.remainder(BigInteger.valueOf(Integer.MAX_VALUE)).intValue());
             if(plugin.getProviders().canSellItem(player, itemStack)) {
-                WSellTool.SoldItem soldItem = new WSellTool.SoldItem(itemStack.clone(), plugin.getProviders().getPrice(player, itemStack));
+                SoldItem soldItem = new SoldItem(itemStack.clone(), plugin.getProviders().getPrice(player, itemStack));
                 toSell.put(0, soldItem);
                 totalEarnings += soldItem.getPrice();
             }
@@ -68,7 +69,7 @@ public final class ContainerProvider_WildChests implements ContainerProvider {
                 for (int slot = 0; slot < inventory.getSize(); slot++) {
                     ItemStack itemStack = inventory.getItem(slot);
                     if (itemStack != null && plugin.getProviders().canSellItem(player, itemStack)) {
-                        WSellTool.SoldItem soldItem = new WSellTool.SoldItem(itemStack.clone(), plugin.getProviders().getPrice(player, itemStack));
+                        SoldItem soldItem = new SoldItem(itemStack.clone(), plugin.getProviders().getPrice(player, itemStack));
                         toSell.put(i * 54 + slot, soldItem);
                         totalEarnings += soldItem.getPrice();
                     }
