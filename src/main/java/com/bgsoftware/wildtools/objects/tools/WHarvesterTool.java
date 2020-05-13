@@ -6,6 +6,7 @@ import com.bgsoftware.wildtools.api.objects.tools.HarvesterTool;
 import com.bgsoftware.wildtools.api.objects.ToolMode;
 import com.bgsoftware.wildtools.objects.WMaterial;
 import com.bgsoftware.wildtools.utils.BukkitUtils;
+import com.bgsoftware.wildtools.utils.NumberUtils;
 import com.bgsoftware.wildtools.utils.blocks.BlocksController;
 import com.bgsoftware.wildtools.utils.items.ItemUtils;
 import com.bgsoftware.wildtools.utils.items.ToolTaskManager;
@@ -260,7 +261,7 @@ public final class WHarvesterTool extends WTool implements HarvesterTool {
                 //noinspection all
                 message = harvesterHoeSellEvent.getMessage()
                         .replace("{0}", (int) totalAmount.value + "")
-                        .replace("{1}", totalPrice + "")
+                        .replace("{1}", NumberUtils.format(totalPrice))
                         .replace("{2}", multiplier != 1 && Locale.MULTIPLIER.getMessage() != null ? Locale.MULTIPLIER.getMessage(multiplier) : "");
 
                 if (!message.isEmpty())
