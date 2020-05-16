@@ -6,6 +6,7 @@ import com.bgsoftware.wildtools.api.hooks.SoldItem;
 import com.bgsoftware.wildtools.api.hooks.SellInfo;
 import org.bukkit.Material;
 import org.bukkit.block.BlockState;
+import org.bukkit.block.Chest;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
