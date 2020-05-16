@@ -38,13 +38,6 @@ public final class BukkitUtils {
         };
 
         Consumer<Block> onBlockBreak = blockConsumer -> {
-            if(omniTool){
-                BlockBreakEvent blockBreakEvent = new BlockBreakEvent(block, player);
-                Bukkit.getPluginManager().callEvent(blockBreakEvent);
-                if(blockBreakEvent.isCancelled())
-                    return;
-            }
-
             if(omniTool || blockConsumer.getType().hasGravity() || Arrays.stream(blockFaces)
                     .anyMatch(blockFace -> blockConsumer.getRelative(blockFace).getType().name().contains("WATER")))
                 blockConsumer.setType(Material.AIR);
@@ -75,6 +68,13 @@ public final class BukkitUtils {
                 ExperienceOrb orb = block.getWorld().spawn(block.getLocation(), ExperienceOrb.class);
                 orb.setExperience(expFromBlock);
             }
+        }
+
+        if(tool != null && tool.isOmni()){
+            BlockBreakEvent blockBreakEvent = new BlockBreakEvent(block, player);
+            Bukkit.getPluginManager().callEvent(blockBreakEvent);
+            if(blockBreakEvent.isCancelled())
+                return;
         }
 
         if(onItemDrop != null) {
