@@ -53,6 +53,8 @@ public final class DataHandler {
         cfg.syncWithConfig(file, plugin.getResource("config.yml"), "tools");
 
         ProvidersHandler.pricesPlugin = cfg.getString("prices-plugin", "ShopGUIPlus");
+        ProvidersHandler.mcmmoHook = cfg.getBoolean("hooks.mcmmo", true);
+        ProvidersHandler.jobsHook = cfg.getBoolean("hooks.jobs", true);
 
         SellWandLogger.setLogsFile(cfg.getString("logs-file", "logs.txt"));
 

@@ -16,6 +16,11 @@ prices-list:
 - 'STONE:5' #Each stone will cost $5
 - 'LOG:0:5' #Only oak logs will cost $5
 
+# What hooks should be supported by WildTools?
+hooks:
+  mcmmo: true
+  jobs: true
+
 # The plugin brings a lot of options and features for making tools easily with rich-configuration options.
 # The default config has basic trench-pickaxe, tray-pickaxe, sand-wand, sell-wand, lightning-wand, harvester-hoe
 # and cannon-wand examples. Each tool-mode has it's own configuration options, make sure you don't mix them.

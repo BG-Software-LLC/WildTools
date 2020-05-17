@@ -76,6 +76,7 @@ public final class ProvidersHandler implements ProvidersManager {
     private static final SellInfo EMPTY_INFO = new SellInfo(new HashMap<>(), 0.0);
 
     static String pricesPlugin;
+    static boolean mcmmoHook = false, jobsHook = false;
 
     private boolean isVaultEnabled = false;
     private Economy economy;
@@ -289,7 +290,8 @@ public final class ProvidersHandler implements ProvidersManager {
         }
         if(Bukkit.getPluginManager().isPluginEnabled("mcMMO")){
             dropsProviders.add(new DropsProvider_mcMMO());
-            blockActionProviders.add(new BlockActionProvider_mcMMO());
+            if(mcmmoHook)
+                blockActionProviders.add(new BlockActionProvider_mcMMO());
         }
         if(Bukkit.getPluginManager().isPluginEnabled("LockettePro"))
             blocksProviders.add(new BlocksProvider_LockettePro());
@@ -311,8 +313,10 @@ public final class ProvidersHandler implements ProvidersManager {
         //Block Actions
         if(Bukkit.getPluginManager().isPluginEnabled("CoreProtect"))
             blockActionProviders.add(new BlockActionProvider_CoreProtect());
-        if(Bukkit.getPluginManager().isPluginEnabled("Jobs"))
-            blockActionProviders.add(new BlockActionProvider_Jobs());
+        if(Bukkit.getPluginManager().isPluginEnabled("Jobs")) {
+            if(jobsHook)
+                blockActionProviders.add(new BlockActionProvider_Jobs());
+        }
         if(Bukkit.getPluginManager().isPluginEnabled("WildStacker"))
             blockActionProviders.add(new BlockActionProvider_WildStacker());
     }
