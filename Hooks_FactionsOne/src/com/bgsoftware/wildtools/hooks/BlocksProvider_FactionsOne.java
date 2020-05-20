@@ -4,8 +4,7 @@ import com.massivecraft.factions.Board;
 import com.massivecraft.factions.FPlayer;
 import com.massivecraft.factions.Faction;
 import com.massivecraft.factions.P;
-import com.massivecraft.factions.zcore.fperms.Access;
-import com.massivecraft.factions.zcore.fperms.PermissableAction;
+import com.massivecraft.factions.struct.FPerm;
 import de.erethon.factionsone.FactionsOneAPI;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
@@ -22,7 +21,7 @@ public final class BlocksProvider_FactionsOne implements BlocksProvider {
     @Override
     public boolean canBreak(Player player, Block block, boolean onlyInClaim) {
         FPlayer fPlayer = FactionsOneAPI.getFPlayer(player.getUniqueId());
-        boolean overriding = fPlayer.isAdminBypassing();
+        boolean overriding = fPlayer.hasAdminMode();
         Faction faction = null;
 
         try{
@@ -33,13 +32,13 @@ public final class BlocksProvider_FactionsOne implements BlocksProvider {
         if(onlyInClaim && faction == null) return false;
 
         return faction == null || overriding || (fPlayer.hasFaction() && (fPlayer.getFaction().equals(faction) ||
-                faction.getPermissions().get(faction.getRelationWish(fPlayer.getFaction())).get(PermissableAction.DESTROY) == Access.ALLOW));
+                faction.getPermittedRelations(FPerm.BUILD).contains(faction.getRelationWish(fPlayer.getFaction()))));
     }
 
     @Override
     public boolean canInteract(Player player, Block block, boolean onlyInClaim) {
         FPlayer fPlayer = FactionsOneAPI.getFPlayer(player.getUniqueId());
-        boolean overriding = fPlayer.isAdminBypassing();
+        boolean overriding = fPlayer.hasAdminMode();
         Faction faction = null;
 
         try{
@@ -50,6 +49,6 @@ public final class BlocksProvider_FactionsOne implements BlocksProvider {
         if(onlyInClaim && faction == null) return false;
 
         return faction == null || overriding || (fPlayer.hasFaction() && (fPlayer.getFaction().equals(faction) ||
-                faction.getPermissions().get(faction.getRelationWish(fPlayer.getFaction())).get(PermissableAction.CONTAINER) == Access.ALLOW));
+                faction.getPermittedRelations(FPerm.CONTAINER).contains(faction.getRelationWish(fPlayer.getFaction()))));
     }
 }

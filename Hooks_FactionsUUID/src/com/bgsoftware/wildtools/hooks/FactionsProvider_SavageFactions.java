@@ -4,7 +4,6 @@ import com.bgsoftware.wildtools.WildToolsPlugin;
 import com.massivecraft.factions.FPlayer;
 import com.massivecraft.factions.FPlayers;
 import com.massivecraft.factions.struct.Role;
-
 import org.bukkit.entity.Player;
 
 public final class FactionsProvider_SavageFactions implements FactionsProvider {

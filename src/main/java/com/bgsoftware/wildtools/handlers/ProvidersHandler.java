@@ -13,8 +13,6 @@ import com.bgsoftware.wildtools.hooks.BlocksProvider_AcidIsland;
 import com.bgsoftware.wildtools.hooks.BlocksProvider_BentoBox;
 import com.bgsoftware.wildtools.hooks.BlocksProvider_ChunkHoppers;
 import com.bgsoftware.wildtools.hooks.BlocksProvider_FabledSkyblock;
-import com.bgsoftware.wildtools.hooks.BlocksProvider_FactionsOne;
-import com.bgsoftware.wildtools.hooks.BlocksProvider_FactionsUUID;
 import com.bgsoftware.wildtools.hooks.BlocksProvider_FactionsX;
 import com.bgsoftware.wildtools.hooks.BlocksProvider_GriefPrevention;
 import com.bgsoftware.wildtools.hooks.BlocksProvider_Lands;
@@ -44,7 +42,6 @@ import com.bgsoftware.wildtools.hooks.PerWorldPluginsHook;
 import com.bgsoftware.wildtools.hooks.PricesProvider_CMI;
 import com.bgsoftware.wildtools.hooks.FactionsProvider;
 import com.bgsoftware.wildtools.hooks.FactionsProvider_Default;
-import com.bgsoftware.wildtools.hooks.FactionsProvider_SavageFactions;
 import com.bgsoftware.wildtools.hooks.PricesProvider;
 import com.bgsoftware.wildtools.hooks.PricesProvider_Default;
 import com.bgsoftware.wildtools.hooks.PricesProvider_Essentials;
@@ -234,7 +231,7 @@ public final class ProvidersHandler implements ProvidersManager {
         //Factions Hookup
         if(Bukkit.getPluginManager().isPluginEnabled("Factions") &&
                 Bukkit.getPluginManager().getPlugin("Factions").getDescription().getAuthors().contains("ProSavage"))
-            factionsProvider = new FactionsProvider_SavageFactions();
+            factionsProvider = (FactionsProvider) getInstance("com.bgsoftware.wildtools.hooks.FactionsProvider_SavageFactions");
         else factionsProvider = new FactionsProvider_Default();
         //Claim Hookup
         if(Bukkit.getPluginManager().isPluginEnabled("AcidIsland"))
@@ -248,9 +245,9 @@ public final class ProvidersHandler implements ProvidersManager {
         if(Bukkit.getPluginManager().isPluginEnabled("Factions")){
             Plugin factionsPlugin = Bukkit.getPluginManager().getPlugin("Factions");
             if(factionsPlugin.getDescription().getAuthors().contains("Daniel Saukel"))
-                blocksProviders.add(new BlocksProvider_FactionsOne());
+                blocksProviders.add((BlocksProvider) getInstance("com.bgsoftware.wildtools.hooks.BlocksProvider_FactionsOne"));
             else if(factionsPlugin.getDescription().getAuthors().contains("drtshock"))
-                blocksProviders.add(new BlocksProvider_FactionsUUID());
+                blocksProviders.add((BlocksProvider) getInstance("com.bgsoftware.wildtools.hooks.BlocksProvider_FactionsUUID"));
             else
                 blocksProviders.add(new BlocksProvider_MassiveFactions());
         }
@@ -328,6 +325,14 @@ public final class ProvidersHandler implements ProvidersManager {
 
     public static void reload(){
         plugin.getProviders().loadData();
+    }
+
+    private static Object getInstance(String clazz){
+        try{
+            return Class.forName(clazz).newInstance();
+        }catch(Exception ex){
+            throw new RuntimeException(ex);
+        }
     }
 
 }
