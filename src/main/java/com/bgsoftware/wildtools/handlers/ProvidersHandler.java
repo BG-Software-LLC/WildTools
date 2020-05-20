@@ -60,6 +60,7 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 
@@ -172,19 +173,19 @@ public final class ProvidersHandler implements ProvidersManager {
         return false;
     }
 
-    public SellInfo sellContainer(BlockState blockState, Player player){
+    public SellInfo sellContainer(BlockState blockState, Inventory inventory, Player player){
         for(ContainerProvider containerProvider : containerProviders){
             if(containerProvider.isContainer(blockState))
-                return containerProvider.sellContainer(blockState, player);
+                return containerProvider.sellContainer(blockState, inventory, player);
         }
 
         return EMPTY_INFO;
     }
 
-    public void removeContainer(BlockState blockState, SellInfo sellInfo){
+    public void removeContainer(BlockState blockState, Inventory inventory, SellInfo sellInfo){
         for(ContainerProvider containerProvider : containerProviders){
             if(containerProvider.isContainer(blockState)) {
-                containerProvider.removeContainer(blockState, sellInfo);
+                containerProvider.removeContainer(blockState, inventory, sellInfo);
                 break;
             }
         }

@@ -8,7 +8,6 @@ import org.bukkit.Material;
 import org.bukkit.block.BlockState;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.HashMap;
@@ -29,8 +28,7 @@ public final class ContainerProvider_Default implements ContainerProvider {
     }
 
     @Override
-    public SellInfo sellContainer(BlockState blockState, Player player) {
-        Inventory inventory = ((InventoryHolder) blockState).getInventory();
+    public SellInfo sellContainer(BlockState blockState, Inventory inventory, Player player) {
         Map<Integer, SoldItem> toSell = new HashMap<>();
         double totalEarnings = 0;
 
@@ -47,8 +45,7 @@ public final class ContainerProvider_Default implements ContainerProvider {
     }
 
     @Override
-    public void removeContainer(BlockState blockState, SellInfo sellInfo) {
-        Inventory inventory = ((InventoryHolder) blockState).getInventory();
+    public void removeContainer(BlockState blockState, Inventory inventory, SellInfo sellInfo) {
         sellInfo.getSoldItems().keySet().forEach(slot -> inventory.setItem(slot, new ItemStack(Material.AIR)));
     }
 }

@@ -31,7 +31,7 @@ public final class ContainerProvider_WildChests implements ContainerProvider {
     }
 
     @Override
-    public SellInfo sellContainer(BlockState blockState, Player player) {
+    public SellInfo sellContainer(BlockState blockState, Inventory inventory, Player player) {
         Chest chest = WildChestsAPI.getChest(blockState.getLocation());
 
         Map<Integer, SoldItem> toSell = new HashMap<>();
@@ -65,7 +65,7 @@ public final class ContainerProvider_WildChests implements ContainerProvider {
             Inventory[] pages = chest.getPages();
 
             for(int i = 0; i < pages.length; i++){
-                Inventory inventory = pages[i];
+                inventory = pages[i];
                 for (int slot = 0; slot < inventory.getSize(); slot++) {
                     ItemStack itemStack = inventory.getItem(slot);
                     if (itemStack != null && plugin.getProviders().canSellItem(player, itemStack)) {
@@ -81,7 +81,7 @@ public final class ContainerProvider_WildChests implements ContainerProvider {
     }
 
     @Override
-    public void removeContainer(BlockState blockState, SellInfo sellInfo) {
+    public void removeContainer(BlockState blockState, Inventory inventory, SellInfo sellInfo) {
         Chest chest = WildChestsAPI.getChest(blockState.getLocation());
 
         if(chest instanceof StorageChest){
@@ -92,7 +92,7 @@ public final class ContainerProvider_WildChests implements ContainerProvider {
         else{
             Inventory[] pages = chest.getPages();
             for(int i = 0; i < pages.length; i++){
-                Inventory inventory = pages[i];
+                inventory = pages[i];
                 for (int slot = 0; slot < inventory.getSize(); slot++) {
                     if(sellInfo.getSoldItems().containsKey(i * 54 + slot))
                         inventory.setItem(slot, new ItemStack(Material.AIR));

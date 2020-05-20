@@ -16,7 +16,8 @@ import com.bgsoftware.wildtools.api.objects.tools.SellTool;
 import com.bgsoftware.wildtools.api.objects.ToolMode;
 
 import org.bukkit.Material;
-import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryHolder;
 
 import java.util.Map;
 import java.util.UUID;
@@ -39,6 +40,7 @@ public final class WSellTool extends WTool implements SellTool {
             return false;
 
         BlockState blockState = e.getClickedBlock().getState();
+        Inventory inventory = blockState instanceof InventoryHolder ? ((InventoryHolder) blockState).getInventory() : null;
 
         if(!plugin.getProviders().isContainer(blockState)){
             Locale.INVALID_CONTAINER_SELL_WAND.send(e.getPlayer());
@@ -50,7 +52,7 @@ public final class WSellTool extends WTool implements SellTool {
         Executor.async(() -> {
             synchronized (getToolMutex(e.getClickedBlock())) {
                 try {
-                    SellInfo sellInfo = plugin.getProviders().sellContainer(blockState, e.getPlayer());
+                    SellInfo sellInfo = plugin.getProviders().sellContainer(blockState, inventory, e.getPlayer());
 
                     Map<Integer, SoldItem> toSell = sellInfo.getSoldItems();
                     double totalEarnings = sellInfo.getTotalEarnings();
@@ -69,7 +71,7 @@ public final class WSellTool extends WTool implements SellTool {
 
                     plugin.getProviders().depositPlayer(e.getPlayer(), totalEarnings);
 
-                    plugin.getProviders().removeContainer(blockState, sellInfo);
+                    plugin.getProviders().removeContainer(blockState, inventory, sellInfo);
 
                     //noinspection all
                     message = sellWandUseEvent.getMessage().replace("{0}", NumberUtils.format(totalEarnings))

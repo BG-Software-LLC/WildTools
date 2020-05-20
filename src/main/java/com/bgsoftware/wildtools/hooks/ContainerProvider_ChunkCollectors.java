@@ -24,13 +24,13 @@ public final class ContainerProvider_ChunkCollectors implements ContainerProvide
     }
 
     @Override
-    public SellInfo sellContainer(BlockState blockState, Player player) {
+    public SellInfo sellContainer(BlockState blockState, Inventory inventory, Player player) {
         ChunkCollector chunkCollector = ChunkCollectorPlugin.getInstance().getCollectorHandler().getCollectorAtLocation(blockState.getLocation());
         Map<Integer, SoldItem> toSell = new HashMap<>();
         double totalEarnings = 0;
 
         CollectorInventory collectorInventory = chunkCollector.getInventory();
-        Inventory inventory = collectorInventory.get();
+        inventory = collectorInventory.get();
 
         for (int slot = 0; slot < inventory.getSize(); slot++) {
             ItemStack itemStack = inventory.getItem(slot);
@@ -46,7 +46,7 @@ public final class ContainerProvider_ChunkCollectors implements ContainerProvide
     }
 
     @Override
-    public void removeContainer(BlockState blockState, SellInfo sellInfo) {
+    public void removeContainer(BlockState blockState, Inventory inventory, SellInfo sellInfo) {
         ChunkCollector chunkCollector = ChunkCollectorPlugin.getInstance().getCollectorHandler().getCollectorAtLocation(blockState.getLocation());
 
         for(SoldItem soldItem : sellInfo.getSoldItems().values()){
