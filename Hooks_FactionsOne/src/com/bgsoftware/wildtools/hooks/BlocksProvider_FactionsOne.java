@@ -22,12 +22,7 @@ public final class BlocksProvider_FactionsOne implements BlocksProvider {
     public boolean canBreak(Player player, Block block, boolean onlyInClaim) {
         FPlayer fPlayer = FactionsOneAPI.getFPlayer(player.getUniqueId());
         boolean overriding = fPlayer.hasAdminMode();
-        Faction faction = null;
-
-        try{
-            //noinspection JavaReflectionMemberAccess
-            faction = (Faction) Board.class.getMethod("getFactionAt", Location.class).invoke(null, block.getLocation());
-        }catch(Throwable ignored){}
+        Faction faction = Board.getFactionAt(block);
 
         if(onlyInClaim && faction == null) return false;
 
@@ -39,12 +34,7 @@ public final class BlocksProvider_FactionsOne implements BlocksProvider {
     public boolean canInteract(Player player, Block block, boolean onlyInClaim) {
         FPlayer fPlayer = FactionsOneAPI.getFPlayer(player.getUniqueId());
         boolean overriding = fPlayer.hasAdminMode();
-        Faction faction = null;
-
-        try{
-            //noinspection JavaReflectionMemberAccess
-            faction = (Faction) Board.class.getMethod("getFactionAt", Location.class).invoke(null, block.getLocation());
-        }catch(Throwable ignored){}
+        Faction faction = Board.getFactionAt(block);
 
         if(onlyInClaim && faction == null) return false;
 
