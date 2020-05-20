@@ -1,12 +1,12 @@
 package com.bgsoftware.wildtools.hooks;
 
-import net.prosavage.FactionsX;
-import net.prosavage.core.FPlayer;
-import net.prosavage.core.Faction;
-import net.prosavage.manager.GridManager;
-import net.prosavage.manager.PlayerManager;
-import net.prosavage.persist.data.FactionsKt;
-import net.prosavage.util.PlayerAction;
+import net.prosavage.factionsx.FactionsX;
+import net.prosavage.factionsx.core.FPlayer;
+import net.prosavage.factionsx.core.Faction;
+import net.prosavage.factionsx.manager.GridManager;
+import net.prosavage.factionsx.manager.PlayerManager;
+import net.prosavage.factionsx.persist.data.FactionsKt;
+import net.prosavage.factionsx.util.PlayerAction;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
