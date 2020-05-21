@@ -10,7 +10,18 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
+import java.lang.reflect.Method;
+
 public final class BlocksProvider_MassiveFactions implements BlocksProvider {
+
+    private static Method isUsingAdminModeMethod;
+
+    static {
+        try{
+            //noinspection JavaReflectionMemberAccess
+            isUsingAdminModeMethod = MPlayer.class.getMethod("isUsingAdminMode");
+        }catch(Throwable ignored){}
+    }
 
     @Override
     public Plugin getPlugin() {
@@ -26,14 +37,13 @@ public final class BlocksProvider_MassiveFactions implements BlocksProvider {
             overriding = mPlayer.isOverriding();
         } catch (Throwable ex) {
             try {
-                overriding = (boolean) mPlayer.getClass().getMethod("isUsingAdminMode").invoke(mPlayer);
+                overriding = (boolean) isUsingAdminModeMethod.invoke(mPlayer);
             } catch (Exception ignored) { }
         }
 
         Faction faction = BoardColl.get().getFactionAt(PS.valueOf(block.getLocation()));
 
         if(onlyInClaim && faction.getId().equals(Factions.ID_NONE)) return false;
-
 
         return faction.getId().equals(Factions.ID_NONE) || overriding || (mPlayer.hasFaction() && (mPlayer.getFaction().equals(faction) ||
                 faction.getPermitted(MPerm.getPermAccess()).contains(faction.getRelationWish(mPlayer.getFaction()))));
@@ -48,7 +58,7 @@ public final class BlocksProvider_MassiveFactions implements BlocksProvider {
             overriding = mPlayer.isOverriding();
         } catch (Throwable ex) {
             try {
-                overriding = (boolean) mPlayer.getClass().getMethod("isUsingAdminMode").invoke(mPlayer);
+                overriding = (boolean) isUsingAdminModeMethod.invoke(mPlayer);
             } catch (Exception ignored) { }
         }
 

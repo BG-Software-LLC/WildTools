@@ -50,8 +50,10 @@ import com.bgsoftware.wildtools.hooks.PricesProvider_NewtShop;
 import com.bgsoftware.wildtools.hooks.PricesProvider_ShopGUIPlus;
 
 import com.bgsoftware.wildtools.api.hooks.SellInfo;
+import com.gmail.nossr50.datatypes.skills.PrimarySkillType;
 import com.google.common.collect.Lists;
 
+import com.sk89q.worldguard.internal.platform.WorldGuardPlatform;
 import net.milkbowl.vault.economy.Economy;
 
 import org.bukkit.Bukkit;
@@ -222,8 +224,13 @@ public final class ProvidersHandler implements ProvidersManager {
             pricesProvider = new PricesProvider_ShopGUIPlus();
         else if(pricesPlugin.equalsIgnoreCase("GUIShop") && Bukkit.getPluginManager().isPluginEnabled("GUIShop"))
             pricesProvider = new PricesProvider_GUIShop();
-        else if(pricesPlugin.equalsIgnoreCase("Essentials") && Bukkit.getPluginManager().isPluginEnabled("Essentials"))
-            pricesProvider = new PricesProvider_Essentials();
+        else if(pricesPlugin.equalsIgnoreCase("Essentials") && Bukkit.getPluginManager().isPluginEnabled("Essentials")){
+            try{
+                pricesProvider = new PricesProvider_Essentials();
+            }catch(Throwable ex){
+                pricesProvider = (PricesProvider) getInstance("com.bgsoftware.wildtools.hooks.PricesProvider_EssentialsOld");
+            }
+        }
         else if(pricesPlugin.equals("CMI") && Bukkit.getPluginManager().isPluginEnabled("CMI"))
             pricesProvider = new PricesProvider_CMI();
         else if(pricesPlugin.equalsIgnoreCase("newtShop") && Bukkit.getPluginManager().isPluginEnabled("newtShop"))
@@ -262,8 +269,14 @@ public final class ProvidersHandler implements ProvidersManager {
             blocksProviders.add(new BlocksProvider_Towny());
         if(Bukkit.getPluginManager().isPluginEnabled("Villages"))
             blocksProviders.add(new BlocksProvider_Villages());
-        if(Bukkit.getPluginManager().isPluginEnabled("WorldGuard"))
-            blocksProviders.add(new BlocksProvider_WorldGuard());
+        if(Bukkit.getPluginManager().isPluginEnabled("WorldGuard")){
+            try{
+                WorldGuardPlatform worldGuardPlatform;
+                blocksProviders.add(new BlocksProvider_WorldGuard());
+            }catch (Throwable ex){
+                blocksProviders.add((BlocksProvider) getInstance("com.bgsoftware.wildtools.hooks.BlocksProvider_WorldGuardOld"));
+            }
+        }
         if(Bukkit.getPluginManager().isPluginEnabled("Lands"))
             blocksProviders.add(new BlocksProvider_Lands());
         if(Bukkit.getPluginManager().isPluginEnabled("PlotSquared")) {
@@ -287,17 +300,31 @@ public final class ProvidersHandler implements ProvidersManager {
             blocksProviders.add(new BlocksProvider_ChunkHoppers());
         }
         if(Bukkit.getPluginManager().isPluginEnabled("mcMMO")){
-            dropsProviders.add(new DropsProvider_mcMMO());
-            if(mcmmoHook)
-                blockActionProviders.add(new BlockActionProvider_mcMMO());
+            try{
+                PrimarySkillType.valueOf("HERBALISM");
+
+                dropsProviders.add(new DropsProvider_mcMMO());
+                if(mcmmoHook)
+                    blockActionProviders.add(new BlockActionProvider_mcMMO());
+            }catch(Throwable ex){
+                dropsProviders.add((DropsProvider) getInstance("com.bgsoftware.wildtools.hooks.DropsProvider_mcMMOOld"));
+                if(mcmmoHook)
+                    blockActionProviders.add((BlockActionProvider) getInstance("com.bgsoftware.wildtools.hooks.BlockActionProvider_mcMMOOld"));
+            }
         }
         if(Bukkit.getPluginManager().isPluginEnabled("LockettePro"))
             blocksProviders.add(new BlocksProvider_LockettePro());
         //Drops for spawners
         if(Bukkit.getPluginManager().isPluginEnabled("WildStacker"))
             dropsProviders.add(new DropsProvider_WildStacker());
-        else if(Bukkit.getPluginManager().isPluginEnabled("SilkSpawners"))
-            dropsProviders.add(new DropsProvider_SilkSpawners());
+        else if(Bukkit.getPluginManager().isPluginEnabled("SilkSpawners")){
+            try{
+                de.dustplanet.util.SilkUtil.class.getMethod("getCreatureName", String.class);
+                dropsProviders.add(new DropsProvider_SilkSpawners());
+            }catch(Throwable ex){
+                dropsProviders.add((DropsProvider) getInstance("com.bgsoftware.wildtools.hooks.DropsProvider_SilkSpawnersOld"));
+            }
+        }
         else
             dropsProviders.add(new DropsProviders_WildToolsSpawners());
         //Containers

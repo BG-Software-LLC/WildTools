@@ -1,7 +1,7 @@
 package com.bgsoftware.wildtools.utils.blocks;
 
 import com.bgsoftware.wildtools.WildToolsPlugin;
-import com.bgsoftware.wildtools.hooks.BlockActionProvider_mcMMO;
+import com.bgsoftware.wildtools.hooks.McMMOHook;
 import com.bgsoftware.wildtools.utils.NumberUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
@@ -57,7 +57,7 @@ public final class BlocksController {
             for(Map.Entry<Location, Integer> blockEntry : entry.getValue().entrySet()) {
                 plugin.getNMSAdapter().setBlockFast(blockEntry.getKey(), blockEntry.getValue());
                 if(blockEntry.getValue() != 0)
-                    BlockActionProvider_mcMMO.markAsPlaced(blockEntry.getKey());
+                    McMMOHook.markAsPlaced(blockEntry.getKey());
             }
             plugin.getNMSAdapter().refreshChunk(entry.getKey().buildChunk(), locations);
         }

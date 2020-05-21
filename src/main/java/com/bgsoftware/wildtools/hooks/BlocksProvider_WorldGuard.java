@@ -16,17 +16,7 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
-import java.lang.reflect.Method;
-
 public final class BlocksProvider_WorldGuard implements BlocksProvider {
-
-    private static Method canBuildMethod;
-
-    static {
-        try{
-            canBuildMethod = WorldGuardPlugin.class.getMethod("canBuild", Player.class, Block.class);
-        }catch(Throwable ignored){}
-    }
 
     private final WorldGuardPlugin worldGuard = (WorldGuardPlugin) Bukkit.getPluginManager().getPlugin("WorldGuard");
 
@@ -45,24 +35,20 @@ public final class BlocksProvider_WorldGuard implements BlocksProvider {
     }
 
     private boolean canBuild(Player player, Block block) {
-        try {
-            return (boolean) canBuildMethod.invoke(worldGuard, player, block);
-        }catch(Throwable ex){
-            WorldGuardPlatform worldGuardPlatform = WorldGuard.getInstance().getPlatform();
-            RegionContainer regionContainer = worldGuardPlatform.getRegionContainer();
-            com.sk89q.worldedit.world.World world = BukkitAdapter.adapt(block.getWorld());
-            RegionManager regionManager = regionContainer.get(world);
+        WorldGuardPlatform worldGuardPlatform = WorldGuard.getInstance().getPlatform();
+        RegionContainer regionContainer = worldGuardPlatform.getRegionContainer();
+        com.sk89q.worldedit.world.World world = BukkitAdapter.adapt(block.getWorld());
+        RegionManager regionManager = regionContainer.get(world);
 
-            if(regionManager == null)
-                return false;
+        if(regionManager == null)
+            return false;
 
-            LocalPlayer localPlayer = worldGuard.wrapPlayer(player);
-            BlockVector3 blockVector3 = BlockVector3.at(block.getX(), block.getY(), block.getZ());
-            ApplicableRegionSet set = regionManager.getApplicableRegions(blockVector3);
+        LocalPlayer localPlayer = worldGuard.wrapPlayer(player);
+        BlockVector3 blockVector3 = BlockVector3.at(block.getX(), block.getY(), block.getZ());
+        ApplicableRegionSet set = regionManager.getApplicableRegions(blockVector3);
 
-            return worldGuardPlatform.getSessionManager().hasBypass(localPlayer, world) ||
-                    set.testState(localPlayer, Flags.BLOCK_PLACE, Flags.BLOCK_BREAK, Flags.BUILD);
-        }
+        return worldGuardPlatform.getSessionManager().hasBypass(localPlayer, world) ||
+                set.testState(localPlayer, Flags.BLOCK_PLACE, Flags.BLOCK_BREAK, Flags.BUILD);
     }
 
 }

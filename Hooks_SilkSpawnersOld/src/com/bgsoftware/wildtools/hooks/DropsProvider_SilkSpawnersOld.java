@@ -9,11 +9,11 @@ import org.bukkit.inventory.ItemStack;
 import java.util.ArrayList;
 import java.util.List;
 
-public final class DropsProvider_SilkSpawners implements DropsProvider {
+public final class DropsProvider_SilkSpawnersOld implements DropsProvider {
 
     private final SilkUtil silkUtil;
 
-    public DropsProvider_SilkSpawners(){
+    public DropsProvider_SilkSpawnersOld(){
         silkUtil = SilkUtil.hookIntoSilkSpanwers();
     }
 
@@ -24,8 +24,10 @@ public final class DropsProvider_SilkSpawners implements DropsProvider {
         if(!(block.getState() instanceof CreatureSpawner))
             return drops;
 
-        String entityId = silkUtil.getSpawnerEntityID(block);
-        if(entityId == null)
+        silkUtil.getSpawnerEntityID(block);
+
+        short entityId = silkUtil.getSpawnerEntityID(block);
+        if(entityId == 0)
             entityId = silkUtil.getDefaultEntityID();
 
         String mobName = silkUtil.getCreatureName(entityId).toLowerCase().replace(" ", "");

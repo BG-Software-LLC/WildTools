@@ -1,8 +1,9 @@
 package com.bgsoftware.wildtools.hooks;
 
 import com.bgsoftware.wildtools.WildToolsPlugin;
-import com.gmail.nossr50.datatypes.skills.PrimarySkillType;
-import com.gmail.nossr50.datatypes.skills.SuperAbilityType;
+import com.gmail.nossr50.datatypes.player.McMMOPlayer;
+import com.gmail.nossr50.datatypes.skills.AbilityType;
+import com.gmail.nossr50.datatypes.skills.SkillType;
 import com.gmail.nossr50.events.items.McMMOItemSpawnEvent;
 import com.gmail.nossr50.mcMMO;
 import com.gmail.nossr50.skills.excavation.ExcavationManager;
@@ -18,39 +19,38 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.inventory.ItemStack;
 
-public final class BlockActionProvider_mcMMO implements BlockActionProvider {
+public final class BlockActionProvider_mcMMOOld implements BlockActionProvider {
 
     private static final WildToolsPlugin plugin = WildToolsPlugin.getPlugin();
 
-    public BlockActionProvider_mcMMO(){
+    public BlockActionProvider_mcMMOOld(){
         Bukkit.getPluginManager().registerEvents(new McMMOListener(), plugin);
     }
 
     @Override
     public void onBlockBreak(Player player, Block block, ItemStack usedItem){
-        com.gmail.nossr50.datatypes.player.McMMOPlayer mcMMOPlayer = com.gmail.nossr50.util.player.UserManager.getPlayer(player);
+        McMMOPlayer mcMMOPlayer = com.gmail.nossr50.util.player.UserManager.getPlayer(player);
         BlockState blockState = block.getState();
         try {
             if (BlockUtils.affectedByGreenTerra(block.getState())) {
                 HerbalismManager herbalismManager = mcMMOPlayer.getHerbalismManager();
                 if (herbalismManager.canActivateAbility()) {
-                    mcMMOPlayer.checkAbilityActivation(PrimarySkillType.HERBALISM);
+                    mcMMOPlayer.checkAbilityActivation(SkillType.HERBALISM);
                 }
 
-                if (PrimarySkillType.HERBALISM.getPermissions(player)) {
-                    herbalismManager.processHerbalismBlockBreakEvent(new BlockBreakEvent(block, player));
+                if(SkillType.HERBALISM.getPermissions(player)) {
+                    herbalismManager.herbalismBlockCheck(block.getState());
                 }
 
             } else {
                 if (BlockUtils.affectedBySuperBreaker(blockState) && ItemUtils.isPickaxe(usedItem) &&
-                        PrimarySkillType.MINING.getPermissions(player) && !mcMMO.getPlaceStore().isTrue(blockState)) {
+                        SkillType.MINING.getPermissions(player) && !mcMMO.getPlaceStore().isTrue(blockState)) {
                     MiningManager miningManager = mcMMOPlayer.getMiningManager();
                     miningManager.miningBlockCheck(blockState);
-                } else if (BlockUtils.isLog(blockState) && ItemUtils.isAxe(usedItem) &&
-                        PrimarySkillType.WOODCUTTING.getPermissions(player) && !mcMMO.getPlaceStore().isTrue(blockState)) {
+                } else if (BlockUtils.isLog(blockState) && ItemUtils.isAxe(usedItem) && SkillType.WOODCUTTING.getPermissions(player) &&
+                        !mcMMO.getPlaceStore().isTrue(blockState)) {
                     WoodcuttingManager woodcuttingManager = mcMMOPlayer.getWoodcuttingManager();
                     if (woodcuttingManager.canUseTreeFeller(usedItem)) {
                         woodcuttingManager.processTreeFeller(blockState);
@@ -58,10 +58,10 @@ public final class BlockActionProvider_mcMMO implements BlockActionProvider {
                         woodcuttingManager.woodcuttingBlockCheck(blockState);
                     }
                 } else if (BlockUtils.affectedByGigaDrillBreaker(blockState) && ItemUtils.isShovel(usedItem) &&
-                        PrimarySkillType.EXCAVATION.getPermissions(player) && !mcMMO.getPlaceStore().isTrue(blockState)) {
+                        SkillType.EXCAVATION.getPermissions(player) && !mcMMO.getPlaceStore().isTrue(blockState)) {
                     ExcavationManager excavationManager = mcMMOPlayer.getExcavationManager();
                     excavationManager.excavationBlockCheck(blockState);
-                    if (mcMMOPlayer.getAbilityMode(SuperAbilityType.GIGA_DRILL_BREAKER)) {
+                    if (mcMMOPlayer.getAbilityMode(AbilityType.GIGA_DRILL_BREAKER)) {
                         excavationManager.gigaDrillBreaker(blockState);
                     }
                 }
