@@ -6,6 +6,7 @@ import com.massivecraft.factions.FPlayer;
 import com.massivecraft.factions.FPlayers;
 import com.massivecraft.factions.Faction;
 import com.massivecraft.factions.FactionsPlugin;
+import com.massivecraft.factions.P;
 import com.massivecraft.factions.SavageFactions;
 import com.massivecraft.factions.perms.Permissible;
 import com.massivecraft.factions.perms.PermissibleAction;
@@ -33,7 +34,12 @@ public final class BlocksProvider_FactionsUUID implements BlocksProvider {
         try {
             return FactionsPlugin.getInstance();
         }catch(Throwable ex){
-            return SavageFactions.plugin;
+            try {
+                return SavageFactions.plugin;
+            }catch(Throwable ex2){
+                // Some forks have the P class as an instance of the plugin
+                return P.p;
+            }
         }
     }
 
