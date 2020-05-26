@@ -271,7 +271,7 @@ public final class ProvidersHandler implements ProvidersManager {
             blocksProviders.add(new BlocksProvider_Villages());
         if(Bukkit.getPluginManager().isPluginEnabled("WorldGuard")){
             try{
-                WorldGuardPlatform worldGuardPlatform;
+                Class.forName("com.sk89q.worldguard.internal.platform.WorldGuardPlatform");
                 blocksProviders.add(new BlocksProvider_WorldGuard());
             }catch (Throwable ex){
                 blocksProviders.add((BlocksProvider) getInstance("com.bgsoftware.wildtools.hooks.BlocksProvider_WorldGuardOld"));
