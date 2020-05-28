@@ -24,4 +24,18 @@ public final class InventoryUtils {
         return amount;
     }
 
+    public static void removeItem(Inventory inventory, ItemStack itemStack){
+        ItemStack additionalItem = inventory.removeItem(itemStack).get(0);
+        try {
+            ItemStack offHand = inventory.getItem(40);
+            if (additionalItem != null && additionalItem.isSimilar(offHand)) {
+                offHand.setAmount(offHand.getAmount() - additionalItem.getAmount());
+                if (offHand.getAmount() <= 0)
+                    inventory.setItem(40, null);
+                else
+                    inventory.setItem(40, offHand);
+            }
+        }catch(Exception ignored){ }
+    }
+
 }

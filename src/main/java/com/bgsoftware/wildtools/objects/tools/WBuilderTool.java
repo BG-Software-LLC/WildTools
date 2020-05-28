@@ -93,7 +93,7 @@ public final class WBuilderTool extends WTool implements BuilderTool {
         blocksController.updateSession();
 
         blockItemStack.setAmount(iter);
-        e.getPlayer().getInventory().removeItem(blockItemStack);
+        InventoryUtils.removeItem(e.getPlayer().getInventory(), blockItemStack);
 
         if(amountOfBlocks < length)
             Locale.BUILDER_NO_BLOCK.send(e.getPlayer(), e.getClickedBlock().getType().name());
@@ -106,4 +106,5 @@ public final class WBuilderTool extends WTool implements BuilderTool {
 
         return true;
     }
+
 }
