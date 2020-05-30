@@ -132,7 +132,7 @@ public final class PlayerListener implements Listener {
     public void onToolDrop(PlayerDeathEvent e){
         List<ItemStack>  drops = new ArrayList<>(e.getDrops());
         for(ItemStack itemStack : drops) {
-            if(itemStack != null) {
+            if(itemStack != null && itemStack.getType() != Material.AIR) {
                 List<UUID> taskIds = plugin.getNMSAdapter().getTasks(itemStack);
                 if (!taskIds.isEmpty()) {
                     e.getDrops().remove(itemStack);
