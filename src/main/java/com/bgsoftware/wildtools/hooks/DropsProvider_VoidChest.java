@@ -1,10 +1,10 @@
 package com.bgsoftware.wildtools.hooks;
 
-import me.shin1gamix.voidchest.VoidChestPlugin;
 import me.shin1gamix.voidchest.configuration.FileManager;
 import me.shin1gamix.voidchest.datastorage.VoidStorage;
 import me.shin1gamix.voidchest.utilities.nbtapi.NBTItem;
 import me.shin1gamix.voidchest.voidmanager.VoidItemManager;
+import me.shin1gamix.voidchest.voidmanager.VoidStorageManager;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -14,12 +14,11 @@ import java.util.List;
 
 public final class DropsProvider_VoidChest implements DropsProvider {
 
-    private final VoidChestPlugin plugin = VoidChestPlugin.getInstance();
-
     @Override
     public List<ItemStack> getBlockDrops(Player player, Block block) {
         List<ItemStack> drops = new ArrayList<>();
-        VoidStorage voidStorage = plugin.getVoidManager().getVoidStorage(block);
+
+        VoidStorage voidStorage = VoidStorageManager.getInstance().getVoidStorage(block);
 
         if(voidStorage == null)
             return drops;
@@ -41,7 +40,9 @@ public final class DropsProvider_VoidChest implements DropsProvider {
         voidStorage.getInventoryHandler().closeInventories();
         voidStorage.getVoidStorageAbilities().setHologramActivated(false);
         voidStorage.getVoidStorageHologram().updateHologram();
-        voidStorage.getPlayerData().getVoidStorages().remove(voidStorage);
+        List<VoidStorage> voidStorages = voidStorage.getPlayerData().getVoidStorages().get(voidStorage.getName());
+        if(voidStorages != null)
+            voidStorages.remove(voidStorage);
         voidStorage.getPlayerData().loadStatsToFile(false);
 
         return drops;
