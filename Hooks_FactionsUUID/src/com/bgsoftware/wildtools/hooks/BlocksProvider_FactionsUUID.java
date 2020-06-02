@@ -8,7 +8,6 @@ import com.massivecraft.factions.P;
 import com.massivecraft.factions.SavageFactions;
 import com.massivecraft.factions.listeners.FactionsBlockListener;
 import com.massivecraft.factions.perms.PermissibleAction;
-import com.massivecraft.factions.zcore.fperms.PermissableAction;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -46,21 +45,21 @@ public final class BlocksProvider_FactionsUUID implements BlocksProvider {
     public boolean canBreak(Player player, Block block, boolean onlyInClaim) {
         Faction faction = Board.getInstance().getFactionAt(new FLocation(block.getLocation()));
         if(onlyInClaim && faction.isWilderness()) return false;
-        return playerCanBuildDestroyBlockMethod(player, block, PermissableAction.DESTROY);
+        return playerCanBuildDestroyBlockMethod(player, block, PermissibleAction.DESTROY);
     }
 
     @Override
     public boolean canInteract(Player player, Block block, boolean onlyInClaim) {
         Faction faction = Board.getInstance().getFactionAt(new FLocation(block.getLocation()));
         if(onlyInClaim && faction.isWilderness()) return false;
-        return playerCanBuildDestroyBlockMethod(player, block, PermissableAction.CONTAINER);
+        return playerCanBuildDestroyBlockMethod(player, block, PermissibleAction.CONTAINER);
     }
 
-    private boolean playerCanBuildDestroyBlockMethod(Player player, Block block, PermissableAction action){
+    private boolean playerCanBuildDestroyBlockMethod(Player player, Block block, PermissibleAction action){
         try{
-            return (boolean) playerCanBuildDestroyBlockMethod.invoke(player, block.getLocation(), action, true);
+            return (boolean) playerCanBuildDestroyBlockMethod.invoke(null, player, block.getLocation(), action, true);
         }catch(Throwable ex){
-            return FactionsBlockListener.playerCanBuildDestroyBlock(player, block.getLocation(), action.getName(), true);
+            return FactionsBlockListener.playerCanBuildDestroyBlock(player, block.getLocation(), action.name(), true);
         }
     }
 
