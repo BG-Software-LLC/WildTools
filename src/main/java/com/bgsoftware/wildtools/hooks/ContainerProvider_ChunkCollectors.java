@@ -53,6 +53,6 @@ public final class ContainerProvider_ChunkCollectors implements ContainerProvide
             chunkCollector.getItemCollection().put(soldItem.getItem().getType(), 0);
         }
 
-        chunkCollector.update();
+        chunkCollector.update(true);
     }
 }
