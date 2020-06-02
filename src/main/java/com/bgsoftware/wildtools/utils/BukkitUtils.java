@@ -38,11 +38,15 @@ public final class BukkitUtils {
         };
 
         Consumer<Block> onBlockBreak = blockConsumer -> {
-            if(omniTool || blockConsumer.getType().hasGravity() || Arrays.stream(blockFaces)
-                    .anyMatch(blockFace -> blockConsumer.getRelative(blockFace).getType().name().contains("WATER")))
+            if(omniTool || blockConsumer.getType().hasGravity() || Arrays.stream(blockFaces).anyMatch(blockFace -> {
+                Material blockType = blockConsumer.getRelative(blockFace).getType();
+                return blockType.name().contains("WATER") || blockType.name().contains("LAVA");
+            })) {
                 blockConsumer.setType(Material.AIR);
-            else
+            }
+            else {
                 blocksController.setAir(blockConsumer.getLocation());
+            }
         };
 
         breakNaturally(player, block, usedItem, tool, onBlockBreak, onItemDrop);
