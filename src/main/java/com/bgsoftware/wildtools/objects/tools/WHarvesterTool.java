@@ -222,7 +222,16 @@ public final class WHarvesterTool extends WTool implements HarvesterTool {
 
                     if (blockType == Material.CACTUS || blockType == WMaterial.SUGAR_CANE.parseMaterial() || blockType.name().equals("BAMBOO")) {
                         if(y == cropsMax.getBlockY()) {
-                            toolUsages += breakTallCrop(player, blocksController, targetBlock, usedItem, onItemDrop, toolUsages, toolDurability, usingDurability);
+                            // Checking if the block is the bottom crop
+                            if(targetBlock.getRelative(BlockFace.DOWN).getType() != blockType) {
+                                Block aboveBlock = targetBlock.getRelative(BlockFace.UP);
+                                //Making sure there's a valid crop on top of the bottom one
+                                if(aboveBlock.getType() == blockType)
+                                    toolUsages += breakTallCrop(player, blocksController, aboveBlock, usedItem, onItemDrop, toolUsages, toolDurability, usingDurability);
+                            }
+                            else {
+                                toolUsages += breakTallCrop(player, blocksController, targetBlock, usedItem, onItemDrop, toolUsages, toolDurability, usingDurability);
+                            }
                             continue;
                         }
 
