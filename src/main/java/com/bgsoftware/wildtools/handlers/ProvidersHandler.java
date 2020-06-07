@@ -15,6 +15,7 @@ import com.bgsoftware.wildtools.hooks.BlocksProvider_ChunkHoppers;
 import com.bgsoftware.wildtools.hooks.BlocksProvider_FabledSkyblock;
 import com.bgsoftware.wildtools.hooks.BlocksProvider_FactionsX;
 import com.bgsoftware.wildtools.hooks.BlocksProvider_GriefPrevention;
+import com.bgsoftware.wildtools.hooks.BlocksProvider_IslandWorld;
 import com.bgsoftware.wildtools.hooks.BlocksProvider_Lands;
 import com.bgsoftware.wildtools.hooks.BlocksProvider_LockettePro;
 import com.bgsoftware.wildtools.hooks.BlocksProvider_MassiveFactions;
@@ -317,6 +318,8 @@ public final class ProvidersHandler implements ProvidersManager {
         }
         if(Bukkit.getPluginManager().isPluginEnabled("LockettePro"))
             blocksProviders.add(new BlocksProvider_LockettePro());
+        if(Bukkit.getPluginManager().isPluginEnabled("IslandWorld"))
+            blocksProviders.add(new BlocksProvider_IslandWorld());
         //Drops for spawners
         if(Bukkit.getPluginManager().isPluginEnabled("WildStacker"))
             dropsProviders.add(new DropsProvider_WildStacker());
