@@ -99,6 +99,9 @@ public final class ProvidersHandler implements ProvidersManager {
      */
 
     public double getPrice(Player player, ItemStack itemStack){
+        if(plugin.getToolsManager().getTool(itemStack) != null)
+            return -1;
+        
         try {
             return pricesProvider.getPrice(player, itemStack);
         }catch(Exception ex){
