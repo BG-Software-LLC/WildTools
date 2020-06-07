@@ -20,6 +20,7 @@ import com.bgsoftware.wildtools.hooks.BlocksProvider_LockettePro;
 import com.bgsoftware.wildtools.hooks.BlocksProvider_MassiveFactions;
 import com.bgsoftware.wildtools.hooks.BlocksProvider_PlotSquared;
 import com.bgsoftware.wildtools.hooks.BlocksProvider_PlotSquaredLegacy;
+import com.bgsoftware.wildtools.hooks.BlocksProvider_QuickShop;
 import com.bgsoftware.wildtools.hooks.BlocksProvider_Residence;
 import com.bgsoftware.wildtools.hooks.BlocksProvider_SnowGearsShops;
 import com.bgsoftware.wildtools.hooks.BlocksProvider_SuperiorSkyblock;
@@ -292,6 +293,8 @@ public final class ProvidersHandler implements ProvidersManager {
         if(Bukkit.getPluginManager().isPluginEnabled("Shop") && Bukkit.getPluginManager().getPlugin("Shop")
                 .getDescription().getAuthors().stream().anyMatch(line -> line.contains("SnowGears")))
             blocksProviders.add(new BlocksProvider_SnowGearsShops());
+        if(Bukkit.getPluginManager().isPluginEnabled("QuickShop"))
+            blocksProviders.add(new BlocksProvider_QuickShop());
         //Drops Plugin hook
         if(Bukkit.getPluginManager().isPluginEnabled("VoidChest"))
             dropsProviders.add(new DropsProvider_VoidChest());
