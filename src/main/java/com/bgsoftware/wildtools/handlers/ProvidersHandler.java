@@ -55,7 +55,6 @@ import com.bgsoftware.wildtools.api.hooks.SellInfo;
 import com.gmail.nossr50.datatypes.skills.PrimarySkillType;
 import com.google.common.collect.Lists;
 
-import com.sk89q.worldguard.internal.platform.WorldGuardPlatform;
 import net.milkbowl.vault.economy.Economy;
 
 import org.bukkit.Bukkit;
@@ -101,7 +100,7 @@ public final class ProvidersHandler implements ProvidersManager {
     public double getPrice(Player player, ItemStack itemStack){
         if(plugin.getToolsManager().getTool(itemStack) != null)
             return -1;
-        
+
         try {
             return pricesProvider.getPrice(player, itemStack);
         }catch(Exception ex){
@@ -259,6 +258,8 @@ public final class ProvidersHandler implements ProvidersManager {
             Plugin factionsPlugin = Bukkit.getPluginManager().getPlugin("Factions");
             if(factionsPlugin.getDescription().getAuthors().contains("Daniel Saukel"))
                 blocksProviders.add((BlocksProvider) getInstance("com.bgsoftware.wildtools.hooks.BlocksProvider_FactionsOne"));
+            else if(factionsPlugin.getDescription().getAuthors().contains("Driftay"))
+                blocksProviders.add((BlocksProvider) getInstance("com.bgsoftware.wildtools.hooks.BlocksProvider_SaberFactions"));
             else if(factionsPlugin.getDescription().getAuthors().contains("drtshock"))
                 blocksProviders.add((BlocksProvider) getInstance("com.bgsoftware.wildtools.hooks.BlocksProvider_FactionsUUID"));
             else
