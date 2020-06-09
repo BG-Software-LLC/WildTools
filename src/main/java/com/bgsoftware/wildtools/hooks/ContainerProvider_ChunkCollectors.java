@@ -34,7 +34,8 @@ public final class ContainerProvider_ChunkCollectors implements ContainerProvide
 
         for (int slot = 0; slot < inventory.getSize(); slot++) {
             ItemStack itemStack = inventory.getItem(slot);
-            double price = itemStack == null ? 0 : collectorInventory.getPrice(itemStack.getType()) * chunkCollector.getItemCollection().get(itemStack.getType());
+            double price = itemStack == null || !collectorInventory.isCollecting(itemStack.getType()) ? 0 :
+                    collectorInventory.getPrice(itemStack.getType()) * chunkCollector.getItemCollection().get(itemStack.getType());
             if(price > 0){
                 SoldItem soldItem = new SoldItem(itemStack, price);
                 toSell.put(slot, soldItem);
