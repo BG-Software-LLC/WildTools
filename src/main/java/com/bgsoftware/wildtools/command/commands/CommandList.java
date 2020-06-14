@@ -73,6 +73,9 @@ public final class CommandList implements ICommand {
             toolsListString.append("\n").append(Locale.TOOL_LIST_LINE.getMessage(tool.getName()));
         }
 
+        if(!toolsListString.toString().isEmpty())
+            Locale.TOOL_LIST_TYPE.send(sender, currentMode, toolsListString.toString().substring(1));
+
         Locale.TOOL_LIST_FOOTER.send(sender);
     }
 
