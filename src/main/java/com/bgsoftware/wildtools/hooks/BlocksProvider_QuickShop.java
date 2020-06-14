@@ -44,7 +44,7 @@ public final class BlocksProvider_QuickShop implements BlocksProvider {
         if(shop != null)
             shop.delete();
 
-        return shop != null;
+        return shop == null;
     }
 
 }
