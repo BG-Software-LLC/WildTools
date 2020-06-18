@@ -197,11 +197,10 @@ public final class WHarvesterTool extends WTool implements HarvesterTool {
 
                     Location blockLocation = new Location(player.getWorld(), x, y, z);
                     Block targetBlock = blockLocation.getBlock();
-
-                    if(!plugin.getProviders().canBreak(player, targetBlock, this))
-                        continue;
-
                     Material blockType = targetBlock.getType();
+
+                    if(!isHarvestableBlock(blockType) || !plugin.getProviders().canBreak(player, targetBlock, this))
+                        continue;
 
                     if((blockType == Material.DIRT || blockType == WMaterial.GRASS_BLOCK.parseMaterial()) &&
                         isBetweenBlocks(farmlandMax, farmlandMin, blockLocation)){
@@ -347,6 +346,11 @@ public final class WHarvesterTool extends WTool implements HarvesterTool {
         currentUsages++;
 
         return currentUsages;
+    }
+
+    private boolean isHarvestableBlock(Material type){
+        return type == Material.DIRT || type == WMaterial.GRASS_BLOCK.parseMaterial() ||
+                type.name().contains("CHORUS") || crops.contains(type.name());
     }
 
     private static final class ChangeableDouble{
