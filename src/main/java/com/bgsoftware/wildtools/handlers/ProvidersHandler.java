@@ -49,6 +49,7 @@ import com.bgsoftware.wildtools.hooks.PricesProvider_Default;
 import com.bgsoftware.wildtools.hooks.PricesProvider_Essentials;
 import com.bgsoftware.wildtools.hooks.PricesProvider_GUIShop;
 import com.bgsoftware.wildtools.hooks.PricesProvider_NewtShop;
+import com.bgsoftware.wildtools.hooks.PricesProvider_QuantumShop;
 import com.bgsoftware.wildtools.hooks.PricesProvider_ShopGUIPlus;
 
 import com.bgsoftware.wildtools.api.hooks.SellInfo;
@@ -239,6 +240,8 @@ public final class ProvidersHandler implements ProvidersManager {
             pricesProvider = new PricesProvider_CMI();
         else if(pricesPlugin.equalsIgnoreCase("newtShop") && Bukkit.getPluginManager().isPluginEnabled("newtShop"))
             pricesProvider = new PricesProvider_NewtShop();
+        else if(pricesPlugin.equalsIgnoreCase("QuantumShop") && Bukkit.getPluginManager().isPluginEnabled("QuantumShop"))
+            pricesProvider = new PricesProvider_QuantumShop();
         else pricesProvider = new PricesProvider_Default();
         //Factions Hookup
         if(Bukkit.getPluginManager().isPluginEnabled("Factions") &&

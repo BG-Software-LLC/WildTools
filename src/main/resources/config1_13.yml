@@ -5,13 +5,21 @@
 ##                                                ##
 ####################################################
 
-# Choose which prices plugin to check for prices (ShopGUIPlus, Essentials, CMI, newtShop, WildTools).
+# Choose which prices plugin to check for prices (ShopGUIPlus, Essentials, CMI, newtShop, QuantumShop, WildTools).
 prices-plugin: 'ShopGUIPlus'
+
+# Path to the logs file.
+logs-file: 'logs.txt'
 
 # A list of prices. Use "TYPE" and "TYPE:DATA" formats.
 prices-list:
 - 'STONE:5' #Each stone will cost $5
 - 'LOG:0:5' #Only oak logs will cost $5
+
+# What hooks should be supported by WildTools?
+hooks:
+  mcmmo: true
+  jobs: true
 
 # The plugin brings a lot of options and features for making tools easily with rich-configuration options.
 # The default config has basic trench-pickaxe, tray-pickaxe, sand-wand, sell-wand, lightning-wand, harvester-hoe
