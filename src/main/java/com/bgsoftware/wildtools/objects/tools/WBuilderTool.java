@@ -15,13 +15,12 @@ import org.bukkit.inventory.ItemStack;
 import com.bgsoftware.wildtools.Locale;
 import com.bgsoftware.wildtools.api.objects.ToolMode;
 import com.bgsoftware.wildtools.api.objects.tools.BuilderTool;
-import org.bukkit.material.Tree;
 
 import java.util.UUID;
 
 public final class WBuilderTool extends WTool implements BuilderTool {
 
-    private int length;
+    private final int length;
 
     public WBuilderTool(Material type, String name, int length){
         super(type, name, ToolMode.BUILDER);
@@ -64,8 +63,12 @@ public final class WBuilderTool extends WTool implements BuilderTool {
             if((blockItemStack.getType().name().contains("STEP") || blockItemStack.getType().name().contains("SLAB")) &&
                     blockItemStack.getDurability() >= 8)
                 blockItemStack.setDurability((short) (blockItemStack.getDurability() - 8));
-            else if(e.getClickedBlock().getState().getData() instanceof Tree && blockItemStack.getDurability() >= 4)
+            else if(blockItemStack.getType() == Material.LOG && blockItemStack.getDurability() >= 4) {
                 blockItemStack.setDurability((short) (blockItemStack.getDurability() % 4));
+            }
+            else if(blockItemStack.getType() == Material.LOG_2 && blockItemStack.getDurability() >= 2){
+                blockItemStack.setDurability((short) (blockItemStack.getDurability() % 2));
+            }
         }
 
         int amountOfBlocks = InventoryUtils.countItems(e.getPlayer().getInventory(), blockItemStack);
