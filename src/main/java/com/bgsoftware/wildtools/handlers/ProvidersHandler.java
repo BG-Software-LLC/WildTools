@@ -261,7 +261,7 @@ public final class ProvidersHandler implements ProvidersManager {
             Plugin factionsPlugin = Bukkit.getPluginManager().getPlugin("Factions");
             if(factionsPlugin.getDescription().getAuthors().contains("Daniel Saukel"))
                 blocksProviders.add((BlocksProvider) getInstance("com.bgsoftware.wildtools.hooks.BlocksProvider_FactionsOne"));
-            else if(factionsPlugin.getDescription().getAuthors().contains("Driftay"))
+            else if(factionsPlugin.getDescription().getAuthors().contains("DroppingAnvil"))
                 blocksProviders.add((BlocksProvider) getInstance("com.bgsoftware.wildtools.hooks.BlocksProvider_SaberFactions"));
             else if(factionsPlugin.getDescription().getAuthors().contains("drtshock"))
                 blocksProviders.add((BlocksProvider) getInstance("com.bgsoftware.wildtools.hooks.BlocksProvider_FactionsUUID"));
