@@ -87,7 +87,7 @@ public final class WBuilderTool extends WTool implements BuilderTool {
         for(iter = 0; iter < toolIterations; iter++){
             nextBlock = nextBlock.getRelative(blockFace);
 
-            if(nextBlock.getType() != Material.AIR || !plugin.getProviders().canBreak(e.getPlayer(), nextBlock, firstType, firstData, this))
+            if(nextBlock.getType().isSolid() || !plugin.getProviders().canBreak(e.getPlayer(), nextBlock, firstType, firstData, this))
                 break;
 
             blocksController.setType(nextBlock.getLocation(), block);
