@@ -45,21 +45,21 @@ public final class BlocksProvider_FactionsUUID implements BlocksProvider {
     public boolean canBreak(Player player, Block block, boolean onlyInClaim) {
         Faction faction = Board.getInstance().getFactionAt(new FLocation(block.getLocation()));
         if(onlyInClaim && faction.isWilderness()) return false;
-        return playerCanBuildDestroyBlockMethod(player, block, PermissibleAction.DESTROY);
+        return playerCanBuildDestroyBlockMethod(player, block, "DESTROY");
     }
 
     @Override
     public boolean canInteract(Player player, Block block, boolean onlyInClaim) {
         Faction faction = Board.getInstance().getFactionAt(new FLocation(block.getLocation()));
         if(onlyInClaim && faction.isWilderness()) return false;
-        return playerCanBuildDestroyBlockMethod(player, block, PermissibleAction.CONTAINER);
+        return playerCanBuildDestroyBlockMethod(player, block, "CONTAINER");
     }
 
-    private boolean playerCanBuildDestroyBlockMethod(Player player, Block block, PermissibleAction action){
+    private boolean playerCanBuildDestroyBlockMethod(Player player, Block block, String action){
         try{
-            return (boolean) playerCanBuildDestroyBlockMethod.invoke(null, player, block.getLocation(), action, true);
+            return (boolean) playerCanBuildDestroyBlockMethod.invoke(null, player, block.getLocation(), PermissibleAction.valueOf(action), true);
         }catch(Throwable ex){
-            return FactionsBlockListener.playerCanBuildDestroyBlock(player, block.getLocation(), action.name(), true);
+            return FactionsBlockListener.playerCanBuildDestroyBlock(player, block.getLocation(), action, true);
         }
     }
 
