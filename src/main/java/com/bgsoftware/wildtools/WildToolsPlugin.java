@@ -48,7 +48,10 @@ public final class WildToolsPlugin extends JavaPlugin implements WildTools {
 
         log("******** ENABLE START ********");
 
-        getServer().getPluginManager().registerEvents(new AnvilListener(this), this);
+        try {
+            Class.forName("org.bukkit.event.inventory.PrepareAnvilEvent");
+            getServer().getPluginManager().registerEvents(new AnvilListener(this), this);
+        }catch (Exception ignored){}
         getServer().getPluginManager().registerEvents(new BlocksListener(this), this);
         getServer().getPluginManager().registerEvents(new PlayerListener(this), this);
         getServer().getPluginManager().registerEvents(new EditorListener(this), this);
