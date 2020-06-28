@@ -67,6 +67,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
+import org.maxgamer.quickshop.QuickShop;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -301,11 +302,14 @@ public final class ProvidersHandler implements ProvidersManager {
         if(Bukkit.getPluginManager().isPluginEnabled("Shop") && Bukkit.getPluginManager().getPlugin("Shop")
                 .getDescription().getAuthors().stream().anyMatch(line -> line.contains("SnowGears")))
             blocksProviders.add(new BlocksProvider_SnowGearsShops());
-        if(Bukkit.getPluginManager().isPluginEnabled("QuickShop"))
-            blocksProviders.add(new BlocksProvider_QuickShop());
-        //Drops Plugin hook
-        if(Bukkit.getPluginManager().isPluginEnabled("VoidChest"))
-            dropsProviders.add(new DropsProvider_VoidChest());
+        if(Bukkit.getPluginManager().isPluginEnabled("QuickShop")){
+            try{
+                QuickShop.getInstance();
+                blocksProviders.add(new BlocksProvider_QuickShop());
+            }catch (Throwable ex){
+                blocksProviders.add((BlocksProvider) getInstance("com.bgsoftware.wildtools.hooks.BlocksProvider_QuickShopOld"));
+            }
+        }
         if(Bukkit.getPluginManager().isPluginEnabled("ChunkHoppers")) {
             dropsProviders.add(new DropsProvider_ChunkHoppers());
             blocksProviders.add(new BlocksProvider_ChunkHoppers());
@@ -328,6 +332,8 @@ public final class ProvidersHandler implements ProvidersManager {
         if(Bukkit.getPluginManager().isPluginEnabled("IslandWorld"))
             blocksProviders.add(new BlocksProvider_IslandWorld());
         //Drops for spawners
+        if(Bukkit.getPluginManager().isPluginEnabled("VoidChest"))
+            dropsProviders.add(new DropsProvider_VoidChest());
         if(Bukkit.getPluginManager().isPluginEnabled("WildStacker"))
             dropsProviders.add(new DropsProvider_WildStacker());
         else if(Bukkit.getPluginManager().isPluginEnabled("SilkSpawners")){
