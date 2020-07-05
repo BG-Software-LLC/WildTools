@@ -13,7 +13,7 @@ public final class BlocksProvider_Towny implements BlocksProvider {
 
     @Override
     public Plugin getPlugin() {
-        return Towny.plugin;
+        return Towny.getPlugin();
     }
 
     @Override
