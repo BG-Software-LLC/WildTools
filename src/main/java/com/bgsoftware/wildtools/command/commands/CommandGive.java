@@ -90,7 +90,7 @@ public final class CommandGive implements ICommand {
                 toolItem = plugin.getNMSAdapter().setTag(toolItem, "tool-uses", uses);
             }
 
-            ItemUtils.addItem(toolItem, pl.getInventory(), null);
+            ItemUtils.addItem(toolItem, pl.getInventory(), pl.getLocation());
         }
 
         Locale.GIVE_TOOL_SUCCESS.send(sender, amount, tool.getName(), pl.getName());
