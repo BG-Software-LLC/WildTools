@@ -34,6 +34,7 @@ import com.bgsoftware.wildtools.hooks.ContainerProvider_Default;
 import com.bgsoftware.wildtools.hooks.ContainerProvider_WildChests;
 import com.bgsoftware.wildtools.hooks.DropsProvider;
 import com.bgsoftware.wildtools.hooks.DropsProvider_ChunkHoppers;
+import com.bgsoftware.wildtools.hooks.DropsProvider_MergedSpawner;
 import com.bgsoftware.wildtools.hooks.DropsProvider_SilkSpawners;
 import com.bgsoftware.wildtools.hooks.DropsProvider_VoidChest;
 import com.bgsoftware.wildtools.hooks.DropsProvider_WildStacker;
@@ -344,6 +345,8 @@ public final class ProvidersHandler implements ProvidersManager {
                 dropsProviders.add((DropsProvider) getInstance("com.bgsoftware.wildtools.hooks.DropsProvider_SilkSpawnersOld"));
             }
         }
+        else if(Bukkit.getPluginManager().isPluginEnabled("MergedSpawner"))
+            dropsProviders.add(new DropsProvider_MergedSpawner());
         else
             dropsProviders.add(new DropsProviders_WildToolsSpawners());
         //Containers
