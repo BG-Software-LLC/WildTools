@@ -9,7 +9,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
-public final class BlocksProvider_PlotSquared implements BlocksProvider {
+public final class BlocksProvider_PlotSquared4 implements BlocksProvider {
 
     private final BukkitMain instance = JavaPlugin.getPlugin(BukkitMain.class);
     private final PlotAPI API = new PlotAPI();

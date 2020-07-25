@@ -19,7 +19,8 @@ import com.bgsoftware.wildtools.hooks.BlocksProvider_IslandWorld;
 import com.bgsoftware.wildtools.hooks.BlocksProvider_Lands;
 import com.bgsoftware.wildtools.hooks.BlocksProvider_LockettePro;
 import com.bgsoftware.wildtools.hooks.BlocksProvider_MassiveFactions;
-import com.bgsoftware.wildtools.hooks.BlocksProvider_PlotSquared;
+import com.bgsoftware.wildtools.hooks.BlocksProvider_PlotSquared4;
+import com.bgsoftware.wildtools.hooks.BlocksProvider_PlotSquared5;
 import com.bgsoftware.wildtools.hooks.BlocksProvider_PlotSquaredLegacy;
 import com.bgsoftware.wildtools.hooks.BlocksProvider_QuickShop;
 import com.bgsoftware.wildtools.hooks.BlocksProvider_Residence;
@@ -295,7 +296,12 @@ public final class ProvidersHandler implements ProvidersManager {
                 Class.forName("com.intellectualcrafters.plot.api.PlotAPI");
                 blocksProviders.add(new BlocksProvider_PlotSquaredLegacy());
             }catch(ClassNotFoundException ex){
-                blocksProviders.add(new BlocksProvider_PlotSquared());
+                try {
+                    Class.forName("com.github.intellectualsites.plotsquared.api.PlotAPI");
+                    blocksProviders.add(new BlocksProvider_PlotSquared4());
+                }catch (Exception ex2){
+                    blocksProviders.add(new BlocksProvider_PlotSquared5());
+                }
             }
         }
         if(Bukkit.getPluginManager().isPluginEnabled("Residence"))
