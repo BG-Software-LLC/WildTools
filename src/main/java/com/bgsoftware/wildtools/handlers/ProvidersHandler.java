@@ -37,6 +37,7 @@ import com.bgsoftware.wildtools.hooks.DropsProvider;
 import com.bgsoftware.wildtools.hooks.DropsProvider_ChunkHoppers;
 import com.bgsoftware.wildtools.hooks.DropsProvider_MergedSpawner;
 import com.bgsoftware.wildtools.hooks.DropsProvider_SilkSpawners;
+import com.bgsoftware.wildtools.hooks.DropsProvider_SuperLuckyBlock;
 import com.bgsoftware.wildtools.hooks.DropsProvider_VoidChest;
 import com.bgsoftware.wildtools.hooks.DropsProvider_WildStacker;
 import com.bgsoftware.wildtools.hooks.DropsProvider_mcMMO;
@@ -338,9 +339,11 @@ public final class ProvidersHandler implements ProvidersManager {
             blocksProviders.add(new BlocksProvider_LockettePro());
         if(Bukkit.getPluginManager().isPluginEnabled("IslandWorld"))
             blocksProviders.add(new BlocksProvider_IslandWorld());
-        //Drops for spawners
         if(Bukkit.getPluginManager().isPluginEnabled("VoidChest"))
             dropsProviders.add(new DropsProvider_VoidChest());
+        if(Bukkit.getPluginManager().isPluginEnabled("SuperLuckyBlock"))
+            dropsProviders.add(new DropsProvider_SuperLuckyBlock());
+        //Drops for spawners
         if(Bukkit.getPluginManager().isPluginEnabled("WildStacker"))
             dropsProviders.add(new DropsProvider_WildStacker());
         else if(Bukkit.getPluginManager().isPluginEnabled("SilkSpawners")){
