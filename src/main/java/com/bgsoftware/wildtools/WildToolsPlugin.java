@@ -89,7 +89,6 @@ public final class WildToolsPlugin extends JavaPlugin implements WildTools {
 
     @Override
     public void onDisable() {
-        Bukkit.resetRecipes();
         for(Player player : nmsAdapter.getOnlinePlayers()) {
             while(player.getOpenInventory().getType() == InventoryType.CHEST)
                 player.closeInventory();
