@@ -1,6 +1,9 @@
 package com.bgsoftware.wildtools.hooks;
 
+import me.shin1gamix.voidchest.VoidChestPlugin;
 import me.shin1gamix.voidchest.configuration.FileManager;
+import me.shin1gamix.voidchest.data.PlayerData;
+import me.shin1gamix.voidchest.data.PlayerDataManager;
 import me.shin1gamix.voidchest.datastorage.VoidStorage;
 import me.shin1gamix.voidchest.utilities.nbtapi.NBTItem;
 import me.shin1gamix.voidchest.voidmanager.VoidItemManager;
@@ -14,16 +17,24 @@ import java.util.List;
 
 public final class DropsProvider_VoidChest implements DropsProvider {
 
+    private final VoidChestPlugin instance;
+
+    public DropsProvider_VoidChest(){
+        instance = VoidChestPlugin.getInstance();
+    }
+
     @Override
     public List<ItemStack> getBlockDrops(Player player, Block block) {
         List<ItemStack> drops = new ArrayList<>();
 
-        VoidStorage voidStorage = VoidStorageManager.getInstance().getVoidStorage(block);
+        VoidStorageManager voidStorageManager = instance.getVoidChestPluginHandler().getVoidStorageManager();
+        VoidItemManager voidItemManager = instance.getVoidChestPluginHandler().getVoidItemManager();
+        VoidStorage voidStorage = voidStorageManager.getVoidStorage(block);
 
         if(voidStorage == null)
             return drops;
 
-        VoidItemManager.getInstance().getCachedItem(voidStorage.getName()).ifPresent(cachedItem -> {
+        voidItemManager.getCachedItem(voidStorage.getName()).ifPresent(cachedItem -> {
             ItemStack itemStack = cachedItem.getVoidChestItem();
             if(FileManager.getInstance().getOptions().getFileConfiguration().getBoolean("charge-break-persistent", false)) {
                 Long chargeLeftSeconds = voidStorage.getVoidStorageCharge().getChargeLeftSeconds();
@@ -40,10 +51,9 @@ public final class DropsProvider_VoidChest implements DropsProvider {
         voidStorage.getInventoryHandler().closeInventories();
         voidStorage.getVoidStorageAbilities().setHologramActivated(false);
         voidStorage.getVoidStorageHologram().updateHologram();
-        List<VoidStorage> voidStorages = voidStorage.getPlayerData().getVoidStorages().get(voidStorage.getName());
-        if(voidStorages != null)
-            voidStorages.remove(voidStorage);
-        voidStorage.getPlayerData().loadStatsToFile(false);
+        PlayerData playerData = PlayerDataManager.getInstance().getPlayerData(player);
+        playerData.removeVoidStorage(voidStorage);
+        playerData.loadStatsToFile(false);
 
         return drops;
     }
