@@ -38,6 +38,9 @@ public final class BlocksController {
             combinedId = blockId;
         }
 
+        if(location.getBlockY() >= location.getWorld().getMaxHeight() || location.getBlockY() < 0)
+            return;
+
         affectedBlocks.add(location);
         cachedChunks.computeIfAbsent(new CachedChunk(location), map -> new HashMap<>()).put(location, blockId);
     }
