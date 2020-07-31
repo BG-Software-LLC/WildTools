@@ -20,6 +20,8 @@ prices-list:
 hooks:
   mcmmo: true
   jobs: true
+  # When enabled, you won't be able to enchant WT tools with AE's enchants.
+  advancedenchantments: true
 
 # The plugin brings a lot of options and features for making tools easily with rich-configuration options.
 # The default config has basic trench-pickaxe, tray-pickaxe, sand-wand, sell-wand, lightning-wand, harvester-hoe

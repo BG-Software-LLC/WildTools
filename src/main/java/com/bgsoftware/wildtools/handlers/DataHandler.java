@@ -55,6 +55,7 @@ public final class DataHandler {
         ProvidersHandler.pricesPlugin = cfg.getString("prices-plugin", "ShopGUIPlus");
         ProvidersHandler.mcmmoHook = cfg.getBoolean("hooks.mcmmo", true);
         ProvidersHandler.jobsHook = cfg.getBoolean("hooks.jobs", true);
+        ProvidersHandler.advancedEnchantmentsHook = cfg.getBoolean("hooks.advancedenchantments", true);
 
         SellWandLogger.setLogsFile(cfg.getString("logs-file", "logs.txt"));
 

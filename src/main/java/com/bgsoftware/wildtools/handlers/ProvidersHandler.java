@@ -3,6 +3,7 @@ package com.bgsoftware.wildtools.handlers;
 import com.bgsoftware.wildtools.WildToolsPlugin;
 import com.bgsoftware.wildtools.api.handlers.ProvidersManager;
 import com.bgsoftware.wildtools.api.objects.tools.Tool;
+import com.bgsoftware.wildtools.hooks.AdvancedEnchantmentsHook;
 import com.bgsoftware.wildtools.hooks.BlockActionProvider;
 import com.bgsoftware.wildtools.hooks.BlockActionProvider_CoreProtect;
 import com.bgsoftware.wildtools.hooks.BlockActionProvider_Jobs;
@@ -82,7 +83,7 @@ public final class ProvidersHandler implements ProvidersManager {
     private static final SellInfo EMPTY_INFO = new SellInfo(new HashMap<>(), 0.0);
 
     static String pricesPlugin;
-    static boolean mcmmoHook = false, jobsHook = false;
+    static boolean mcmmoHook = false, jobsHook = false, advancedEnchantmentsHook = false;
 
     private boolean isVaultEnabled = false;
     private Economy economy;
@@ -375,11 +376,18 @@ public final class ProvidersHandler implements ProvidersManager {
         }
         if(Bukkit.getPluginManager().isPluginEnabled("WildStacker"))
             blockActionProviders.add(new BlockActionProvider_WildStacker());
+
+        if(Bukkit.getPluginManager().isPluginEnabled("AdvancedEnchantment"))
+            AdvancedEnchantmentsHook.register(plugin);
     }
 
     @Override
     public void addContainerProvider(ContainerProvider containerProvider) {
         containerProviders.add(containerProvider);
+    }
+
+    public boolean hasAdvancedEnchantmentsEnabled(){
+        return advancedEnchantmentsHook;
     }
 
     public static void reload(){
