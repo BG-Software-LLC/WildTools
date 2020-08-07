@@ -3,6 +3,7 @@ package com.bgsoftware.wildtools.objects.tools;
 import com.bgsoftware.wildtools.api.events.DrainWandUseEvent;
 import com.bgsoftware.wildtools.api.objects.ToolMode;
 import com.bgsoftware.wildtools.api.objects.tools.DrainTool;
+import com.bgsoftware.wildtools.utils.BukkitUtils;
 import com.bgsoftware.wildtools.utils.blocks.BlocksController;
 import com.bgsoftware.wildtools.utils.items.ToolTaskManager;
 import org.bukkit.Bukkit;
@@ -17,7 +18,7 @@ import java.util.UUID;
 
 public final class WDrainTool extends WTool implements DrainTool {
 
-    private int radius;
+    private final int radius;
 
     public WDrainTool(Material type, String name, int radius){
         super(type, name, ToolMode.DRAIN);
@@ -58,7 +59,8 @@ public final class WDrainTool extends WTool implements DrainTool {
                         break outerLoop;
 
                     Block targetBlock = block.getWorld().getBlockAt(x, y, z);
-                    if(targetBlock.getType() != Material.ICE || !plugin.getProviders().canBreak(player, targetBlock, this))
+
+                    if(targetBlock.getType() != Material.ICE || !BukkitUtils.canBreakBlock(targetBlock, this))
                         continue;
 
                     blocksController.setAir(targetBlock.getLocation());

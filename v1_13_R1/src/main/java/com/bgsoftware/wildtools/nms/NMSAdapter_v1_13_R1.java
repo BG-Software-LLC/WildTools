@@ -39,6 +39,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.WorldBorder;
+import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.Ageable;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.craftbukkit.v1_13_R1.CraftChunk;
@@ -60,6 +61,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
+import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
@@ -441,13 +443,6 @@ public final class NMSAdapter_v1_13_R1 implements NMSAdapter {
     }
 
     @Override
-    public void copyBlock(org.bukkit.block.Block from, org.bukkit.block.Block to) {
-        CraftBlock fromBlock = (CraftBlock) from, toBlock = (CraftBlock) to;
-        toBlock.setType(fromBlock.getType());
-        toBlock.setBlockData(fromBlock.getBlockData(), true);
-    }
-
-    @Override
     public Collection<Player> getOnlinePlayers() {
         return new ArrayList<>(Bukkit.getOnlinePlayers());
     }
@@ -457,6 +452,10 @@ public final class NMSAdapter_v1_13_R1 implements NMSAdapter {
         World world = ((CraftWorld) location.getWorld()).getHandle();
         Chunk chunk = world.getChunkAt(location.getChunk().getX(), location.getChunk().getZ());
         BlockPosition blockPosition = new BlockPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ());
+
+        if(combinedId == 0)
+            world.a(null, 2001, blockPosition, Block.getCombinedId(world.getType(blockPosition)));
+
         chunk.a(blockPosition, Block.getByCombinedId(combinedId), false);
         if(PaperHook.isAntiXRayAvailable())
             PaperHook.handleLeftClickBlockMethod(world, blockPosition);
@@ -564,6 +563,21 @@ public final class NMSAdapter_v1_13_R1 implements NMSAdapter {
     }
 
     @Override
+    public BlockPlaceEvent getFakePlaceEvent(Player player, Location location, org.bukkit.block.Block copyBlock) {
+        FakeCraftBlock fakeBlock = FakeCraftBlock.at(location, copyBlock.getType());
+        org.bukkit.block.Block original = location.getBlock();
+        return new BlockPlaceEvent(
+                fakeBlock,
+                original.getState(),
+                fakeBlock.getRelative(BlockFace.DOWN),
+                new org.bukkit.inventory.ItemStack(copyBlock.getType()),
+                player,
+                true,
+                EquipmentSlot.HAND
+        );
+    }
+
+    @Override
     public void playPickupAnimation(LivingEntity livingEntity, org.bukkit.entity.Item item) {
         EntityLiving entityLiving = ((CraftLivingEntity) livingEntity).getHandle();
         EntityItem entityItem = (EntityItem) ((CraftItem) item).getHandle();
@@ -642,6 +656,40 @@ public final class NMSAdapter_v1_13_R1 implements NMSAdapter {
             }catch(Exception ex){
                 throw new RuntimeException(ex);
             }
+        }
+
+    }
+
+    @SuppressWarnings("NullableProblems")
+    private static class FakeCraftBlock extends CraftBlock{
+
+        private Material blockType;
+
+        FakeCraftBlock(WorldServer worldServer, BlockPosition blockPosition, Material material){
+            super(worldServer, blockPosition);
+            this.blockType = material;
+        }
+
+        @Override
+        public Material getType() {
+            return blockType;
+        }
+
+        @Override
+        public void setType(Material type) {
+            this.blockType = type;
+            super.setType(type);
+        }
+
+        @Override
+        public BlockData getBlockData() {
+            return CraftBlockData.newData(blockType, null);
+        }
+
+        static FakeCraftBlock at(Location location, Material type){
+            WorldServer worldServer = ((CraftWorld) location.getWorld()).getHandle();
+            BlockPosition blockPosition = new BlockPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ());
+            return new FakeCraftBlock(worldServer, blockPosition, type);
         }
 
     }

@@ -3,13 +3,16 @@ package com.bgsoftware.wildtools.utils;
 import com.bgsoftware.wildtools.utils.blocks.BlocksController;
 import com.bgsoftware.wildtools.utils.items.ItemUtils;
 import org.bukkit.Bukkit;
+import org.bukkit.CropState;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.ExperienceOrb;
 import org.bukkit.entity.Player;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import com.bgsoftware.wildtools.WildToolsPlugin;
 import com.bgsoftware.wildtools.api.objects.tools.Tool;
@@ -17,7 +20,7 @@ import com.bgsoftware.wildtools.api.objects.tools.Tool;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.function.Consumer;
+import java.util.function.Function;
 
 public final class BukkitUtils {
 
@@ -26,80 +29,106 @@ public final class BukkitUtils {
             BlockFace.UP, BlockFace.DOWN, BlockFace.WEST, BlockFace.EAST, BlockFace.SOUTH, BlockFace.NORTH
     };
 
-    public static void breakNaturally(Player player, BlocksController blocksController, Block block, ItemStack usedItem, Tool tool){
-        boolean autoCollect = tool.isAutoCollect();
-        boolean omniTool = tool.isOmni();
-
-        Consumer<ItemStack> onItemDrop = itemConsumer -> {
-            if (autoCollect)
-                ItemUtils.addItem(itemConsumer, player.getInventory(), block.getLocation());
-            else
-                block.getWorld().dropItemNaturally(block.getLocation(), itemConsumer);
-        };
-
-        Consumer<Block> onBlockBreak = blockConsumer -> {
-            if(omniTool || blockConsumer.getType().hasGravity() || Arrays.stream(blockFaces).anyMatch(blockFace -> {
-                Material blockType = blockConsumer.getRelative(blockFace).getType();
-                return blockType.name().contains("WATER") || blockType.name().contains("LAVA");
-            })) {
-                blockConsumer.setType(Material.AIR);
-            }
-            else {
-                blocksController.setAir(blockConsumer.getLocation());
-            }
-        };
-
-        breakNaturally(player, block, usedItem, tool, onBlockBreak, onItemDrop);
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
+    public static boolean canBreakBlock(Block block, Tool tool){
+        return canBreakBlock(block, block.getType(), block.getState().getData().toItemStack().getDurability(), tool);
     }
 
-    public static void breakNaturally(Player player, BlocksController blocksController, Block block, ItemStack usedItem, Tool tool, Consumer<ItemStack> onItemDrop){
-        Consumer<Block> onBlockBreak = blockConsumer -> {
-            if(blockConsumer.getRelative(BlockFace.UP).getType().name().contains("WATER") || blockConsumer.getType().hasGravity())
-                blockConsumer.setType(Material.AIR);
-            else
-                blocksController.setAir(blockConsumer.getLocation());
-        };
-
-        breakNaturally(player, block, usedItem, tool, onBlockBreak, onItemDrop);
+    public static boolean canBreakBlock(Block block, Material firstType, short firstData, Tool tool){
+        return tool.canBreakBlock(block, firstType, firstData) &&
+                !plugin.getNMSAdapter().isOutsideWorldborder(block.getLocation())
+                && block.getType() != Material.BEDROCK;
     }
 
-    public static void breakNaturally(Player player, Block block, ItemStack usedItem, Tool tool, Consumer<Block> onBlockBreak, Consumer<ItemStack> onItemDrop){
-        List<ItemStack> drops = new ArrayList<>();
+    public static boolean canInteractBlock(Player player, Block block, ItemStack usedItem){
+        PlayerInteractEvent playerInteractEvent =
+                new PlayerInteractEvent(player, Action.RIGHT_CLICK_BLOCK, usedItem, block, BlockFace.SELF);
+        Bukkit.getPluginManager().callEvent(playerInteractEvent);
+        return !playerInteractEvent.isCancelled();
+    }
 
-        if((tool == null || !tool.hasSilkTouch()) && usedItem.getEnchantmentLevel(Enchantment.SILK_TOUCH) == 0) {
-            int expFromBlock = plugin.getNMSAdapter().getExpFromBlock(block, player);
-            if (expFromBlock > 0) {
-                ExperienceOrb orb = block.getWorld().spawn(block.getLocation(), ExperienceOrb.class);
-                orb.setExperience(expFromBlock);
-            }
+    public static boolean breakBlock(Player player, BlocksController blocksController, Block block, ItemStack usedItem, Tool tool, Function<ItemStack, ItemStack> dropItemFunction){
+        BlockBreakEvent blockBreakEvent = new BlockBreakEvent(block, player);
+
+        if((tool == null || !tool.hasSilkTouch()) && usedItem.getEnchantmentLevel(Enchantment.SILK_TOUCH) == 0)
+            blockBreakEvent.setExpToDrop(plugin.getNMSAdapter().getExpFromBlock(block, player));
+
+        Bukkit.getPluginManager().callEvent(blockBreakEvent);
+
+        if(blockBreakEvent.isCancelled())
+            return false;
+
+        List<ItemStack> drops = getBlockDrops(player, block, tool);
+
+        if(blocksController == null || (tool != null && tool.isOmni()) || block.getType().hasGravity() || hasNearbyWater(block)) {
+            block.setType(Material.AIR);
+        }
+        else {
+            blocksController.setAir(block.getLocation());
         }
 
-        if(tool != null && tool.isOmni()){
-            BlockBreakEvent blockBreakEvent = new BlockBreakEvent(block, player);
-            Bukkit.getPluginManager().callEvent(blockBreakEvent);
-            if(blockBreakEvent.isCancelled())
-                return;
-        }
-
-        if(onItemDrop != null) {
-            drops.addAll(getBlockDrops(player, block, tool));
-        }
-
-        plugin.getProviders().onBlockBreak(player, block, usedItem);
-
-        if(onBlockBreak != null)
-            onBlockBreak.accept(block);
-
-        if(!drops.isEmpty()) {
-            if (tool != null)
-                drops = tool.filterDrops(drops);
-
-            for (ItemStack is : drops) {
-                if (is != null && is.getType() != Material.AIR) {
-                    onItemDrop.accept(is);
+        if(tool != null) {
+            tool.filterDrops(drops).forEach(itemStack -> {
+                itemStack = dropItemFunction.apply(itemStack);
+                if(itemStack != null) {
+                    if (tool.isAutoCollect()) {
+                        ItemUtils.addItem(itemStack, player.getInventory(), block.getLocation());
+                    } else {
+                        block.getWorld().dropItemNaturally(block.getLocation(), itemStack);
+                    }
                 }
-            }
+            });
         }
+
+        return true;
+    }
+
+    @SuppressWarnings("UnusedReturnValue")
+    public static boolean breakBlockAsBoolean(Player player, BlocksController blocksController, Block block, ItemStack usedItem, Tool tool, Function<ItemStack, Boolean> dropItemFunction){
+        return breakBlock(player, blocksController, block, usedItem, tool, itemStack -> dropItemFunction.apply(itemStack) ? itemStack : null);
+    }
+
+    public static boolean seedBlock(Player player, Block block, Tool tool, Function<ItemStack, ItemStack> dropItemFunction){
+        BlockBreakEvent blockBreakEvent = new BlockBreakEvent(block, player);
+        Bukkit.getPluginManager().callEvent(blockBreakEvent);
+
+        if(blockBreakEvent.isCancelled())
+            return false;
+
+        List<ItemStack> drops = getBlockDrops(player, block, tool);
+
+        plugin.getNMSAdapter().setCropState(block, CropState.SEEDED);
+
+        if (tool != null) {
+            tool.filterDrops(drops).forEach(itemStack -> {
+                itemStack = dropItemFunction.apply(itemStack);
+                if(itemStack != null) {
+                    if (tool.isAutoCollect()) {
+                        ItemUtils.addItem(itemStack, player.getInventory(), block.getLocation());
+                    } else {
+                        block.getWorld().dropItemNaturally(block.getLocation(), itemStack);
+                    }
+                }
+            });
+        }
+
+        return true;
+    }
+
+    public static boolean seedBlockAsBoolean(Player player, Block block, Tool tool, Function<ItemStack, Boolean> dropItemFunction){
+        return seedBlock(player, block, tool, itemStack -> dropItemFunction.apply(itemStack) ? itemStack : null);
+    }
+
+    public static boolean placeBlock(Player player, BlocksController blocksController, Block block, Block materialBlock){
+        BlockPlaceEvent blockPlaceEvent = plugin.getNMSAdapter().getFakePlaceEvent(player, block.getLocation(), materialBlock);
+        Bukkit.getPluginManager().callEvent(blockPlaceEvent);
+
+        if(blockPlaceEvent.isCancelled())
+            return false;
+
+        blocksController.setType(block.getLocation(), materialBlock.getLocation());
+
+        return true;
     }
 
     public static List<ItemStack> getBlockDrops(Player player, Block block, Tool tool){
@@ -113,6 +142,13 @@ public final class BukkitUtils {
 
         return ItemUtils.isCrops(block.getType()) ? plugin.getNMSAdapter().getCropDrops(player, block) :
                 plugin.getNMSAdapter().getBlockDrops(player, block, tool.hasSilkTouch());
+    }
+
+    private static boolean hasNearbyWater(Block block){
+        return Arrays.stream(blockFaces).anyMatch(blockFace -> {
+            Material blockType = block.getRelative(blockFace).getType();
+            return blockType.name().contains("WATER") || blockType.name().contains("LAVA");
+        });
     }
 
 }

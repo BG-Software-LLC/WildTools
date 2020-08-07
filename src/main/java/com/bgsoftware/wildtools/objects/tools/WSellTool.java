@@ -2,6 +2,7 @@ package com.bgsoftware.wildtools.objects.tools;
 
 import com.bgsoftware.wildtools.SellWandLogger;
 import com.bgsoftware.wildtools.api.hooks.SoldItem;
+import com.bgsoftware.wildtools.utils.BukkitUtils;
 import com.bgsoftware.wildtools.utils.Executor;
 import com.bgsoftware.wildtools.utils.NumberUtils;
 import com.bgsoftware.wildtools.api.hooks.SellInfo;
@@ -36,7 +37,7 @@ public final class WSellTool extends WTool implements SellTool {
             return false;
         }
 
-        if(!plugin.getProviders().canInteract(e.getPlayer(), e.getClickedBlock(), this))
+        if(!BukkitUtils.canInteractBlock(e.getPlayer(), e.getClickedBlock(), e.getItem()))
             return false;
 
         BlockState blockState = e.getClickedBlock().getState();

@@ -17,7 +17,7 @@ import java.util.UUID;
 
 public final class WCuboidTool extends WTool implements CuboidTool {
 
-    private int breakLevel;
+    private final int breakLevel;
 
     public WCuboidTool(Material type, String name, int breakLevel){
         super(type, name, ToolMode.CUBOID);
@@ -54,11 +54,11 @@ public final class WCuboidTool extends WTool implements CuboidTool {
                     Block targetBlock = e.getPlayer().getWorld().getBlockAt(x, y, z);
 
                     if(targetBlock.getType() == Material.AIR ||
-                            !plugin.getProviders().canBreak(e.getPlayer(), targetBlock, firstType, firstData, this))
+                            !BukkitUtils.canBreakBlock(targetBlock, firstType, firstData, this))
                         continue;
 
-                    BukkitUtils.breakNaturally(e.getPlayer(), blocksController, targetBlock, e.getPlayer().getItemInHand(), this);
-                    toolUsages++;
+                   if(BukkitUtils.breakBlock(e.getPlayer(), blocksController, targetBlock, e.getPlayer().getItemInHand(), this, itemStack -> itemStack))
+                        toolUsages++;
                 }
             }
         }

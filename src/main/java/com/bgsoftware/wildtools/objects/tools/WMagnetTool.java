@@ -3,7 +3,7 @@ package com.bgsoftware.wildtools.objects.tools;
 import com.bgsoftware.wildtools.api.events.MagnetWandUseEvent;
 import com.bgsoftware.wildtools.api.objects.ToolMode;
 import com.bgsoftware.wildtools.api.objects.tools.MagnetTool;
-import com.bgsoftware.wildtools.hooks.BlockActionProvider_WildStacker;
+import com.bgsoftware.wildtools.hooks.WildStackerHook;
 import com.bgsoftware.wildtools.utils.Executor;
 import com.bgsoftware.wildtools.utils.items.ToolTaskManager;
 import org.bukkit.Bukkit;
@@ -11,6 +11,7 @@ import org.bukkit.Material;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
@@ -58,11 +59,17 @@ public final class WMagnetTool extends WTool implements MagnetTool {
 
             for(Item item : nearbyItems) {
                 synchronized (item) {
-                    if (!item.isValid() || item.isDead() || !plugin.getProviders().canPickupItem(player, item))
+                    if (!item.isValid() || item.isDead())
+                        continue;
+
+                    PlayerPickupItemEvent playerPickupItemEvent = new PlayerPickupItemEvent(player, item, item.getItemStack().getAmount());
+                    Bukkit.getPluginManager().callEvent(playerPickupItemEvent);
+
+                    if(playerPickupItemEvent.isCancelled())
                         continue;
 
                     ItemStack itemStack = Bukkit.getPluginManager().isPluginEnabled("WildStacker") ?
-                            BlockActionProvider_WildStacker.getItemStack(item) : item.getItemStack();
+                            WildStackerHook.getItemStack(item) : item.getItemStack();
 
                     Map<Integer, ItemStack> additionalItems = player.getInventory().addItem(itemStack);
 
@@ -75,7 +82,7 @@ public final class WMagnetTool extends WTool implements MagnetTool {
                         ItemStack additionalItem = additionalItems.get(0);
                         affectedItems.add(item);
                         if (Bukkit.getPluginManager().isPluginEnabled("WildStacker")) {
-                            BlockActionProvider_WildStacker.setItemStack(item, additionalItem);
+                            WildStackerHook.setItemStack(item, additionalItem);
                         } else {
                             item.setItemStack(additionalItem);
                         }

@@ -13,7 +13,7 @@ import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
-import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.Recipe;
@@ -69,8 +69,6 @@ public interface NMSAdapter {
 
     void setCropState(Block block, CropState cropState);
 
-    void copyBlock(Block from, Block to);
-
     Collection<Player> getOnlinePlayers();
 
     void setBlockFast(Location location, int combinedId);
@@ -88,6 +86,8 @@ public interface NMSAdapter {
     boolean isOutsideWorldborder(Location location);
 
     Object getBlockData(Material type, byte data);
+
+    BlockPlaceEvent getFakePlaceEvent(Player player, Location location, Block copyBlock);
 
     void playPickupAnimation(LivingEntity livingEntity, Item item);
 

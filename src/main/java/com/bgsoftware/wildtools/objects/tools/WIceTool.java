@@ -1,6 +1,7 @@
 package com.bgsoftware.wildtools.objects.tools;
 
 import com.bgsoftware.wildtools.api.events.IceWandUseEvent;
+import com.bgsoftware.wildtools.utils.BukkitUtils;
 import com.bgsoftware.wildtools.utils.items.ToolTaskManager;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -59,7 +60,8 @@ public final class WIceTool extends WTool implements IceTool {
                         break outerLoop;
 
                     Block targetBlock = block.getWorld().getBlockAt(x, y, z);
-                    if(targetBlock.getType() != Material.ICE || !plugin.getProviders().canBreak(player, targetBlock, this))
+
+                    if(targetBlock.getType() != Material.ICE || !BukkitUtils.canBreakBlock(targetBlock, this))
                         continue;
 
                     affectedBlocks.add(targetBlock.getLocation());

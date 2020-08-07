@@ -1,11 +1,11 @@
 package com.bgsoftware.wildtools.objects.tools;
 
 import com.bgsoftware.wildtools.api.events.BuilderWandUseEvent;
+import com.bgsoftware.wildtools.utils.BukkitUtils;
 import com.bgsoftware.wildtools.utils.blocks.BlocksController;
 import com.bgsoftware.wildtools.utils.inventory.InventoryUtils;
 import com.bgsoftware.wildtools.utils.items.ToolTaskManager;
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -81,16 +81,15 @@ public final class WBuilderTool extends WTool implements BuilderTool {
         int toolIterations = Math.min(usingDurability ? getDurability(e.getPlayer(), taskId) : length, Math.min(amountOfBlocks, length));
         int iter;
 
-        Location block = e.getClickedBlock().getLocation();
+        Block originalBlock = e.getClickedBlock();
 
         Block nextBlock = e.getClickedBlock();
         for(iter = 0; iter < toolIterations; iter++){
             nextBlock = nextBlock.getRelative(blockFace);
 
-            if(nextBlock.getType().isSolid() || !plugin.getProviders().canBreak(e.getPlayer(), nextBlock, firstType, firstData, this))
+            if(nextBlock.getType().isSolid() || !BukkitUtils.canBreakBlock(nextBlock, firstType, firstData, this) ||
+                    !BukkitUtils.placeBlock(e.getPlayer(), blocksController, nextBlock, originalBlock))
                 break;
-
-            blocksController.setType(nextBlock.getLocation(), block);
         }
 
         BuilderWandUseEvent builderWandUseEvent = new BuilderWandUseEvent(e.getPlayer(), this, blocksController.getAffectedBlocks());

@@ -1,6 +1,7 @@
 package com.bgsoftware.wildtools.objects.tools;
 
 import com.bgsoftware.wildtools.api.events.CraftingWandUseEvent;
+import com.bgsoftware.wildtools.utils.BukkitUtils;
 import com.bgsoftware.wildtools.utils.Executor;
 import com.bgsoftware.wildtools.utils.items.ToolTaskManager;
 import com.bgsoftware.wildtools.utils.recipes.RecipeChoice;
@@ -46,7 +47,7 @@ public final class WCraftingTool extends WTool implements CraftingTool {
 
     @Override
     public boolean onBlockInteract(PlayerInteractEvent e) {
-        if(!plugin.getProviders().canInteract(e.getPlayer(), e.getClickedBlock(), this))
+        if(!BukkitUtils.canInteractBlock(e.getPlayer(), e.getClickedBlock(), e.getItem()))
             return false;
 
         if(e.getClickedBlock().getType() != Material.CHEST && e.getClickedBlock().getType() != Material.TRAPPED_CHEST){
