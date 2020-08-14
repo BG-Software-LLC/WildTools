@@ -231,28 +231,30 @@ public final class WHarvesterTool extends WTool implements HarvesterTool {
         HarvesterHoeUseEvent harvesterHoeUseEvent = new HarvesterHoeUseEvent(player, this, blocksController.getAffectedBlocks());
         Bukkit.getPluginManager().callEvent(harvesterHoeUseEvent);
 
-        double multiplier = getMultiplier();
+        if(sellInfo.hasSellMode) {
+            double multiplier = getMultiplier();
 
-        String message = sellInfo.itemsToSell.isEmpty() ? Locale.NO_SELL_ITEMS.getMessage() :
-                Locale.HARVESTER_SELL_SUCCEED.getMessage();
+            String message = sellInfo.itemsToSell.isEmpty() ? Locale.NO_SELL_ITEMS.getMessage() :
+                    Locale.HARVESTER_SELL_SUCCEED.getMessage();
 
-        HarvesterHoeSellEvent harvesterHoeSellEvent = new HarvesterHoeSellEvent(player, sellInfo.totalPrice, multiplier, message);
-        Bukkit.getPluginManager().callEvent(harvesterHoeSellEvent);
+            HarvesterHoeSellEvent harvesterHoeSellEvent = new HarvesterHoeSellEvent(player, sellInfo.totalPrice, multiplier, message);
+            Bukkit.getPluginManager().callEvent(harvesterHoeSellEvent);
 
-        if(!harvesterHoeSellEvent.isCancelled()) {
-            multiplier = harvesterHoeSellEvent.getMultiplier();
-            sellInfo.totalPrice = harvesterHoeSellEvent.getPrice() * multiplier;
+            if (!harvesterHoeSellEvent.isCancelled()) {
+                multiplier = harvesterHoeSellEvent.getMultiplier();
+                sellInfo.totalPrice = harvesterHoeSellEvent.getPrice() * multiplier;
 
-            plugin.getProviders().depositPlayer(player, sellInfo.totalPrice);
+                plugin.getProviders().depositPlayer(player, sellInfo.totalPrice);
 
-            //noinspection all
-            message = harvesterHoeSellEvent.getMessage()
-                    .replace("{0}", sellInfo.totalAmount + "")
-                    .replace("{1}", NumberUtils.format(sellInfo.totalPrice))
-                    .replace("{2}", multiplier != 1 && Locale.MULTIPLIER.getMessage() != null ? Locale.MULTIPLIER.getMessage(multiplier) : "");
+                //noinspection all
+                message = harvesterHoeSellEvent.getMessage()
+                        .replace("{0}", sellInfo.totalAmount + "")
+                        .replace("{1}", NumberUtils.format(sellInfo.totalPrice))
+                        .replace("{2}", multiplier != 1 && Locale.MULTIPLIER.getMessage() != null ? Locale.MULTIPLIER.getMessage(multiplier) : "");
 
-            if (!message.isEmpty())
-                player.sendMessage(message);
+                if (!message.isEmpty())
+                    player.sendMessage(message);
+            }
         }
 
         blocksController.updateSession();
