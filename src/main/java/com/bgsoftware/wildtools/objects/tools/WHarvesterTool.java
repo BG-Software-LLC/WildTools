@@ -251,10 +251,10 @@ public final class WHarvesterTool extends WTool implements HarvesterTool {
                         .replace("{0}", sellInfo.totalAmount + "")
                         .replace("{1}", NumberUtils.format(sellInfo.totalPrice))
                         .replace("{2}", multiplier != 1 && Locale.MULTIPLIER.getMessage() != null ? Locale.MULTIPLIER.getMessage(multiplier) : "");
-
-                if (!message.isEmpty())
-                    player.sendMessage(message);
             }
+
+            if (message != null && !message.isEmpty())
+                player.sendMessage(message);
         }
 
         blocksController.updateSession();
