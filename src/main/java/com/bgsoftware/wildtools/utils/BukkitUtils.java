@@ -43,7 +43,7 @@ public final class BukkitUtils {
     public static boolean canInteractBlock(Player player, Block block, ItemStack usedItem){
         PlayerInteractEvent playerInteractEvent =
                 new PlayerInteractEvent(player, Action.RIGHT_CLICK_BLOCK, usedItem, block, BlockFace.SELF);
-        Bukkit.getPluginManager().callEvent(playerInteractEvent);
+        plugin.getProviders().runWithBypass(player, () -> Bukkit.getPluginManager().callEvent(playerInteractEvent));
         return !playerInteractEvent.isCancelled();
     }
 
@@ -53,7 +53,7 @@ public final class BukkitUtils {
         if((tool == null || !tool.hasSilkTouch()) && usedItem.getEnchantmentLevel(Enchantment.SILK_TOUCH) == 0)
             blockBreakEvent.setExpToDrop(plugin.getNMSAdapter().getExpFromBlock(block, player));
 
-        Bukkit.getPluginManager().callEvent(blockBreakEvent);
+        plugin.getProviders().runWithBypass(player, () -> Bukkit.getPluginManager().callEvent(blockBreakEvent));
 
         if(blockBreakEvent.isCancelled())
             return false;
@@ -90,7 +90,7 @@ public final class BukkitUtils {
 
     public static boolean seedBlock(Player player, Block block, Tool tool, Function<ItemStack, ItemStack> dropItemFunction){
         BlockBreakEvent blockBreakEvent = new BlockBreakEvent(block, player);
-        Bukkit.getPluginManager().callEvent(blockBreakEvent);
+        plugin.getProviders().runWithBypass(player, () -> Bukkit.getPluginManager().callEvent(blockBreakEvent));
 
         if(blockBreakEvent.isCancelled())
             return false;
@@ -121,7 +121,7 @@ public final class BukkitUtils {
 
     public static boolean placeBlock(Player player, BlocksController blocksController, Block block, Block materialBlock){
         BlockPlaceEvent blockPlaceEvent = plugin.getNMSAdapter().getFakePlaceEvent(player, block.getLocation(), materialBlock);
-        Bukkit.getPluginManager().callEvent(blockPlaceEvent);
+        plugin.getProviders().runWithBypass(player, () -> Bukkit.getPluginManager().callEvent(blockPlaceEvent));
 
         if(blockPlaceEvent.isCancelled())
             return false;

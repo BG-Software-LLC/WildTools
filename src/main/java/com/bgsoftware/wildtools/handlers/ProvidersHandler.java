@@ -4,6 +4,11 @@ import com.bgsoftware.wildtools.WildToolsPlugin;
 import com.bgsoftware.wildtools.api.handlers.ProvidersManager;
 import com.bgsoftware.wildtools.hooks.AdvancedEnchantmentsHook;
 import com.bgsoftware.wildtools.api.hooks.ContainerProvider;
+import com.bgsoftware.wildtools.hooks.AntiCheatProvider;
+import com.bgsoftware.wildtools.hooks.AntiCheatProvider_AAC;
+import com.bgsoftware.wildtools.hooks.AntiCheatProvider_Default;
+import com.bgsoftware.wildtools.hooks.AntiCheatProvider_NoCheatPlus;
+import com.bgsoftware.wildtools.hooks.AntiCheatProvider_Spartan;
 import com.bgsoftware.wildtools.hooks.ContainerProvider_ChunkCollectors;
 import com.bgsoftware.wildtools.hooks.ContainerProvider_Default;
 import com.bgsoftware.wildtools.hooks.ContainerProvider_WildChests;
@@ -59,6 +64,7 @@ public final class ProvidersHandler implements ProvidersManager {
     private final List<ContainerProvider> containerProviders = Lists.newArrayList();
     private PricesProvider pricesProvider;
     private FactionsProvider factionsProvider;
+    private AntiCheatProvider antiCheatProvider;
 
     public ProvidersHandler(){
         loadData();
@@ -142,8 +148,26 @@ public final class ProvidersHandler implements ProvidersManager {
         return isVaultEnabled;
     }
 
+    @Override
+    public void addContainerProvider(ContainerProvider containerProvider) {
+        containerProviders.add(containerProvider);
+    }
+
+    public boolean hasAdvancedEnchantmentsEnabled(){
+        return advancedEnchantmentsHook;
+    }
+
+    public void runWithBypass(Player player, Runnable runnable){
+        try {
+            antiCheatProvider.enableBypass(player);
+            runnable.run();
+        }finally {
+            antiCheatProvider.disableBypass(player);
+        }
+    }
+
     private void loadData(){
-        //Prices Plugin Hookup
+        // Prices Plugin Hookup
         if(pricesPlugin.equalsIgnoreCase("ShopGUIPlus") && Bukkit.getPluginManager().isPluginEnabled("ShopGUIPlus"))
             pricesProvider = new PricesProvider_ShopGUIPlus();
         else if(pricesPlugin.equalsIgnoreCase("GUIShop") && Bukkit.getPluginManager().isPluginEnabled("GUIShop"))
@@ -162,80 +186,16 @@ public final class ProvidersHandler implements ProvidersManager {
         else if(pricesPlugin.equalsIgnoreCase("QuantumShop") && Bukkit.getPluginManager().isPluginEnabled("QuantumShop"))
             pricesProvider = new PricesProvider_QuantumShop();
         else pricesProvider = new PricesProvider_Default();
-        //Factions Hookup
+
+        // Factions Hookup
         if(Bukkit.getPluginManager().isPluginEnabled("Factions") &&
                 Bukkit.getPluginManager().getPlugin("Factions").getDescription().getAuthors().contains("ProSavage"))
             factionsProvider = (FactionsProvider) getInstance("com.bgsoftware.wildtools.hooks.FactionsProvider_SavageFactions");
         else factionsProvider = new FactionsProvider_Default();
-        //Claim Hookup
-//        if(Bukkit.getPluginManager().isPluginEnabled("AcidIsland"))
-//            blocksProviders.add(new BlocksProvider_AcidIsland());
-//        if(Bukkit.getPluginManager().isPluginEnabled("ASkyBlock"))
-//            blocksProviders.add(new BlocksProvider_ASkyblock());
-//        if(Bukkit.getPluginManager().isPluginEnabled("BentoBox"))
-//            blocksProviders.add(new BlocksProvider_BentoBox());
-//        if(Bukkit.getPluginManager().isPluginEnabled("FabledSkyBlock"))
-//            blocksProviders.add(new BlocksProvider_FabledSkyblock());
-//        if(Bukkit.getPluginManager().isPluginEnabled("Factions")){
-//            Plugin factionsPlugin = Bukkit.getPluginManager().getPlugin("Factions");
-//            if(factionsPlugin.getDescription().getAuthors().contains("Daniel Saukel"))
-//                blocksProviders.add((BlocksProvider) getInstance("com.bgsoftware.wildtools.hooks.BlocksProvider_FactionsOne"));
-//            else if(factionsPlugin.getDescription().getAuthors().contains("DroppingAnvil"))
-//                blocksProviders.add((BlocksProvider) getInstance("com.bgsoftware.wildtools.hooks.BlocksProvider_SaberFactions"));
-//            else if(factionsPlugin.getDescription().getAuthors().contains("drtshock"))
-//                blocksProviders.add((BlocksProvider) getInstance("com.bgsoftware.wildtools.hooks.BlocksProvider_FactionsUUID"));
-//            else
-//                blocksProviders.add(new BlocksProvider_MassiveFactions());
-//        }
-//        if(Bukkit.getPluginManager().isPluginEnabled("FactionsX"))
-//            blocksProviders.add(new BlocksProvider_FactionsX());
-//        if(Bukkit.getPluginManager().isPluginEnabled("GriefPrevention"))
-//            blocksProviders.add(new BlocksProvider_GriefPrevention());
-//        if(Bukkit.getPluginManager().isPluginEnabled("SuperiorSkyblock2"))
-//            blocksProviders.add(new BlocksProvider_SuperiorSkyblock());
-//        if(Bukkit.getPluginManager().isPluginEnabled("Towny"))
-//            blocksProviders.add(new BlocksProvider_Towny());
-//        if(Bukkit.getPluginManager().isPluginEnabled("Villages"))
-//            blocksProviders.add(new BlocksProvider_Villages());
-//        if(Bukkit.getPluginManager().isPluginEnabled("WorldGuard")){
-//            try{
-//                Class.forName("com.sk89q.worldguard.internal.platform.WorldGuardPlatform");
-//                blocksProviders.add(new BlocksProvider_WorldGuard());
-//            }catch (Throwable ex){
-//                blocksProviders.add((BlocksProvider) getInstance("com.bgsoftware.wildtools.hooks.BlocksProvider_WorldGuardOld"));
-//            }
-//        }
-//        if(Bukkit.getPluginManager().isPluginEnabled("Lands"))
-//            blocksProviders.add(new BlocksProvider_Lands());
-//        if(Bukkit.getPluginManager().isPluginEnabled("PlotSquared")) {
-//            try {
-//                Class.forName("com.intellectualcrafters.plot.api.PlotAPI");
-//                blocksProviders.add(new BlocksProvider_PlotSquaredLegacy());
-//            }catch(ClassNotFoundException ex){
-//                try {
-//                    Class.forName("com.github.intellectualsites.plotsquared.api.PlotAPI");
-//                    blocksProviders.add(new BlocksProvider_PlotSquared4());
-//                }catch (Exception ex2){
-//                    blocksProviders.add(new BlocksProvider_PlotSquared5());
-//                }
-//            }
-//        }
-//        if(Bukkit.getPluginManager().isPluginEnabled("Residence"))
-//            blocksProviders.add(new BlocksProvider_Residence());
-//        if(Bukkit.getPluginManager().isPluginEnabled("Shop") && Bukkit.getPluginManager().getPlugin("Shop")
-//                .getDescription().getAuthors().stream().anyMatch(line -> line.contains("SnowGears")))
-//            blocksProviders.add(new BlocksProvider_SnowGearsShops());
-//        if(Bukkit.getPluginManager().isPluginEnabled("QuickShop")){
-//            try{
-//                QuickShop.getInstance();
-//                blocksProviders.add(new BlocksProvider_QuickShop());
-//            }catch (Throwable ex){
-//                blocksProviders.add((BlocksProvider) getInstance("com.bgsoftware.wildtools.hooks.BlocksProvider_QuickShopOld"));
-//            }
-//        }
+
+        // Drops hookup
         if(Bukkit.getPluginManager().isPluginEnabled("ChunkHoppers")) {
             dropsProviders.add(new DropsProvider_ChunkHoppers());
-            //blocksProviders.add(new BlocksProvider_ChunkHoppers());
         }
         if(Bukkit.getPluginManager().isPluginEnabled("mcMMO")){
             try{
@@ -246,15 +206,10 @@ public final class ProvidersHandler implements ProvidersManager {
                 dropsProviders.add((DropsProvider) getInstance("com.bgsoftware.wildtools.hooks.DropsProvider_mcMMOOld"));
             }
         }
-//        if(Bukkit.getPluginManager().isPluginEnabled("LockettePro"))
-//            blocksProviders.add(new BlocksProvider_LockettePro());
-//        if(Bukkit.getPluginManager().isPluginEnabled("IslandWorld"))
-//            blocksProviders.add(new BlocksProvider_IslandWorld());
         if(Bukkit.getPluginManager().isPluginEnabled("VoidChest"))
             dropsProviders.add(new DropsProvider_VoidChest());
         if(Bukkit.getPluginManager().isPluginEnabled("SuperLuckyBlock"))
             dropsProviders.add(new DropsProvider_SuperLuckyBlock());
-        //Drops for spawners
         if(Bukkit.getPluginManager().isPluginEnabled("WildStacker"))
             dropsProviders.add(new DropsProvider_WildStacker());
         else if(Bukkit.getPluginManager().isPluginEnabled("SilkSpawners")){
@@ -269,7 +224,8 @@ public final class ProvidersHandler implements ProvidersManager {
             dropsProviders.add(new DropsProvider_MergedSpawner());
         else
             dropsProviders.add(new DropsProviders_WildToolsSpawners());
-        //Containers
+
+        // Containers hookup
         if(Bukkit.getPluginManager().isPluginEnabled("ChunkCollectors")){
             addContainerProvider(new ContainerProvider_ChunkCollectors());
         }
@@ -278,17 +234,20 @@ public final class ProvidersHandler implements ProvidersManager {
         }
         addContainerProvider(new ContainerProvider_Default(plugin));
 
+        // Anti Cheats hookup
+        if(Bukkit.getPluginManager().isPluginEnabled("NoCheatPlus")){
+            antiCheatProvider = new AntiCheatProvider_NoCheatPlus();
+        }
+        else if(Bukkit.getPluginManager().isPluginEnabled("AAC")){
+            antiCheatProvider = new AntiCheatProvider_AAC();
+        }
+        else if(Bukkit.getPluginManager().isPluginEnabled("Spartan")){
+            antiCheatProvider = new AntiCheatProvider_Spartan();
+        }
+        else antiCheatProvider = new AntiCheatProvider_Default();
+
         if(Bukkit.getPluginManager().isPluginEnabled("AdvancedEnchantment"))
             AdvancedEnchantmentsHook.register(plugin);
-    }
-
-    @Override
-    public void addContainerProvider(ContainerProvider containerProvider) {
-        containerProviders.add(containerProvider);
-    }
-
-    public boolean hasAdvancedEnchantmentsEnabled(){
-        return advancedEnchantmentsHook;
     }
 
     public static void reload(){
