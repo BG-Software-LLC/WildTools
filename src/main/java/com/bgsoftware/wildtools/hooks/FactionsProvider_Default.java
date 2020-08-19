@@ -6,7 +6,7 @@ import org.bukkit.entity.Player;
 public final class FactionsProvider_Default implements FactionsProvider {
 
     public FactionsProvider_Default(){
-        WildToolsPlugin.log(" - Couldn't find any factions providers, using default one.");
+        WildToolsPlugin.log(" - Couldn't find any factions providers for tnt banks, using default one.");
     }
 
     @Override

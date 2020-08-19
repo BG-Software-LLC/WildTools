@@ -21,6 +21,7 @@ import com.bgsoftware.wildtools.hooks.DropsProvider_VoidChest;
 import com.bgsoftware.wildtools.hooks.DropsProvider_WildStacker;
 import com.bgsoftware.wildtools.hooks.DropsProvider_mcMMO;
 import com.bgsoftware.wildtools.hooks.DropsProviders_WildToolsSpawners;
+import com.bgsoftware.wildtools.hooks.FactionsProvider_FactionsX;
 import com.bgsoftware.wildtools.hooks.PricesProvider_CMI;
 import com.bgsoftware.wildtools.hooks.FactionsProvider;
 import com.bgsoftware.wildtools.hooks.FactionsProvider_Default;
@@ -191,6 +192,10 @@ public final class ProvidersHandler implements ProvidersManager {
         if(Bukkit.getPluginManager().isPluginEnabled("Factions") &&
                 Bukkit.getPluginManager().getPlugin("Factions").getDescription().getAuthors().contains("ProSavage"))
             factionsProvider = (FactionsProvider) getInstance("com.bgsoftware.wildtools.hooks.FactionsProvider_SavageFactions");
+        else if(Bukkit.getPluginManager().isPluginEnabled("FactionsX") &&
+                containsClass("net.prosavage.factionsx.persist.TNTAddonData")){
+            factionsProvider = new FactionsProvider_FactionsX();
+        }
         else factionsProvider = new FactionsProvider_Default();
 
         // Drops hookup
@@ -259,6 +264,15 @@ public final class ProvidersHandler implements ProvidersManager {
             return Class.forName(clazz).newInstance();
         }catch(Exception ex){
             throw new RuntimeException(ex);
+        }
+    }
+
+    private static boolean containsClass(String path){
+        try{
+            Class.forName(path);
+            return true;
+        }catch (Throwable ex){
+            return false;
         }
     }
 
