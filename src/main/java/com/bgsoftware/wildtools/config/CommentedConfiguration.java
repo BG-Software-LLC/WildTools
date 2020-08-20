@@ -116,6 +116,13 @@ public final class CommentedConfiguration extends YamlConfiguration {
     }
 
     /**
+     * Check if the config has failed to load.
+     */
+    public boolean hasFailed(){
+        return creationFailure;
+    }
+
+    /**
      * Load all data related to the config file - keys, values and comments.
      * @param contents The contents of the file.
      * @throws InvalidConfigurationException if the contents are invalid.

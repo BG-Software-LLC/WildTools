@@ -50,6 +50,10 @@ public final class DataHandler {
         }
 
         CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(file);
+
+        if(cfg.hasFailed())
+            return;
+
         cfg.syncWithConfig(file, plugin.getResource("config.yml"), "tools");
 
         ProvidersHandler.pricesPlugin = cfg.getString("prices-plugin", "ShopGUIPlus");
@@ -75,9 +79,6 @@ public final class DataHandler {
         }
 
         PricesProvider_Default.prices = prices;
-
-        if(!cfg.contains("tools"))
-            return;
 
         for(String name : cfg.getConfigurationSection("tools").getKeys(false)){
             Material type;
