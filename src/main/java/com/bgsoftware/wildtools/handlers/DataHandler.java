@@ -76,6 +76,9 @@ public final class DataHandler {
 
         PricesProvider_Default.prices = prices;
 
+        if(!cfg.contains("tools"))
+            return;
+
         for(String name : cfg.getConfigurationSection("tools").getKeys(false)){
             Material type;
 
