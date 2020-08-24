@@ -41,11 +41,12 @@ public final class WCrowbarTool extends WTool implements CrowbarTool {
 
         CreatureSpawner creatureSpawner = (CreatureSpawner) e.getClickedBlock().getState();
 
+        List<ItemStack> itemsToDrop = plugin.getProviders().getBlockDrops(e.getPlayer(), e.getClickedBlock(), true);
+
         if(!BukkitUtils.breakBlock(e.getPlayer(), null, e.getClickedBlock(), e.getItem(), this, itemStack -> null))
             return true;
 
         if(commandsOnUse.isEmpty()) {
-            List<ItemStack> itemsToDrop = plugin.getProviders().getBlockDrops(e.getPlayer(), e.getClickedBlock(), true);
             if(!itemsToDrop.isEmpty()) {
                 ItemStack dropItem = itemsToDrop.get(0);
                 if (isAutoCollect())
