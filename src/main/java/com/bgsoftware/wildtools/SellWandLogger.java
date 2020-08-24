@@ -13,9 +13,15 @@ public final class SellWandLogger {
 
     private static final WildToolsPlugin plugin = WildToolsPlugin.getPlugin();
     private static final Logger LOGGER = Logger.getLogger("WildTools-SellWand");
+    private static boolean enabled = true;
 
     @SuppressWarnings("all")
     public static void setLogsFile(String logsFilePath){
+        if(logsFilePath.isEmpty()){
+            enabled = false;
+            return;
+        }
+
         File file = new File(plugin.getDataFolder(), logsFilePath);
 
         FileHandler fileHandler;
@@ -38,7 +44,8 @@ public final class SellWandLogger {
     }
 
     public static void log(String line){
-        LOGGER.info(line);
+        if(enabled)
+            LOGGER.info(line);
     }
 
     public static void close(){

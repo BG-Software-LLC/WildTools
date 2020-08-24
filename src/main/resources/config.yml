@@ -9,6 +9,7 @@
 prices-plugin: 'ShopGUIPlus'
 
 # Path to the logs file.
+# You may disable it by setting the path to be empty.
 logs-file: 'logs.txt'
 
 # A list of prices. Use "TYPE" and "TYPE:DATA" formats.
