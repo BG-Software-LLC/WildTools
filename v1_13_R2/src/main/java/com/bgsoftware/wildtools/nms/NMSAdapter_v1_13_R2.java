@@ -587,6 +587,20 @@ public final class NMSAdapter_v1_13_R2 implements NMSAdapter {
     }
 
     @Override
+    public boolean isAxeType(Material material) {
+        float destroySpeed = Items.DIAMOND_AXE.getDestroySpeed(
+                new ItemStack(Items.DIAMOND_AXE), ((CraftBlockData) material.createBlockData()).getState());
+        return destroySpeed == 8.0F;
+    }
+
+    @Override
+    public boolean isShovelType(Material material) {
+        float destroySpeed = Items.DIAMOND_SHOVEL.getDestroySpeed(
+                new ItemStack(Items.DIAMOND_SHOVEL), ((CraftBlockData) material.createBlockData()).getState());
+        return destroySpeed == 8.0F;
+    }
+
+    @Override
     public Collection<Entity> getNearbyEntities(Location location, double range) {
         return location.getWorld().getNearbyEntities(location, range, range, range);
     }

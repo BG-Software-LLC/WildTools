@@ -91,6 +91,10 @@ public interface NMSAdapter {
 
     void playPickupAnimation(LivingEntity livingEntity, Item item);
 
+    boolean isAxeType(Material material);
+
+    boolean isShovelType(Material material);
+
     default Collection<Entity> getNearbyEntities(Location location, double range){
         return new ArrayList<>();
     }

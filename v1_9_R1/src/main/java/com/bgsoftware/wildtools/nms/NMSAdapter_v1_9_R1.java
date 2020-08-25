@@ -50,6 +50,7 @@ import org.bukkit.craftbukkit.v1_9_R1.inventory.CraftInventoryView;
 import org.bukkit.craftbukkit.v1_9_R1.inventory.CraftItemStack;
 
 import org.bukkit.CropState;
+import org.bukkit.craftbukkit.v1_9_R1.util.CraftMagicNumbers;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.Entity;
@@ -585,6 +586,16 @@ public final class NMSAdapter_v1_9_R1 implements NMSAdapter {
         EntityLiving entityLiving = ((CraftLivingEntity) livingEntity).getHandle();
         EntityItem entityItem = (EntityItem) ((CraftItem) item).getHandle();
         ((WorldServer) entityLiving.world).getTracker().a(entityItem, new PacketPlayOutCollect(entityItem.getId(), entityLiving.getId()));
+    }
+
+    @Override
+    public boolean isAxeType(Material material) {
+        return Items.DIAMOND_AXE.getDestroySpeed(new ItemStack(Items.DIAMOND_AXE), CraftMagicNumbers.getBlock(material).getBlockData()) == 8.0F;
+    }
+
+    @Override
+    public boolean isShovelType(Material material) {
+        return Items.DIAMOND_SHOVEL.getDestroySpeed(new ItemStack(Items.DIAMOND_SHOVEL), CraftMagicNumbers.getBlock(material).getBlockData()) == 8.0F;
     }
 
     @Override

@@ -21,7 +21,6 @@ import com.bgsoftware.wildtools.api.objects.tools.Tool;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -29,29 +28,9 @@ import java.util.UUID;
 @SuppressWarnings("unused")
 public final class BlocksListener implements Listener {
 
-    private static Map<UUID, Material> lastClickedType = new HashMap<>();
-    private static String[] shovelMaterials = new String[] {"CLAY", "SOIL", "GRASS", "GRASS_PATH", "GRAVEL", "MYCEL",
-            "SOUL_SAND", "SAND", "DIRT", "SNOW_BLOCK", "SNOW", "FARMLAND", "COARSE_DIRT", "GRASS_BLOCK",
-            "MYCELIUM", "PODZOL", "RED_SAND", ""};
-    private static String[] axeMaterials = new String[] {"TRAP_DOOR", "WOODEN_DOOR", "SPRUCE_DOOR", "BIRCH_DOOR",
-            "JUNGLE_DOOR", "ACACIA_DOOR", "DARK_OAK_DOOR", "TRAPPED_CHEST", "FENCE", "SPRUCE_FENCE", "BIRCH_FENCE",
-            "JUNGLE_FENCE", "ACACIA_FENCE", "DARK_OAK_FENCE", "CHEST", "FENCE_GATE", "SPRUCE_FENCE_GATE", "BIRCH_FENCE_GATE",
-            "JUNGLE_FENCE_GATE", "ACACIA_FENCE_GATE", "DARK_OAK_FENCE_GATE", "WORKBENCH", "LOG", "LOG_2", "JUKEBOX",
-            "WOOD", "WOOD_STEP", "WOOD_STAIRS", "SPRUCE_WOOD_STAIRS", "BIRCH_WOOD_STAIRS", "JUNGLE_WOOD_STAIRS",
-            "ACACIA_STAIRS", "DARK_OAK_STAIRS", "BOOKSHELF", "STANDING_BANNER", "PUMPKIN", "JACK_O_LANTERN", "NOTE_BLOCK",
-            "SIGN_POST", "WALL_SIGN", "DAYLIGHT_DETECTOR", "HUGE_MUSHROOM_1", "HUGE_MUSHROOM_2", "OAK_DOOR", "OAK_TRAPDOOR",
-            "SPRUCE_TRAPDOOR", "BIRCH_TRAPDOOR", "JUNGLE_TRAPDOOR", "ACACIA_TRAPDOOR", "DARK_OAK_TRAPDOOR", "OAK_FENCE",
-            "OAK_FENCE_GATE", "OAK_LOG", "SPRUCE_LOG", "BIRCH_LOG", "JUNGLE_LOG", "ACACIA_LOG", "DARK_OAK_LOG", "STRIPPED_OAK_LOG",
-            "STRIPPED_SPRUCE_LOG", "STRIPPED_BIRCH_LOG", "STRIPPED_JUNGLE_LOG", "STRIPPED_ACACIA_LOG", "STRIPPED_DARK_OAK_LOG",
-            "OAK_PLANKS", "SPRUCE_PLANKS", "BIRCH_PLANKS", "JUNGLE_PLANKS", "ACACIA_PLANKS", "DARK_OAK_PLANKS", "OAK_SLAB",
-            "SPRUCE_SLAB", "BIRCH_SLAB", "JUNGLE_SLAB", "ACACIA_SLAB", "DARK_OAK_SLAB", "OAK_STAIRS", "BIRCH_STAIRS",
-            "JUNGLE_STAIRS", "OAK_PRESSURE_PLATE", "SPRUCE_PRESSURE_PLATE", "BIRCH_PRESSURE_PLATE", "JUNGLE_PRESSURE_PLATE",
-            "ACACIA_PRESSURE_PLATE", "DARK_OAK_PRESSURE_PLATE", "CRAFTING_TABLE", "CARVED_PUMPKIN", "WHITE_BANNER",
-            "ORANGE_BANNER", "MAGENTA_BANNER", "LIGHT_BLUE_BANNER", "YELLOW_BANNER", "LIME_BANNER", "PINK_BANNER",
-            "GRAY_BANNER", "LIGHT_GRAY_BANNER", "CYAN_BANNER", "PURPLE_BANNER", "BLUE_BANNER", "BROWN_BANNER", "SPRUCE_STAIRS",
-            "GREEN_BANNER", "RED_BANNER", "BLACK_BANNER", "SIGN", "MUSHROOM_STEM", "RED_MUSHROOM_BLOCK", "BROWN_MUSHROOM_BLOCK"};
+    private static final Map<UUID, Material> lastClickedType = new HashMap<>();
 
-    private WildToolsPlugin plugin;
+    private final WildToolsPlugin plugin;
 
     public BlocksListener(WildToolsPlugin plugin){
         this.plugin = plugin;
@@ -249,8 +228,12 @@ public final class BlocksListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onOmniInteract(PlayerInteractEvent e){
-        if(e.getAction() != Action.LEFT_CLICK_BLOCK ||
-                (lastClickedType.containsKey(e.getPlayer().getUniqueId()) && lastClickedType.get(e.getPlayer().getUniqueId()) == e.getClickedBlock().getType()))
+        if(e.getAction() != Action.LEFT_CLICK_BLOCK)
+            return;
+
+        Material blockType = e.getClickedBlock().getType();
+
+        if(lastClickedType.containsKey(e.getPlayer().getUniqueId()) && lastClickedType.get(e.getPlayer().getUniqueId()) == blockType)
             return;
 
         ItemStack itemStack = plugin.getNMSAdapter().getItemInHand(e.getPlayer(), e);
@@ -266,13 +249,14 @@ public final class BlocksListener implements Listener {
             return;
         }
 
-        lastClickedType.put(e.getPlayer().getUniqueId(), e.getClickedBlock().getType());
+        lastClickedType.put(e.getPlayer().getUniqueId(), blockType);
 
         String replaceType = "PICKAXE";
-        if(Arrays.asList(shovelMaterials).contains(e.getClickedBlock().getType().name())){
+
+        if(plugin.getNMSAdapter().isShovelType(blockType)) {
             replaceType = plugin.getNMSAdapter().isLegacy() ? "SPADE" : "SHOVEL";
         }
-        else if(Arrays.asList(axeMaterials).contains(e.getClickedBlock().getType().name())){
+        else if(plugin.getNMSAdapter().isAxeType(blockType)) {
             replaceType = "AXE";
         }
 

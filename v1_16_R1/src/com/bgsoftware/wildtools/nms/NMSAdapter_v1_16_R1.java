@@ -15,6 +15,7 @@ import net.minecraft.server.v1_16_R1.EntityLiving;
 import net.minecraft.server.v1_16_R1.EntityPlayer;
 import net.minecraft.server.v1_16_R1.IBlockData;
 import net.minecraft.server.v1_16_R1.ItemStack;
+import net.minecraft.server.v1_16_R1.Items;
 import net.minecraft.server.v1_16_R1.NBTBase;
 import net.minecraft.server.v1_16_R1.NBTTagCompound;
 import net.minecraft.server.v1_16_R1.NBTTagList;
@@ -483,6 +484,20 @@ public final class NMSAdapter_v1_16_R1 implements NMSAdapter {
         EntityLiving entityLiving = ((CraftLivingEntity) livingEntity).getHandle();
         EntityItem entityItem = (EntityItem) ((CraftItem) item).getHandle();
         ((WorldServer) entityLiving.world).getChunkProvider().broadcast(entityItem, new PacketPlayOutCollect(entityItem.getId(), entityLiving.getId(), item.getItemStack().getAmount()));
+    }
+
+    @Override
+    public boolean isAxeType(Material material) {
+        float destroySpeed = Items.DIAMOND_AXE.getDestroySpeed(
+                new ItemStack(Items.DIAMOND_AXE), ((CraftBlockData) material.createBlockData()).getState());
+        return destroySpeed == 8.0F;
+    }
+
+    @Override
+    public boolean isShovelType(Material material) {
+        float destroySpeed = Items.DIAMOND_SHOVEL.getDestroySpeed(
+                new ItemStack(Items.DIAMOND_SHOVEL), ((CraftBlockData) material.createBlockData()).getState());
+        return destroySpeed == 8.0F;
     }
 
     @Override
