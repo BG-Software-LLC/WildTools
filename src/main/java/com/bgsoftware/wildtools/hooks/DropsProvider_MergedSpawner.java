@@ -1,5 +1,6 @@
 package com.bgsoftware.wildtools.hooks;
 
+import com.bgsoftware.wildtools.api.hooks.DropsProvider;
 import com.vk2gpz.mergedspawner.api.MergedSpawnerAPI;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;

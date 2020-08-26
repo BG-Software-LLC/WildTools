@@ -1,6 +1,7 @@
 package com.bgsoftware.wildtools.hooks;
 
 import com.bgsoftware.wildtools.WildToolsPlugin;
+import com.bgsoftware.wildtools.api.hooks.DropsProvider;
 import com.bgsoftware.wildtools.utils.items.ItemUtils;
 import com.gmail.nossr50.datatypes.player.McMMOPlayer;
 import com.gmail.nossr50.datatypes.skills.SecondaryAbility;
@@ -30,6 +31,11 @@ public final class DropsProvider_mcMMOOld implements DropsProvider {
 
         return plugin.getNMSAdapter().getCropDrops(player, block).stream()
                 .peek(itemStack -> itemStack.setAmount(itemStack.getAmount() * 2)).collect(Collectors.toList());
+    }
+
+    @Override
+    public boolean isSpawnersOnly() {
+        return false;
     }
 
     private boolean shouldBonusDrops(Player player){

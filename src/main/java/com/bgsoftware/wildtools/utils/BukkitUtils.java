@@ -16,6 +16,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import com.bgsoftware.wildtools.WildToolsPlugin;
 import com.bgsoftware.wildtools.api.objects.tools.Tool;
+import org.bukkit.metadata.FixedMetadataValue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -49,16 +50,18 @@ public final class BukkitUtils {
 
     public static boolean breakBlock(Player player, BlocksController blocksController, Block block, ItemStack usedItem, Tool tool, Function<ItemStack, ItemStack> dropItemFunction){
         BlockBreakEvent blockBreakEvent = new BlockBreakEvent(block, player);
+        List<ItemStack> drops = getBlockDrops(player, block, tool);
+        block.setMetadata("drop-items", new FixedMetadataValue(plugin, tool == null));
 
         if((tool == null || !tool.hasSilkTouch()) && usedItem.getEnchantmentLevel(Enchantment.SILK_TOUCH) == 0)
             blockBreakEvent.setExpToDrop(plugin.getNMSAdapter().getExpFromBlock(block, player));
 
         plugin.getProviders().runWithBypass(player, () -> Bukkit.getPluginManager().callEvent(blockBreakEvent));
 
+        block.removeMetadata("drop-items", plugin);
+
         if(blockBreakEvent.isCancelled())
             return false;
-
-        List<ItemStack> drops = getBlockDrops(player, block, tool);
 
         if(blocksController == null || (tool != null && tool.isOmni()) || block.getType().hasGravity() || hasNearbyWater(block)) {
             block.setType(Material.AIR);
@@ -89,13 +92,16 @@ public final class BukkitUtils {
     }
 
     public static boolean seedBlock(Player player, Block block, Tool tool, Function<ItemStack, ItemStack> dropItemFunction){
+        List<ItemStack> drops = getBlockDrops(player, block, tool);
         BlockBreakEvent blockBreakEvent = new BlockBreakEvent(block, player);
+        block.setMetadata("drop-items", new FixedMetadataValue(plugin, tool == null));
+
         plugin.getProviders().runWithBypass(player, () -> Bukkit.getPluginManager().callEvent(blockBreakEvent));
+
+        block.removeMetadata("drop-items", plugin);
 
         if(blockBreakEvent.isCancelled())
             return false;
-
-        List<ItemStack> drops = getBlockDrops(player, block, tool);
 
         plugin.getNMSAdapter().setCropState(block, CropState.SEEDED);
 

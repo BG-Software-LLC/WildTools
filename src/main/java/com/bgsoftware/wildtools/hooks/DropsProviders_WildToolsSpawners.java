@@ -1,5 +1,6 @@
 package com.bgsoftware.wildtools.hooks;
 
+import com.bgsoftware.wildtools.api.hooks.DropsProvider;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.CreatureSpawner;

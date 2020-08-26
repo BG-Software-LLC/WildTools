@@ -1,5 +1,6 @@
 package com.bgsoftware.wildtools.hooks;
 
+import com.bgsoftware.wildtools.api.hooks.DropsProvider;
 import de.dustplanet.util.SilkUtil;
 import org.bukkit.block.Block;
 import org.bukkit.block.CreatureSpawner;
@@ -40,11 +41,6 @@ public final class DropsProvider_SilkSpawnersOld implements DropsProvider {
     @Override
     public boolean isSpawnersOnly() {
         return true;
-    }
-
-    @Override
-    public boolean callEvent() {
-        return false;
     }
 
 }

@@ -12,11 +12,10 @@ import com.bgsoftware.wildtools.hooks.AntiCheatProvider_Spartan;
 import com.bgsoftware.wildtools.hooks.ContainerProvider_ChunkCollectors;
 import com.bgsoftware.wildtools.hooks.ContainerProvider_Default;
 import com.bgsoftware.wildtools.hooks.ContainerProvider_WildChests;
-import com.bgsoftware.wildtools.hooks.DropsProvider;
+import com.bgsoftware.wildtools.api.hooks.DropsProvider;
 import com.bgsoftware.wildtools.hooks.DropsProvider_ChunkHoppers;
 import com.bgsoftware.wildtools.hooks.DropsProvider_MergedSpawner;
 import com.bgsoftware.wildtools.hooks.DropsProvider_SilkSpawners;
-import com.bgsoftware.wildtools.hooks.DropsProvider_SuperLuckyBlock;
 import com.bgsoftware.wildtools.hooks.DropsProvider_WildStacker;
 import com.bgsoftware.wildtools.hooks.DropsProvider_mcMMO;
 import com.bgsoftware.wildtools.hooks.DropsProviders_WildToolsSpawners;
@@ -153,6 +152,11 @@ public final class ProvidersHandler implements ProvidersManager {
         containerProviders.add(containerProvider);
     }
 
+    @Override
+    public void addDropsProvider(DropsProvider dropsProvider) {
+        dropsProviders.add(dropsProvider);
+    }
+
     public boolean hasAdvancedEnchantmentsEnabled(){
         return advancedEnchantmentsHook;
     }
@@ -199,34 +203,35 @@ public final class ProvidersHandler implements ProvidersManager {
 
         // Drops hookup
         if(Bukkit.getPluginManager().isPluginEnabled("ChunkHoppers")) {
-            dropsProviders.add(new DropsProvider_ChunkHoppers());
+            addDropsProvider(new DropsProvider_ChunkHoppers());
         }
         if(Bukkit.getPluginManager().isPluginEnabled("mcMMO")){
             try{
                 PrimarySkillType.valueOf("HERBALISM");
-
-                dropsProviders.add(new DropsProvider_mcMMO());
+                addDropsProvider(new DropsProvider_mcMMO());
             }catch(Throwable ex){
-                dropsProviders.add((DropsProvider) getInstance("com.bgsoftware.wildtools.hooks.DropsProvider_mcMMOOld"));
+                addDropsProvider((DropsProvider) getInstance("com.bgsoftware.wildtools.hooks.DropsProvider_mcMMOOld"));
             }
         }
 
-        if(Bukkit.getPluginManager().isPluginEnabled("SuperLuckyBlock"))
-            dropsProviders.add(new DropsProvider_SuperLuckyBlock());
-        if(Bukkit.getPluginManager().isPluginEnabled("WildStacker"))
-            dropsProviders.add(new DropsProvider_WildStacker());
+        // Spawners drops
+        if(Bukkit.getPluginManager().isPluginEnabled("WildStacker")) {
+            addDropsProvider(new DropsProvider_WildStacker());
+        }
         else if(Bukkit.getPluginManager().isPluginEnabled("SilkSpawners")){
             try{
                 de.dustplanet.util.SilkUtil.class.getMethod("getCreatureName", String.class);
-                dropsProviders.add(new DropsProvider_SilkSpawners());
+                addDropsProvider(new DropsProvider_SilkSpawners());
             }catch(Throwable ex){
-                dropsProviders.add((DropsProvider) getInstance("com.bgsoftware.wildtools.hooks.DropsProvider_SilkSpawnersOld"));
+                addDropsProvider((DropsProvider) getInstance("com.bgsoftware.wildtools.hooks.DropsProvider_SilkSpawnersOld"));
             }
         }
-        else if(Bukkit.getPluginManager().isPluginEnabled("MergedSpawner"))
-            dropsProviders.add(new DropsProvider_MergedSpawner());
-        else
-            dropsProviders.add(new DropsProviders_WildToolsSpawners());
+        else if(Bukkit.getPluginManager().isPluginEnabled("MergedSpawner")) {
+            addDropsProvider(new DropsProvider_MergedSpawner());
+        }
+        else {
+            addDropsProvider(new DropsProviders_WildToolsSpawners());
+        }
 
         // Containers hookup
         if(Bukkit.getPluginManager().isPluginEnabled("ChunkCollectors")){
