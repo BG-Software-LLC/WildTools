@@ -17,7 +17,6 @@ import com.bgsoftware.wildtools.hooks.DropsProvider_ChunkHoppers;
 import com.bgsoftware.wildtools.hooks.DropsProvider_MergedSpawner;
 import com.bgsoftware.wildtools.hooks.DropsProvider_SilkSpawners;
 import com.bgsoftware.wildtools.hooks.DropsProvider_SuperLuckyBlock;
-import com.bgsoftware.wildtools.hooks.DropsProvider_VoidChest;
 import com.bgsoftware.wildtools.hooks.DropsProvider_WildStacker;
 import com.bgsoftware.wildtools.hooks.DropsProvider_mcMMO;
 import com.bgsoftware.wildtools.hooks.DropsProviders_WildToolsSpawners;
@@ -211,8 +210,7 @@ public final class ProvidersHandler implements ProvidersManager {
                 dropsProviders.add((DropsProvider) getInstance("com.bgsoftware.wildtools.hooks.DropsProvider_mcMMOOld"));
             }
         }
-        if(Bukkit.getPluginManager().isPluginEnabled("VoidChest"))
-            dropsProviders.add(new DropsProvider_VoidChest());
+
         if(Bukkit.getPluginManager().isPluginEnabled("SuperLuckyBlock"))
             dropsProviders.add(new DropsProvider_SuperLuckyBlock());
         if(Bukkit.getPluginManager().isPluginEnabled("WildStacker"))
