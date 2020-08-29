@@ -41,6 +41,12 @@ public final class BukkitUtils {
                 && block.getType() != Material.BEDROCK;
     }
 
+    public static boolean hasBreakAccess(Block block, Player player){
+        BlockBreakEvent blockBreakEvent = new BlockBreakEvent(block, player);
+        plugin.getProviders().runWithBypass(player, () -> Bukkit.getPluginManager().callEvent(blockBreakEvent));
+        return !blockBreakEvent.isCancelled();
+    }
+
     public static boolean canInteractBlock(Player player, Block block, ItemStack usedItem){
         PlayerInteractEvent playerInteractEvent =
                 new PlayerInteractEvent(player, Action.RIGHT_CLICK_BLOCK, usedItem, block, BlockFace.SELF);
