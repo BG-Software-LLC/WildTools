@@ -9,6 +9,8 @@ import net.minecraft.server.v1_16_R2.Block;
 import net.minecraft.server.v1_16_R2.BlockPosition;
 import net.minecraft.server.v1_16_R2.Blocks;
 import net.minecraft.server.v1_16_R2.Chunk;
+import net.minecraft.server.v1_16_R2.ChunkProviderServer;
+import net.minecraft.server.v1_16_R2.ChunkSection;
 import net.minecraft.server.v1_16_R2.ContainerAnvil;
 import net.minecraft.server.v1_16_R2.EntityItem;
 import net.minecraft.server.v1_16_R2.EntityLiving;
@@ -65,6 +67,7 @@ import org.bukkit.inventory.RecipeChoice;
 import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.inventory.ShapelessRecipe;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -78,6 +81,20 @@ import java.util.stream.Collectors;
 
 @SuppressWarnings({"unused", "ConstantConditions"})
 public final class NMSAdapter_v1_16_R2 implements NMSAdapter {
+
+    private static Class<?> SHORT_ARRAY_SET_CLASS = null;
+    private static Constructor<?> MULTI_BLOCK_CHANGE_CONSTRUCTOR = null;
+
+    static {
+        try {
+            SHORT_ARRAY_SET_CLASS = Class.forName("it.unimi.dsi.fastutil.shorts.ShortArraySet");
+            Class<?> shortSetClass = Class.forName("it.unimi.dsi.fastutil.shorts.ShortSet");
+            for(Constructor<?> constructor : PacketPlayOutMultiBlockChange.class.getConstructors()){
+                if(constructor.getParameterCount() > 0)
+                    MULTI_BLOCK_CHANGE_CONSTRUCTOR = constructor;
+            }
+        }catch (Exception ignored){}
+    }
 
     @Override
     public String getVersion() {
@@ -367,12 +384,16 @@ public final class NMSAdapter_v1_16_R2 implements NMSAdapter {
         chunk.setType(blockPosition, Block.getByCombinedId(combinedId), true);
         if(PaperHook.isAntiXRayAvailable())
             PaperHook.handleLeftClickBlockMethod(world, blockPosition);
+
+        ChunkProviderServer chunkProviderServer = chunk.world.getChunkProvider();
+        chunkProviderServer.getLightEngine().a(blockPosition);
+        chunkProviderServer.flagDirty(blockPosition);
     }
 
     @Override
     public void refreshChunk(org.bukkit.Chunk bukkitChunk, Set<Location> blocksList) {
         Chunk chunk = ((CraftChunk) bukkitChunk).getHandle();
-        Map<Integer, ShortSet> blocks = new HashMap<>();
+        Map<Integer, Set<Short>> blocks = new HashMap<>();
 
         Location firstLocation = null;
 
@@ -380,24 +401,53 @@ public final class NMSAdapter_v1_16_R2 implements NMSAdapter {
             if(firstLocation == null)
                 firstLocation = location;
 
-            ShortSet shortSet = blocks.computeIfAbsent(location.getBlockY() >> 4, ShortArraySet::new);
+            Set<Short> shortSet = blocks.computeIfAbsent(location.getBlockY() >> 4, i -> createShortSet());
             shortSet.add((short)((location.getBlockX() & 15) << 8 | (location.getBlockZ() & 15) << 4 | (location.getBlockY() & 15)));
         }
 
         Collection<Entity> playerList = bukkitChunk.getWorld().getNearbyEntities(firstLocation, 60, 200, 60, entity -> entity instanceof Player);
         Set<PacketPlayOutMultiBlockChange> packetsToSend = new HashSet<>();
 
-        for(Map.Entry<Integer, ShortSet> entry : blocks.entrySet()){
-            packetsToSend.add(new PacketPlayOutMultiBlockChange(
-                    SectionPosition.a(chunk.getPos(), entry.getKey()),
-                    entry.getValue(),
-                    chunk.getSections()[entry.getKey()],
-                    true
-            ));
+        for(Map.Entry<Integer,  Set<Short>> entry : blocks.entrySet()){
+            PacketPlayOutMultiBlockChange packetPlayOutMultiBlockChange = createMultiBlockChangePacket(
+                    SectionPosition.a(chunk.getPos(), entry.getKey()), entry.getValue(), chunk.getSections()[entry.getKey()]);
+            if(packetPlayOutMultiBlockChange != null)
+                packetsToSend.add(packetPlayOutMultiBlockChange);
         }
 
         for(Entity player : playerList)
             packetsToSend.forEach(((CraftPlayer) player).getHandle().playerConnection::sendPacket);
+    }
+
+    @SuppressWarnings("all")
+    private static Set<Short> createShortSet(){
+        if(SHORT_ARRAY_SET_CLASS == null)
+            return new ShortArraySet();
+
+        try{
+            return (Set<Short>) SHORT_ARRAY_SET_CLASS.newInstance();
+        }catch (Throwable ex){
+            ex.printStackTrace();
+            return null;
+        }
+    }
+
+    private static PacketPlayOutMultiBlockChange createMultiBlockChangePacket(SectionPosition sectionPosition, Set<Short> shortSet, ChunkSection chunkSection){
+        if(MULTI_BLOCK_CHANGE_CONSTRUCTOR == null){
+            return new PacketPlayOutMultiBlockChange(
+                    sectionPosition,
+                    (ShortSet) shortSet,
+                    chunkSection,
+                    true
+            );
+        }
+
+        try{
+            return (PacketPlayOutMultiBlockChange) MULTI_BLOCK_CHANGE_CONSTRUCTOR.newInstance(sectionPosition, shortSet, chunkSection, true);
+        }catch (Throwable ex){
+            ex.printStackTrace();
+            return null;
+        }
     }
 
     @Override
