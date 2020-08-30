@@ -9,7 +9,6 @@ import net.minecraft.server.v1_16_R2.Block;
 import net.minecraft.server.v1_16_R2.BlockPosition;
 import net.minecraft.server.v1_16_R2.Blocks;
 import net.minecraft.server.v1_16_R2.Chunk;
-import net.minecraft.server.v1_16_R2.ChunkProviderServer;
 import net.minecraft.server.v1_16_R2.ChunkSection;
 import net.minecraft.server.v1_16_R2.ContainerAnvil;
 import net.minecraft.server.v1_16_R2.EntityItem;
@@ -384,10 +383,6 @@ public final class NMSAdapter_v1_16_R2 implements NMSAdapter {
         chunk.setType(blockPosition, Block.getByCombinedId(combinedId), true);
         if(PaperHook.isAntiXRayAvailable())
             PaperHook.handleLeftClickBlockMethod(world, blockPosition);
-
-        ChunkProviderServer chunkProviderServer = chunk.world.getChunkProvider();
-        chunkProviderServer.getLightEngine().a(blockPosition);
-        chunkProviderServer.flagDirty(blockPosition);
     }
 
     @Override
