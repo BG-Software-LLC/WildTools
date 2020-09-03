@@ -41,6 +41,8 @@ public interface NMSAdapter {
 
     int getExpFromBlock(Block block, Player player);
 
+    void dropExp(Location location, int exp);
+
     int getTag(ItemStack is, String key, int def);
 
     ItemStack setTag(ItemStack is, String key, int value);

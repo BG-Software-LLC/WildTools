@@ -89,6 +89,8 @@ public final class BukkitUtils {
             });
         }
 
+        plugin.getNMSAdapter().dropExp(block.getLocation(), blockBreakEvent.getExpToDrop());
+
         return true;
     }
 
