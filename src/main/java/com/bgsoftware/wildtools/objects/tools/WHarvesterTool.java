@@ -237,7 +237,8 @@ public final class WHarvesterTool extends WTool implements HarvesterTool {
             String message = sellInfo.itemsToSell.isEmpty() ? Locale.NO_SELL_ITEMS.getMessage() :
                     Locale.HARVESTER_SELL_SUCCEED.getMessage();
 
-            HarvesterHoeSellEvent harvesterHoeSellEvent = new HarvesterHoeSellEvent(player, sellInfo.totalPrice, multiplier, message);
+            HarvesterHoeSellEvent harvesterHoeSellEvent = new HarvesterHoeSellEvent(player, sellInfo.totalPrice,
+                    multiplier, message == null ? "" : message);
             Bukkit.getPluginManager().callEvent(harvesterHoeSellEvent);
 
             if (!harvesterHoeSellEvent.isCancelled()) {
