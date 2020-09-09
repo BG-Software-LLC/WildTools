@@ -7,9 +7,9 @@ import com.bgsoftware.wildtools.api.objects.ToolMode;
 import com.bgsoftware.wildtools.objects.WMaterial;
 import com.bgsoftware.wildtools.utils.BukkitUtils;
 import com.bgsoftware.wildtools.utils.NumberUtils;
+import com.bgsoftware.wildtools.utils.items.ToolItemStack;
 import com.bgsoftware.wildtools.utils.blocks.BlocksController;
 import com.bgsoftware.wildtools.utils.items.ItemUtils;
-import com.bgsoftware.wildtools.utils.items.ToolTaskManager;
 import com.bgsoftware.wildtools.Locale;
 
 import org.bukkit.Bukkit;
@@ -25,7 +25,6 @@ import org.bukkit.inventory.ItemStack;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.UUID;
 
 public final class WHarvesterTool extends WTool implements HarvesterTool {
 
@@ -100,20 +99,20 @@ public final class WHarvesterTool extends WTool implements HarvesterTool {
         if(e.getAction() != Action.RIGHT_CLICK_AIR || !e.getPlayer().isSneaking() || !e.getPlayer().hasPermission("wildtools.sellmode"))
             return false;
 
-        boolean sellMode = hasSellMode(e.getItem());
-        ItemStack itemStack;
+        ToolItemStack toolItemStack = ToolItemStack.of(e.getItem());
+
+        boolean sellMode = toolItemStack.hasSellMode();
 
         if(sellMode){
-            itemStack = plugin.getNMSAdapter().setTag(e.getItem(), "sell-mode", 0);
+            toolItemStack.setSellMode(false);
             Locale.SELL_MODE_DISABLED.send(e.getPlayer());
         }
         else{
-            itemStack = plugin.getNMSAdapter().setTag(e.getItem(), "sell-mode", 1);
+            toolItemStack.setSellMode(true);
             Locale.SELL_MODE_ENABLED.send(e.getPlayer());
         }
 
-        ItemUtils.formatItemStack(this, itemStack, getDefaultUses(), !sellMode, () ->
-            plugin.getNMSAdapter().setItemInHand(e.getPlayer(), itemStack, e));
+        ItemUtils.formatItemStack(toolItemStack);
 
         return true;
     }
@@ -124,7 +123,7 @@ public final class WHarvesterTool extends WTool implements HarvesterTool {
             e.setCancelled(true);
             return false;
         }
-        return handleUse(e.getPlayer(), e.getClickedBlock(), e.getItem());
+        return handleUse(e.getPlayer(), e.getClickedBlock(), ToolItemStack.of(e.getItem()));
     }
 
     @Override
@@ -133,11 +132,7 @@ public final class WHarvesterTool extends WTool implements HarvesterTool {
             e.setCancelled(true);
             return false;
         }
-        return handleUse(e.getPlayer(), e.getClickedBlock(), e.getItem());
-    }
-
-    public boolean hasSellMode(ItemStack itemStack){
-        return plugin.getNMSAdapter().getTag(itemStack, "sell-mode", 0) == 1;
+        return handleUse(e.getPlayer(), e.getClickedBlock(), ToolItemStack.of(e.getItem()));
     }
 
     private boolean isBetweenBlocks(Location max, Location min, Location location){
@@ -146,9 +141,7 @@ public final class WHarvesterTool extends WTool implements HarvesterTool {
                 location.getBlockZ() >= min.getBlockZ() && location.getBlockZ() <= max.getBlockZ();
     }
 
-    private boolean handleUse(Player player, Block block, ItemStack usedItem){
-        UUID taskId = ToolTaskManager.generateTaskId(usedItem, player);
-
+    private boolean handleUse(Player player, Block block, ToolItemStack usedItem){
         Location farmlandMax = block.getLocation().add(farmlandRadius, oneLayerOnly ? 0 : farmlandRadius, farmlandRadius);
         Location farmlandMin = block.getLocation().subtract(farmlandRadius, oneLayerOnly ? 0 : farmlandRadius, farmlandRadius);
         Location cropsMax = block.getLocation().add(radius, oneLayerOnly ? 0 : radius, radius);
@@ -160,9 +153,9 @@ public final class WHarvesterTool extends WTool implements HarvesterTool {
                 Math.min(farmlandMin.getBlockY(), cropsMin.getBlockY()), Math.min(farmlandMin.getBlockZ(), cropsMin.getBlockZ()));
 
         BlocksController blocksController = new BlocksController();
-        SellInfo sellInfo = new SellInfo(hasSellMode(usedItem) && player.hasPermission("wildtools.sellmode"));
+        SellInfo sellInfo = new SellInfo(usedItem.hasSellMode() && player.hasPermission("wildtools.sellmode"));
 
-        int toolDurability = getDurability(player, taskId);
+        int toolDurability = getDurability(player, usedItem);
         boolean usingDurability = isUsingDurability();
         int toolUsages = 0;
 
@@ -260,11 +253,8 @@ public final class WHarvesterTool extends WTool implements HarvesterTool {
 
         blocksController.updateSession();
 
-        if(toolUsages > 0) {
-            reduceDurablility(player, usingDurability ? toolUsages : 1, taskId);
-        } else {
-            ToolTaskManager.removeTask(taskId);
-        }
+        if(toolUsages > 0)
+            reduceDurablility(player, usingDurability ? toolUsages : 1, usedItem);
 
         return true;
     }

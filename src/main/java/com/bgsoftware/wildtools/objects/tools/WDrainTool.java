@@ -5,7 +5,6 @@ import com.bgsoftware.wildtools.api.objects.ToolMode;
 import com.bgsoftware.wildtools.api.objects.tools.DrainTool;
 import com.bgsoftware.wildtools.utils.BukkitUtils;
 import com.bgsoftware.wildtools.utils.blocks.BlocksController;
-import com.bgsoftware.wildtools.utils.items.ToolTaskManager;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -13,8 +12,6 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
-
-import java.util.UUID;
 
 public final class WDrainTool extends WTool implements DrainTool {
 
@@ -44,10 +41,8 @@ public final class WDrainTool extends WTool implements DrainTool {
         Location max = block.getLocation().clone().add(radius, radius, radius),
                 min = block.getLocation().clone().subtract(radius, radius, radius);
 
-        UUID taskId = ToolTaskManager.generateTaskId(usedItem, player);
-
         BlocksController blocksController = new BlocksController();
-        int toolDurability = getDurability(player, taskId);
+        int toolDurability = getDurability(player, usedItem);
         boolean usingDurability = isUsingDurability();
         int toolUsages = 0;
 
@@ -75,11 +70,8 @@ public final class WDrainTool extends WTool implements DrainTool {
 
         blocksController.updateSession();
 
-        if(toolUsages > 0) {
-            reduceDurablility(player, usingDurability ? toolUsages : 1, taskId);
-        } else {
-            ToolTaskManager.removeTask(taskId);
-        }
+        if(toolUsages > 0)
+            reduceDurablility(player, usingDurability ? toolUsages : 1, usedItem);
 
         return true;
     }

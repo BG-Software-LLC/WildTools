@@ -1,6 +1,6 @@
 package com.bgsoftware.wildtools.nms;
 
-import com.bgsoftware.wildtools.utils.items.ToolTaskManager;
+import com.bgsoftware.wildtools.utils.items.ToolItemStack;
 import net.minecraft.server.v1_7_R4.AxisAlignedBB;
 import net.minecraft.server.v1_7_R4.Block;
 import net.minecraft.server.v1_7_R4.BlockCarrots;
@@ -17,14 +17,13 @@ import net.minecraft.server.v1_7_R4.EntityLiving;
 import net.minecraft.server.v1_7_R4.EntityPlayer;
 import net.minecraft.server.v1_7_R4.GameProfileSerializer;
 import net.minecraft.server.v1_7_R4.Item;
+import net.minecraft.server.v1_7_R4.ItemBow;
 import net.minecraft.server.v1_7_R4.ItemStack;
 import net.minecraft.server.v1_7_R4.Items;
 import net.minecraft.server.v1_7_R4.NBTTagCompound;
-import net.minecraft.server.v1_7_R4.NBTTagList;
-import net.minecraft.server.v1_7_R4.NBTTagString;
 import net.minecraft.server.v1_7_R4.PacketPlayOutCollect;
 import net.minecraft.server.v1_7_R4.PacketPlayOutMultiBlockChange;
-import net.minecraft.server.v1_7_R4.PlayerInventory;
+import net.minecraft.server.v1_7_R4.StatisticList;
 import net.minecraft.server.v1_7_R4.TileEntity;
 import net.minecraft.server.v1_7_R4.TileEntitySkull;
 import net.minecraft.server.v1_7_R4.World;
@@ -42,6 +41,7 @@ import org.bukkit.craftbukkit.v1_7_R4.block.CraftBlock;
 import org.bukkit.craftbukkit.v1_7_R4.entity.CraftItem;
 import org.bukkit.craftbukkit.v1_7_R4.entity.CraftLivingEntity;
 import org.bukkit.craftbukkit.v1_7_R4.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_7_R4.event.CraftEventFactory;
 import org.bukkit.craftbukkit.v1_7_R4.inventory.CraftInventoryPlayer;
 import org.bukkit.craftbukkit.v1_7_R4.inventory.CraftItemStack;
 
@@ -64,10 +64,18 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 
 @SuppressWarnings({"unused", "deprecation"})
 public final class NMSAdapter_v1_7_R4 implements NMSAdapter {
+
+    private static Field customItemStackHandleField = null;
+
+    static {
+        try {
+            customItemStackHandleField = CraftItemStack.class.getDeclaredField("handle");
+            customItemStackHandleField.setAccessible(true);
+        }catch (Exception ignored){}
+    }
 
     @Override
     public String getVersion() {
@@ -206,162 +214,99 @@ public final class NMSAdapter_v1_7_R4 implements NMSAdapter {
     }
 
     @Override
-    public int getTag(org.bukkit.inventory.ItemStack is, String key, int def) {
-        ItemStack nmsStack = CraftItemStack.asNMSCopy(is);
-
-        if(nmsStack == null)
-            return def;
-
-        NBTTagCompound tag = new NBTTagCompound();
-
-        if(nmsStack.hasTag()){
-            tag = nmsStack.getTag();
+    public int getTag(ToolItemStack toolItemStack, String key, int def) {
+        ItemStack nmsStack = (ItemStack) toolItemStack.getNMSItem();
+        NBTTagCompound tagCompound = nmsStack.getTag();
+        if(tagCompound == null){
+            nmsStack.setTag(new NBTTagCompound());
+            tagCompound = nmsStack.getTag();
         }
-
-        if(tag.hasKey(key)){
-            return tag.getInt(key);
-        }
-
-        return def;
+        return tagCompound.hasKey(key)  ? tagCompound.getInt(key) : def;
     }
 
     @Override
-    public org.bukkit.inventory.ItemStack setTag(org.bukkit.inventory.ItemStack is, String key, int value) {
-        ItemStack nmsStack = CraftItemStack.asNMSCopy(is);
-        NBTTagCompound tag = new NBTTagCompound();
-
-        if(nmsStack.hasTag()){
-            tag = nmsStack.getTag();
+    public void setTag(ToolItemStack toolItemStack, String key, int value) {
+        ItemStack nmsStack = (ItemStack) toolItemStack.getNMSItem();
+        NBTTagCompound tagCompound = nmsStack.getTag();
+        if(tagCompound == null){
+            nmsStack.setTag(new NBTTagCompound());
+            tagCompound = nmsStack.getTag();
         }
-
-        tag.setInt(key, value);
-
-        nmsStack.setTag(tag);
-
-        return CraftItemStack.asBukkitCopy(nmsStack);
+        tagCompound.setInt(key, value);
     }
 
     @Override
-    public String getTag(org.bukkit.inventory.ItemStack is, String key, String def) {
-        ItemStack nmsStack = CraftItemStack.asNMSCopy(is);
-
-        if(nmsStack == null)
-            return def;
-
-        NBTTagCompound tag = new NBTTagCompound();
-
-        if(nmsStack.hasTag()){
-            tag = nmsStack.getTag();
+    public String getTag(ToolItemStack toolItemStack, String key, String def) {
+        ItemStack nmsStack = (ItemStack) toolItemStack.getNMSItem();
+        NBTTagCompound tagCompound = nmsStack.getTag();
+        if(tagCompound == null){
+            nmsStack.setTag(new NBTTagCompound());
+            tagCompound = nmsStack.getTag();
         }
-
-        if(tag.hasKey(key)){
-            return tag.getString(key);
-        }
-
-        return def;
+        return tagCompound.hasKey(key)  ? tagCompound.getString(key) : def;
     }
 
     @Override
-    public org.bukkit.inventory.ItemStack setTag(org.bukkit.inventory.ItemStack is, String key, String value) {
-        ItemStack nmsStack = CraftItemStack.asNMSCopy(is);
-        NBTTagCompound tag = new NBTTagCompound();
-
-        if(nmsStack.hasTag()){
-            tag = nmsStack.getTag();
+    public void setTag(ToolItemStack toolItemStack, String key, String value) {
+        ItemStack nmsStack = (ItemStack) toolItemStack.getNMSItem();
+        NBTTagCompound tagCompound = nmsStack.getTag();
+        if(tagCompound == null){
+            nmsStack.setTag(new NBTTagCompound());
+            tagCompound = nmsStack.getTag();
         }
-
-        tag.setString(key, value);
-
-        nmsStack.setTag(tag);
-
-        return CraftItemStack.asBukkitCopy(nmsStack);
+        tagCompound.setString(key, value);
     }
 
     @Override
-    public List<UUID> getTasks(org.bukkit.inventory.ItemStack itemStack) {
-        ItemStack nmsStack = CraftItemStack.asNMSCopy(itemStack);
-        NBTTagCompound tag = nmsStack.hasTag() ? nmsStack.getTag() : new NBTTagCompound();
-        List<UUID> taskIds = new ArrayList<>();
+    public void clearTasks(ToolItemStack toolItemStack) {
+        ItemStack nmsStack = (ItemStack) toolItemStack.getNMSItem();
+        NBTTagCompound tagCompound = nmsStack.getTag();
+        if(tagCompound == null){
+            nmsStack.setTag(new NBTTagCompound());
+            tagCompound = nmsStack.getTag();
+        }
+        tagCompound.remove("task-id");
+    }
 
-        if(tag.hasKeyOfType("task-id", 8)){
+    @Override
+    public void breakTool(ToolItemStack toolItemStack, Player player) {
+        ItemStack nmsStack = (ItemStack) toolItemStack.getNMSItem();
+        EntityPlayer entityPlayer = ((CraftPlayer) player).getHandle();
+
+        entityPlayer.a(nmsStack);
+        nmsStack.count -= 1;
+
+        entityPlayer.a(StatisticList.BREAK_ITEM_COUNT[Item.getId(nmsStack.getItem())]);
+        if (nmsStack.count == 0 && nmsStack.getItem() instanceof ItemBow) {
+            entityPlayer.bG();
+        }
+
+        if (nmsStack.count < 0)
+            nmsStack.count = 0;
+
+        if (nmsStack.count == 0)
+            CraftEventFactory.callPlayerItemBreakEvent(entityPlayer, nmsStack);
+
+        nmsStack.setData(0);
+    }
+
+    @Override
+    public Object[] createSyncedItem(org.bukkit.inventory.ItemStack other) {
+        CraftItemStack craftItemStack;
+        ItemStack handle = null;
+        if(other instanceof CraftItemStack){
+            craftItemStack = (CraftItemStack) other;
             try {
-                taskIds.add(UUID.fromString(tag.getString("task-id")));
-            }catch(Exception ignored){}
-        }
-        else if(tag.hasKeyOfType("task-id", 9)){
-            NBTTagList nbtTagList = tag.getList("task-id", 8);
-            for(int i = 0; i < nbtTagList.size(); i++){
-                try {
-                    taskIds.add(UUID.fromString(nbtTagList.getString(i)));
-                }catch(Exception ignored){}
+                handle = (ItemStack) customItemStackHandleField.get(other);
+            }catch (Exception ex){
+                ex.printStackTrace();
             }
+        }else{
+            handle = CraftItemStack.asNMSCopy(other);
+            craftItemStack = CraftItemStack.asCraftMirror(handle);
         }
 
-        return taskIds;
-    }
-
-    @Override
-    public org.bukkit.inventory.ItemStack addTask(org.bukkit.inventory.ItemStack itemStack, UUID taskId) {
-        ItemStack nmsStack = CraftItemStack.asNMSCopy(itemStack);
-        NBTTagCompound tag = nmsStack.hasTag() ? nmsStack.getTag() : new NBTTagCompound();
-        NBTTagList nbtTagList;
-
-        if(tag.hasKeyOfType("task-id", 9)){
-            nbtTagList = tag.getList("task-id", 8);
-        }
-        else{
-            nbtTagList = new NBTTagList();
-            if(tag.hasKeyOfType("task-id", 8))
-                nbtTagList.add(tag.get("task-id"));
-        }
-
-        nbtTagList.add(new NBTTagString(taskId.toString()));
-        tag.set("task-id", nbtTagList);
-
-        nmsStack.setTag(tag);
-
-        return CraftItemStack.asCraftMirror(nmsStack);
-    }
-
-    @Override
-    public org.bukkit.inventory.ItemStack removeTask(org.bukkit.inventory.ItemStack itemStack, UUID taskId) {
-        ItemStack nmsStack = CraftItemStack.asNMSCopy(itemStack);
-        NBTTagCompound tag = nmsStack.hasTag() ? nmsStack.getTag() : new NBTTagCompound();
-        NBTTagList nbtTagList = new NBTTagList();
-
-        if(tag.hasKeyOfType("task-id", 9)){
-            NBTTagList currentTaskIds = tag.getList("task-id", 8);
-            for(int i = 0; i < currentTaskIds.size(); i++){
-                String tagString = currentTaskIds.getString(i);
-                if(!tagString.equals(taskId.toString()) && ToolTaskManager.isTaskActive(UUID.fromString(tagString))) {
-                    nbtTagList.add(new NBTTagString(tagString));
-                }
-            }
-        }
-        else{
-            if(tag.hasKeyOfType("task-id", 8)) {
-                NBTTagString tagString = (NBTTagString) tag.get("task-id");
-                if(!tagString.a_().equals(taskId.toString()) && ToolTaskManager.isTaskActive(UUID.fromString(tagString.a_())))
-                    nbtTagList.add(tagString);
-            }
-        }
-
-        tag.set("task-id", nbtTagList);
-
-        nmsStack.setTag(tag);
-
-        return CraftItemStack.asCraftMirror(nmsStack);
-    }
-
-    @Override
-    public org.bukkit.inventory.ItemStack clearTasks(org.bukkit.inventory.ItemStack itemStack) {
-        ItemStack nmsStack = CraftItemStack.asNMSCopy(itemStack);
-        NBTTagCompound tag = nmsStack.getTag();
-
-        if(tag != null)
-            tag.remove("task-id");
-
-        return CraftItemStack.asCraftMirror(nmsStack);
+        return new Object[] {craftItemStack, handle};
     }
 
     @Override
@@ -373,17 +318,6 @@ public final class NMSAdapter_v1_7_R4 implements NMSAdapter {
     @Override
     public org.bukkit.inventory.ItemStack getItemInHand(Player player, Event e) {
         return getItemInHand(player);
-    }
-
-    @Override
-    public void setItemInHand(Player player, org.bukkit.inventory.ItemStack itemStack) {
-        PlayerInventory playerInventory = ((CraftInventoryPlayer) player.getInventory()).getInventory();
-        playerInventory.setItem(playerInventory.itemInHandIndex, CraftItemStack.asNMSCopy(itemStack));
-    }
-
-    @Override
-    public void setItemInHand(Player player, org.bukkit.inventory.ItemStack itemStack, Event event) {
-        setItemInHand(player, itemStack);
     }
 
     @Override
@@ -539,11 +473,6 @@ public final class NMSAdapter_v1_7_R4 implements NMSAdapter {
     @Override
     public boolean isOutsideWorldborder(Location location) {
         return false;
-    }
-
-    @Override
-    public Object getBlockData(Material type, byte data) {
-        throw new UnsupportedOperationException("That's not possible to create block data in 1.7");
     }
 
     @Override

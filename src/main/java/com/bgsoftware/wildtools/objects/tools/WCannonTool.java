@@ -3,7 +3,6 @@ package com.bgsoftware.wildtools.objects.tools;
 import com.bgsoftware.wildtools.api.events.CannonWandUseEvent;
 import com.bgsoftware.wildtools.objects.WSelection;
 import com.bgsoftware.wildtools.utils.items.ItemUtils;
-import com.bgsoftware.wildtools.utils.items.ToolTaskManager;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -27,9 +26,9 @@ import java.util.stream.Collectors;
 @SuppressWarnings("WeakerAccess")
 public final class WCannonTool extends WTool implements CannonTool {
 
-    private static Map<UUID, WSelection> selections = new HashMap<>();
+    private static final Map<UUID, WSelection> selections = new HashMap<>();
 
-    private int tntAmount;
+    private final int tntAmount;
 
     public WCannonTool(Material type, String name, int tntAmount){
         super(type, name, ToolMode.CANNON);
@@ -69,8 +68,6 @@ public final class WCannonTool extends WTool implements CannonTool {
             return false;
         }
 
-        UUID taskId = ToolTaskManager.generateTaskId(e.getItem(), e.getPlayer());
-
         List<Dispenser> dispenserList = selection.getDispensers(this);
 
         int filledDispensers = 0;
@@ -105,10 +102,9 @@ public final class WCannonTool extends WTool implements CannonTool {
         Bukkit.getPluginManager().callEvent(cannonWandUseEvent);
 
         if(filledDispensers > 0){
-            reduceDurablility(e.getPlayer(), 1, taskId);
+            reduceDurablility(e.getPlayer(), 1, e.getItem());
             Locale.FILLED_DISPENSERS.send(e.getPlayer(), filledDispensers, totalTNT);
         } else {
-            ToolTaskManager.removeTask(taskId);
             Locale.NO_FILLED_DISPENSERS.send(e.getPlayer(), filledDispensers, totalTNT);
         }
 

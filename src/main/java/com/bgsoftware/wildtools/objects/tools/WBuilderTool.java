@@ -4,7 +4,6 @@ import com.bgsoftware.wildtools.api.events.BuilderWandUseEvent;
 import com.bgsoftware.wildtools.utils.BukkitUtils;
 import com.bgsoftware.wildtools.utils.blocks.BlocksController;
 import com.bgsoftware.wildtools.utils.inventory.InventoryUtils;
-import com.bgsoftware.wildtools.utils.items.ToolTaskManager;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -15,8 +14,6 @@ import org.bukkit.inventory.ItemStack;
 import com.bgsoftware.wildtools.Locale;
 import com.bgsoftware.wildtools.api.objects.ToolMode;
 import com.bgsoftware.wildtools.api.objects.tools.BuilderTool;
-
-import java.util.UUID;
 
 public final class WBuilderTool extends WTool implements BuilderTool {
 
@@ -49,7 +46,6 @@ public final class WBuilderTool extends WTool implements BuilderTool {
         if(!e.getClickedBlock().getType().isSolid())
             return false;
 
-        UUID taskId = ToolTaskManager.generateTaskId(e.getItem(), e.getPlayer());
         BlockFace blockFace = e.getBlockFace();
 
         ItemStack blockItemStack;
@@ -78,7 +74,7 @@ public final class WBuilderTool extends WTool implements BuilderTool {
 
         BlocksController blocksController = new BlocksController();
         boolean usingDurability = isUsingDurability();
-        int toolIterations = Math.min(usingDurability ? getDurability(e.getPlayer(), taskId) : length, Math.min(amountOfBlocks, length));
+        int toolIterations = Math.min(usingDurability ? getDurability(e.getPlayer(), e.getItem()) : length, Math.min(amountOfBlocks, length));
         int iter;
 
         Block originalBlock = e.getClickedBlock();
@@ -103,11 +99,8 @@ public final class WBuilderTool extends WTool implements BuilderTool {
         if(amountOfBlocks < length)
             Locale.BUILDER_NO_BLOCK.send(e.getPlayer(), e.getClickedBlock().getType().name());
 
-        if(iter > 0) {
-            reduceDurablility(e.getPlayer(), usingDurability ? iter : 1, taskId);
-        } else {
-            ToolTaskManager.removeTask(taskId);
-        }
+        if(iter > 0)
+            reduceDurablility(e.getPlayer(), usingDurability ? iter : 1, e.getItem());
 
         return true;
     }

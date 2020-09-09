@@ -5,15 +5,11 @@ import com.bgsoftware.wildtools.WildToolsPlugin;
 import com.bgsoftware.wildtools.objects.WSelection;
 import com.bgsoftware.wildtools.objects.tools.WCannonTool;
 import com.bgsoftware.wildtools.utils.items.ItemUtils;
-import com.bgsoftware.wildtools.utils.items.ToolTaskManager;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.entity.PlayerDeathEvent;
-import org.bukkit.event.player.PlayerDropItemEvent;
-import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.ChatColor;
 import org.bukkit.event.EventHandler;
@@ -24,7 +20,6 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import com.bgsoftware.wildtools.api.objects.tools.Tool;
-import org.bukkit.inventory.PlayerInventory;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -39,7 +34,7 @@ public final class PlayerListener implements Listener {
     Just notifies me if the server is using WildBuster
      */
 
-    private WildToolsPlugin plugin;
+    private final WildToolsPlugin plugin;
 
     public PlayerListener(WildToolsPlugin plugin){
         this.plugin = plugin;
@@ -66,20 +61,9 @@ public final class PlayerListener implements Listener {
 
         if(selection != null)
             selection.remove();
-
-        PlayerInventory playerInventory = e.getPlayer().getInventory();
-
-        for(int i = 0; i < playerInventory.getSize(); i++){
-            ItemStack itemStack = playerInventory.getItem(i);
-            if(itemStack != null){
-                ItemStack newItem = ToolTaskManager.clearTasks(itemStack);
-                if(!itemStack.equals(newItem))
-                    playerInventory.setItem(i, newItem);
-            }
-        }
     }
 
-    private Map<UUID, List<ItemStack>> keepInventoryTools = new HashMap<>();
+    private final Map<UUID, List<ItemStack>> keepInventoryTools = new HashMap<>();
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerDeath(PlayerDeathEvent e){
@@ -111,35 +95,6 @@ public final class PlayerListener implements Listener {
             List<ItemStack> toAdd = keepInventoryTools.get(e.getPlayer().getUniqueId());
             keepInventoryTools.remove(e.getPlayer().getUniqueId());
             toAdd.forEach(itemStack -> ItemUtils.addItem(itemStack, e.getPlayer().getInventory(), e.getPlayer().getLocation()));
-        }
-    }
-
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onToolDrop(PlayerDropItemEvent e){
-        List<UUID> taskIds = plugin.getNMSAdapter().getTasks(e.getItemDrop().getItemStack());
-        if(!taskIds.isEmpty())
-            taskIds.forEach(taskId -> ToolTaskManager.handleDropItem(taskId, e.getItemDrop()));
-    }
-
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onToolDrop(PlayerPickupItemEvent e){
-        List<UUID> taskIds = plugin.getNMSAdapter().getTasks(e.getItem().getItemStack());
-        if(!taskIds.isEmpty())
-            taskIds.forEach(taskId -> ToolTaskManager.handlePickupItem(taskId, e.getPlayer()));
-    }
-
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onToolDrop(PlayerDeathEvent e){
-        List<ItemStack>  drops = new ArrayList<>(e.getDrops());
-        for(ItemStack itemStack : drops) {
-            if(itemStack != null && itemStack.getType() != Material.AIR) {
-                List<UUID> taskIds = plugin.getNMSAdapter().getTasks(itemStack);
-                if (!taskIds.isEmpty()) {
-                    e.getDrops().remove(itemStack);
-                    Item droppedItem = e.getEntity().getWorld().dropItemNaturally(e.getEntity().getLocation(), itemStack);
-                    taskIds.forEach(taskId -> ToolTaskManager.handleDropItem(taskId, droppedItem));
-                }
-            }
         }
     }
 

@@ -2,7 +2,6 @@ package com.bgsoftware.wildtools.objects.tools;
 
 import com.bgsoftware.wildtools.api.events.LightningWandUseEvent;
 import com.bgsoftware.wildtools.utils.Executor;
-import com.bgsoftware.wildtools.utils.items.ToolTaskManager;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
@@ -19,7 +18,6 @@ import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 public final class WLightningTool extends WTool implements LightningTool {
 
@@ -58,12 +56,10 @@ public final class WLightningTool extends WTool implements LightningTool {
     private void handleUse(Player player, ItemStack usedItem, Entity entity){
         List<Entity> nearbyEntities = entity.getNearbyEntities(3, 3, 3);
 
-        UUID taskId = ToolTaskManager.generateTaskId(usedItem, player);
-
         Executor.async(() -> {
             List<Creeper> creeperList = new ArrayList<>();
 
-            int toolDurability = getDurability(player, taskId);
+            int toolDurability = getDurability(player, usedItem);
             boolean usingDurability = isUsingDurability();
 
             if(entity instanceof Creeper && (!usingDurability || creeperList.size() < toolDurability)) {
@@ -88,11 +84,8 @@ public final class WLightningTool extends WTool implements LightningTool {
                     creeper.setPowered(true);
             });
 
-            if(creeperList.size() > 0) {
-                reduceDurablility(player, usingDurability ? creeperList.size() : 1, taskId);
-            } else {
-                ToolTaskManager.removeTask(taskId);
-            }
+            if(creeperList.size() > 0)
+                reduceDurablility(player, usingDurability ? creeperList.size() : 1, usedItem);
 
         });
     }

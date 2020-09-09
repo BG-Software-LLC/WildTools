@@ -3,7 +3,6 @@ package com.bgsoftware.wildtools.objects.tools;
 import com.bgsoftware.wildtools.api.events.CuboidWandUseEvent;
 import com.bgsoftware.wildtools.utils.BukkitUtils;
 import com.bgsoftware.wildtools.utils.blocks.BlocksController;
-import com.bgsoftware.wildtools.utils.items.ToolTaskManager;
 import org.bukkit.Bukkit;
 import org.bukkit.event.block.BlockBreakEvent;
 import com.bgsoftware.wildtools.api.objects.tools.CuboidTool;
@@ -12,8 +11,7 @@ import com.bgsoftware.wildtools.api.objects.ToolMode;
 import org.bukkit.block.Block;
 import org.bukkit.Location;
 import org.bukkit.Material;
-
-import java.util.UUID;
+import org.bukkit.inventory.ItemStack;
 
 public final class WCuboidTool extends WTool implements CuboidTool {
 
@@ -30,7 +28,7 @@ public final class WCuboidTool extends WTool implements CuboidTool {
 
     @Override
     public boolean onBlockBreak(BlockBreakEvent e) {
-        UUID taskId = ToolTaskManager.generateTaskId(e.getPlayer().getItemInHand(), e.getPlayer());
+        ItemStack inHand = e.getPlayer().getItemInHand();
         int radius = breakLevel / 2;
 
         Location max = e.getBlock().getLocation().add(radius, radius, radius),
@@ -40,7 +38,7 @@ public final class WCuboidTool extends WTool implements CuboidTool {
         short firstData = e.getBlock().getState().getData().toItemStack().getDurability();
 
         BlocksController blocksController = new BlocksController();
-        int toolDurability = getDurability(e.getPlayer(), taskId);
+        int toolDurability = getDurability(e.getPlayer(), inHand);
         boolean usingDurability = isUsingDurability();
         int toolUsages = 0;
 
@@ -57,7 +55,7 @@ public final class WCuboidTool extends WTool implements CuboidTool {
                             !BukkitUtils.canBreakBlock(targetBlock, firstType, firstData, this))
                         continue;
 
-                   if(BukkitUtils.breakBlock(e.getPlayer(), blocksController, targetBlock, e.getPlayer().getItemInHand(), this, itemStack -> itemStack))
+                   if(BukkitUtils.breakBlock(e.getPlayer(), blocksController, targetBlock, inHand, this, itemStack -> itemStack))
                         toolUsages++;
                 }
             }
@@ -68,11 +66,8 @@ public final class WCuboidTool extends WTool implements CuboidTool {
 
         blocksController.updateSession();
 
-        if(toolUsages > 0) {
-            reduceDurablility(e.getPlayer(), usingDurability ? toolUsages : 1, taskId);
-        } else {
-            ToolTaskManager.removeTask(taskId);
-        }
+        if(toolUsages > 0)
+            reduceDurablility(e.getPlayer(), usingDurability ? toolUsages : 1, inHand);
 
         return true;
     }

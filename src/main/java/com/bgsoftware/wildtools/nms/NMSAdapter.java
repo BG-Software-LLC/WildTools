@@ -1,6 +1,7 @@
 package com.bgsoftware.wildtools.nms;
 
 import com.bgsoftware.wildtools.recipes.AdvancedShapedRecipe;
+import com.bgsoftware.wildtools.utils.items.ToolItemStack;
 import org.apache.commons.lang.Validate;
 import org.bukkit.Chunk;
 import org.bukkit.CropState;
@@ -8,7 +9,6 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -20,12 +20,10 @@ import org.bukkit.inventory.Recipe;
 import org.bukkit.inventory.ShapedRecipe;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 
 public interface NMSAdapter {
 
@@ -43,29 +41,23 @@ public interface NMSAdapter {
 
     void dropExp(Location location, int exp);
 
-    int getTag(ItemStack is, String key, int def);
-
-    ItemStack setTag(ItemStack is, String key, int value);
-
-    String getTag(ItemStack is, String key, String def);
-
-    ItemStack setTag(ItemStack is, String key, String value);
-
     ItemStack getItemInHand(Player player);
 
     ItemStack getItemInHand(Player player, Event e);
 
-    List<UUID> getTasks(ItemStack itemStack);
+    Object[] createSyncedItem(ItemStack other);
 
-    ItemStack addTask(ItemStack itemStack, UUID taskId);
+    void setTag(ToolItemStack toolItemStack, String key, int value);
 
-    ItemStack removeTask(ItemStack itemStack, UUID taskId);
+    void setTag(ToolItemStack toolItemStack, String key, String value);
 
-    ItemStack clearTasks(ItemStack itemStack);
+    int getTag(ToolItemStack toolItemStack, String key, int def);
 
-    void setItemInHand(Player player, ItemStack itemStack);
+    String getTag(ToolItemStack toolItemStack, String key, String def);
 
-    void setItemInHand(Player player, ItemStack itemStack, Event event);
+    void clearTasks(ToolItemStack toolItemStack);
+
+    void breakTool(ToolItemStack toolItemStack, Player player);
 
     boolean isFullyGrown(Block block);
 
@@ -87,8 +79,6 @@ public interface NMSAdapter {
 
     boolean isOutsideWorldborder(Location location);
 
-    Object getBlockData(Material type, byte data);
-
     BlockPlaceEvent getFakePlaceEvent(Player player, Location location, Block copyBlock);
 
     void playPickupAnimation(LivingEntity livingEntity, Item item);
@@ -96,10 +86,6 @@ public interface NMSAdapter {
     boolean isAxeType(Material material);
 
     boolean isShovelType(Material material);
-
-    default Collection<Entity> getNearbyEntities(Location location, double range){
-        return new ArrayList<>();
-    }
 
     default ItemStack[] parseChoice(Recipe recipe, ItemStack itemStack){
         return new ItemStack[] {itemStack};

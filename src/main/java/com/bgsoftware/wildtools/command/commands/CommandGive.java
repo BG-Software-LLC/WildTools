@@ -1,9 +1,9 @@
 package com.bgsoftware.wildtools.command.commands;
 
+import com.bgsoftware.wildtools.utils.items.ToolItemStack;
 import com.bgsoftware.wildtools.utils.items.ItemUtils;
 
 import com.bgsoftware.wildtools.utils.NumberUtils;
-import org.bukkit.inventory.ItemStack;
 import com.bgsoftware.wildtools.Locale;
 import com.bgsoftware.wildtools.WildToolsPlugin;
 import com.bgsoftware.wildtools.api.objects.tools.Tool;
@@ -84,11 +84,10 @@ public final class CommandGive implements ICommand {
         }
 
         for(int i = 0; i < amount; i++){
-            ItemStack toolItem = tool.getFormattedItemStack(uses > -1 ? uses : tool.getDefaultUses());
+            ToolItemStack toolItem = (ToolItemStack) tool.getFormattedItemStack(uses > -1 ? uses : tool.getDefaultUses());
 
-            if(uses > -1){
-                toolItem = plugin.getNMSAdapter().setTag(toolItem, "tool-uses", uses);
-            }
+            if(uses > -1)
+                toolItem.setUses(uses);
 
             ItemUtils.addItem(toolItem, pl.getInventory(), pl.getLocation());
         }

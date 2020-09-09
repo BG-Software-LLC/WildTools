@@ -14,6 +14,7 @@ import com.bgsoftware.wildtools.objects.tools.WMagnetTool;
 import com.bgsoftware.wildtools.objects.tools.WPillarTool;
 import com.bgsoftware.wildtools.objects.tools.WSellTool;
 import com.bgsoftware.wildtools.objects.tools.WSortTool;
+import com.bgsoftware.wildtools.utils.items.ToolItemStack;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -125,7 +126,10 @@ public final class ToolsHandler implements ToolsManager {
         if(itemStack == null)
             return null;
 
-        String toolName = plugin.getNMSAdapter().getTag(itemStack, "tool-type", "");
+        ToolItemStack toolItemStack = ToolItemStack.of(itemStack);
+
+        String toolName = toolItemStack.getToolType();
+
         Tool toolByName = getTool(toolName);
 
         if(toolByName != null)
@@ -201,12 +205,13 @@ public final class ToolsHandler implements ToolsManager {
 
     @Override
     public boolean isOwningTool(ItemStack itemStack, Player player) {
-        Tool tool = getTool(itemStack);
+        ToolItemStack toolItemStack = ToolItemStack.of(itemStack);
+        Tool tool = getTool(toolItemStack);
 
         if(tool == null || !tool.isPrivate())
             return true;
 
-        String uuid = plugin.getNMSAdapter().getTag(itemStack, "tool-owner", "");
+        String uuid = toolItemStack.getOwner();
 
         return uuid.isEmpty() || player.getUniqueId().toString().equals(uuid);
     }

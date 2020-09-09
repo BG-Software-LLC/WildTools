@@ -375,16 +375,16 @@ public interface Tool {
      * Reduce durability of an item of this tool.
      * @param pl The player which holds/used the tool.
      * @param amount The amount of durability to remove.
-     * @param taskId The task id of the item.
+     * @param itemStack The item to reduce it's durability.
      */
-    void reduceDurablility(Player pl, int amount, UUID taskId);
+    void reduceDurablility(Player pl, int amount, ItemStack itemStack);
 
     /**
      * Get the durability of an item of this tool.
      * @param player The player which holds/used the tool.
-     * @param taskId The task id of the item.
+     * @param itemStack The item to check.
      */
-    int getDurability(Player player, UUID taskId);
+    int getDurability(Player player, ItemStack itemStack);
 
     /**
      * Check whether or not the tool can break a block.

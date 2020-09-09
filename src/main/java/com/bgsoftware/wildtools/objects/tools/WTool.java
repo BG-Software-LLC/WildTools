@@ -1,10 +1,7 @@
 package com.bgsoftware.wildtools.objects.tools;
 
-import com.bgsoftware.wildtools.api.objects.tools.HarvesterTool;
+import com.bgsoftware.wildtools.utils.items.ToolItemStack;
 import com.bgsoftware.wildtools.utils.items.ItemUtils;
-import com.bgsoftware.wildtools.utils.items.ToolTaskManager;
-import org.bukkit.GameMode;
-import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -24,7 +21,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -33,7 +29,6 @@ import java.util.stream.Collectors;
 public abstract class WTool implements Tool {
 
     protected static WildToolsPlugin plugin = WildToolsPlugin.getPlugin();
-    private static final Map<Location, Object> toolMutexes = new HashMap<>();
 
     public static Set<UUID> toolBlockBreak;
 
@@ -41,7 +36,7 @@ public abstract class WTool implements Tool {
 
     private Map<UUID, Long> lastUses;
 
-    private ItemStack is;
+    private ToolItemStack toolItemStack;
     private int usesLeft;
     private String name, toolMode;
     private boolean onlySameType, onlyInsideClaim, unbreakable, autoCollect, instantBreak, silkTouch, keepInventory, omni, privateTool;
@@ -54,7 +49,7 @@ public abstract class WTool implements Tool {
     /***********************************************************************************/
 
     public WTool(Material type, String name, ToolMode toolMode){
-        this.is = new ItemStack(type, 1);
+        this.toolItemStack = ToolItemStack.of(type);
         this.toolMode = toolMode.name();
         this.name = name;
         this.usesLeft = -1;
@@ -80,29 +75,29 @@ public abstract class WTool implements Tool {
 
     @Override
     public void setDisplayName(String name){
-        ItemMeta im = is.getItemMeta();
+        ItemMeta im = toolItemStack.getItemMeta();
         im.setDisplayName(ChatColor.translateAlternateColorCodes('&', name));
-        is.setItemMeta(im);
+        toolItemStack.setItemMeta(im);
     }
 
     @Override
     public void setLore(List<String> lore){
-        ItemMeta im = is.getItemMeta();
+        ItemMeta im = toolItemStack.getItemMeta();
         List<String> _lore = new ArrayList<>();
 
         for(String line : lore)
             _lore.add(ChatColor.translateAlternateColorCodes('&', line));
 
         im.setLore(_lore);
-        is.setItemMeta(im);
+        toolItemStack.setItemMeta(im);
     }
 
     @Override
     public void setSpigotUnbreakable(boolean spigotUnbreakable) {
         try {
-            ItemMeta itemMeta = is.getItemMeta();
+            ItemMeta itemMeta = toolItemStack.getItemMeta();
             ItemMeta.class.getMethod("setUnbreakable", boolean.class).invoke(itemMeta, spigotUnbreakable);
-            is.setItemMeta(itemMeta);
+            toolItemStack.setItemMeta(itemMeta);
         }catch(Throwable ignored){}
     }
 
@@ -163,9 +158,9 @@ public abstract class WTool implements Tool {
 
     @Override
     public void addEnchantment(Enchantment ench, int level){
-        ItemMeta im = is.getItemMeta();
+        ItemMeta im = toolItemStack.getItemMeta();
         im.addEnchant(ench, level, true);
-        is.setItemMeta(im);
+        toolItemStack.setItemMeta(im);
     }
 
     @Override
@@ -217,7 +212,7 @@ public abstract class WTool implements Tool {
 
     @Override
     public ItemStack getItemStack(){
-        return is.clone();
+        return toolItemStack.clone();
     }
 
     @Override
@@ -227,13 +222,11 @@ public abstract class WTool implements Tool {
 
     @Override
     public ItemStack getFormattedItemStack(int uses) {
-        ItemStack is = this.is.clone();
-
-        ItemUtils.formatItemStack(this, is, uses, false, false, null);
-
-        is = plugin.getNMSAdapter().setTag(is, "tool-type", getName().toLowerCase());
-
-        return is;
+        ToolItemStack toolItemStack = (ToolItemStack) getItemStack();
+        toolItemStack.setToolType(getName());
+        toolItemStack.setUses(uses);
+        ItemUtils.formatItemStack(toolItemStack);
+        return toolItemStack;
     }
 
     @Override
@@ -404,86 +397,13 @@ public abstract class WTool implements Tool {
     /***********************************************************************************/
 
     @Override
-    public void reduceDurablility(Player pl, int amount, UUID taskId) {
-        ItemStack is = ToolTaskManager.getItemFromTask(taskId);
-
-        if(isUnbreakable() || pl.getGameMode() == GameMode.CREATIVE) {
-            ToolTaskManager.setItemOfTask(taskId, is);
-            ToolTaskManager.removeTask(taskId);
-            return;
-        }
-
-        ItemStack originalItem = is.clone();
-        boolean giveOriginal = is.getAmount() > 1;
-
-        if(is.getAmount() > 1){
-            is.setAmount(1);
-            originalItem.setAmount(originalItem.getAmount() - 1);
-        }
-
-        if(isUsingDurability()){
-            int unbLevel = is.getEnchantmentLevel(Enchantment.DURABILITY);
-
-            // Durability Reduce Chance: (100/(Level+1))%
-            if (unbLevel != 0) {
-                int chance = new Random().nextInt(100);
-                if (chance > (100 / (unbLevel + 1))) {
-                    ToolTaskManager.setItemOfTask(taskId, is);
-                    ToolTaskManager.removeTask(taskId);
-                    return;
-                }
-            }
-
-            is.setDurability((short) (is.getDurability() + amount));
-
-            if(is.getDurability() > is.getType().getMaxDurability()) {
-                is = new ItemStack(Material.AIR);
-            }
-        }
-
-        else{
-            int usesLeft = plugin.getNMSAdapter().getTag(is, "tool-uses", getDefaultUses());
-            is = plugin.getNMSAdapter().setTag(is, "tool-uses", (usesLeft -= amount));
-
-            if (usesLeft <= 0) {
-                is = new ItemStack(Material.AIR);
-            }
-
-            //Update name and lore
-            else if(is.hasItemMeta()){
-                final ItemStack ITEM_STACK = is;
-                ItemUtils.formatItemStack(
-                        this,
-                        ITEM_STACK,
-                        getDefaultUses(),
-                        this instanceof HarvesterTool && ((WHarvesterTool) this).hasSellMode(is),
-                        () -> {
-                            ToolTaskManager.setItemOfTask(taskId, ITEM_STACK);
-                            if(giveOriginal)
-                                ItemUtils.addItem(originalItem, pl.getInventory(), pl.getLocation());
-                            ToolTaskManager.removeTask(taskId);
-                        }
-                );
-                return;
-            }
-        }
-
-        ToolTaskManager.setItemOfTask(taskId, is);
-
-        if(giveOriginal)
-            ItemUtils.addItem(originalItem, pl.getInventory(), pl.getLocation());
-
-        ToolTaskManager.removeTask(taskId);
+    public void reduceDurablility(Player pl, int amount, ItemStack toolItem) {
+        ItemUtils.reduceDurability(ToolItemStack.of(toolItem), pl, amount);
     }
 
     @Override
-    public int getDurability(Player player, UUID taskId) {
-        if(isUnbreakable() || player.getGameMode() == GameMode.CREATIVE)
-            return Integer.MAX_VALUE;
-
-        ItemStack is = ToolTaskManager.getItemFromTask(taskId);
-
-        return isUsingDurability() ? is.getType().getMaxDurability() - is.getDurability() + 1 : plugin.getNMSAdapter().getTag(is, "tool-uses", getDefaultUses());
+    public int getDurability(Player player, ItemStack itemStack) {
+        return ItemUtils.getDurability(player, ToolItemStack.of(itemStack));
     }
 
     @Override
@@ -518,24 +438,26 @@ public abstract class WTool implements Tool {
 
     @Override
     public boolean isSimilar(ItemStack is){
-        if(plugin.getNMSAdapter().getTag(is, "tool-type", "").equals(getName().toLowerCase()))
+        ToolItemStack other = ToolItemStack.of(is);
+
+        if(other.getToolType().equals(getName().toLowerCase()))
             return true;
 
-        if(this.is.getType() != is.getType() || this.is.hasItemMeta() != is.hasItemMeta())
+        if(this.toolItemStack.getType() != is.getType() || this.toolItemStack.hasItemMeta() != is.hasItemMeta())
             return false;
 
-        if(this.is.hasItemMeta()){
-            int usesLeft = plugin.getNMSAdapter().getTag(is, "tool-uses", getDefaultUses());
-            if(this.is.getItemMeta().hasDisplayName()) {
+        if(this.toolItemStack.hasItemMeta()){
+            int usesLeft = other.getUses();
+            if(this.toolItemStack.getItemMeta().hasDisplayName()) {
                 if(!is.getItemMeta().hasDisplayName())
                     return false;
-                if (!is.getItemMeta().getDisplayName().equals(this.is.getItemMeta().getDisplayName().replace("{}", usesLeft + "")))
+                if (!is.getItemMeta().getDisplayName().equals(this.toolItemStack.getItemMeta().getDisplayName().replace("{}", usesLeft + "")))
                     return false;
             }
-            if(this.is.getItemMeta().hasLore()) {
+            if(this.toolItemStack.getItemMeta().hasLore()) {
                 if(!is.getItemMeta().hasLore())
                     return false;
-                if (!is.getItemMeta().getLore().toString().equals(this.is.getItemMeta().getLore().toString().replace("{}", usesLeft + "")))
+                if (!is.getItemMeta().getLore().toString().equals(this.toolItemStack.getItemMeta().getLore().toString().replace("{}", usesLeft + "")))
                     return false;
             }
         }
@@ -595,21 +517,6 @@ public abstract class WTool implements Tool {
     }
 
     /***********************************************************************************/
-
-    protected static Object getToolMutex(Block block){
-        Location location = block.getLocation();
-        if(!toolMutexes.containsKey(location))
-            toolMutexes.put(location, new Object());
-        return toolMutexes.get(location);
-    }
-
-    public static boolean isToolMutex(Block block){
-        return toolMutexes.containsKey(block.getLocation());
-    }
-
-    protected static void removeToolMutex(Block block){
-        toolMutexes.remove(block.getLocation());
-    }
 
     private boolean isMaterialInList(Material type, short data, Set<String> list){
         for(String mat : list) {

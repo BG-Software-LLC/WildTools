@@ -3,10 +3,8 @@ package com.bgsoftware.wildtools.objects.tools;
 import com.bgsoftware.wildtools.SellWandLogger;
 import com.bgsoftware.wildtools.api.hooks.SoldItem;
 import com.bgsoftware.wildtools.utils.BukkitUtils;
-import com.bgsoftware.wildtools.utils.Executor;
 import com.bgsoftware.wildtools.utils.NumberUtils;
 import com.bgsoftware.wildtools.api.hooks.SellInfo;
-import com.bgsoftware.wildtools.utils.items.ToolTaskManager;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.block.BlockState;
@@ -21,7 +19,6 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 
 import java.util.Map;
-import java.util.UUID;
 
 public final class WSellTool extends WTool implements SellTool {
 
@@ -48,55 +45,42 @@ public final class WSellTool extends WTool implements SellTool {
             return false;
         }
 
-        UUID taskId = ToolTaskManager.generateTaskId(e.getItem(), e.getPlayer());
+        SellInfo sellInfo = plugin.getProviders().sellContainer(blockState, inventory, e.getPlayer());
 
-        Executor.async(() -> {
-            synchronized (getToolMutex(e.getClickedBlock())) {
-                try {
-                    SellInfo sellInfo = plugin.getProviders().sellContainer(blockState, inventory, e.getPlayer());
+        Map<Integer, SoldItem> toSell = sellInfo.getSoldItems();
+        double totalEarnings = sellInfo.getTotalEarnings();
+        double multiplier = getMultiplier();
 
-                    Map<Integer, SoldItem> toSell = sellInfo.getSoldItems();
-                    double totalEarnings = sellInfo.getTotalEarnings();
-                    double multiplier = getMultiplier();
+        String message = toSell.isEmpty() ? Locale.NO_SELL_ITEMS.getMessage() : Locale.SOLD_CHEST.getMessage();
 
-                    String message = toSell.isEmpty() ? Locale.NO_SELL_ITEMS.getMessage() : Locale.SOLD_CHEST.getMessage();
+        SellWandUseEvent sellWandUseEvent = new SellWandUseEvent(e.getPlayer(), blockState, totalEarnings,
+                multiplier, message == null ? "" : message);
+        Bukkit.getPluginManager().callEvent(sellWandUseEvent);
 
-                    SellWandUseEvent sellWandUseEvent = new SellWandUseEvent(e.getPlayer(), blockState, totalEarnings,
-                            multiplier, message == null ? "" : message);
-                    Bukkit.getPluginManager().callEvent(sellWandUseEvent);
+        if (sellWandUseEvent.isCancelled())
+            return false;
 
-                    if (sellWandUseEvent.isCancelled())
-                        return;
+        multiplier = sellWandUseEvent.getMultiplier();
+        totalEarnings = sellWandUseEvent.getPrice() * multiplier;
 
-                    multiplier = sellWandUseEvent.getMultiplier();
-                    totalEarnings = sellWandUseEvent.getPrice() * multiplier;
+        plugin.getProviders().depositPlayer(e.getPlayer(), totalEarnings);
 
-                    plugin.getProviders().depositPlayer(e.getPlayer(), totalEarnings);
+        plugin.getProviders().removeContainer(blockState, inventory, sellInfo);
 
-                    plugin.getProviders().removeContainer(blockState, inventory, sellInfo);
+        //noinspection all
+        message = sellWandUseEvent.getMessage().replace("{0}", NumberUtils.format(totalEarnings))
+                .replace("{1}", multiplier != 1 && Locale.MULTIPLIER.getMessage() != null ? Locale.MULTIPLIER.getMessage(multiplier) : "");
 
-                    //noinspection all
-                    message = sellWandUseEvent.getMessage().replace("{0}", NumberUtils.format(totalEarnings))
-                            .replace("{1}", multiplier != 1 && Locale.MULTIPLIER.getMessage() != null ? Locale.MULTIPLIER.getMessage(multiplier) : "");
+        if (!toSell.isEmpty())
+            reduceDurablility(e.getPlayer(), 1, e.getItem());
 
-                    if (!toSell.isEmpty()) {
-                        reduceDurablility(e.getPlayer(), 1, taskId);
-                    } else {
-                        ToolTaskManager.removeTask(taskId);
-                    }
+        for(SoldItem soldItem : toSell.values()){
+            SellWandLogger.log(e.getPlayer().getName() + " sold x" + soldItem.getItem().getAmount() + " " +
+                    soldItem.getItem().getType() + " for $" + soldItem.getPrice() + " (Multiplier: " + multiplier + ")");
+        }
 
-                    for(SoldItem soldItem : toSell.values()){
-                        SellWandLogger.log(e.getPlayer().getName() + " sold x" + soldItem.getItem().getAmount() + " " +
-                                soldItem.getItem().getType() + " for $" + soldItem.getPrice() + " (Multiplier: " + multiplier + ")");
-                    }
-
-                    if (!message.isEmpty())
-                        e.getPlayer().sendMessage(message);
-                } finally {
-                    removeToolMutex(e.getClickedBlock());
-                }
-            }
-        });
+        if (!message.isEmpty())
+            e.getPlayer().sendMessage(message);
 
         return true;
     }

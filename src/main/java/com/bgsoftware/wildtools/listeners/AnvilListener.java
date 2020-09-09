@@ -3,6 +3,7 @@ package com.bgsoftware.wildtools.listeners;
 import com.bgsoftware.wildtools.WildToolsPlugin;
 import com.bgsoftware.wildtools.api.objects.tools.Tool;
 import com.bgsoftware.wildtools.utils.Executor;
+import com.bgsoftware.wildtools.utils.items.ToolItemStack;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -73,7 +74,8 @@ public final class AnvilListener implements Listener {
     public void onAnvilRecipe(PrepareAnvilEvent e){
         AnvilInventory anvilInventory = e.getInventory();
 
-        ItemStack firstItem = anvilInventory.getItem(0), secondItem = anvilInventory.getItem(1);
+        ToolItemStack firstItem = ToolItemStack.of(anvilInventory.getItem(0)),
+                secondItem = ToolItemStack.of(anvilInventory.getItem(1));
 
         Tool firstSlot = plugin.getToolsManager().getTool(firstItem),
                 secondSlot = plugin.getToolsManager().getTool(secondItem);
@@ -85,12 +87,11 @@ public final class AnvilListener implements Listener {
         String originalRenameText = renameTexts.remove(e.getInventory());
         String renameText = plugin.getNMSAdapter().getRenameText(e.getView());
 
-        int firstUses = plugin.getNMSAdapter().getTag(firstItem, "tool-uses", firstSlot.getDefaultUses());
-        int secondUses = plugin.getNMSAdapter().getTag(secondItem, "tool-uses", secondSlot.getDefaultUses());
+        int firstUses = firstItem.getUses(), secondUses = secondItem.getUses();
         int finalUses = firstSlot.hasAnvilCombineLimit() ?
                 Math.min(firstSlot.getAnvilCombineLimit(), firstUses + secondUses) : firstUses + secondUses;
 
-        ItemStack result = firstSlot.getFormattedItemStack(finalUses);
+        ToolItemStack result = (ToolItemStack) firstSlot.getFormattedItemStack(finalUses);
         ItemMeta itemMeta = result.getItemMeta();
 
         int expCost = firstSlot.getAnvilCombineExp();
@@ -110,7 +111,8 @@ public final class AnvilListener implements Listener {
         recentPrepares.add(anvilInventory);
         Executor.sync(() -> recentPrepares.remove(anvilInventory), 5L);
 
-        result = plugin.getNMSAdapter().setTag(result, "tool-uses", finalUses);
+
+        result.setUses(finalUses);
 
         e.setResult(result);
     }

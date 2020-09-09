@@ -3,7 +3,6 @@ package com.bgsoftware.wildtools.objects.tools;
 import com.bgsoftware.wildtools.api.events.PillarWandUseEvent;
 import com.bgsoftware.wildtools.utils.BukkitUtils;
 import com.bgsoftware.wildtools.utils.blocks.BlocksController;
-import com.bgsoftware.wildtools.utils.items.ToolTaskManager;
 import org.bukkit.Bukkit;
 import org.bukkit.event.player.PlayerInteractEvent;
 import com.bgsoftware.wildtools.api.objects.tools.PillarTool;
@@ -12,8 +11,6 @@ import com.bgsoftware.wildtools.api.objects.ToolMode;
 import org.bukkit.block.Block;
 import org.bukkit.Location;
 import org.bukkit.Material;
-
-import java.util.UUID;
 
 public final class WPillarTool extends WTool implements PillarTool {
 
@@ -26,13 +23,11 @@ public final class WPillarTool extends WTool implements PillarTool {
         int maxY = getPoint(e.getClickedBlock(), true), minY = getPoint(e.getClickedBlock(), false),
                 x = e.getClickedBlock().getLocation().getBlockX(), z = e.getClickedBlock().getLocation().getBlockZ();
 
-        UUID taskId = ToolTaskManager.generateTaskId(e.getItem(), e.getPlayer());
-
         Material firstType = e.getClickedBlock().getType();
         short firstData = e.getClickedBlock().getState().getData().toItemStack().getDurability();
 
         BlocksController blocksController = new BlocksController();
-        int toolDurability = getDurability(e.getPlayer(), taskId);
+        int toolDurability = getDurability(e.getPlayer(), e.getItem());
         boolean usingDurability = isUsingDurability();
         int toolUsages = 0;
 
@@ -54,11 +49,8 @@ public final class WPillarTool extends WTool implements PillarTool {
 
         blocksController.updateSession();
 
-        if(toolUsages > 0) {
-            reduceDurablility(e.getPlayer(), usingDurability ? toolUsages : 1, taskId);
-        } else {
-            ToolTaskManager.removeTask(taskId);
-        }
+        if(toolUsages > 0)
+            reduceDurablility(e.getPlayer(), usingDurability ? toolUsages : 1, e.getItem());
 
         return true;
     }

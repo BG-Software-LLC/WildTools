@@ -5,7 +5,6 @@ import com.bgsoftware.wildtools.api.objects.ToolMode;
 import com.bgsoftware.wildtools.api.objects.tools.CrowbarTool;
 import com.bgsoftware.wildtools.utils.BukkitUtils;
 import com.bgsoftware.wildtools.utils.items.ItemUtils;
-import com.bgsoftware.wildtools.utils.items.ToolTaskManager;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.CreatureSpawner;
@@ -13,7 +12,6 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
-import java.util.UUID;
 
 public final class WCrowbarTool extends WTool implements CrowbarTool {
 
@@ -33,8 +31,6 @@ public final class WCrowbarTool extends WTool implements CrowbarTool {
     public boolean onBlockInteract(PlayerInteractEvent e) {
         if(!e.getClickedBlock().getType().name().contains("SPAWNER"))
             return false;
-
-        UUID taskId = ToolTaskManager.generateTaskId(e.getItem(), e.getPlayer());
 
         if(!BukkitUtils.canBreakBlock(e.getClickedBlock(), this))
             return true;
@@ -65,7 +61,7 @@ public final class WCrowbarTool extends WTool implements CrowbarTool {
         CrowbarWandUseEvent crowbarWandUseEvent = new CrowbarWandUseEvent(e.getPlayer(), this, e.getClickedBlock());
         Bukkit.getPluginManager().callEvent(crowbarWandUseEvent);
 
-        reduceDurablility(e.getPlayer(), 1, taskId);
+        reduceDurablility(e.getPlayer(), 1, e.getItem());
 
         return true;
     }

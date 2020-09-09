@@ -62,7 +62,6 @@ public final class SellWandUseEvent extends Event implements Cancellable {
      * @param sellMessage The message that will be sent to the player.
      */
     public SellWandUseEvent(Player player, BlockState container, double price, double multiplier, String sellMessage){
-        super(true);
         this.player = player;
         this.container = container;
         this.sellMessage = sellMessage;
