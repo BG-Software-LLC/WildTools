@@ -109,6 +109,8 @@ hooks:
 #      Tool's default type must be a tool, such as pickaxe, shovel or axe.
 # uses: Custom durability for the tool (INTEGER)
 #      If both unbreakable and uses are not set, tool will use the vanilla durability (supports unbreaking enchantment)
+# uses-progress: Whether or not the durability of the tool should be decreased in relation to the uses.
+#      This is only a cosmetic feature, and will not affect the amount of uses of the tools.
 # keep-inventory: Tool won't get dropped from players inventory (BOOLEAN) (Default false)
 # private: Should tool be assigned to only one player? (BOOLEAN) (Default false)
 # anvil-combine-exp: Amount of exp required to combine tool with another (INTEGER) (Default -1)

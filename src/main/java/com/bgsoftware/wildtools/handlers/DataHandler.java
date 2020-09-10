@@ -256,6 +256,9 @@ public final class DataHandler {
             if(cfg.contains("tools." + name + ".private"))
                 tool.setPrivate(cfg.getBoolean("tools." + name + ".private"));
 
+            if(cfg.contains("tools." + name + ".uses-progress"))
+                tool.setUsesProgress(cfg.getBoolean("tools." + name + ".uses-progress"));
+
             if(cfg.contains("tools." + name + ".anvil-combine-exp"))
                 tool.setAnvilCombineExp(cfg.getInt("tools." + name + ".anvil-combine-exp"));
 

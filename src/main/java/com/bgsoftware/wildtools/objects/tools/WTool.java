@@ -39,7 +39,8 @@ public abstract class WTool implements Tool {
     private ToolItemStack toolItemStack;
     private int usesLeft;
     private String name, toolMode;
-    private boolean onlySameType, onlyInsideClaim, unbreakable, autoCollect, instantBreak, silkTouch, keepInventory, omni, privateTool;
+    private boolean onlySameType, onlyInsideClaim, unbreakable, autoCollect, instantBreak, silkTouch,
+            keepInventory, omni, privateTool, usesProgress;
     private long cooldown;
     private double multiplier;
     private int anvilCombineExp, anvilCombineLimit;
@@ -154,6 +155,11 @@ public abstract class WTool implements Tool {
     @Override
     public void setPrivate(boolean privateTool) {
         this.privateTool = privateTool;
+    }
+
+    @Override
+    public void setUsesProgress(boolean usesProgress) {
+        this.usesProgress = usesProgress;
     }
 
     @Override
@@ -297,6 +303,11 @@ public abstract class WTool implements Tool {
     @Override
     public boolean isPrivate() {
         return privateTool;
+    }
+
+    @Override
+    public boolean isUsesProgress() {
+        return usesProgress;
     }
 
     @Override

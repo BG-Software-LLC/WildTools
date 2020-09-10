@@ -101,6 +101,12 @@ public interface Tool {
     void setPrivate(boolean privateTool);
 
     /**
+     * Set whether or not the durability of the tool should be decreased in relation to the uses.
+     * @param usesProgress True if durability should decrease, otherwise false.
+     */
+    void setUsesProgress(boolean usesProgress);
+
+    /**
      * Add an enchantment for the tool item.
      * @param ench The enchantment to add.
      * @param level The level of the enchantment.
@@ -263,6 +269,11 @@ public interface Tool {
      * Check whether or not the tool is private.
      */
     boolean isPrivate();
+
+    /**
+     * Check whether or not the durability of the tool should be decreased in relation to the uses.
+     */
+    boolean isUsesProgress();
 
     /**
      * Check whether or not the tool can be combined with another tool in an anvil.

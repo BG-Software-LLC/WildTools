@@ -132,6 +132,10 @@ public final class ToolItemStack extends ItemStack {
         return original.getDurability();
     }
 
+    public short getMaxDurability(){
+        return getType().getMaxDurability();
+    }
+
     @Override
     public int getMaxStackSize() {
         return original.getMaxStackSize();

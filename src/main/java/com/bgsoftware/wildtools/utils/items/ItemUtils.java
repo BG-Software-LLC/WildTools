@@ -11,7 +11,6 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
 import com.bgsoftware.wildtools.WildToolsPlugin;
 import com.bgsoftware.wildtools.api.objects.tools.Tool;
@@ -89,7 +88,9 @@ public final class ItemUtils {
             return;
 
         ToolItemStack originalItem = toolItemStack.clone();
-        boolean giveOriginal = toolItemStack.getAmount() > 1;
+
+        if(toolItemStack.getAmount() > 1)
+            ItemUtils.addItem(originalItem, pl.getInventory(), pl.getLocation());
 
         if(toolItemStack.getAmount() > 1){
             toolItemStack.setAmount(1);
@@ -108,7 +109,7 @@ public final class ItemUtils {
 
             toolItemStack.setDurability((short) (toolItemStack.getDurability() + amount));
 
-            if(toolItemStack.getDurability() > toolItemStack.getType().getMaxDurability())
+            if(toolItemStack.getDurability() > toolItemStack.getMaxDurability())
                 plugin.getNMSAdapter().breakTool(toolItemStack, pl);
         }
 
@@ -116,18 +117,22 @@ public final class ItemUtils {
             int usesLeft = toolItemStack.getUses();
             toolItemStack.setUses((usesLeft -= amount));
 
-            if (usesLeft <= 0)
+            if (usesLeft <= 0) {
                 plugin.getNMSAdapter().breakTool(toolItemStack, pl);
+            }
 
             //Update name and lore
-            else if(toolItemStack.hasItemMeta()){
-                ItemUtils.formatItemStack(toolItemStack);
-                return;
+            else {
+                // Update durability depends on the uses
+                if(tool.isUsesProgress()) {
+                    float usesPercentage = (float) usesLeft / tool.getDefaultUses();
+                    toolItemStack.setDurability((short) Math.round((1 - usesPercentage) * toolItemStack.getMaxDurability()));
+                }
+
+                if(toolItemStack.hasItemMeta())
+                    ItemUtils.formatItemStack(toolItemStack);
             }
         }
-
-        if(giveOriginal)
-            ItemUtils.addItem(originalItem, pl.getInventory(), pl.getLocation());
     }
 
     public static int getDurability(Player player, ToolItemStack toolItemStack) {
@@ -139,59 +144,7 @@ public final class ItemUtils {
         if(unbreakable || player.getGameMode() == GameMode.CREATIVE)
             return Integer.MAX_VALUE;
 
-        return usingDurability ? toolItemStack.getType().getMaxDurability() - toolItemStack.getDurability() + 1 : toolItemStack.getUses();
-    }
-
-//    public static void formatItemStack(ToolItemStack toolItemStack, int defaultUses, boolean sellMode){
-//        ItemMeta meta = toolItemStack.getItemMeta();
-//        int usesLeft = toolItemStack.getUses(defaultUses);
-//        String ownerName = "None", ownerUUID = toolItemStack.getOwner();
-//        String enabled = Locale.HARVESTER_SELL_ENABLED.getMessage(), disabled = Locale.HARVESTER_SELL_DISABLED.getMessage();
-//
-//        if(enabled == null) enabled = "";
-//        if(disabled == null) disabled = "";
-//
-//        try {
-//            ownerName = Bukkit.getOfflinePlayer(UUID.fromString(ownerUUID)).getName();
-//        }catch(Exception ignored){}
-//
-//        if(meta.hasDisplayName()){
-//            meta.setDisplayName(tool.getItemStack().getItemMeta().getDisplayName()
-//                    .replace("{}", usesLeft + "")
-//                    .replace("{owner}", ownerName)
-//                    .replace("{sell-mode}", sellMode ? enabled : disabled));
-//        }
-//
-//        if(meta.hasLore()){
-//            List<String> lore = new ArrayList<>();
-//
-//            for(String line : tool.getItemStack().getItemMeta().getLore())
-//                lore.add(line
-//                        .replace("{}", usesLeft + "")
-//                        .replace("{owner}", ownerName)
-//                        .replace("{sell-mode}", sellMode ? enabled : disabled));
-//
-//            meta.setLore(lore);
-//        }
-//
-//        toolItemStack.setItemMeta(meta);
-//    }
-
-    public static int getItemSlot(PlayerInventory playerInventory, ItemStack itemStack){
-        //Checking for the held slot.
-        if(itemStack.equals(playerInventory.getItem(playerInventory.getHeldItemSlot())))
-            return playerInventory.getHeldItemSlot();
-
-        //Checking off hand slot
-        if(itemStack.equals(playerInventory.getItem(40)))
-            return 40;
-
-        for(int i = 0; i < playerInventory.getSize(); i++){
-            if(itemStack.equals(playerInventory.getItem(i)))
-                return i;
-        }
-
-        throw new IllegalArgumentException("The item wasn't found in the inventory.");
+        return usingDurability ? toolItemStack.getMaxDurability() - toolItemStack.getDurability() + 1 : toolItemStack.getUses();
     }
 
     public static boolean isCrops(Material type){
