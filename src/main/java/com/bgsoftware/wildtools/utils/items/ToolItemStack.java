@@ -23,7 +23,8 @@ public final class ToolItemStack extends ItemStack {
         this.original = original;
         this.nmsItem = nmsItem;
         this.tool = plugin.getToolsManager().getTool(this);
-        plugin.getNMSAdapter().clearTasks(this);
+        if(!isEmpty())
+            plugin.getNMSAdapter().clearTasks(this);
     }
 
     public static ToolItemStack of(Material type){
