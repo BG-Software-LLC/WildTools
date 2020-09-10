@@ -224,19 +224,25 @@ public final class ToolItemStack extends ItemStack {
     }
 
     private void setTag(String key, int value){
-        plugin.getNMSAdapter().setTag(this, key, value);
+        if(!isEmpty())
+            plugin.getNMSAdapter().setTag(this, key, value);
     }
 
     private void setTag(String key, String value){
-        plugin.getNMSAdapter().setTag(this, key, value);
+        if(!isEmpty())
+            plugin.getNMSAdapter().setTag(this, key, value);
     }
 
-    public String getTag(String key, String def){
-        return plugin.getNMSAdapter().getTag(this, key, def);
+    private String getTag(String key, String def){
+        return isEmpty() ? def : plugin.getNMSAdapter().getTag(this, key, def);
     }
 
-    public int getTag(String key, int def){
-        return plugin.getNMSAdapter().getTag(this, key, def);
+    private int getTag(String key, int def){
+        return isEmpty() ? def : plugin.getNMSAdapter().getTag(this, key, def);
+    }
+
+    private boolean isEmpty(){
+        return original == null || original.getType() == Material.AIR;
     }
 
 }
