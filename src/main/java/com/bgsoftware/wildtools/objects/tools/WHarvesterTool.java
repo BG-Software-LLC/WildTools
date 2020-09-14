@@ -155,7 +155,7 @@ public final class WHarvesterTool extends WTool implements HarvesterTool {
         BlocksController blocksController = new BlocksController();
         SellInfo sellInfo = new SellInfo(usedItem.hasSellMode() && player.hasPermission("wildtools.sellmode"));
 
-        int toolDurability = getDurability(player, usedItem);
+        int toolDurability = getDurability(player, usedItem.getItem());
         boolean usingDurability = isUsingDurability();
         int toolUsages = 0;
 
@@ -183,7 +183,7 @@ public final class WHarvesterTool extends WTool implements HarvesterTool {
                         continue;
 
                     if(targetBlock.getType().name().contains("CHORUS")){
-                        toolUsages += breakChorusFruit(player, blocksController, targetBlock, usedItem, sellInfo, new ArrayList<>(), toolUsages, toolDurability, usingDurability);
+                        toolUsages += breakChorusFruit(player, blocksController, targetBlock, usedItem.getItem(), sellInfo, new ArrayList<>(), toolUsages, toolDurability, usingDurability);
                         continue;
                     }
 
@@ -197,10 +197,10 @@ public final class WHarvesterTool extends WTool implements HarvesterTool {
                                 Block aboveBlock = targetBlock.getRelative(BlockFace.UP);
                                 //Making sure there's a valid crop on top of the bottom one
                                 if(aboveBlock.getType() == blockType)
-                                    toolUsages += breakTallCrop(player, blocksController, aboveBlock, usedItem, sellInfo, toolUsages, toolDurability, usingDurability);
+                                    toolUsages += breakTallCrop(player, blocksController, aboveBlock, usedItem.getItem(), sellInfo, toolUsages, toolDurability, usingDurability);
                             }
                             else {
-                                toolUsages += breakTallCrop(player, blocksController, targetBlock, usedItem, sellInfo, toolUsages, toolDurability, usingDurability);
+                                toolUsages += breakTallCrop(player, blocksController, targetBlock, usedItem.getItem(), sellInfo, toolUsages, toolDurability, usingDurability);
                             }
                             continue;
                         }
@@ -209,7 +209,7 @@ public final class WHarvesterTool extends WTool implements HarvesterTool {
                         if(targetBlock.getRelative(BlockFace.DOWN).getType() != blockType)
                             continue;
 
-                        if(BukkitUtils.breakBlockAsBoolean(player, blocksController, targetBlock, usedItem, this,
+                        if(BukkitUtils.breakBlockAsBoolean(player, blocksController, targetBlock, usedItem.getItem(), this,
                                 itemStack -> !sellInfo.handleItem(player, itemStack)))
                             toolUsages++;
                         continue;
@@ -254,7 +254,7 @@ public final class WHarvesterTool extends WTool implements HarvesterTool {
         blocksController.updateSession();
 
         if(toolUsages > 0)
-            reduceDurablility(player, usingDurability ? toolUsages : 1, usedItem);
+            reduceDurablility(player, usingDurability ? toolUsages : 1, usedItem.getItem());
 
         return true;
     }

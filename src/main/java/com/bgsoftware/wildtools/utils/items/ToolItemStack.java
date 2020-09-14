@@ -6,11 +6,8 @@ import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.material.MaterialData;
 
-import java.util.Map;
-
-public final class ToolItemStack extends ItemStack {
+public final class ToolItemStack{
 
     private static final WildToolsPlugin plugin = WildToolsPlugin.getPlugin();
 
@@ -22,7 +19,7 @@ public final class ToolItemStack extends ItemStack {
     private ToolItemStack(ItemStack original, Object nmsItem) {
         this.original = original;
         this.nmsItem = nmsItem;
-        this.tool = plugin.getToolsManager().getTool(this);
+        this.tool = plugin.getToolsManager().getTool(getToolType());
         if(!isEmpty())
             plugin.getNMSAdapter().clearTasks(this);
     }
@@ -40,11 +37,12 @@ public final class ToolItemStack extends ItemStack {
     }
 
     public static ToolItemStack of(ItemStack itemStack) {
-        if(itemStack instanceof ToolItemStack)
-            return (ToolItemStack) itemStack;
-
         Object[] items = plugin.getNMSAdapter().createSyncedItem(itemStack);
         return new ToolItemStack((ItemStack) items[0], items[1]);
+    }
+
+    public ItemStack getItem() {
+        return original;
     }
 
     public Tool getTool() {
@@ -93,135 +91,54 @@ public final class ToolItemStack extends ItemStack {
         ItemUtils.formatItemStack(this);
     }
 
-    @Override
-    public Material getType() {
+    public ItemMeta getItemMeta(){
+        return original.getItemMeta();
+    }
+
+    public void setItemMeta(ItemMeta itemMeta){
+        original.setItemMeta(itemMeta);
+    }
+
+    public boolean hasItemMeta(){
+        return original.hasItemMeta();
+    }
+
+    public Material getType(){
         return original.getType();
     }
 
-    @Override
-    public void setType(Material type) {
+    public void setType(Material type){
         original.setType(type);
     }
 
-    @Override
-    public int getAmount() {
+    public int getAmount(){
         return original.getAmount();
     }
 
-    @Override
-    public void setAmount(int amount) {
+    public void setAmount(int amount){
         original.setAmount(amount);
     }
 
-    @Override
-    public MaterialData getData() {
-        return original.getData();
+    public int getEnchantmentLevel(Enchantment enchantment){
+        return original.getEnchantmentLevel(enchantment);
     }
 
-    @Override
-    public void setData(MaterialData data) {
-        original.setData(data);
-    }
-
-    @Override
-    public void setDurability(short durability) {
+    public void setDurability(short durability){
         original.setDurability(durability);
     }
 
-    @Override
-    public short getDurability() {
+    public short getDurability(){
         return original.getDurability();
     }
 
     public short getMaxDurability(){
-        return getType().getMaxDurability();
-    }
-
-    @Override
-    public int getMaxStackSize() {
-        return original.getMaxStackSize();
-    }
-
-    @Override
-    public String toString() {
-        return original.toString();
-    }
-
-    @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
-    @Override
-    public boolean equals(Object obj) {
-        return original.equals(obj);
-    }
-
-    @Override
-    public boolean isSimilar(ItemStack stack) {
-        return original.isSimilar(stack);
+        return original.getType().getMaxDurability();
     }
 
     @Override
     public ToolItemStack clone() {
         ItemStack cloned = original.clone();
         return of(cloned);
-    }
-
-    @Override
-    public boolean containsEnchantment(Enchantment ench) {
-        return original.containsEnchantment(ench);
-    }
-
-    @Override
-    public int getEnchantmentLevel(Enchantment ench) {
-        return original.getEnchantmentLevel(ench);
-    }
-
-    @Override
-    public Map<Enchantment, Integer> getEnchantments() {
-        return original.getEnchantments();
-    }
-
-    @Override
-    public void addEnchantments(Map<Enchantment, Integer> enchantments) {
-        original.addEnchantments(enchantments);
-    }
-
-    @Override
-    public void addEnchantment(Enchantment ench, int level) {
-        original.addEnchantment(ench, level);
-    }
-
-    @Override
-    public void addUnsafeEnchantments(Map<Enchantment, Integer> enchantments) {
-        original.addUnsafeEnchantments(enchantments);
-    }
-
-    @Override
-    public void addUnsafeEnchantment(Enchantment ench, int level) {
-        original.addUnsafeEnchantment(ench, level);
-    }
-
-    @Override
-    public int removeEnchantment(Enchantment ench) {
-        return original.removeEnchantment(ench);
-    }
-
-    @Override
-    public Map<String, Object> serialize() {
-        return original.serialize();
-    }
-
-    @Override
-    public ItemMeta getItemMeta() {
-        return original.getItemMeta();
-    }
-
-    @Override
-    public boolean hasItemMeta() {
-        return original.hasItemMeta();
-    }
-
-    @Override
-    public boolean setItemMeta(ItemMeta itemMeta) {
-        return original.setItemMeta(itemMeta);
     }
 
     private void setTag(String key, int value){

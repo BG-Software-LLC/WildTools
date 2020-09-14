@@ -206,7 +206,7 @@ public final class ToolsHandler implements ToolsManager {
     @Override
     public boolean isOwningTool(ItemStack itemStack, Player player) {
         ToolItemStack toolItemStack = ToolItemStack.of(itemStack);
-        Tool tool = getTool(toolItemStack);
+        Tool tool = toolItemStack.getTool();
 
         if(tool == null || !tool.isPrivate())
             return true;

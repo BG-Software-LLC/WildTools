@@ -42,8 +42,7 @@ public final class BlocksListener implements Listener {
             return;
 
         ToolItemStack toolItemStack = ToolItemStack.of(plugin.getNMSAdapter().getItemInHand(e.getPlayer()));
-
-        Tool tool = plugin.getToolsManager().getTool(toolItemStack);
+        Tool tool = toolItemStack.getTool();
 
         if(tool == null)
             return;
@@ -61,7 +60,7 @@ public final class BlocksListener implements Listener {
             return;
         }
 
-        if(!plugin.getToolsManager().isOwningTool(toolItemStack, e.getPlayer())){
+        if(!plugin.getToolsManager().isOwningTool(toolItemStack.getItem(), e.getPlayer())){
             e.setCancelled(true);
             Locale.NOT_OWNER.send(e.getPlayer());
             return;
@@ -97,8 +96,7 @@ public final class BlocksListener implements Listener {
             return;
 
         ToolItemStack toolItemStack = ToolItemStack.of(e.getItem());
-
-        Tool tool = plugin.getToolsManager().getTool(toolItemStack);
+        Tool tool = toolItemStack.getTool();
 
         if(tool == null)
             return;
@@ -116,7 +114,7 @@ public final class BlocksListener implements Listener {
             return;
         }
 
-        if(!plugin.getToolsManager().isOwningTool(toolItemStack, e.getPlayer())){
+        if(!plugin.getToolsManager().isOwningTool(toolItemStack.getItem(), e.getPlayer())){
             e.setCancelled(true);
             Locale.NOT_OWNER.send(e.getPlayer());
             return;
@@ -166,8 +164,7 @@ public final class BlocksListener implements Listener {
             return;
 
         ToolItemStack toolItemStack = ToolItemStack.of(plugin.getNMSAdapter().getItemInHand(e.getPlayer(), e));
-
-        Tool tool = plugin.getToolsManager().getTool(toolItemStack);
+        Tool tool = toolItemStack.getTool();
 
         if(tool == null)
             return;
@@ -185,7 +182,7 @@ public final class BlocksListener implements Listener {
             return;
         }
 
-        if(!plugin.getToolsManager().isOwningTool(toolItemStack, e.getPlayer())){
+        if(!plugin.getToolsManager().isOwningTool(toolItemStack.getItem(), e.getPlayer())){
             e.setCancelled(true);
             Locale.NOT_OWNER.send(e.getPlayer());
             return;
@@ -194,7 +191,7 @@ public final class BlocksListener implements Listener {
         try {
             WTool.toolBlockBreak.add(e.getPlayer().getUniqueId());
 
-            if (tool.onAirInteract(new PlayerInteractEvent(e.getPlayer(), Action.RIGHT_CLICK_AIR, toolItemStack, null, BlockFace.UP))) {
+            if (tool.onAirInteract(new PlayerInteractEvent(e.getPlayer(), Action.RIGHT_CLICK_AIR, toolItemStack.getItem(), null, BlockFace.UP))) {
                 e.setCancelled(true);
                 tool.setLastUse(e.getPlayer().getUniqueId());
             }

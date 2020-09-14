@@ -77,8 +77,7 @@ public final class AnvilListener implements Listener {
         ToolItemStack firstItem = ToolItemStack.of(anvilInventory.getItem(0)),
                 secondItem = ToolItemStack.of(anvilInventory.getItem(1));
 
-        Tool firstSlot = plugin.getToolsManager().getTool(firstItem),
-                secondSlot = plugin.getToolsManager().getTool(secondItem);
+        Tool firstSlot = firstItem.getTool(), secondSlot = secondItem.getTool();
 
         if(firstSlot == null || !firstSlot.equals(secondSlot) || !firstSlot.isAnvilCombine() ||
                 firstSlot.isUnbreakable() || firstSlot.isUsingDurability())
@@ -91,7 +90,7 @@ public final class AnvilListener implements Listener {
         int finalUses = firstSlot.hasAnvilCombineLimit() ?
                 Math.min(firstSlot.getAnvilCombineLimit(), firstUses + secondUses) : firstUses + secondUses;
 
-        ToolItemStack result = (ToolItemStack) firstSlot.getFormattedItemStack(finalUses);
+        ToolItemStack result = ToolItemStack.of(firstSlot.getFormattedItemStack(finalUses));
         ItemMeta itemMeta = result.getItemMeta();
 
         int expCost = firstSlot.getAnvilCombineExp();
@@ -114,7 +113,7 @@ public final class AnvilListener implements Listener {
 
         result.setUses(finalUses);
 
-        e.setResult(result);
+        e.setResult(result.getItem());
     }
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)

@@ -218,7 +218,7 @@ public abstract class WTool implements Tool {
 
     @Override
     public ItemStack getItemStack(){
-        return toolItemStack.clone();
+        return toolItemStack.clone().getItem();
     }
 
     @Override
@@ -228,11 +228,11 @@ public abstract class WTool implements Tool {
 
     @Override
     public ItemStack getFormattedItemStack(int uses) {
-        ToolItemStack toolItemStack = (ToolItemStack) getItemStack();
+        ToolItemStack toolItemStack = this.toolItemStack.clone();
         toolItemStack.setToolType(getName());
         toolItemStack.setUses(uses);
         ItemUtils.formatItemStack(toolItemStack);
-        return toolItemStack;
+        return toolItemStack.getItem();
     }
 
     @Override

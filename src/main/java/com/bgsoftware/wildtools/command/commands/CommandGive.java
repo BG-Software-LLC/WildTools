@@ -84,12 +84,12 @@ public final class CommandGive implements ICommand {
         }
 
         for(int i = 0; i < amount; i++){
-            ToolItemStack toolItem = (ToolItemStack) tool.getFormattedItemStack(uses > -1 ? uses : tool.getDefaultUses());
+            ToolItemStack toolItem = ToolItemStack.of(tool.getFormattedItemStack(uses > -1 ? uses : tool.getDefaultUses()));
 
             if(uses > -1)
                 toolItem.setUses(uses);
 
-            ItemUtils.addItem(toolItem, pl.getInventory(), pl.getLocation());
+            ItemUtils.addItem(toolItem.getItem(), pl.getInventory(), pl.getLocation());
         }
 
         Locale.GIVE_TOOL_SUCCESS.send(sender, amount, tool.getName(), pl.getName());

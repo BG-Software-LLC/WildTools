@@ -90,7 +90,7 @@ public final class ItemUtils {
         ToolItemStack originalItem = toolItemStack.clone();
 
         if(toolItemStack.getAmount() > 1)
-            ItemUtils.addItem(originalItem, pl.getInventory(), pl.getLocation());
+            ItemUtils.addItem(originalItem.getItem(), pl.getInventory(), pl.getLocation());
 
         if(toolItemStack.getAmount() > 1){
             toolItemStack.setAmount(1);
