@@ -11,12 +11,10 @@ import net.minecraft.server.v1_16_R2.Blocks;
 import net.minecraft.server.v1_16_R2.Chunk;
 import net.minecraft.server.v1_16_R2.ChunkSection;
 import net.minecraft.server.v1_16_R2.ContainerAnvil;
-import net.minecraft.server.v1_16_R2.EntityExperienceOrb;
 import net.minecraft.server.v1_16_R2.EntityItem;
 import net.minecraft.server.v1_16_R2.EntityLiving;
 import net.minecraft.server.v1_16_R2.EntityPlayer;
 import net.minecraft.server.v1_16_R2.EnumItemSlot;
-import net.minecraft.server.v1_16_R2.GameRules;
 import net.minecraft.server.v1_16_R2.IBlockData;
 import net.minecraft.server.v1_16_R2.Item;
 import net.minecraft.server.v1_16_R2.ItemStack;
@@ -138,19 +136,6 @@ public final class NMSAdapter_v1_16_R2 implements NMSAdapter {
         BlockPosition blockPosition = new BlockPosition(block.getX(), block.getY(), block.getZ());
         IBlockData blockData = world.getType(blockPosition);
         return blockData.getBlock().getExpDrop(blockData, world, blockPosition, entityPlayer.getItemInMainHand());
-    }
-
-    @Override
-    public void dropExp(Location location, int exp) {
-        double x = location.getBlockX() + 0.5, y = location.getBlockY() + 0.5, z = location.getBlockZ() + 0.5;
-        World world = ((CraftWorld) location.getWorld()).getHandle();
-        if(world.getGameRules().getBoolean(GameRules.DO_TILE_DROPS)) {
-            while (exp > 0) {
-                int expValue = EntityExperienceOrb.getOrbValue(exp);
-                exp -= expValue;
-                world.addEntity(new EntityExperienceOrb(world, x + 0.5D, y + 0.5D, z + 0.5D, expValue));
-            }
-        }
     }
 
     @Override

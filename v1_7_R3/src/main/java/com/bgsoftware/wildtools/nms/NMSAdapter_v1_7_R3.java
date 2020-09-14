@@ -11,7 +11,6 @@ import net.minecraft.server.v1_7_R3.BlockPotatoes;
 import net.minecraft.server.v1_7_R3.Blocks;
 import net.minecraft.server.v1_7_R3.Chunk;
 import net.minecraft.server.v1_7_R3.EnchantmentManager;
-import net.minecraft.server.v1_7_R3.EntityExperienceOrb;
 import net.minecraft.server.v1_7_R3.EntityItem;
 import net.minecraft.server.v1_7_R3.EntityLiving;
 import net.minecraft.server.v1_7_R3.EntityPlayer;
@@ -200,17 +199,6 @@ public final class NMSAdapter_v1_7_R3 implements NMSAdapter {
         EntityPlayer entityPlayer = ((CraftPlayer) player).getHandle();
         return world.getType(block.getX(), block.getY(), block.getZ())
                 .getExpDrop(world, block.getData(), EnchantmentManager.getBonusBlockLootEnchantmentLevel(entityPlayer));
-    }
-
-    @Override
-    public void dropExp(Location location, int exp) {
-        double x = location.getBlockX() + 0.5, y = location.getBlockY() + 0.5, z = location.getBlockZ() + 0.5;
-        World world = ((CraftWorld) location.getWorld()).getHandle();
-        while(exp > 0) {
-            int expValue = EntityExperienceOrb.getOrbValue(exp);
-            exp -= expValue;
-            world.addEntity(new EntityExperienceOrb(world, x + 0.5D, y + 0.5D, z + 0.5D, expValue));
-        }
     }
 
     @Override

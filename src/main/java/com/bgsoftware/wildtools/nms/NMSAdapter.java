@@ -39,8 +39,6 @@ public interface NMSAdapter {
 
     int getExpFromBlock(Block block, Player player);
 
-    void dropExp(Location location, int exp);
-
     ItemStack getItemInHand(Player player);
 
     ItemStack getItemInHand(Player player, Event e);

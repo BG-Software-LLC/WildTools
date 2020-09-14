@@ -8,6 +8,7 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.ExperienceOrb;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -89,7 +90,10 @@ public final class BukkitUtils {
             });
         }
 
-        plugin.getNMSAdapter().dropExp(block.getLocation(), blockBreakEvent.getExpToDrop());
+        if(blockBreakEvent.getExpToDrop() > 0) {
+            ExperienceOrb orb = block.getWorld().spawn(block.getLocation(), ExperienceOrb.class);
+            orb.setExperience(blockBreakEvent.getExpToDrop());
+        }
 
         return true;
     }
