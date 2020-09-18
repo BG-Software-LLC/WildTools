@@ -87,14 +87,12 @@ public final class ItemUtils {
         if(tool.isUnbreakable() || pl.getGameMode() == GameMode.CREATIVE)
             return;
 
-        ToolItemStack originalItem = toolItemStack.clone();
-
-        if(toolItemStack.getAmount() > 1)
-            ItemUtils.addItem(originalItem.getItem(), pl.getInventory(), pl.getLocation());
+        ItemStack clonedTools = null;
 
         if(toolItemStack.getAmount() > 1){
+            clonedTools = toolItemStack.getItem().clone();
+            clonedTools.setAmount(clonedTools.getAmount() - 1);
             toolItemStack.setAmount(1);
-            originalItem.setAmount(originalItem.getAmount() - 1);
         }
 
         if(tool.isUsingDurability()){
@@ -133,6 +131,9 @@ public final class ItemUtils {
                     ItemUtils.formatItemStack(toolItemStack);
             }
         }
+
+        if(clonedTools != null)
+            ItemUtils.addItem(clonedTools, pl.getInventory(), pl.getLocation());
     }
 
     public static int getDurability(Player player, ToolItemStack toolItemStack) {
