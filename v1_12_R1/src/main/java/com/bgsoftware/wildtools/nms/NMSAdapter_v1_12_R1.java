@@ -247,11 +247,7 @@ public final class NMSAdapter_v1_12_R1 implements NMSAdapter {
     public int getTag(ToolItemStack toolItemStack, String key, int def) {
         ItemStack nmsStack = (ItemStack) toolItemStack.getNMSItem();
         NBTTagCompound tagCompound = nmsStack.getTag();
-        if(tagCompound == null){
-            nmsStack.setTag(new NBTTagCompound());
-            tagCompound = nmsStack.getTag();
-        }
-        return tagCompound.hasKey(key)  ? tagCompound.getInt(key) : def;
+        return tagCompound == null || !tagCompound.hasKey(key) ? def : tagCompound.getInt(key);
     }
 
     @Override
@@ -269,11 +265,7 @@ public final class NMSAdapter_v1_12_R1 implements NMSAdapter {
     public String getTag(ToolItemStack toolItemStack, String key, String def) {
         ItemStack nmsStack = (ItemStack) toolItemStack.getNMSItem();
         NBTTagCompound tagCompound = nmsStack.getTag();
-        if(tagCompound == null){
-            nmsStack.setTag(new NBTTagCompound());
-            tagCompound = nmsStack.getTag();
-        }
-        return tagCompound.hasKey(key)  ? tagCompound.getString(key) : def;
+        return tagCompound == null || !tagCompound.hasKey(key) ? def : tagCompound.getString(key);
     }
 
     @Override
@@ -291,11 +283,8 @@ public final class NMSAdapter_v1_12_R1 implements NMSAdapter {
     public void clearTasks(ToolItemStack toolItemStack) {
         ItemStack nmsStack = (ItemStack) toolItemStack.getNMSItem();
         NBTTagCompound tagCompound = nmsStack.getTag();
-        if(tagCompound == null){
-            nmsStack.setTag(new NBTTagCompound());
-            tagCompound = nmsStack.getTag();
-        }
-        tagCompound.remove("task-id");
+        if(tagCompound != null)
+            tagCompound.remove("task-id");
     }
 
     @Override
