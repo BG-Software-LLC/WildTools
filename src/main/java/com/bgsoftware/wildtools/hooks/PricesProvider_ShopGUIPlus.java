@@ -1,6 +1,7 @@
 package com.bgsoftware.wildtools.hooks;
 
 import com.bgsoftware.wildtools.WildToolsPlugin;
+import com.bgsoftware.wildtools.api.hooks.PricesProvider;
 import net.brcdev.shopgui.ShopGuiPlugin;
 import net.brcdev.shopgui.ShopGuiPlusApi;
 

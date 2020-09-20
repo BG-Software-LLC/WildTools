@@ -1,4 +1,4 @@
-package com.bgsoftware.wildtools.hooks;
+package com.bgsoftware.wildtools.api.hooks;
 
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;

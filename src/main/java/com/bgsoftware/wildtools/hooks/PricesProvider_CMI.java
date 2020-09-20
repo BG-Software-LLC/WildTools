@@ -5,6 +5,7 @@ import com.bgsoftware.wildtools.WildToolsPlugin;
 import com.Zrips.CMI.CMI;
 import com.Zrips.CMI.Modules.Worth.WorthItem;
 
+import com.bgsoftware.wildtools.api.hooks.PricesProvider;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 

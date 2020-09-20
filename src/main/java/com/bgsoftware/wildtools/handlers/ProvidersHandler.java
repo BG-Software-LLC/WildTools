@@ -23,7 +23,7 @@ import com.bgsoftware.wildtools.hooks.FactionsProvider_FactionsX;
 import com.bgsoftware.wildtools.hooks.PricesProvider_CMI;
 import com.bgsoftware.wildtools.hooks.FactionsProvider;
 import com.bgsoftware.wildtools.hooks.FactionsProvider_Default;
-import com.bgsoftware.wildtools.hooks.PricesProvider;
+import com.bgsoftware.wildtools.api.hooks.PricesProvider;
 import com.bgsoftware.wildtools.hooks.PricesProvider_Default;
 import com.bgsoftware.wildtools.hooks.PricesProvider_Essentials;
 import com.bgsoftware.wildtools.hooks.PricesProvider_GUIShop;
@@ -157,6 +157,11 @@ public final class ProvidersHandler implements ProvidersManager {
         dropsProviders.add(dropsProvider);
     }
 
+    @Override
+    public void setPricesProvider(PricesProvider pricesProvider) {
+        this.pricesProvider = pricesProvider;
+    }
+
     public boolean hasAdvancedEnchantmentsEnabled(){
         return advancedEnchantmentsHook;
     }
@@ -171,25 +176,26 @@ public final class ProvidersHandler implements ProvidersManager {
     }
 
     private void loadData(){
-        // Prices Plugin Hookup
-        if(pricesPlugin.equalsIgnoreCase("ShopGUIPlus") && Bukkit.getPluginManager().isPluginEnabled("ShopGUIPlus"))
-            pricesProvider = new PricesProvider_ShopGUIPlus();
-        else if(pricesPlugin.equalsIgnoreCase("GUIShop") && Bukkit.getPluginManager().isPluginEnabled("GUIShop"))
-            pricesProvider = new PricesProvider_GUIShop();
-        else if(pricesPlugin.equalsIgnoreCase("Essentials") && Bukkit.getPluginManager().isPluginEnabled("Essentials")){
-            try{
-                pricesProvider = new PricesProvider_Essentials();
-            }catch(Throwable ex){
-                pricesProvider = (PricesProvider) getInstance("com.bgsoftware.wildtools.hooks.PricesProvider_EssentialsOld");
-            }
+        if(pricesProvider == null) {
+            // Prices Plugin Hookup
+            if (pricesPlugin.equalsIgnoreCase("ShopGUIPlus") && Bukkit.getPluginManager().isPluginEnabled("ShopGUIPlus"))
+                pricesProvider = new PricesProvider_ShopGUIPlus();
+            else if (pricesPlugin.equalsIgnoreCase("GUIShop") && Bukkit.getPluginManager().isPluginEnabled("GUIShop"))
+                pricesProvider = new PricesProvider_GUIShop();
+            else if (pricesPlugin.equalsIgnoreCase("Essentials") && Bukkit.getPluginManager().isPluginEnabled("Essentials")) {
+                try {
+                    pricesProvider = new PricesProvider_Essentials();
+                } catch (Throwable ex) {
+                    pricesProvider = (PricesProvider) getInstance("com.bgsoftware.wildtools.hooks.PricesProvider_EssentialsOld");
+                }
+            } else if (pricesPlugin.equals("CMI") && Bukkit.getPluginManager().isPluginEnabled("CMI"))
+                pricesProvider = new PricesProvider_CMI();
+            else if (pricesPlugin.equalsIgnoreCase("newtShop") && Bukkit.getPluginManager().isPluginEnabled("newtShop"))
+                pricesProvider = new PricesProvider_NewtShop();
+            else if (pricesPlugin.equalsIgnoreCase("QuantumShop") && Bukkit.getPluginManager().isPluginEnabled("QuantumShop"))
+                pricesProvider = new PricesProvider_QuantumShop();
+            else pricesProvider = new PricesProvider_Default();
         }
-        else if(pricesPlugin.equals("CMI") && Bukkit.getPluginManager().isPluginEnabled("CMI"))
-            pricesProvider = new PricesProvider_CMI();
-        else if(pricesPlugin.equalsIgnoreCase("newtShop") && Bukkit.getPluginManager().isPluginEnabled("newtShop"))
-            pricesProvider = new PricesProvider_NewtShop();
-        else if(pricesPlugin.equalsIgnoreCase("QuantumShop") && Bukkit.getPluginManager().isPluginEnabled("QuantumShop"))
-            pricesProvider = new PricesProvider_QuantumShop();
-        else pricesProvider = new PricesProvider_Default();
 
         // Factions Hookup
         if(Bukkit.getPluginManager().isPluginEnabled("Factions") &&

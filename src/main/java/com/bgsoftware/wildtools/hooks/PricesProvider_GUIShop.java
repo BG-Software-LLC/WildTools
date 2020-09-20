@@ -1,6 +1,7 @@
 package com.bgsoftware.wildtools.hooks;
 
 import com.bgsoftware.wildtools.WildToolsPlugin;
+import com.bgsoftware.wildtools.api.hooks.PricesProvider;
 import com.pablo67340.guishop.Main;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;

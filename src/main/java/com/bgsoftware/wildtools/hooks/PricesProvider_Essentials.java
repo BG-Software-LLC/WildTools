@@ -1,6 +1,7 @@
 package com.bgsoftware.wildtools.hooks;
 
 import com.bgsoftware.wildtools.WildToolsPlugin;
+import com.bgsoftware.wildtools.api.hooks.PricesProvider;
 import com.earth2me.essentials.Essentials;
 
 import com.earth2me.essentials.Worth;
