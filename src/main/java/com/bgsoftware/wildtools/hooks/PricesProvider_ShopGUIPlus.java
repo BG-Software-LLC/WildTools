@@ -48,7 +48,7 @@ public final class PricesProvider_ShopGUIPlus implements PricesProvider {
             }
             else{
                 PlayerData playerData = ShopGuiPlugin.getInstance().getPlayerManager().getPlayerData(player);
-                price = Math.max(price, shopPair.getX().getSellPriceForAmount(shopPair.getY(), player, playerData, itemStack.getAmount()));
+                price = Math.max(price, shopPair.getX().getSellPriceForAmount(player, playerData, itemStack.getAmount()));
             }
         }
 
