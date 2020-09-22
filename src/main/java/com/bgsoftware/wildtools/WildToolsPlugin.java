@@ -4,6 +4,7 @@ import com.bgsoftware.wildtools.api.WildTools;
 import com.bgsoftware.wildtools.api.WildToolsAPI;
 import com.bgsoftware.wildtools.command.CommandsHandler;
 import com.bgsoftware.wildtools.handlers.EditorHandler;
+import com.bgsoftware.wildtools.handlers.EventsHandler;
 import com.bgsoftware.wildtools.handlers.ToolsHandler;
 import com.bgsoftware.wildtools.hooks.PaperHook;
 import com.bgsoftware.wildtools.hooks.SuperMobCoinsHook;
@@ -37,6 +38,8 @@ public final class WildToolsPlugin extends JavaPlugin implements WildTools {
     private ProvidersHandler providersHandler;
     private EditorHandler editorHandler;
     private RecipesHandler recipesHandler;
+    private EventsHandler eventsHandler;
+
     private Enchantment glowEnchant;
 
     private NMSAdapter nmsAdapter;
@@ -66,6 +69,7 @@ public final class WildToolsPlugin extends JavaPlugin implements WildTools {
         registerGlowEnchantment();
 
         toolsManager = new ToolsHandler(this);
+        eventsHandler = new EventsHandler();
 
         DataHandler.loadData();
         Locale.reload();
@@ -175,6 +179,10 @@ public final class WildToolsPlugin extends JavaPlugin implements WildTools {
     @Override
     public ProvidersHandler getProviders() {
         return providersHandler;
+    }
+
+    public EventsHandler getEvents() {
+        return eventsHandler;
     }
 
     public EditorHandler getEditor() {

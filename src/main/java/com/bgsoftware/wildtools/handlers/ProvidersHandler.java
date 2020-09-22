@@ -2,7 +2,6 @@ package com.bgsoftware.wildtools.handlers;
 
 import com.bgsoftware.wildtools.WildToolsPlugin;
 import com.bgsoftware.wildtools.api.handlers.ProvidersManager;
-import com.bgsoftware.wildtools.hooks.AdvancedEnchantmentsHook;
 import com.bgsoftware.wildtools.api.hooks.ContainerProvider;
 import com.bgsoftware.wildtools.hooks.AntiCheatProvider;
 import com.bgsoftware.wildtools.hooks.AntiCheatProvider_AAC;
@@ -54,7 +53,6 @@ public final class ProvidersHandler implements ProvidersManager {
     private static final SellInfo EMPTY_INFO = new SellInfo(new HashMap<>(), 0.0);
 
     static String pricesPlugin;
-    static boolean mcmmoHook = false, jobsHook = false, advancedEnchantmentsHook = false;
 
     private boolean isVaultEnabled = false;
     private Economy economy;
@@ -162,10 +160,6 @@ public final class ProvidersHandler implements ProvidersManager {
         this.pricesProvider = pricesProvider;
     }
 
-    public boolean hasAdvancedEnchantmentsEnabled(){
-        return advancedEnchantmentsHook;
-    }
-
     public void runWithBypass(Player player, Runnable runnable){
         try {
             antiCheatProvider.enableBypass(player);
@@ -259,9 +253,6 @@ public final class ProvidersHandler implements ProvidersManager {
             antiCheatProvider = new AntiCheatProvider_Spartan();
         }
         else antiCheatProvider = new AntiCheatProvider_Default();
-
-        if(Bukkit.getPluginManager().isPluginEnabled("AdvancedEnchantment"))
-            AdvancedEnchantmentsHook.register(plugin);
     }
 
     public static void reload(){

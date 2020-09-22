@@ -44,14 +44,16 @@ public final class BukkitUtils {
 
     public static boolean hasBreakAccess(Block block, Player player){
         BlockBreakEvent blockBreakEvent = new BlockBreakEvent(block, player);
-        plugin.getProviders().runWithBypass(player, () -> Bukkit.getPluginManager().callEvent(blockBreakEvent));
+        //plugin.getProviders().runWithBypass(player, () -> Bukkit.getPluginManager().callEvent(blockBreakEvent));
+        plugin.getEvents().callBreakEvent(blockBreakEvent, true);
         return !blockBreakEvent.isCancelled();
     }
 
     public static boolean canInteractBlock(Player player, Block block, ItemStack usedItem){
         PlayerInteractEvent playerInteractEvent =
                 new PlayerInteractEvent(player, Action.RIGHT_CLICK_BLOCK, usedItem, block, BlockFace.SELF);
-        plugin.getProviders().runWithBypass(player, () -> Bukkit.getPluginManager().callEvent(playerInteractEvent));
+        //plugin.getProviders().runWithBypass(player, () -> Bukkit.getPluginManager().callEvent(playerInteractEvent));
+        plugin.getEvents().callInteractEvent(playerInteractEvent);
         return !playerInteractEvent.isCancelled();
     }
 
@@ -63,12 +65,15 @@ public final class BukkitUtils {
         if((tool == null || !tool.hasSilkTouch()) && usedItem.getEnchantmentLevel(Enchantment.SILK_TOUCH) == 0)
             blockBreakEvent.setExpToDrop(plugin.getNMSAdapter().getExpFromBlock(block, player));
 
-        plugin.getProviders().runWithBypass(player, () -> Bukkit.getPluginManager().callEvent(blockBreakEvent));
+        //plugin.getProviders().runWithBypass(player, () -> Bukkit.getPluginManager().callEvent(blockBreakEvent));
+        plugin.getEvents().callBreakEvent(blockBreakEvent, true);
 
         block.removeMetadata("drop-items", plugin);
 
         if(blockBreakEvent.isCancelled())
             return false;
+
+        plugin.getEvents().callBreakEvent(blockBreakEvent, false);
 
         if(blocksController == null || (tool != null && tool.isOmni()) || block.getType().hasGravity() || hasNearbyWater(block)) {
             block.setType(Material.AIR);
@@ -108,12 +113,15 @@ public final class BukkitUtils {
         BlockBreakEvent blockBreakEvent = new BlockBreakEvent(block, player);
         block.setMetadata("drop-items", new FixedMetadataValue(plugin, tool == null));
 
-        plugin.getProviders().runWithBypass(player, () -> Bukkit.getPluginManager().callEvent(blockBreakEvent));
+        //plugin.getProviders().runWithBypass(player, () -> Bukkit.getPluginManager().callEvent(blockBreakEvent));
+        plugin.getEvents().callBreakEvent(blockBreakEvent, true);
 
         block.removeMetadata("drop-items", plugin);
 
         if(blockBreakEvent.isCancelled())
             return false;
+
+        plugin.getEvents().callBreakEvent(blockBreakEvent, false);
 
         plugin.getNMSAdapter().setCropState(block, CropState.SEEDED);
 
@@ -139,7 +147,8 @@ public final class BukkitUtils {
 
     public static boolean placeBlock(Player player, BlocksController blocksController, Block block, Block materialBlock){
         BlockPlaceEvent blockPlaceEvent = plugin.getNMSAdapter().getFakePlaceEvent(player, block.getLocation(), materialBlock);
-        plugin.getProviders().runWithBypass(player, () -> Bukkit.getPluginManager().callEvent(blockPlaceEvent));
+        //plugin.getProviders().runWithBypass(player, () -> Bukkit.getPluginManager().callEvent(blockPlaceEvent));
+        plugin.getEvents().callPlaceEvent(blockPlaceEvent);
 
         if(blockPlaceEvent.isCancelled())
             return false;

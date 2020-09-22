@@ -19,6 +19,7 @@ import com.bgsoftware.wildtools.api.objects.tools.SortTool;
 import com.bgsoftware.wildtools.api.objects.tools.Tool;
 import com.bgsoftware.wildtools.hooks.PricesProvider_Default;
 
+import com.bgsoftware.wildtools.utils.Executor;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 
@@ -57,9 +58,11 @@ public final class DataHandler {
         cfg.syncWithConfig(file, plugin.getResource("config.yml"), "tools");
 
         ProvidersHandler.pricesPlugin = cfg.getString("prices-plugin", "ShopGUIPlus");
-        ProvidersHandler.mcmmoHook = cfg.getBoolean("hooks.mcmmo", true);
-        ProvidersHandler.jobsHook = cfg.getBoolean("hooks.jobs", true);
-        ProvidersHandler.advancedEnchantmentsHook = cfg.getBoolean("hooks.advancedenchantments", true);
+
+        Executor.sync(() -> {
+            plugin.getEvents().loadClaimingPlugins(cfg.getStringList("events-manipulations.claiming-plugins"));
+            plugin.getEvents().loadOtherPlugins(cfg.getStringList("events-manipulations.other-plugins"));
+        }, 20L);
 
         SellWandLogger.setLogsFile(cfg.getString("logs-file", "logs.txt"));
 

@@ -17,12 +17,18 @@ prices-list:
 - 'STONE:5' #Each stone will cost $5
 - 'LOG:0:5' #Only oak logs will cost $5
 
-# What hooks should be supported by WildTools?
-hooks:
-  mcmmo: true
-  jobs: true
-  # When enabled, you won't be able to enchant WT tools with AE's enchants.
-  advancedenchantments: true
+# Here you can configure which plugins will be called, etc.
+# Optimizing the lists will result better performance!
+events-manipulations:
+  # A list of all the plugins that handle claims here on your server.
+  # If one of the plugins here cancel the events, then WT will know that the player doesn't have access.
+  claiming-plugins:
+    - EXAMPLE_PLUGIN
+  # A list of all the other plugins that needs to know about breaking of blocks.
+  # You can add your custom shops plugins, spawners plugin and more.
+  # WildTools will not care if events are cancelled from this list. Therefore, if WildTools needs to know
+  # if the events are cancelled from a plugin, add it to the 'claiming-plugins' section.
+  other-plugins: []
 
 # The plugin brings a lot of options and features for making tools easily with rich-configuration options.
 # The default config has basic trench-pickaxe, tray-pickaxe, sand-wand, sell-wand, lightning-wand, harvester-hoe
