@@ -15,6 +15,10 @@ import java.util.List;
 
 public final class EventsHandler {
 
+    private static final List<String> PRE_DEFINED_CLAIMING_PLUGINS = Arrays.asList("AcidIsland", "ASkyBlock",
+            "BentoBox", "FabledSkyBlock", "Factions", "FactionsX", "GriefPrevention", "IslandWorld", "Lands",
+            "PlotSquared", "Residence", "SuperiorSkyblock2", "Villages", "WorldGuard");
+
     private final List<Pair<Method, Listener>> claimingPluginsBreakMethods = new ArrayList<>();
     private final List<Pair<Method, Listener>> claimingPluginsPlaceMethods = new ArrayList<>();
     private final List<Pair<Method, Listener>> claimingPluginsInteractMethods = new ArrayList<>();
@@ -37,14 +41,20 @@ public final class EventsHandler {
     }
 
     public void loadClaimingPlugins(List<String> claimingPlugins){
+        // We want to initialize some well-known plugins for claims.
+        claimingPlugins.addAll(PRE_DEFINED_CLAIMING_PLUGINS);
+
+        claimingPluginsBreakMethods.clear();
         for(RegisteredListener registeredListener : BlockBreakEvent.getHandlerList().getRegisteredListeners()){
             if(claimingPlugins.contains(registeredListener.getPlugin().getName()))
                 addAllMethods(claimingPluginsBreakMethods, registeredListener.getListener(), BlockBreakEvent.class);
         }
+        claimingPluginsPlaceMethods.clear();
         for(RegisteredListener registeredListener : BlockPlaceEvent.getHandlerList().getRegisteredListeners()){
             if(claimingPlugins.contains(registeredListener.getPlugin().getName()))
                 addAllMethods(claimingPluginsPlaceMethods, registeredListener.getListener(), BlockPlaceEvent.class);
         }
+        claimingPluginsInteractMethods.clear();
         for(RegisteredListener registeredListener : PlayerInteractEvent.getHandlerList().getRegisteredListeners()){
             if(claimingPlugins.contains(registeredListener.getPlugin().getName()))
                 addAllMethods(claimingPluginsInteractMethods, registeredListener.getListener(), PlayerInteractEvent.class);
