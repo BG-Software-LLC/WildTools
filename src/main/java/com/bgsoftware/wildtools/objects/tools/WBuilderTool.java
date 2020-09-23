@@ -15,7 +15,21 @@ import com.bgsoftware.wildtools.Locale;
 import com.bgsoftware.wildtools.api.objects.ToolMode;
 import com.bgsoftware.wildtools.api.objects.tools.BuilderTool;
 
+import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.List;
+
 public final class WBuilderTool extends WTool implements BuilderTool {
+
+    private static final List<String> NON_TRANSPARENT_BLOCKS = Arrays.asList("WEB", "COBWEB");
+    private static Method GET_BLOCK_DATA = null;
+
+    static {
+        try {
+            //noinspection JavaReflectionMemberAccess
+            GET_BLOCK_DATA = Block.class.getMethod("getBlockData");
+        }catch (Throwable ignored){}
+    }
 
     private final int length;
 
@@ -48,13 +62,16 @@ public final class WBuilderTool extends WTool implements BuilderTool {
 
         BlockFace blockFace = e.getBlockFace();
 
-        ItemStack blockItemStack;
+        ItemStack blockItemStack = null;
 
-        try{
-            //noinspection JavaReflectionMemberAccess
-            BlockData blockData = (BlockData) Block.class.getMethod("getBlockData").invoke(e.getClickedBlock());
-            blockItemStack = new ItemStack(blockData.getMaterial());
-        }catch(Exception ex){
+        if(GET_BLOCK_DATA != null){
+            try {
+                BlockData blockData = (BlockData) GET_BLOCK_DATA.invoke(e.getClickedBlock());
+                blockItemStack = new ItemStack(blockData.getMaterial());
+            }catch (Exception ignored){}
+        }
+
+        if(blockItemStack == null){
             blockItemStack = e.getClickedBlock().getState().getData().toItemStack(1);
             if((blockItemStack.getType().name().contains("STEP") || blockItemStack.getType().name().contains("SLAB")) &&
                     blockItemStack.getDurability() >= 8)
@@ -83,7 +100,10 @@ public final class WBuilderTool extends WTool implements BuilderTool {
         for(iter = 0; iter < toolIterations; iter++){
             nextBlock = nextBlock.getRelative(blockFace);
 
-            if(nextBlock.getType().isSolid() || !BukkitUtils.canBreakBlock(nextBlock, firstType, firstData, this) ||
+            Material nextBlockType = nextBlock.getType();
+
+            if(nextBlockType.isSolid() || NON_TRANSPARENT_BLOCKS.contains(nextBlockType.name()) ||
+                    !BukkitUtils.canBreakBlock(nextBlock, firstType, firstData, this) ||
                     !BukkitUtils.placeBlock(e.getPlayer(), blocksController, nextBlock, originalBlock))
                 break;
         }
