@@ -3,11 +3,12 @@ package com.bgsoftware.wildtools.hooks;
 import com.bgsoftware.wildtools.WildToolsPlugin;
 import com.bgsoftware.wildtools.api.hooks.PricesProvider;
 import com.bgsoftware.wildtools.utils.Pair;
-import net.brcdev.shopgui.ShopGuiPlugin;
 
-import net.brcdev.shopgui.player.PlayerData;
+import net.brcdev.shopgui.ShopGuiPlugin;
 import net.brcdev.shopgui.shop.Shop;
 import net.brcdev.shopgui.shop.ShopItem;
+import net.brcdev.shopgui.shop.ShopManager;
+
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -33,9 +34,11 @@ public final class PricesProvider_ShopGUIPlus implements PricesProvider {
         Pair<ShopItem, Shop> shopPair = cachedShopItems.computeIfAbsent(wrappedItemStack, i -> {
             Map<String, Shop> shops = plugin.getShopManager().shops;
             for (Shop shop : shops.values()) {
-                for (ShopItem _shopItem : shop.getShopItems())
-                    if(areSimilar(_shopItem.getItem(), itemStack, _shopItem.isCompareMeta()))
+                for (ShopItem _shopItem : shop.getShopItems()) {
+                    if (_shopItem.getType() != ShopManager.ItemType.SPECIAL &&
+                            areSimilar(_shopItem.getItem(), itemStack, _shopItem.isCompareMeta()))
                         return new Pair<>(_shopItem, shop);
+                }
             }
 
             return null;
@@ -43,12 +46,10 @@ public final class PricesProvider_ShopGUIPlus implements PricesProvider {
 
         if(shopPair != null){
             if(player == null) {
-                //noinspection deprecation
                 price = Math.max(price, shopPair.getX().getSellPriceForAmount(itemStack.getAmount()));
             }
             else{
-                PlayerData playerData = ShopGuiPlugin.getInstance().getPlayerManager().getPlayerData(player);
-                price = Math.max(price, shopPair.getX().getSellPriceForAmount(player, playerData, itemStack.getAmount()));
+                price = Math.max(price, shopPair.getX().getSellPriceForAmount(player, itemStack.getAmount()));
             }
         }
 
