@@ -3,11 +3,6 @@ package com.bgsoftware.wildtools.handlers;
 import com.bgsoftware.wildtools.WildToolsPlugin;
 import com.bgsoftware.wildtools.api.handlers.ProvidersManager;
 import com.bgsoftware.wildtools.api.hooks.ContainerProvider;
-import com.bgsoftware.wildtools.hooks.AntiCheatProvider;
-import com.bgsoftware.wildtools.hooks.AntiCheatProvider_AAC;
-import com.bgsoftware.wildtools.hooks.AntiCheatProvider_Default;
-import com.bgsoftware.wildtools.hooks.AntiCheatProvider_NoCheatPlus;
-import com.bgsoftware.wildtools.hooks.AntiCheatProvider_Spartan;
 import com.bgsoftware.wildtools.hooks.ContainerProvider_ChunkCollectors;
 import com.bgsoftware.wildtools.hooks.ContainerProvider_Default;
 import com.bgsoftware.wildtools.hooks.ContainerProvider_WildChests;
@@ -61,7 +56,6 @@ public final class ProvidersHandler implements ProvidersManager {
     private final List<ContainerProvider> containerProviders = Lists.newArrayList();
     private PricesProvider pricesProvider;
     private FactionsProvider factionsProvider;
-    private AntiCheatProvider antiCheatProvider;
 
     public ProvidersHandler(){
         loadData();
@@ -160,15 +154,6 @@ public final class ProvidersHandler implements ProvidersManager {
         this.pricesProvider = pricesProvider;
     }
 
-    public void runWithBypass(Player player, Runnable runnable){
-        try {
-            antiCheatProvider.enableBypass(player);
-            runnable.run();
-        }finally {
-            antiCheatProvider.disableBypass(player);
-        }
-    }
-
     private void loadData(){
         if(pricesProvider == null) {
             // Prices Plugin Hookup
@@ -241,18 +226,6 @@ public final class ProvidersHandler implements ProvidersManager {
             addContainerProvider(new ContainerProvider_WildChests(plugin));
         }
         addContainerProvider(new ContainerProvider_Default(plugin));
-
-        // Anti Cheats hookup
-        if(Bukkit.getPluginManager().isPluginEnabled("NoCheatPlus")){
-            antiCheatProvider = new AntiCheatProvider_NoCheatPlus();
-        }
-        else if(Bukkit.getPluginManager().isPluginEnabled("AAC")){
-            antiCheatProvider = new AntiCheatProvider_AAC();
-        }
-        else if(Bukkit.getPluginManager().isPluginEnabled("Spartan")){
-            antiCheatProvider = new AntiCheatProvider_Spartan();
-        }
-        else antiCheatProvider = new AntiCheatProvider_Default();
     }
 
     public static void reload(){
