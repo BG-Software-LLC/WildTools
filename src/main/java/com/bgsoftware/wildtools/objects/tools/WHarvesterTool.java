@@ -170,7 +170,7 @@ public final class WHarvesterTool extends WTool implements HarvesterTool {
                     Block targetBlock = blockLocation.getBlock();
                     Material blockType = targetBlock.getType();
 
-                    if(!isHarvestableBlock(blockType) || !BukkitUtils.canBreakBlock(targetBlock, this))
+                    if(!isHarvestableBlock(blockType) || !BukkitUtils.canBreakBlock(player, targetBlock, this))
                         continue;
 
                     if((blockType == Material.DIRT || blockType == WMaterial.GRASS_BLOCK.parseMaterial()) &&

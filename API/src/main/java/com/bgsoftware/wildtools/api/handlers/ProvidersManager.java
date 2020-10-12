@@ -1,5 +1,6 @@
 package com.bgsoftware.wildtools.api.handlers;
 
+import com.bgsoftware.wildtools.api.hooks.ClaimsProvider;
 import com.bgsoftware.wildtools.api.hooks.ContainerProvider;
 import com.bgsoftware.wildtools.api.hooks.DropsProvider;
 import com.bgsoftware.wildtools.api.hooks.PricesProvider;
@@ -23,5 +24,11 @@ public interface ProvidersManager {
      * @param pricesProvider The provider to set.
      */
     void setPricesProvider(PricesProvider pricesProvider);
+
+    /**
+     * Add a new claims handler for the core.
+     * @param claimsProvider The handler to add.
+     */
+    void addClaimsProvider(ClaimsProvider claimsProvider);
 
 }

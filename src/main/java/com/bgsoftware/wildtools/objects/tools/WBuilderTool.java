@@ -103,7 +103,7 @@ public final class WBuilderTool extends WTool implements BuilderTool {
             Material nextBlockType = nextBlock.getType();
 
             if(nextBlockType.isSolid() || NON_TRANSPARENT_BLOCKS.contains(nextBlockType.name()) ||
-                    !BukkitUtils.canBreakBlock(nextBlock, firstType, firstData, this) ||
+                    !BukkitUtils.canBreakBlock(e.getPlayer(), nextBlock, firstType, firstData, this) ||
                     !BukkitUtils.placeBlock(e.getPlayer(), blocksController, nextBlock, originalBlock))
                 break;
         }

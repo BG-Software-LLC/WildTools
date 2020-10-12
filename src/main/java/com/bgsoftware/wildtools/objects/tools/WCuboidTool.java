@@ -52,7 +52,7 @@ public final class WCuboidTool extends WTool implements CuboidTool {
                     Block targetBlock = e.getPlayer().getWorld().getBlockAt(x, y, z);
 
                     if(targetBlock.getType() == Material.AIR ||
-                            !BukkitUtils.canBreakBlock(targetBlock, firstType, firstData, this))
+                            !BukkitUtils.canBreakBlock(e.getPlayer(), targetBlock, firstType, firstData, this))
                         continue;
 
                    if(BukkitUtils.breakBlock(e.getPlayer(), blocksController, targetBlock, inHand, this, itemStack -> itemStack))

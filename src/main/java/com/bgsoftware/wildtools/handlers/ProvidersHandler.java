@@ -2,7 +2,16 @@ package com.bgsoftware.wildtools.handlers;
 
 import com.bgsoftware.wildtools.WildToolsPlugin;
 import com.bgsoftware.wildtools.api.handlers.ProvidersManager;
+import com.bgsoftware.wildtools.api.hooks.ClaimsProvider;
 import com.bgsoftware.wildtools.api.hooks.ContainerProvider;
+import com.bgsoftware.wildtools.hooks.ClaimsProvider_FactionsUUID;
+import com.bgsoftware.wildtools.hooks.ClaimsProvider_FactionsX;
+import com.bgsoftware.wildtools.hooks.ClaimsProvider_GriefPrevention;
+import com.bgsoftware.wildtools.hooks.ClaimsProvider_Lands;
+import com.bgsoftware.wildtools.hooks.ClaimsProvider_MassiveFactions;
+import com.bgsoftware.wildtools.hooks.ClaimsProvider_Residence;
+import com.bgsoftware.wildtools.hooks.ClaimsProvider_Towny;
+import com.bgsoftware.wildtools.hooks.ClaimsProvider_Villages;
 import com.bgsoftware.wildtools.hooks.ContainerProvider_ChunkCollectors;
 import com.bgsoftware.wildtools.hooks.ContainerProvider_Default;
 import com.bgsoftware.wildtools.hooks.ContainerProvider_WildChests;
@@ -32,6 +41,7 @@ import com.google.common.collect.Lists;
 import net.milkbowl.vault.economy.Economy;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.entity.Player;
@@ -54,6 +64,7 @@ public final class ProvidersHandler implements ProvidersManager {
 
     private final List<DropsProvider> dropsProviders = Lists.newArrayList();
     private final List<ContainerProvider> containerProviders = Lists.newArrayList();
+    private final List<ClaimsProvider> claimsProviders = Lists.newArrayList();
     private PricesProvider pricesProvider;
     private FactionsProvider factionsProvider;
 
@@ -118,6 +129,10 @@ public final class ProvidersHandler implements ProvidersManager {
         }
     }
 
+    public boolean isInsideClaim(Player player, Location location){
+        return claimsProviders.stream().anyMatch(claimsProvider -> claimsProvider.isPlayerClaim(player, location));
+    }
+
     /*
      * Handler' methods
      */
@@ -152,6 +167,11 @@ public final class ProvidersHandler implements ProvidersManager {
     @Override
     public void setPricesProvider(PricesProvider pricesProvider) {
         this.pricesProvider = pricesProvider;
+    }
+
+    @Override
+    public void addClaimsProvider(ClaimsProvider claimsProvider) {
+        claimsProviders.add(claimsProvider);
     }
 
     private void loadData(){
@@ -226,6 +246,34 @@ public final class ProvidersHandler implements ProvidersManager {
             addContainerProvider(new ContainerProvider_WildChests(plugin));
         }
         addContainerProvider(new ContainerProvider_Default(plugin));
+
+        if(Bukkit.getPluginManager().isPluginEnabled("Factions")){
+            if(Bukkit.getPluginManager().getPlugin("Factions").getDescription().getAuthors().contains("drtshock")){
+                addClaimsProvider(new ClaimsProvider_FactionsUUID());
+            }
+            else{
+                addClaimsProvider(new ClaimsProvider_MassiveFactions());
+            }
+        }
+        if(Bukkit.getPluginManager().isPluginEnabled("FactionsX")){
+            addClaimsProvider(new ClaimsProvider_FactionsX());
+        }
+        if(Bukkit.getPluginManager().isPluginEnabled("GriefPrevention")){
+            addClaimsProvider(new ClaimsProvider_GriefPrevention());
+        }
+        if(Bukkit.getPluginManager().isPluginEnabled("Lands")){
+            addClaimsProvider(new ClaimsProvider_Lands());
+        }
+        if(Bukkit.getPluginManager().isPluginEnabled("Residence")){
+            addClaimsProvider(new ClaimsProvider_Residence());
+        }
+        if(Bukkit.getPluginManager().isPluginEnabled("Towny")){
+            addClaimsProvider(new ClaimsProvider_Towny());
+        }
+        if(Bukkit.getPluginManager().isPluginEnabled("Villages")){
+            addClaimsProvider(new ClaimsProvider_Villages());
+        }
+
     }
 
     public static void reload(){

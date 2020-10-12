@@ -31,14 +31,15 @@ public final class BukkitUtils {
     };
 
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
-    public static boolean canBreakBlock(Block block, Tool tool){
-        return canBreakBlock(block, block.getType(), block.getState().getData().toItemStack().getDurability(), tool);
+    public static boolean canBreakBlock(Player player, Block block, Tool tool){
+        return canBreakBlock(player, block, block.getType(), block.getState().getData().toItemStack().getDurability(), tool);
     }
 
-    public static boolean canBreakBlock(Block block, Material firstType, short firstData, Tool tool){
+    public static boolean canBreakBlock(Player player, Block block, Material firstType, short firstData, Tool tool){
         return tool.canBreakBlock(block, firstType, firstData) &&
-                !plugin.getNMSAdapter().isOutsideWorldborder(block.getLocation())
-                && block.getType() != Material.BEDROCK;
+                (!tool.isOnlyInsideClaim() || plugin.getProviders().isInsideClaim(player, block.getLocation())) &&
+                !plugin.getNMSAdapter().isOutsideWorldborder(block.getLocation()) &&
+                block.getType() != Material.BEDROCK;
     }
 
     public static boolean hasBreakAccess(Block block, Player player){

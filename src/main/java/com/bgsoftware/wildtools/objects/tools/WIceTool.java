@@ -57,7 +57,7 @@ public final class WIceTool extends WTool implements IceTool {
 
                     Block targetBlock = block.getWorld().getBlockAt(x, y, z);
 
-                    if(targetBlock.getType() != Material.ICE || !BukkitUtils.canBreakBlock(targetBlock, this))
+                    if(targetBlock.getType() != Material.ICE || !BukkitUtils.canBreakBlock(player, targetBlock, this))
                         continue;
 
                     affectedBlocks.add(targetBlock.getLocation());

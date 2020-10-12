@@ -33,7 +33,7 @@ public final class WCrowbarTool extends WTool implements CrowbarTool {
         if(!e.getClickedBlock().getType().name().contains("SPAWNER"))
             return false;
 
-        if(!BukkitUtils.canBreakBlock(e.getClickedBlock(), this))
+        if(!BukkitUtils.canBreakBlock(e.getPlayer(), e.getClickedBlock(), this))
             return true;
 
         CreatureSpawner creatureSpawner = (CreatureSpawner) e.getClickedBlock().getState();

@@ -55,7 +55,7 @@ public final class WDrainTool extends WTool implements DrainTool {
 
                     Block targetBlock = block.getWorld().getBlockAt(x, y, z);
 
-                    if(targetBlock.getType() != Material.ICE || !BukkitUtils.canBreakBlock(targetBlock, this))
+                    if(targetBlock.getType() != Material.ICE || !BukkitUtils.canBreakBlock(player, targetBlock, this))
                         continue;
 
                     blocksController.setAir(targetBlock.getLocation());

@@ -37,7 +37,7 @@ public final class WPillarTool extends WTool implements PillarTool {
 
             Block targetBlock = e.getPlayer().getWorld().getBlockAt(x, y, z);
 
-            if(!BukkitUtils.canBreakBlock(targetBlock, firstType, firstData, this))
+            if(!BukkitUtils.canBreakBlock(e.getPlayer(), targetBlock, firstType, firstData, this))
                 continue;
 
             if(BukkitUtils.breakBlock(e.getPlayer(), blocksController, targetBlock, e.getItem(), this, itemStack -> itemStack))
