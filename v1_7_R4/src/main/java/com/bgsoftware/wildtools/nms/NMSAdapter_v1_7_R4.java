@@ -16,7 +16,6 @@ import net.minecraft.server.v1_7_R4.EntityLiving;
 import net.minecraft.server.v1_7_R4.EntityPlayer;
 import net.minecraft.server.v1_7_R4.GameProfileSerializer;
 import net.minecraft.server.v1_7_R4.Item;
-import net.minecraft.server.v1_7_R4.ItemBow;
 import net.minecraft.server.v1_7_R4.ItemStack;
 import net.minecraft.server.v1_7_R4.Items;
 import net.minecraft.server.v1_7_R4.NBTTagCompound;
@@ -254,7 +253,7 @@ public final class NMSAdapter_v1_7_R4 implements NMSAdapter {
         nmsStack.count -= 1;
 
         entityPlayer.a(StatisticList.BREAK_ITEM_COUNT[Item.getId(nmsStack.getItem())]);
-        if (nmsStack.count == 0 && nmsStack.getItem() instanceof ItemBow) {
+        if (nmsStack.count == 0) {
             entityPlayer.bG();
         }
 

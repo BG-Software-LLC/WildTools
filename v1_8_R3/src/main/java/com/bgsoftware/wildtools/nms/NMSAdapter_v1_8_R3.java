@@ -19,7 +19,6 @@ import net.minecraft.server.v1_8_R3.EnumColor;
 import net.minecraft.server.v1_8_R3.GameProfileSerializer;
 import net.minecraft.server.v1_8_R3.IBlockData;
 import net.minecraft.server.v1_8_R3.Item;
-import net.minecraft.server.v1_8_R3.ItemBow;
 import net.minecraft.server.v1_8_R3.ItemStack;
 import net.minecraft.server.v1_8_R3.Items;
 import net.minecraft.server.v1_8_R3.NBTTagCompound;
@@ -257,7 +256,7 @@ public final class NMSAdapter_v1_8_R3 implements NMSAdapter {
         nmsStack.count -= 1;
 
         entityPlayer.b(StatisticList.BREAK_ITEM_COUNT[Item.getId(nmsStack.getItem())]);
-        if (nmsStack.count == 0 && nmsStack.getItem() instanceof ItemBow) {
+        if (nmsStack.count == 0) {
             entityPlayer.ca();
         }
 
