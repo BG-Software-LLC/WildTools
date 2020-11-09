@@ -40,17 +40,20 @@ public final class WPillarTool extends WTool implements PillarTool {
             if(!BukkitUtils.canBreakBlock(e.getPlayer(), targetBlock, firstType, firstData, this))
                 continue;
 
-            if(BukkitUtils.breakBlock(e.getPlayer(), blocksController, targetBlock, e.getItem(), this, itemStack -> itemStack))
-                toolUsages++;
+            if(!BukkitUtils.breakBlock(e.getPlayer(), blocksController, targetBlock, e.getItem(), this, itemStack -> itemStack))
+                break;
+
+            toolUsages++;
         }
 
-        PillarWandUseEvent pillarWandUseEvent = new PillarWandUseEvent(e.getPlayer(), this, blocksController.getAffectedBlocks());
-        Bukkit.getPluginManager().callEvent(pillarWandUseEvent);
+        if(toolUsages > 0) {
+            PillarWandUseEvent pillarWandUseEvent = new PillarWandUseEvent(e.getPlayer(), this, blocksController.getAffectedBlocks());
+            Bukkit.getPluginManager().callEvent(pillarWandUseEvent);
 
-        blocksController.updateSession();
+            blocksController.updateSession();
 
-        if(toolUsages > 0)
             reduceDurablility(e.getPlayer(), usingDurability ? toolUsages : 1, e.getItem());
+        }
 
         return true;
     }
