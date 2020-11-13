@@ -23,13 +23,15 @@ public interface RecipeChoice extends Predicate<ItemStack> {
 
     void remove(Inventory inventory);
 
+    RecipeChoice copy();
+
     static RecipeChoice of(ItemStack... itemStacks){
         return itemStacks.length == 1 ? new ExactChoice(itemStacks[0]) : new MaterialChoice(Arrays.asList(itemStacks));
     }
 
     final class MaterialChoice implements RecipeChoice {
 
-        private List<ItemStack> itemStacks;
+        private final List<ItemStack> itemStacks;
 
         MaterialChoice(List<ItemStack> itemStacks){
             this.itemStacks = itemStacks.stream().map(ItemStack::clone).collect(Collectors.toList());
@@ -82,11 +84,16 @@ public interface RecipeChoice extends Predicate<ItemStack> {
             return "MaterialChoice{items=" + itemStacks.toString() + "}";
         }
 
+        @Override
+        public RecipeChoice copy() {
+            return new MaterialChoice(itemStacks.stream().map(ItemStack::clone).collect(Collectors.toList()));
+        }
+
     }
 
     final class ExactChoice implements RecipeChoice {
 
-        private ItemStack itemStack;
+        private final ItemStack itemStack;
 
         ExactChoice(ItemStack itemStack){
             this.itemStack = itemStack.clone();
@@ -145,6 +152,12 @@ public interface RecipeChoice extends Predicate<ItemStack> {
         public String toString() {
             return "ExactChoice{item=" + itemStack.toString() + "}";
         }
+
+        @Override
+        public RecipeChoice copy() {
+            return new ExactChoice(itemStack.clone());
+        }
+
     }
 
 }

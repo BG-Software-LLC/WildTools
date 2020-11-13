@@ -89,12 +89,13 @@ public final class WCraftingTool extends WTool implements CraftingTool {
 
                 if (amountOfRecipes > 0) {
                     for (RecipeChoice ingredient : ingredients) {
-                        ingredient.setAmount(ingredient.getAmount() * amountOfRecipes);
-                        ingredient.remove(inventory);
-                        if (ingredient.test("BOTTLE"))
-                            toAdd.add(new ItemStack(Material.GLASS_BOTTLE, ingredient.getAmount()));
-                        else if (ingredient.test("BUCKET"))
-                            toAdd.add(new ItemStack(Material.BUCKET, ingredient.getAmount()));
+                        RecipeChoice clonedIngredient = ingredient.copy();
+                        clonedIngredient.setAmount(clonedIngredient.getAmount() * amountOfRecipes);
+                        clonedIngredient.remove(inventory);
+                        if (clonedIngredient.test("BOTTLE"))
+                            toAdd.add(new ItemStack(Material.GLASS_BOTTLE, clonedIngredient.getAmount()));
+                        else if (clonedIngredient.test("BUCKET"))
+                            toAdd.add(new ItemStack(Material.BUCKET, clonedIngredient.getAmount()));
                     }
 
                     ItemStack result = recipe.getResult().clone();
