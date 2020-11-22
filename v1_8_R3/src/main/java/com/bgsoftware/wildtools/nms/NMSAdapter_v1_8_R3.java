@@ -2,6 +2,7 @@ package com.bgsoftware.wildtools.nms;
 
 import com.bgsoftware.wildtools.hooks.PaperHook;
 import com.bgsoftware.wildtools.utils.items.ToolItemStack;
+import com.bgsoftware.wildtools.utils.reflections.ReflectField;
 import net.minecraft.server.v1_8_R3.Block;
 import net.minecraft.server.v1_8_R3.BlockCarrots;
 import net.minecraft.server.v1_8_R3.BlockCocoa;
@@ -12,6 +13,7 @@ import net.minecraft.server.v1_8_R3.BlockPotatoes;
 import net.minecraft.server.v1_8_R3.Blocks;
 import net.minecraft.server.v1_8_R3.Chunk;
 import net.minecraft.server.v1_8_R3.EnchantmentManager;
+import net.minecraft.server.v1_8_R3.EntityHuman;
 import net.minecraft.server.v1_8_R3.EntityItem;
 import net.minecraft.server.v1_8_R3.EntityLiving;
 import net.minecraft.server.v1_8_R3.EntityPlayer;
@@ -22,8 +24,10 @@ import net.minecraft.server.v1_8_R3.Item;
 import net.minecraft.server.v1_8_R3.ItemStack;
 import net.minecraft.server.v1_8_R3.Items;
 import net.minecraft.server.v1_8_R3.NBTTagCompound;
+import net.minecraft.server.v1_8_R3.Packet;
 import net.minecraft.server.v1_8_R3.PacketPlayOutCollect;
 import net.minecraft.server.v1_8_R3.PacketPlayOutMultiBlockChange;
+import net.minecraft.server.v1_8_R3.PlayerChunkMap;
 import net.minecraft.server.v1_8_R3.StatisticList;
 import net.minecraft.server.v1_8_R3.TileEntity;
 import net.minecraft.server.v1_8_R3.TileEntitySkull;
@@ -49,7 +53,6 @@ import org.bukkit.CropState;
 import org.bukkit.craftbukkit.v1_8_R3.util.CraftMagicNumbers;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.enchantments.EnchantmentTarget;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
@@ -58,7 +61,6 @@ import org.bukkit.material.CocoaPlant;
 import org.bukkit.material.Crops;
 import org.bukkit.material.NetherWarts;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -67,14 +69,7 @@ import java.util.Set;
 @SuppressWarnings({"unused", "deprecation"})
 public final class NMSAdapter_v1_8_R3 implements NMSAdapter {
 
-    private static Field customItemStackHandleField = null;
-
-    static {
-        try {
-            customItemStackHandleField = CraftItemStack.class.getDeclaredField("handle");
-            customItemStackHandleField.setAccessible(true);
-        }catch (Exception ignored){}
-    }
+    private static final ReflectField<ItemStack> ITEM_STACK_HANDLE = new ReflectField<>(CraftItemStack.class, ItemStack.class, "handle");
 
     @Override
     public String getVersion() {
@@ -272,14 +267,10 @@ public final class NMSAdapter_v1_8_R3 implements NMSAdapter {
     @Override
     public Object[] createSyncedItem(org.bukkit.inventory.ItemStack other) {
         CraftItemStack craftItemStack;
-        ItemStack handle = null;
+        ItemStack handle;
         if(other instanceof CraftItemStack){
             craftItemStack = (CraftItemStack) other;
-            try {
-                handle = (ItemStack) customItemStackHandleField.get(other);
-            }catch (Exception ex){
-                ex.printStackTrace();
-            }
+            handle = ITEM_STACK_HANDLE.get(other);
         }else{
             handle = CraftItemStack.asNMSCopy(other);
             craftItemStack = CraftItemStack.asCraftMirror(handle);
@@ -375,12 +366,8 @@ public final class NMSAdapter_v1_8_R3 implements NMSAdapter {
             values[counter++] = (short) ((location.getBlockX() & 15) << 12 | (location.getBlockZ() & 15) << 8 | location.getBlockY());
         }
 
-        PacketPlayOutMultiBlockChange multiBlockChange = new PacketPlayOutMultiBlockChange(blocksAmount, values, chunk);
-
-        for(Entity player : bukkitChunk.getWorld().getNearbyEntities(firstLocation, 60, 200, 60)) {
-            if(player instanceof Player)
-                ((CraftPlayer) player).getHandle().playerConnection.sendPacket(multiBlockChange);
-        }
+        sendPacketToRelevantPlayers((WorldServer) chunk.world, chunk.locX, chunk.locZ,
+                new PacketPlayOutMultiBlockChange(blocksAmount, values, chunk));
     }
 
     @Override
@@ -400,6 +387,14 @@ public final class NMSAdapter_v1_8_R3 implements NMSAdapter {
         World world = ((CraftWorld) location.getWorld()).getHandle();
         BlockPosition blockPosition = new BlockPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ());
         world.setTypeAndData(blockPosition, Block.getByCombinedId(combinedId), 18);
+    }
+
+    private void sendPacketToRelevantPlayers(WorldServer worldServer, int chunkX, int chunkZ, Packet<?> packet){
+        PlayerChunkMap playerChunkMap = worldServer.getPlayerChunkMap();
+        for(EntityHuman entityHuman : worldServer.players){
+            if(entityHuman instanceof EntityPlayer && playerChunkMap.a((EntityPlayer) entityHuman, chunkX, chunkZ))
+                ((EntityPlayer) entityHuman).playerConnection.sendPacket(packet);
+        }
     }
 
     @Override

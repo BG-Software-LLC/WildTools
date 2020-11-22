@@ -5,6 +5,7 @@ import com.bgsoftware.wildtools.hooks.PaperHook;
 import com.bgsoftware.wildtools.objects.WMaterial;
 import com.bgsoftware.wildtools.recipes.AdvancedShapedRecipe;
 import com.bgsoftware.wildtools.utils.items.ToolItemStack;
+import com.bgsoftware.wildtools.utils.reflections.ReflectField;
 import net.minecraft.server.v1_13_R1.Block;
 import net.minecraft.server.v1_13_R1.BlockBeetroot;
 import net.minecraft.server.v1_13_R1.BlockCarrots;
@@ -18,6 +19,7 @@ import net.minecraft.server.v1_13_R1.Chunk;
 import net.minecraft.server.v1_13_R1.ContainerAnvil;
 import net.minecraft.server.v1_13_R1.EnchantmentManager;
 import net.minecraft.server.v1_13_R1.Enchantments;
+import net.minecraft.server.v1_13_R1.EntityHuman;
 import net.minecraft.server.v1_13_R1.EntityItem;
 import net.minecraft.server.v1_13_R1.EntityLiving;
 import net.minecraft.server.v1_13_R1.EntityPlayer;
@@ -26,8 +28,10 @@ import net.minecraft.server.v1_13_R1.Item;
 import net.minecraft.server.v1_13_R1.ItemStack;
 import net.minecraft.server.v1_13_R1.Items;
 import net.minecraft.server.v1_13_R1.NBTTagCompound;
+import net.minecraft.server.v1_13_R1.Packet;
 import net.minecraft.server.v1_13_R1.PacketPlayOutCollect;
 import net.minecraft.server.v1_13_R1.PacketPlayOutMultiBlockChange;
+import net.minecraft.server.v1_13_R1.PlayerChunkMap;
 import net.minecraft.server.v1_13_R1.StatisticList;
 import net.minecraft.server.v1_13_R1.TileEntityShulkerBox;
 import net.minecraft.server.v1_13_R1.World;
@@ -77,14 +81,7 @@ import java.util.Set;
 @SuppressWarnings({"unused", "ConstantConditions"})
 public final class NMSAdapter_v1_13_R1 implements NMSAdapter {
 
-    private static Field customItemStackHandleField = null;
-
-    static {
-        try {
-            customItemStackHandleField = CraftItemStack.class.getDeclaredField("handle");
-            customItemStackHandleField.setAccessible(true);
-        }catch (Exception ignored){}
-    }
+    private static final ReflectField<ItemStack> ITEM_STACK_HANDLE = new ReflectField<>(CraftItemStack.class, ItemStack.class, "handle");
 
     @Override
     public String getVersion() {
@@ -278,14 +275,10 @@ public final class NMSAdapter_v1_13_R1 implements NMSAdapter {
     @Override
     public Object[] createSyncedItem(org.bukkit.inventory.ItemStack other) {
         CraftItemStack craftItemStack;
-        ItemStack handle = null;
+        ItemStack handle;
         if(other instanceof CraftItemStack){
             craftItemStack = (CraftItemStack) other;
-            try {
-                handle = (ItemStack) customItemStackHandleField.get(other);
-            }catch (Exception ex){
-                ex.printStackTrace();
-            }
+            handle = ITEM_STACK_HANDLE.get(other);
         }else{
             handle = CraftItemStack.asNMSCopy(other);
             craftItemStack = CraftItemStack.asCraftMirror(handle);
@@ -512,6 +505,14 @@ public final class NMSAdapter_v1_13_R1 implements NMSAdapter {
         return new AdvancedRecipeClassImpl(toolName, result);
     }
 
+    private void sendPacketToRelevantPlayers(WorldServer worldServer, int chunkX, int chunkZ, Packet<?> packet){
+        PlayerChunkMap playerChunkMap = worldServer.getPlayerChunkMap();
+        for(EntityHuman entityHuman : worldServer.players){
+            if(entityHuman instanceof EntityPlayer && playerChunkMap.a((EntityPlayer) entityHuman, chunkX, chunkZ))
+                ((EntityPlayer) entityHuman).playerConnection.sendPacket(packet);
+        }
+    }
+
     public static class AdvancedRecipeClassImpl extends ShapedRecipe implements AdvancedShapedRecipe {
 
         private static Field ingredientsField;
@@ -562,7 +563,6 @@ public final class NMSAdapter_v1_13_R1 implements NMSAdapter {
 
     }
 
-    @SuppressWarnings("NullableProblems")
     private static class FakeCraftBlock extends CraftBlock{
 
         private Material blockType;

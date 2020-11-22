@@ -1,7 +1,7 @@
 package com.bgsoftware.wildtools.nms;
 
 import com.bgsoftware.wildtools.utils.items.ToolItemStack;
-import net.minecraft.server.v1_7_R4.AxisAlignedBB;
+import com.bgsoftware.wildtools.utils.reflections.ReflectField;
 import net.minecraft.server.v1_7_R4.Block;
 import net.minecraft.server.v1_7_R4.BlockCarrots;
 import net.minecraft.server.v1_7_R4.BlockCocoa;
@@ -19,8 +19,10 @@ import net.minecraft.server.v1_7_R4.Item;
 import net.minecraft.server.v1_7_R4.ItemStack;
 import net.minecraft.server.v1_7_R4.Items;
 import net.minecraft.server.v1_7_R4.NBTTagCompound;
+import net.minecraft.server.v1_7_R4.Packet;
 import net.minecraft.server.v1_7_R4.PacketPlayOutCollect;
 import net.minecraft.server.v1_7_R4.PacketPlayOutMultiBlockChange;
+import net.minecraft.server.v1_7_R4.PlayerChunkMap;
 import net.minecraft.server.v1_7_R4.StatisticList;
 import net.minecraft.server.v1_7_R4.TileEntity;
 import net.minecraft.server.v1_7_R4.TileEntitySkull;
@@ -47,7 +49,6 @@ import org.bukkit.CropState;
 import org.bukkit.craftbukkit.v1_7_R4.util.CraftMagicNumbers;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.enchantments.EnchantmentTarget;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
@@ -66,14 +67,7 @@ import java.util.Set;
 @SuppressWarnings({"unused", "deprecation"})
 public final class NMSAdapter_v1_7_R4 implements NMSAdapter {
 
-    private static Field customItemStackHandleField = null;
-
-    static {
-        try {
-            customItemStackHandleField = CraftItemStack.class.getDeclaredField("handle");
-            customItemStackHandleField.setAccessible(true);
-        }catch (Exception ignored){}
-    }
+    private static final ReflectField<ItemStack> ITEM_STACK_HANDLE = new ReflectField<>(CraftItemStack.class, ItemStack.class, "handle");
 
     @Override
     public String getVersion() {
@@ -269,14 +263,10 @@ public final class NMSAdapter_v1_7_R4 implements NMSAdapter {
     @Override
     public Object[] createSyncedItem(org.bukkit.inventory.ItemStack other) {
         CraftItemStack craftItemStack;
-        ItemStack handle = null;
+        ItemStack handle;
         if(other instanceof CraftItemStack){
             craftItemStack = (CraftItemStack) other;
-            try {
-                handle = (ItemStack) customItemStackHandleField.get(other);
-            }catch (Exception ex){
-                ex.printStackTrace();
-            }
+            handle = ITEM_STACK_HANDLE.get(other);
         }else{
             handle = CraftItemStack.asNMSCopy(other);
             craftItemStack = CraftItemStack.asCraftMirror(handle);
@@ -381,17 +371,8 @@ public final class NMSAdapter_v1_7_R4 implements NMSAdapter {
             values[counter++] = (short) ((location.getBlockX() & 15) << 12 | (location.getBlockZ() & 15) << 8 | location.getBlockY());
         }
 
-        PacketPlayOutMultiBlockChange multiBlockChange = new PacketPlayOutMultiBlockChange(blocksAmount, values, chunk);
-
-        assert firstLocation != null;
-        AxisAlignedBB bb = AxisAlignedBB.a(firstLocation.getX() - 60, firstLocation.getY() - 200, firstLocation.getZ() - 60,
-                firstLocation.getX() + 60, firstLocation.getY() + 200, firstLocation.getZ() + 60);
-
-        //noinspection unchecked
-        for(Entity entity : (List<Entity>) ((CraftWorld) bukkitChunk.getWorld()).getHandle().getEntities(null, bb)){
-            if(entity instanceof EntityPlayer)
-                ((EntityPlayer) entity).playerConnection.sendPacket(multiBlockChange);
-        }
+        sendPacketToRelevantPlayers((WorldServer) chunk.world, chunk.locX, chunk.locZ,
+                new PacketPlayOutMultiBlockChange(blocksAmount, values, chunk));
     }
 
     @Override
@@ -480,6 +461,14 @@ public final class NMSAdapter_v1_7_R4 implements NMSAdapter {
     @Override
     public boolean isShovelType(Material material) {
         return Items.DIAMOND_SPADE.getDestroySpeed(new ItemStack(Items.DIAMOND_SPADE), CraftMagicNumbers.getBlock(material)) == 8.0F;
+    }
+
+    private void sendPacketToRelevantPlayers(WorldServer worldServer, int chunkX, int chunkZ, Packet packet){
+        PlayerChunkMap playerChunkMap = worldServer.getPlayerChunkMap();
+        for(Object entityHuman : worldServer.players){
+            if(entityHuman instanceof EntityPlayer && playerChunkMap.a((EntityPlayer) entityHuman, chunkX, chunkZ))
+                ((EntityPlayer) entityHuman).playerConnection.sendPacket(packet);
+        }
     }
 
     private static class FakeCraftBlock extends CraftBlock{

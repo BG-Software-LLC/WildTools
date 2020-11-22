@@ -5,6 +5,7 @@ import com.bgsoftware.wildtools.hooks.PaperHook;
 import com.bgsoftware.wildtools.objects.WMaterial;
 import com.bgsoftware.wildtools.recipes.AdvancedShapedRecipe;
 import com.bgsoftware.wildtools.utils.items.ToolItemStack;
+import com.bgsoftware.wildtools.utils.reflections.ReflectField;
 import net.minecraft.server.v1_16_R1.Block;
 import net.minecraft.server.v1_16_R1.BlockPosition;
 import net.minecraft.server.v1_16_R1.Blocks;
@@ -19,8 +20,11 @@ import net.minecraft.server.v1_16_R1.Item;
 import net.minecraft.server.v1_16_R1.ItemStack;
 import net.minecraft.server.v1_16_R1.Items;
 import net.minecraft.server.v1_16_R1.NBTTagCompound;
+import net.minecraft.server.v1_16_R1.Packet;
 import net.minecraft.server.v1_16_R1.PacketPlayOutCollect;
 import net.minecraft.server.v1_16_R1.PacketPlayOutMultiBlockChange;
+import net.minecraft.server.v1_16_R1.PlayerChunkMap;
+import net.minecraft.server.v1_16_R1.PlayerMap;
 import net.minecraft.server.v1_16_R1.StatisticList;
 import net.minecraft.server.v1_16_R1.TileEntity;
 import net.minecraft.server.v1_16_R1.World;
@@ -47,7 +51,6 @@ import org.bukkit.craftbukkit.v1_16_R1.inventory.CraftInventoryView;
 import org.bukkit.craftbukkit.v1_16_R1.inventory.CraftItemStack;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.enchantments.EnchantmentTarget;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
@@ -72,14 +75,8 @@ import java.util.stream.Collectors;
 @SuppressWarnings({"unused", "ConstantConditions"})
 public final class NMSAdapter_v1_16_R1 implements NMSAdapter {
 
-    private static Field customItemStackHandleField = null;
-
-    static {
-        try {
-            customItemStackHandleField = CraftItemStack.class.getDeclaredField("handle");
-            customItemStackHandleField.setAccessible(true);
-        }catch (Exception ignored){}
-    }
+    private static final ReflectField<PlayerMap> PLAYER_MAP_FIELD = new ReflectField<>(PlayerChunkMap.class, PlayerMap.class, "playerMap");
+    private static final ReflectField<ItemStack> ITEM_STACK_HANDLE = new ReflectField<>(CraftItemStack.class, ItemStack.class, "handle");
 
     @Override
     public String getVersion() {
@@ -180,14 +177,10 @@ public final class NMSAdapter_v1_16_R1 implements NMSAdapter {
     @Override
     public Object[] createSyncedItem(org.bukkit.inventory.ItemStack other) {
         CraftItemStack craftItemStack;
-        ItemStack handle = null;
+        ItemStack handle;
         if(other instanceof CraftItemStack){
             craftItemStack = (CraftItemStack) other;
-            try {
-                handle = (ItemStack) customItemStackHandleField.get(other);
-            }catch (Exception ex){
-                ex.printStackTrace();
-            }
+            handle = ITEM_STACK_HANDLE.get(other);
         }else{
             handle = CraftItemStack.asNMSCopy(other);
             craftItemStack = CraftItemStack.asCraftMirror(handle);
@@ -278,10 +271,8 @@ public final class NMSAdapter_v1_16_R1 implements NMSAdapter {
             values[counter++] = (short) ((location.getBlockX() & 15) << 12 | (location.getBlockZ() & 15) << 8 | location.getBlockY());
         }
 
-        PacketPlayOutMultiBlockChange multiBlockChange = new PacketPlayOutMultiBlockChange(blocksAmount, values, chunk);
-
-        for(Entity player : bukkitChunk.getWorld().getNearbyEntities(firstLocation, 60, 200, 60, entity -> entity instanceof Player))
-            ((CraftPlayer) player).getHandle().playerConnection.sendPacket(multiBlockChange);
+        sendPacketToRelevantPlayers(chunk.world, chunk.getPos().x, chunk.getPos().z,
+                new PacketPlayOutMultiBlockChange(blocksAmount, values, chunk));
     }
 
     @Override
@@ -439,6 +430,12 @@ public final class NMSAdapter_v1_16_R1 implements NMSAdapter {
     @Override
     public AdvancedShapedRecipe createRecipe(String toolName, org.bukkit.inventory.ItemStack result) {
         return new AdvancedRecipeClassImpl(toolName, result);
+    }
+
+    private static void sendPacketToRelevantPlayers(WorldServer worldServer, int chunkX, int chunkZ, Packet<?> packet){
+        PlayerChunkMap playerChunkMap = worldServer.getChunkProvider().playerChunkMap;
+        PLAYER_MAP_FIELD.get(playerChunkMap).a(1)
+                .forEach(entityPlayer -> entityPlayer.playerConnection.sendPacket(packet));
     }
 
     @SuppressWarnings("NullableProblems")

@@ -5,6 +5,8 @@ import com.bgsoftware.wildtools.hooks.PaperHook;
 import com.bgsoftware.wildtools.objects.WMaterial;
 import com.bgsoftware.wildtools.recipes.AdvancedShapedRecipe;
 import com.bgsoftware.wildtools.utils.items.ToolItemStack;
+import com.bgsoftware.wildtools.utils.reflections.ReflectConstructor;
+import com.bgsoftware.wildtools.utils.reflections.ReflectField;
 import net.minecraft.server.v1_16_R3.Block;
 import net.minecraft.server.v1_16_R3.BlockPosition;
 import net.minecraft.server.v1_16_R3.Blocks;
@@ -20,8 +22,11 @@ import net.minecraft.server.v1_16_R3.Item;
 import net.minecraft.server.v1_16_R3.ItemStack;
 import net.minecraft.server.v1_16_R3.Items;
 import net.minecraft.server.v1_16_R3.NBTTagCompound;
+import net.minecraft.server.v1_16_R3.Packet;
 import net.minecraft.server.v1_16_R3.PacketPlayOutCollect;
 import net.minecraft.server.v1_16_R3.PacketPlayOutMultiBlockChange;
+import net.minecraft.server.v1_16_R3.PlayerChunkMap;
+import net.minecraft.server.v1_16_R3.PlayerMap;
 import net.minecraft.server.v1_16_R3.SectionPosition;
 import net.minecraft.server.v1_16_R3.StatisticList;
 import net.minecraft.server.v1_16_R3.TileEntity;
@@ -51,7 +56,6 @@ import org.bukkit.craftbukkit.v1_16_R3.inventory.CraftInventoryView;
 import org.bukkit.craftbukkit.v1_16_R3.inventory.CraftItemStack;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.enchantments.EnchantmentTarget;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
@@ -65,12 +69,10 @@ import org.bukkit.inventory.RecipeChoice;
 import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.inventory.ShapelessRecipe;
 
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -79,20 +81,16 @@ import java.util.stream.Collectors;
 @SuppressWarnings({"unused", "ConstantConditions"})
 public final class NMSAdapter_v1_16_R3 implements NMSAdapter {
 
+    private static final ReflectField<PlayerMap> PLAYER_MAP_FIELD = new ReflectField<>(PlayerChunkMap.class, PlayerMap.class, "playerMap");
+    private static final ReflectField<ItemStack> ITEM_STACK_HANDLE = new ReflectField<>(CraftItemStack.class, ItemStack.class, "handle");
+    private static final ReflectConstructor<PacketPlayOutMultiBlockChange> MULTI_BLOCK_CHANGE_CONSTRUCTOR = new ReflectConstructor<>(PacketPlayOutMultiBlockChange.class, constructor -> constructor.getParameterCount() > 0);
+
     private static Class<?> SHORT_ARRAY_SET_CLASS = null;
-    private static Constructor<?> MULTI_BLOCK_CHANGE_CONSTRUCTOR = null;
-    private static Field customItemStackHandleField = null;
 
     static {
         try {
-            customItemStackHandleField = CraftItemStack.class.getDeclaredField("handle");
-            customItemStackHandleField.setAccessible(true);
             SHORT_ARRAY_SET_CLASS = Class.forName("it.unimi.dsi.fastutil.shorts.ShortArraySet");
             Class<?> shortSetClass = Class.forName("it.unimi.dsi.fastutil.shorts.ShortSet");
-            for(Constructor<?> constructor : PacketPlayOutMultiBlockChange.class.getConstructors()){
-                if(constructor.getParameterCount() > 0)
-                    MULTI_BLOCK_CHANGE_CONSTRUCTOR = constructor;
-            }
         }catch (Exception ignored){}
     }
 
@@ -195,14 +193,10 @@ public final class NMSAdapter_v1_16_R3 implements NMSAdapter {
     @Override
     public Object[] createSyncedItem(org.bukkit.inventory.ItemStack other) {
         CraftItemStack craftItemStack;
-        ItemStack handle = null;
+        ItemStack handle;
         if(other instanceof CraftItemStack){
             craftItemStack = (CraftItemStack) other;
-            try {
-                handle = (ItemStack) customItemStackHandleField.get(other);
-            }catch (Exception ex){
-                ex.printStackTrace();
-            }
+            handle = ITEM_STACK_HANDLE.get(other);
         }else{
             handle = CraftItemStack.asNMSCopy(other);
             craftItemStack = CraftItemStack.asCraftMirror(handle);
@@ -292,48 +286,11 @@ public final class NMSAdapter_v1_16_R3 implements NMSAdapter {
             shortSet.add((short)((location.getBlockX() & 15) << 8 | (location.getBlockZ() & 15) << 4 | (location.getBlockY() & 15)));
         }
 
-        Collection<Entity> playerList = bukkitChunk.getWorld().getNearbyEntities(firstLocation, 60, 200, 60, entity -> entity instanceof Player);
-        Set<PacketPlayOutMultiBlockChange> packetsToSend = new HashSet<>();
-
         for(Map.Entry<Integer,  Set<Short>> entry : blocks.entrySet()){
             PacketPlayOutMultiBlockChange packetPlayOutMultiBlockChange = createMultiBlockChangePacket(
                     SectionPosition.a(chunk.getPos(), entry.getKey()), entry.getValue(), chunk.getSections()[entry.getKey()]);
             if(packetPlayOutMultiBlockChange != null)
-                packetsToSend.add(packetPlayOutMultiBlockChange);
-        }
-
-        for(Entity player : playerList)
-            packetsToSend.forEach(((CraftPlayer) player).getHandle().playerConnection::sendPacket);
-    }
-
-    @SuppressWarnings("all")
-    private static Set<Short> createShortSet(){
-        if(SHORT_ARRAY_SET_CLASS == null)
-            return new ShortArraySet();
-
-        try{
-            return (Set<Short>) SHORT_ARRAY_SET_CLASS.newInstance();
-        }catch (Throwable ex){
-            ex.printStackTrace();
-            return null;
-        }
-    }
-
-    private static PacketPlayOutMultiBlockChange createMultiBlockChangePacket(SectionPosition sectionPosition, Set<Short> shortSet, ChunkSection chunkSection){
-        if(MULTI_BLOCK_CHANGE_CONSTRUCTOR == null){
-            return new PacketPlayOutMultiBlockChange(
-                    sectionPosition,
-                    (ShortSet) shortSet,
-                    chunkSection,
-                    true
-            );
-        }
-
-        try{
-            return (PacketPlayOutMultiBlockChange) MULTI_BLOCK_CHANGE_CONSTRUCTOR.newInstance(sectionPosition, shortSet, chunkSection, true);
-        }catch (Throwable ex){
-            ex.printStackTrace();
-            return null;
+                sendPacketToRelevantPlayers(chunk.world, chunk.getPos().x, chunk.getPos().z, packetPlayOutMultiBlockChange);
         }
     }
 
@@ -492,6 +449,43 @@ public final class NMSAdapter_v1_16_R3 implements NMSAdapter {
     @Override
     public AdvancedShapedRecipe createRecipe(String toolName, org.bukkit.inventory.ItemStack result) {
         return new AdvancedRecipeClassImpl(toolName, result);
+    }
+
+    @SuppressWarnings("all")
+    private static Set<Short> createShortSet(){
+        if(SHORT_ARRAY_SET_CLASS == null)
+            return new ShortArraySet();
+
+        try{
+            return (Set<Short>) SHORT_ARRAY_SET_CLASS.newInstance();
+        }catch (Throwable ex){
+            ex.printStackTrace();
+            return null;
+        }
+    }
+
+    private static PacketPlayOutMultiBlockChange createMultiBlockChangePacket(SectionPosition sectionPosition, Set<Short> shortSet, ChunkSection chunkSection){
+        if(MULTI_BLOCK_CHANGE_CONSTRUCTOR == null){
+            return new PacketPlayOutMultiBlockChange(
+                    sectionPosition,
+                    (ShortSet) shortSet,
+                    chunkSection,
+                    true
+            );
+        }
+
+        try{
+            return MULTI_BLOCK_CHANGE_CONSTRUCTOR.newInstance(sectionPosition, shortSet, chunkSection, true);
+        }catch (Throwable ex){
+            ex.printStackTrace();
+            return null;
+        }
+    }
+
+    private static void sendPacketToRelevantPlayers(WorldServer worldServer, int chunkX, int chunkZ, Packet<?> packet){
+        PlayerChunkMap playerChunkMap = worldServer.getChunkProvider().playerChunkMap;
+        PLAYER_MAP_FIELD.get(playerChunkMap).a(1)
+                .forEach(entityPlayer -> entityPlayer.playerConnection.sendPacket(packet));
     }
 
     @SuppressWarnings("NullableProblems")
