@@ -35,7 +35,7 @@ public final class PricesProvider_ShopGUIPlus implements PricesProvider {
             Map<String, Shop> shops = plugin.getShopManager().shops;
             for (Shop shop : shops.values()) {
                 for (ShopItem _shopItem : shop.getShopItems()) {
-                    if (_shopItem.getType() != ShopManager.ItemType.SPECIAL &&
+                    if (_shopItem.getType() == ShopManager.ItemType.ITEM &&
                             areSimilar(_shopItem.getItem(), itemStack, _shopItem.isCompareMeta()))
                         return new Pair<>(_shopItem, shop);
                 }
