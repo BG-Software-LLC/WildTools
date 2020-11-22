@@ -63,14 +63,13 @@ public final class ProvidersHandler implements ProvidersManager {
     private Economy economy;
 
     private final List<DropsProvider> dropsProviders = Lists.newArrayList();
+
     private final List<ContainerProvider> containerProviders = Lists.newArrayList();
+    private final ContainerProvider defaultContainer = new ContainerProvider_Default(plugin);
+
     private final List<ClaimsProvider> claimsProviders = Lists.newArrayList();
     private PricesProvider pricesProvider;
     private FactionsProvider factionsProvider;
-
-    public ProvidersHandler(){
-        loadData();
-    }
 
     /*
      * Hooks' methods
@@ -108,7 +107,7 @@ public final class ProvidersHandler implements ProvidersManager {
                 return true;
         }
 
-        return false;
+        return defaultContainer.isContainer(blockState);
     }
 
     public SellInfo sellContainer(BlockState blockState, Inventory inventory, Player player){
@@ -117,6 +116,9 @@ public final class ProvidersHandler implements ProvidersManager {
                 return containerProvider.sellContainer(blockState, inventory, player);
         }
 
+        if(defaultContainer.isContainer(blockState))
+            return defaultContainer.sellContainer(blockState, inventory, player);
+
         return EMPTY_INFO;
     }
 
@@ -124,9 +126,12 @@ public final class ProvidersHandler implements ProvidersManager {
         for(ContainerProvider containerProvider : containerProviders){
             if(containerProvider.isContainer(blockState)) {
                 containerProvider.removeContainer(blockState, inventory, sellInfo);
-                break;
+                return;
             }
         }
+
+        if(defaultContainer.isContainer(blockState))
+            defaultContainer.removeContainer(blockState, inventory, sellInfo);
     }
 
     public boolean isInsideClaim(Player player, Location location){
@@ -174,7 +179,7 @@ public final class ProvidersHandler implements ProvidersManager {
         claimsProviders.add(claimsProvider);
     }
 
-    private void loadData(){
+    public void loadData(){
         if(pricesProvider == null) {
             // Prices Plugin Hookup
             if (pricesPlugin.equalsIgnoreCase("ShopGUIPlus") && Bukkit.getPluginManager().isPluginEnabled("ShopGUIPlus"))
@@ -245,7 +250,6 @@ public final class ProvidersHandler implements ProvidersManager {
         if(Bukkit.getPluginManager().isPluginEnabled("WildChests")){
             addContainerProvider(new ContainerProvider_WildChests(plugin));
         }
-        addContainerProvider(new ContainerProvider_Default(plugin));
 
         if(Bukkit.getPluginManager().isPluginEnabled("Factions")){
             if(Bukkit.getPluginManager().getPlugin("Factions").getDescription().getAuthors().contains("drtshock")){

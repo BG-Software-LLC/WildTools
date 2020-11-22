@@ -68,6 +68,7 @@ public final class WildToolsPlugin extends JavaPlugin implements WildTools {
         loadNMSAdapter();
         registerGlowEnchantment();
 
+        providersHandler = new ProvidersHandler();
         toolsManager = new ToolsHandler(this);
         eventsHandler = new EventsHandler();
 
@@ -113,7 +114,7 @@ public final class WildToolsPlugin extends JavaPlugin implements WildTools {
         log("Loading providers started...");
         long startTime = System.currentTimeMillis();
         log(" - Using " + nmsAdapter.getVersion() + " adapter.");
-        providersHandler = new ProvidersHandler();
+        providersHandler.loadData();
         log("Loading providers done (Took " + (System.currentTimeMillis() - startTime) + "ms)");
 
         if(Bukkit.getPluginManager().isPluginEnabled("SuperMobCoins"))
