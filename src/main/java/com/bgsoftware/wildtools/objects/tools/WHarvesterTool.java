@@ -265,13 +265,14 @@ public final class WHarvesterTool extends WTool implements HarvesterTool {
         if(usingDurability && toolUsages >= toolDurability)
             return currentUsages;
 
-        if(block.getType().name().contains("FLOWER") && block.getRelative(BlockFace.DOWN).getType().name().contains("END")){
-            if(BukkitUtils.seedBlockAsBoolean(player, block, this, itemStack -> !sellInfo.handleItem(player, itemStack)))
+        boolean isFlower = block.getType().name().contains("FLOWER");
+
+        if(isFlower && block.getRelative(BlockFace.DOWN).getType().name().contains("END")){
+            if(BukkitUtils.seedBlockAsBoolean(player, block, this, itemStack -> false))
                 currentUsages++;
         }
 
         else {
-            boolean isFlower = block.getType().name().contains("FLOWER");
             if(BukkitUtils.breakBlockAsBoolean(player, blocksController, block, usedItem, this, itemStack ->
                     !sellInfo.handleItem(player, isFlower ? new ItemStack(Material.matchMaterial("CHORUS_FLOWER")) : itemStack)))
                 currentUsages++;
