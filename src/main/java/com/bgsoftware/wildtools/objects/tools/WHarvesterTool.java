@@ -6,6 +6,7 @@ import com.bgsoftware.wildtools.api.objects.tools.HarvesterTool;
 import com.bgsoftware.wildtools.api.objects.ToolMode;
 import com.bgsoftware.wildtools.objects.WMaterial;
 import com.bgsoftware.wildtools.utils.BukkitUtils;
+import com.bgsoftware.wildtools.utils.Executor;
 import com.bgsoftware.wildtools.utils.NumberUtils;
 import com.bgsoftware.wildtools.utils.items.ToolItemStack;
 import com.bgsoftware.wildtools.utils.blocks.BlocksController;
@@ -44,6 +45,8 @@ public final class WHarvesterTool extends WTool implements HarvesterTool {
     private static final BlockFace[] nearbyBlocks = new BlockFace[]{
             BlockFace.UP, BlockFace.DOWN, BlockFace.WEST, BlockFace.EAST, BlockFace.NORTH, BlockFace.SOUTH
     };
+
+    private static final Material CHORUS_FLOWER = Material.getMaterial("CHORUS_FLOWER");
 
     private final int radius;
 
@@ -157,6 +160,7 @@ public final class WHarvesterTool extends WTool implements HarvesterTool {
 
         int toolDurability = getDurability(player, usedItem.getItem());
         boolean usingDurability = isUsingDurability();
+        List<Location> alreadyBroken = new ArrayList<>();
         int toolUsages = 0;
 
         outerLoop:
@@ -183,7 +187,7 @@ public final class WHarvesterTool extends WTool implements HarvesterTool {
                         continue;
 
                     if(targetBlock.getType().name().contains("CHORUS")){
-                        toolUsages += breakChorusFruit(player, blocksController, targetBlock, usedItem.getItem(), sellInfo, new ArrayList<>(), toolUsages, toolDurability, usingDurability);
+                        toolUsages += breakChorusFruit(player, blocksController, targetBlock, usedItem.getItem(), sellInfo, alreadyBroken, toolUsages, toolDurability, usingDurability, false);
                         continue;
                     }
 
@@ -259,32 +263,36 @@ public final class WHarvesterTool extends WTool implements HarvesterTool {
         return true;
     }
 
-    private int breakChorusFruit(Player player, BlocksController blocksController, Block block, ItemStack usedItem, SellInfo sellInfo, List<Block> alreadyBroken, int toolUsages, int toolDurability, boolean usingDurability){
+    private int breakChorusFruit(Player player, BlocksController blocksController, Block block, ItemStack usedItem, SellInfo sellInfo, List<Location> alreadyBroken, int toolUsages, int toolDurability, boolean usingDurability, boolean foundFlower){
         int currentUsages = 0;
+
+        if(alreadyBroken.contains(block.getLocation()))
+            return currentUsages;
 
         if(usingDurability && toolUsages >= toolDurability)
             return currentUsages;
 
+        alreadyBroken.add(block.getLocation());
+
+        if(block.getRelative(BlockFace.DOWN).getType().name().contains("END")) {
+            Executor.sync(() -> {
+                block.setType(CHORUS_FLOWER);
+                player.getInventory().removeItem(new ItemStack(CHORUS_FLOWER));
+            }, 2L);
+            return currentUsages;
+        }
+
         boolean isFlower = block.getType().name().contains("FLOWER");
 
-        if(isFlower && block.getRelative(BlockFace.DOWN).getType().name().contains("END")){
-            if(BukkitUtils.seedBlockAsBoolean(player, block, this, itemStack -> false))
-                currentUsages++;
-        }
-
-        else {
-            if(BukkitUtils.breakBlockAsBoolean(player, blocksController, block, usedItem, this, itemStack ->
-                    !sellInfo.handleItem(player, isFlower ? new ItemStack(Material.matchMaterial("CHORUS_FLOWER")) : itemStack)))
-                currentUsages++;
-        }
-
-        alreadyBroken.add(block);
+        if(BukkitUtils.breakBlockAsBoolean(player, blocksController, block, usedItem, this, itemStack ->
+                !sellInfo.handleItem(player, isFlower ? new ItemStack(CHORUS_FLOWER) : itemStack)))
+            currentUsages++;
 
         for(BlockFace blockFace : nearbyBlocks){
             Block nearbyBlock = block.getRelative(blockFace);
-            if(nearbyBlock.getType().name().contains("CHORUS") && !alreadyBroken.contains(nearbyBlock)){
-                currentUsages += breakChorusFruit(player, blocksController, nearbyBlock, usedItem, sellInfo, alreadyBroken, toolUsages + currentUsages, toolDurability, usingDurability);
-            }
+            if(nearbyBlock.getType().name().contains("CHORUS"))
+                currentUsages += breakChorusFruit(player, blocksController, nearbyBlock, usedItem, sellInfo, alreadyBroken,
+                        toolUsages + currentUsages, toolDurability, usingDurability, isFlower || foundFlower);
         }
 
         return currentUsages;
