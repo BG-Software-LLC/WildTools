@@ -82,11 +82,10 @@ public final class WLightningTool extends WTool implements LightningTool {
                 player.getWorld().strikeLightningEffect(entity.getLocation());
                 for(Creeper creeper : creeperList)
                     creeper.setPowered(true);
+
+                if(creeperList.size() > 0)
+                    reduceDurablility(player, usingDurability ? creeperList.size() : 1, usedItem);
             });
-
-            if(creeperList.size() > 0)
-                reduceDurablility(player, usingDurability ? creeperList.size() : 1, usedItem);
-
         });
     }
 
