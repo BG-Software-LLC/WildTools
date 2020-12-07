@@ -1,12 +1,14 @@
 package com.bgsoftware.wildtools.handlers;
 
-import com.bgsoftware.wildtools.utils.Pair;
+import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
+import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.plugin.RegisteredListener;
+import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -19,10 +21,10 @@ public final class EventsHandler {
             "BentoBox", "FabledSkyBlock", "Factions", "FactionsX", "GriefPrevention", "IslandWorld", "Lands",
             "PlotSquared", "Residence", "SuperiorSkyblock2", "Villages", "WorldGuard");
 
-    private final List<Pair<Method, Listener>> claimingPluginsBreakMethods = new ArrayList<>();
-    private final List<Pair<Method, Listener>> claimingPluginsPlaceMethods = new ArrayList<>();
-    private final List<Pair<Method, Listener>> claimingPluginsInteractMethods = new ArrayList<>();
-    private final List<Pair<Method, Listener>> otherPluginsBreakMethods = new ArrayList<>();
+    private final List<CachedListenerMethod> claimingPluginsBreakMethods = new ArrayList<>();
+    private final List<CachedListenerMethod> claimingPluginsPlaceMethods = new ArrayList<>();
+    private final List<CachedListenerMethod> claimingPluginsInteractMethods = new ArrayList<>();
+    private final List<CachedListenerMethod> otherPluginsBreakMethods = new ArrayList<>();
 
     public EventsHandler(){
 
@@ -49,16 +51,21 @@ public final class EventsHandler {
             if(claimingPlugins.contains(registeredListener.getPlugin().getName()))
                 addAllMethods(claimingPluginsBreakMethods, registeredListener.getListener(), BlockBreakEvent.class);
         }
+        claimingPluginsBreakMethods.sort(CachedListenerMethod::compareTo);
+
         claimingPluginsPlaceMethods.clear();
         for(RegisteredListener registeredListener : BlockPlaceEvent.getHandlerList().getRegisteredListeners()){
             if(claimingPlugins.contains(registeredListener.getPlugin().getName()))
                 addAllMethods(claimingPluginsPlaceMethods, registeredListener.getListener(), BlockPlaceEvent.class);
         }
+        claimingPluginsPlaceMethods.sort(CachedListenerMethod::compareTo);
+
         claimingPluginsInteractMethods.clear();
         for(RegisteredListener registeredListener : PlayerInteractEvent.getHandlerList().getRegisteredListeners()){
             if(claimingPlugins.contains(registeredListener.getPlugin().getName()))
                 addAllMethods(claimingPluginsInteractMethods, registeredListener.getListener(), PlayerInteractEvent.class);
         }
+        claimingPluginsInteractMethods.sort(CachedListenerMethod::compareTo);
     }
 
     public void loadOtherPlugins(List<String> otherPlugins){
@@ -68,22 +75,44 @@ public final class EventsHandler {
         }
     }
 
-    private static void callMethods(List<Pair<Method, Listener>> methodList, Event event){
-        methodList.forEach(pair -> {
+    private static void callMethods(List<CachedListenerMethod> methodList, Event event){
+        methodList.forEach(method -> method.invoke(event));
+    }
+
+    private static void addAllMethods(List<CachedListenerMethod> methodsList, Listener listener, Class<?> eventClass){
+        for(Method method : listener.getClass().getDeclaredMethods()){
+            EventHandler eventHandler = method.getAnnotation(EventHandler.class);
+            if(eventHandler != null && method.getParameterCount() == 1 && method.getParameterTypes()[0].equals(eventClass)){
+                method.setAccessible(true);
+                methodsList.add(new CachedListenerMethod(listener, method, eventHandler));
+            }
+        }
+    }
+
+    private static final class CachedListenerMethod implements Comparable<CachedListenerMethod> {
+
+        private final Listener listener;
+        private final Method method;
+        private final EventHandler eventHandler;
+
+        CachedListenerMethod(Listener listener, Method method, EventHandler eventHandler){
+            this.listener = listener;
+            this.method = method;
+            this.eventHandler = eventHandler;
+        }
+
+        void invoke(Event event){
             try{
-                pair.getX().invoke(pair.getY(), event);
+                if(!eventHandler.ignoreCancelled() || !(event instanceof Cancellable) || !((Cancellable) event).isCancelled())
+                    method.invoke(listener, event);
             }catch (Exception ex){
                 ex.printStackTrace();
             }
-        });
-    }
+        }
 
-    private static void addAllMethods(List<Pair<Method, Listener>> methodsList, Listener listener, Class<?> eventClass){
-        for(Method method : listener.getClass().getDeclaredMethods()){
-            if(method.getParameterCount() == 1 && Arrays.asList(method.getParameterTypes()).contains(eventClass)){
-                method.setAccessible(true);
-                methodsList.add(new Pair<>(method, listener));
-            }
+        @Override
+        public int compareTo(@NotNull CachedListenerMethod o) {
+            return eventHandler.priority().compareTo(o.eventHandler.priority());
         }
     }
 
