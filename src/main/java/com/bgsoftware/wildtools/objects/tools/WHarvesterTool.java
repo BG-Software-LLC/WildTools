@@ -57,7 +57,7 @@ public final class WHarvesterTool extends WTool implements HarvesterTool {
     public WHarvesterTool(Material type, String name, int radius){
         super(type, name, ToolMode.HARVESTER);
         this.radius = radius;
-        this.farmlandRadius = 0;
+        this.farmlandRadius = -1;
         this.oneLayerOnly = false;
     }
 
@@ -122,19 +122,23 @@ public final class WHarvesterTool extends WTool implements HarvesterTool {
 
     @Override
     public boolean onBlockInteract(PlayerInteractEvent e) {
-        if(!getActivationAction().equals("RIGHT_CLICK") ){
-            e.setCancelled(true);
+        // Preventing usage of harvester hoes as regular hoes
+        e.setCancelled(true);
+
+        if(!getActivationAction().equals("RIGHT_CLICK"))
             return false;
-        }
+
         return handleUse(e.getPlayer(), e.getClickedBlock(), ToolItemStack.of(e.getItem()));
     }
 
     @Override
     public boolean onBlockHit(PlayerInteractEvent e) {
-        if(!getActivationAction().equals("LEFT_CLICK") ){
-            e.setCancelled(true);
+        // Preventing usage of harvester hoes as regular hoes
+        e.setCancelled(true);
+
+        if(!getActivationAction().equals("LEFT_CLICK"))
             return false;
-        }
+
         return handleUse(e.getPlayer(), e.getClickedBlock(), ToolItemStack.of(e.getItem()));
     }
 
@@ -177,7 +181,7 @@ public final class WHarvesterTool extends WTool implements HarvesterTool {
                     if(!isHarvestableBlock(blockType) || !BukkitUtils.canBreakBlock(player, targetBlock, this))
                         continue;
 
-                    if((blockType == Material.DIRT || blockType == WMaterial.GRASS_BLOCK.parseMaterial()) &&
+                    if(farmlandRadius >= 0 && (blockType == Material.DIRT || blockType == WMaterial.GRASS_BLOCK.parseMaterial()) &&
                             isBetweenBlocks(farmlandMax, farmlandMin, blockLocation) && BukkitUtils.hasBreakAccess(block, player)){
                         blocksController.setType(targetBlock.getLocation(), plugin.getNMSAdapter().getFarmlandId());
                         continue;
