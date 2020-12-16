@@ -40,6 +40,7 @@ import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.WorldBorder;
 import org.bukkit.block.BlockFace;
+import org.bukkit.block.BlockState;
 import org.bukkit.block.data.Ageable;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.craftbukkit.libs.it.unimi.dsi.fastutil.shorts.ShortArraySet;
@@ -369,11 +370,12 @@ public final class NMSAdapter_v1_16_R2 implements NMSAdapter {
 
     @Override
     public BlockPlaceEvent getFakePlaceEvent(Player player, Location location, org.bukkit.block.Block copyBlock) {
-        FakeCraftBlock fakeBlock = FakeCraftBlock.at(location, copyBlock.getType());
         org.bukkit.block.Block original = location.getBlock();
+        BlockState originalState = original.getState();
+        FakeCraftBlock fakeBlock = FakeCraftBlock.at(location, copyBlock.getType(), originalState);
         return new BlockPlaceEvent(
                 fakeBlock,
-                original.getState(),
+                originalState,
                 fakeBlock.getRelative(BlockFace.DOWN),
                 new org.bukkit.inventory.ItemStack(copyBlock.getType()),
                 player,
@@ -542,11 +544,13 @@ public final class NMSAdapter_v1_16_R2 implements NMSAdapter {
     @SuppressWarnings("NullableProblems")
     private static class FakeCraftBlock extends CraftBlock{
 
+        private final BlockState originalState;
         private Material blockType;
 
-        FakeCraftBlock(WorldServer worldServer, BlockPosition blockPosition, Material material){
+        FakeCraftBlock(WorldServer worldServer, BlockPosition blockPosition, Material material, BlockState originalState){
             super(worldServer, blockPosition);
             this.blockType = material;
+            this.originalState = originalState;
         }
 
         @Override
@@ -565,10 +569,15 @@ public final class NMSAdapter_v1_16_R2 implements NMSAdapter {
             return CraftBlockData.newData(blockType, null);
         }
 
-        static FakeCraftBlock at(Location location, Material type){
+        @Override
+        public BlockState getState() {
+            return originalState;
+        }
+
+        static FakeCraftBlock at(Location location, Material type, BlockState originalState){
             WorldServer worldServer = ((CraftWorld) location.getWorld()).getHandle();
             BlockPosition blockPosition = new BlockPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ());
-            return new FakeCraftBlock(worldServer, blockPosition, type);
+            return new FakeCraftBlock(worldServer, blockPosition, type, originalState);
         }
 
     }
