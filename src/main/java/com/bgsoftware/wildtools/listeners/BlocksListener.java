@@ -160,8 +160,16 @@ public final class BlocksListener implements Listener {
     public void onItemDamage(PlayerItemDamageEvent e){
         ToolItemStack toolItemStack = ToolItemStack.of(e.getItem());
         Tool tool = toolItemStack.getTool();
-        if(tool != null)
-            e.setCancelled(true);
+
+        if(tool == null)
+            return;
+
+        e.setCancelled(true);
+
+        if(tool.isUnbreakable() || !tool.hasVanillaDamage())
+            return;
+
+        tool.reduceDurablility(e.getPlayer(), tool.isUsingDurability() ? e.getDamage() : 1, e.getItem());
     }
 
     @EventHandler(priority = EventPriority.LOW)

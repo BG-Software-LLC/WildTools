@@ -70,6 +70,13 @@ public interface Tool {
     void setUnbreakable(boolean unbreakable);
 
     /**
+     * Set whether or not the tool should be damaged by other vanilla actions.
+     * This includes hitting mobs, stripping wood, etc.
+     * @param vanillaDamage True if should take damage, otherwise false.
+     */
+    void setVanillaDamage(boolean vanillaDamage);
+
+    /**
      * Set the amount of uses the tool should have.
      * This will override vanilla's durability system.
      * @param usesLeft The amount of uses of the tool.
@@ -214,6 +221,11 @@ public interface Tool {
      * Check whether or not the tool is unbreakable.
      */
     boolean isUnbreakable();
+
+    /**
+     * Check whether or not the tool can take damage by other vanilla actions.
+     */
+    boolean hasVanillaDamage();
 
     /**
      * Check whether or not drops from the tool are added to the players' inventories.

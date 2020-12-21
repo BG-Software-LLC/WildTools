@@ -110,6 +110,7 @@ events-manipulations:
 # only-same-type: Only blocks with the same type will be dug. (BOOLEAN) (Default false)
 # only-inside-claim: Will only work on blocks inside claim land.
 # unbreakable: Tool will never be broken (BOOLEAN) (Default false)
+# vanilla-damage: Tool will be damaged by vanilla actions (BOOLEAN) (Default false)
 # spigot-unbreakable: Set spigot's unbreakable flag (BOOLEAN) (Default false)
 # omni-tool: Tool will change it's type depends on broken block (BOOLEAN) (Default false)
 #      Tool's default type must be a tool, such as pickaxe, shovel or axe.

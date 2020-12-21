@@ -199,6 +199,9 @@ public final class DataHandler {
             if(cfg.contains("tools." + name + ".unbreakable"))
                 tool.setUnbreakable(cfg.getBoolean("tools." + name + ".unbreakable"));
 
+            if(cfg.contains("tools." + name + ".vanilla-damage"))
+                tool.setVanillaDamage(cfg.getBoolean("tools." + name + ".vanilla-damage"));
+
             if(cfg.contains("tools." + name + ".uses"))
                 tool.setUsesLeft(cfg.getInt("tools." + name + ".uses"));
 

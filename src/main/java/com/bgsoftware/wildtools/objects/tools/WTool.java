@@ -39,7 +39,7 @@ public abstract class WTool implements Tool {
     private ToolItemStack toolItemStack;
     private int usesLeft;
     private String name, toolMode;
-    private boolean onlySameType, onlyInsideClaim, unbreakable, autoCollect, instantBreak, silkTouch,
+    private boolean onlySameType, onlyInsideClaim, unbreakable, vanillaDamage, autoCollect, instantBreak, silkTouch,
             keepInventory, omni, privateTool, usesProgress;
     private long cooldown;
     private double multiplier;
@@ -130,6 +130,11 @@ public abstract class WTool implements Tool {
     @Override
     public void setUnbreakable(boolean unbreakable){
         this.unbreakable = unbreakable;
+    }
+
+    @Override
+    public void setVanillaDamage(boolean vanillaDamage) {
+        this.vanillaDamage = vanillaDamage;
     }
 
     @Override
@@ -248,6 +253,11 @@ public abstract class WTool implements Tool {
     @Override
     public boolean isUnbreakable() {
         return unbreakable;
+    }
+
+    @Override
+    public boolean hasVanillaDamage() {
+        return vanillaDamage;
     }
 
     @Override
