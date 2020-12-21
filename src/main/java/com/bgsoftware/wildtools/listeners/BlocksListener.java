@@ -16,6 +16,7 @@ import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 
 import com.bgsoftware.wildtools.api.objects.tools.Tool;
+import org.bukkit.event.player.PlayerItemDamageEvent;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -152,6 +153,15 @@ public final class BlocksListener implements Listener {
         }finally {
             WTool.toolBlockBreak.remove(e.getPlayer().getUniqueId());
         }
+    }
+
+
+    @EventHandler(priority = EventPriority.LOW)
+    public void onItemDamage(PlayerItemDamageEvent e){
+        ToolItemStack toolItemStack = ToolItemStack.of(e.getItem());
+        Tool tool = toolItemStack.getTool();
+        if(tool != null)
+            e.setCancelled(true);
     }
 
     @EventHandler(priority = EventPriority.LOW)
