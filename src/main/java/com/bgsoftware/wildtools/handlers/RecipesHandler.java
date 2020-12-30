@@ -97,7 +97,9 @@ public final class RecipesHandler {
                 for(Map.Entry<Character, ItemStack> entry : charToItem.entrySet())
                     recipe.setIngredient(entry.getKey(), entry.getValue());
 
-                Bukkit.addRecipe(recipe.toRecipe());
+                try {
+                    Bukkit.addRecipe(recipe.toRecipe());
+                }catch (Exception ignored){}
             }
         }
 
