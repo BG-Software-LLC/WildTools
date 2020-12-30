@@ -20,7 +20,8 @@ public final class ContainerProvider_ChunkCollectors implements ContainerProvide
     @Override
     public boolean isContainer(BlockState blockState) {
         CollectorHandler collectorHandler = ChunkCollectorPlugin.getInstance().getCollectorHandler();
-        return collectorHandler.getCollectorAtLocation(blockState.getLocation()) != null;
+        ChunkCollector chunkCollector = collectorHandler.getCollectorAtLocation(blockState.getLocation());
+        return chunkCollector != null && chunkCollector.getLocation().equals(blockState.getLocation());
     }
 
     @Override
