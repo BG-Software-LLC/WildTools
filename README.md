@@ -4,116 +4,27 @@ WildTools 2 - The most optimized all-in-one tools plugin!
 
 ## Compiling
 
-I am compiling it using the built-in system of Intellij. I made it so every folder is a module, so I can add different
-dependencies for every one of them. Down below, you'll find information about every module and what dependencies
-it should contain:
+You can compile the project using gradlew.<br>
+Run `gradlew shadowJar build` in console to build the project.<br>
+You can find already compiled jars on our [Jenkins](https://hub.bg-software.com/) hub!<br>
+You must add yourself all the private jars or purchase access to our private repository.
 
-- main module:
+##### Private Jars:
+- ChunkCollectors by Cloth [[link]](https://www.mc-market.org/resources/13522/)
+- CMI by Zrips [[link]](https://www.spigotmc.org/resources/3742/)
+- ShopGUIPlus by brcdev [[link]](https://www.spigotmc.org/resources/6515/)
+- Lands by Angeschossen [[link]](https://www.spigotmc.org/resources/53313/)
+- mcMMO (v1 & v2) by nossr50 [[link]](https://www.spigotmc.org/resources/64348/)
+- SuperMobCoins by Swanis [[link]](https://www.mc-market.org/resources/8309/)
+- QuantumShop by NightExpress [[link]](https://www.spigotmc.org/resources/50696/)
+- Residence by Zrips [[link]](https://www.spigotmc.org/resources/11480/)
 
-  - v1_7_R3 jar (1.7 spigot jar)
-   
-  - v1_12_R1 jar (1.12.x spigot jar)
+## Updates
 
-  - v1_15_R1 jar (1.15.x spigot jar)
-      
-  - all the libraries from the libs folder (their order shouldn't matter, but it might cause issues).
-      
-  - the API module.
+This plugin is provided "as is", which means no updates or new features are guaranteed. We will do our best to keep 
+updating and pushing new updates, and you are more than welcome to contribute your time as well and make pull requests
+for bug fixes. 
 
-- API module:
+## License
 
-  - v1_7_R3 jar (1.7 spigot jar)
-
-- NMS modules:
-
-  - their matching spigot jar (module v1_8_R1 will get a v1_8_R1 spigot jar, etc)
-      
-  - the API module.
-      
-  - the main module.
-
-- Hook modules:
-
-  - v1_7_R3 jar (1.7 spigot jar)
-      
-  - the main module.
-
-  - the API module.
-
-  - EssentialsOld:
-
-    - EssentialsX-2.15.0.17.jar
-
-  - FactionsOne:
-
-    - factionsone-1.3.1.jar
- 
-  - FactionsUUID:
-
-    - SavageFactions.jar
-
-    - FactionsUUID-NewVersion.jar
-
-    - factionsone-1.3.1.jar
-
-  - McMMOOld:
-
-    - mcMMO.jar
-
-  - QuickShopOld:
-
-    - QuickShop-0.9.35.jar
- 
-  - SaberFactions:
-
-    - SaberFactions.jar
-
-  - SilkSpawnersOld:
-
-    - SilkSpawners-5.0.2.jar
-
-  - WorldGuardOld:
-
-    - WorldGuard-old.jar
-
-
-## Spigot Jars
-
-As I am not allowed to publish the spigot jars, I will explain below what are the versions of spigot that you need.
-
-  v1_7_R3 - Spigot 1.7
-
-  v1_7_R4 - Spigot 1.7.10
-
-  v1_8_R1 - Spigot 1.8
-
-  v1_8_R2 - Spigot 1.8.3
-
-  v1_8_R3 - Spigot 1.8.8
-
-  v1_9_R1 - Spigot 1.9
-
-  v1_9_R2 - Spigot 1.9.2
-
-  v1_10_R1 - Spigot 1.10.x
-
-  v1_11_R1 - Spigot 1.11.x
-
-  v1_12_R1 - Spigot 1.12.x
-
-  v1_13_R1 - Spigot 1.13
-
-  v1_13_R2 - Spigot 1.13.2
-
-  v1_14_R1 - Spigot 1.14.x
-
-  v1_15_R1 - Spigot 1.15.x
-
-  v1_16_R1 - Spigot 1.16.x
-
-
-If you struggle with finding the correct ones, please open a ticket on the Discord server, so I can help with them.
-
-## Credits
-
-• Ome_R for the base-code.
+This plugin is licensed under GNU GPL v3.0
