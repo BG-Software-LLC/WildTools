@@ -35,7 +35,8 @@ public final class PricesProvider_ShopGUIPlus implements PricesProvider {
             Map<String, Shop> shops = plugin.getShopManager().shops;
             for (Shop shop : shops.values()) {
                 for (ShopItem _shopItem : shop.getShopItems()) {
-                    if (_shopItem.getType() == ShopManager.ItemType.ITEM &&
+                    if (getShopItemPrice(_shopItem, null, 1) > 0 &&
+                            _shopItem.getType() == ShopManager.ItemType.ITEM &&
                             areSimilar(_shopItem.getItem(), itemStack, _shopItem.isCompareMeta()))
                         return new Pair<>(_shopItem, shop);
                 }
@@ -44,14 +45,8 @@ public final class PricesProvider_ShopGUIPlus implements PricesProvider {
             return null;
         });
 
-        if(shopPair != null){
-            if(player == null) {
-                price = Math.max(price, shopPair.getX().getSellPriceForAmount(itemStack.getAmount()));
-            }
-            else{
-                price = Math.max(price, shopPair.getX().getSellPriceForAmount(player, itemStack.getAmount()));
-            }
-        }
+        if(shopPair != null)
+            price = Math.max(price, getShopItemPrice(shopPair.getX(), player, itemStack.getAmount()));
 
         return price;
     }
@@ -59,6 +54,10 @@ public final class PricesProvider_ShopGUIPlus implements PricesProvider {
     private static boolean areSimilar(ItemStack is1, ItemStack is2, boolean compareMetadata){
         return compareMetadata ? is1.isSimilar(is2) : is2 != null && is1 != null && is1.getType() == is2.getType() &&
                 is1.getDurability() == is2.getDurability();
+    }
+
+    private static double getShopItemPrice(ShopItem shopItem, Player player, int amount){
+        return player == null ? shopItem.getSellPriceForAmount(amount) : shopItem.getSellPriceForAmount(player, amount);
     }
 
     private static final class WrappedItemStack{
