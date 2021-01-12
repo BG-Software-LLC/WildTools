@@ -19,6 +19,38 @@ You must add yourself all the private jars or purchase access to our private rep
 - QuantumShop by NightExpress [[link]](https://www.spigotmc.org/resources/50696/)
 - Residence by Zrips [[link]](https://www.spigotmc.org/resources/11480/)
 
+## API
+
+You can hook into the plugin by using the built-in API module.<br>
+The API module is safe to be used, its methods will not be renamed or changed, and will not have methods removed 
+without any further warning.<br>
+You can add the API as a dependency using Maven or Gradle:<br>
+
+#### Maven
+```
+<repository>
+    <id>bg-repo</id>
+    <url>https://repo.bg-software.com/repository/api/</url>
+</repository>
+
+<dependency>
+    <groupId>com.bgsoftware</groupId>
+    <artifactId>WildToolsAPI</artifactId>
+    <version>latest</version>
+</dependency>
+```
+
+#### Gradle
+```
+repositories {
+    maven { url 'https://repo.bg-software.com/repository/api/' }
+}
+
+dependencies {
+    compileOnly 'com.bgsoftware:WildToolsAPI:latest'
+}
+```
+
 ## Updates
 
 This plugin is provided "as is", which means no updates or new features are guaranteed. We will do our best to keep 
