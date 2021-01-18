@@ -69,10 +69,12 @@ public final class EventsHandler {
     }
 
     public void loadOtherPlugins(List<String> otherPlugins){
+        otherPluginsBreakMethods.clear();
         for(RegisteredListener registeredListener : BlockBreakEvent.getHandlerList().getRegisteredListeners()){
             if(otherPlugins.contains(registeredListener.getPlugin().getName()))
                 addAllMethods(otherPluginsBreakMethods, registeredListener.getListener(), BlockBreakEvent.class);
         }
+        otherPluginsBreakMethods.sort(CachedListenerMethod::compareTo);
     }
 
     private static void callMethods(List<CachedListenerMethod> methodList, Event event){
