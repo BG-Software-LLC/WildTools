@@ -8,6 +8,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Event;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.inventory.ItemStack;
@@ -33,19 +34,21 @@ public final class WMagnetTool extends WTool implements MagnetTool {
 
     @Override
     public boolean onAirInteract(PlayerInteractEvent e) {
-        handleUse(e.getPlayer(), e.getItem());
+        handleUse(e.getPlayer(), e.getItem(), e);
         return true;
     }
 
     @Override
     public boolean onBlockInteract(PlayerInteractEvent e) {
-        handleUse(e.getPlayer(), e.getItem());
+        handleUse(e.getPlayer(), e.getItem(), e);
         return true;
     }
 
-    private void handleUse(Player player, ItemStack usedItem){
+    private void handleUse(Player player, ItemStack usedItem, Event e){
         List<Item> nearbyItems = player.getNearbyEntities(radius, radius, radius).stream()
                 .filter(entity -> entity instanceof Item).map(entity -> (Item) entity).collect(Collectors.toList());
+
+        ItemStack originalItem = usedItem.clone();
 
         boolean reduceDurability = false;
 
@@ -86,8 +89,25 @@ public final class WMagnetTool extends WTool implements MagnetTool {
         MagnetWandUseEvent magnetWandUseEvent = new MagnetWandUseEvent(player, this, affectedItems);
         Bukkit.getPluginManager().callEvent(magnetWandUseEvent);
 
-        if(reduceDurability)
-            reduceDurablility(player, 1, usedItem);
+        if(reduceDurability) {
+            // We need to check if the held item is different than the used item.
+            // If it is, we need to split it so a duplication glitch doesn't occur
+            if(originalItem.equals(usedItem)){
+                reduceDurablility(player, 1, usedItem);
+            }
+            else{
+                usedItem = plugin.getNMSAdapter().getItemInHand(player, e);
+
+                ItemStack clonedTool = usedItem.clone();
+
+                usedItem.setAmount(originalItem.getAmount());
+
+                clonedTool.setAmount(clonedTool.getAmount() - originalItem.getAmount());
+
+                reduceDurablility(player, 1, usedItem);
+                player.getInventory().addItem(clonedTool);
+            }
+        }
     }
 
 }
