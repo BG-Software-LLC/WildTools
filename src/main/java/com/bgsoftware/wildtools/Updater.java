@@ -11,7 +11,7 @@ import java.net.URL;
 @SuppressWarnings("WeakerAccess")
 public final class Updater {
 
-    private static WildToolsPlugin plugin = WildToolsPlugin.getPlugin();
+    private static final WildToolsPlugin plugin = WildToolsPlugin.getPlugin();
     private static String latestVersion, versionDescription;
 
     static{
@@ -19,7 +19,7 @@ public final class Updater {
     }
 
     public static boolean isOutdated(){
-        return !plugin.getDescription().getVersion().equals(latestVersion);
+        return !plugin.getDescription().getVersion().startsWith(latestVersion);
     }
 
     public static String getLatestVersion(){
