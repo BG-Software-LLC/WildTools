@@ -24,7 +24,8 @@ public final class ContainerProvider_Default implements ContainerProvider {
     @Override
     public boolean isContainer(BlockState blockState) {
         Material type = blockState.getType();
-        return type == Material.CHEST || type == Material.TRAPPED_CHEST;
+        return type == Material.CHEST || type == Material.TRAPPED_CHEST || 
+                type.name().equals("BARREL") || type.name().contains("SHULKER_BOX");
     }
 
     @Override
