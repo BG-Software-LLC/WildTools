@@ -453,6 +453,24 @@ public final class NMSAdapter_v1_16_R2 implements NMSAdapter {
         return new AdvancedRecipeClassImpl(toolName, result);
     }
 
+    @Override
+    public Object getDroppedItem(org.bukkit.inventory.ItemStack itemStack, Location location) {
+        WorldServer world = ((CraftWorld) location.getWorld()).getHandle();
+        EntityItem entityitem = new EntityItem(world, location.getX(), location.getY(), location.getZ(), CraftItemStack.asNMSCopy(itemStack));
+        entityitem.pickupDelay = 10;
+        return entityitem;
+    }
+
+    @Override
+    public void dropItems(List<Object> droppedItems) {
+        droppedItems.forEach(droppedItemObject -> {
+            if(droppedItemObject instanceof EntityItem){
+                EntityItem entityItem = (EntityItem) droppedItemObject;
+                entityItem.world.addEntity(entityItem);
+            }
+        });
+    }
+
     @SuppressWarnings("all")
     private static Set<Short> createShortSet(){
         if(SHORT_ARRAY_SET_CLASS == null)

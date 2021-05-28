@@ -462,6 +462,24 @@ public final class NMSAdapter_v1_8_R1 implements NMSAdapter {
         return Items.DIAMOND_SHOVEL.getDestroySpeed(new ItemStack(Items.DIAMOND_SHOVEL), CraftMagicNumbers.getBlock(material)) == 8.0F;
     }
 
+    @Override
+    public Object getDroppedItem(org.bukkit.inventory.ItemStack itemStack, Location location) {
+        WorldServer world = ((CraftWorld) location.getWorld()).getHandle();
+        EntityItem entityitem = new EntityItem(world, location.getX(), location.getY(), location.getZ(), CraftItemStack.asNMSCopy(itemStack));
+        entityitem.pickupDelay = 10;
+        return entityitem;
+    }
+
+    @Override
+    public void dropItems(List<Object> droppedItems) {
+        droppedItems.forEach(droppedItemObject -> {
+            if(droppedItemObject instanceof EntityItem){
+                EntityItem entityItem = (EntityItem) droppedItemObject;
+                entityItem.world.addEntity(entityItem);
+            }
+        });
+    }
+
     private void sendPacketToRelevantPlayers(WorldServer worldServer, int chunkX, int chunkZ, Packet packet){
         PlayerChunkMap playerChunkMap = worldServer.getPlayerChunkMap();
         for(Object entityHuman : worldServer.players){

@@ -2,6 +2,7 @@ package com.bgsoftware.wildtools.utils;
 
 import com.bgsoftware.wildtools.utils.blocks.BlocksController;
 import com.bgsoftware.wildtools.utils.items.ItemUtils;
+import com.bgsoftware.wildtools.utils.items.ItemsDropper;
 import org.bukkit.CropState;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -83,16 +84,18 @@ public final class BukkitUtils {
         }
 
         if(tool != null) {
+            ItemsDropper itemsDropper = new ItemsDropper();
             tool.filterDrops(drops).forEach(itemStack -> {
                 itemStack = dropItemFunction.apply(itemStack);
                 if(itemStack != null) {
                     if (tool.isAutoCollect()) {
-                        ItemUtils.addItem(itemStack, player.getInventory(), block.getLocation());
+                        ItemUtils.addItem(itemStack, player.getInventory(), block.getLocation(), itemsDropper);
                     } else {
-                        block.getWorld().dropItemNaturally(block.getLocation(), itemStack);
+                        itemsDropper.addDrop(itemStack, block.getLocation());
                     }
                 }
             });
+            itemsDropper.dropItems();
         }
 
         if(blockBreakEvent.getExpToDrop() > 0) {
@@ -126,16 +129,18 @@ public final class BukkitUtils {
         plugin.getNMSAdapter().setCropState(block, CropState.SEEDED);
 
         if (tool != null) {
+            ItemsDropper itemsDropper = new ItemsDropper();
             tool.filterDrops(drops).forEach(itemStack -> {
                 itemStack = dropItemFunction.apply(itemStack);
                 if(itemStack != null) {
                     if (tool.isAutoCollect()) {
-                        ItemUtils.addItem(itemStack, player.getInventory(), block.getLocation());
+                        ItemUtils.addItem(itemStack, player.getInventory(), block.getLocation(), itemsDropper);
                     } else {
-                        block.getWorld().dropItemNaturally(block.getLocation(), itemStack);
+                        itemsDropper.addDrop(itemStack, block.getLocation());
                     }
                 }
             });
+            itemsDropper.dropItems();
         }
 
         return true;

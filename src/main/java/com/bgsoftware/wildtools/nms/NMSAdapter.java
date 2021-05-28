@@ -105,6 +105,10 @@ public interface NMSAdapter {
         return new AdvancedRecipeClassImpl(result);
     }
 
+    Object getDroppedItem(ItemStack itemStack, Location location);
+
+    void dropItems(List<Object> droppedItems);
+
     class AdvancedRecipeClassImpl extends ShapedRecipe implements AdvancedShapedRecipe {
 
         private static Field ingredientsField;

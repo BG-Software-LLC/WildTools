@@ -1,5 +1,6 @@
 package com.bgsoftware.wildtools.command.commands;
 
+import com.bgsoftware.wildtools.utils.items.ItemsDropper;
 import com.bgsoftware.wildtools.utils.items.ToolItemStack;
 import com.bgsoftware.wildtools.utils.items.ItemUtils;
 
@@ -83,14 +84,18 @@ public final class CommandGive implements ICommand {
             uses = Integer.parseInt(args[4]);
         }
 
+        ItemsDropper itemsDropper = new ItemsDropper();
+
         for(int i = 0; i < amount; i++){
             ToolItemStack toolItem = ToolItemStack.of(tool.getFormattedItemStack(uses > -1 ? uses : tool.getDefaultUses()));
 
             if(uses > -1)
                 toolItem.setUses(uses);
 
-            ItemUtils.addItem(toolItem.getItem(), pl.getInventory(), pl.getLocation());
+            ItemUtils.addItem(toolItem.getItem(), pl.getInventory(), pl.getLocation(), itemsDropper);
         }
+
+        itemsDropper.dropItems();
 
         Locale.GIVE_TOOL_SUCCESS.send(sender, amount, tool.getName(), pl.getName());
     }
