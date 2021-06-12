@@ -486,7 +486,7 @@ public final class NMSAdapter_v1_16_R3 implements NMSAdapter {
 
     private static boolean canMerge(EntityItem entityItem){
         ItemStack itemStack = entityItem.getItemStack();
-        return itemStack.getCount() < itemStack.getMaxStackSize();
+        return !itemStack.isEmpty() && itemStack.getCount() < itemStack.getMaxStackSize();
     }
 
     private static boolean mergeEntityItems(EntityItem entityItem, EntityItem otherEntity){
