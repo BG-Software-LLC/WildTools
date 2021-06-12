@@ -50,7 +50,7 @@ public final class WCrowbarTool extends WTool implements CrowbarTool {
         }
 
         try {
-            if (!BukkitUtils.breakBlock(e.getPlayer(), null, e.getClickedBlock(), e.getItem(), this, itemStack -> null))
+            if (!BukkitUtils.breakBlock(e.getPlayer(), null, null, e.getClickedBlock(), e.getItem(), this, itemStack -> null))
                 return true;
         }finally {
             if(addedSilktouch)

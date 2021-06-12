@@ -3,6 +3,7 @@ package com.bgsoftware.wildtools.objects.tools;
 import com.bgsoftware.wildtools.api.events.PillarWandUseEvent;
 import com.bgsoftware.wildtools.utils.BukkitUtils;
 import com.bgsoftware.wildtools.utils.blocks.BlocksController;
+import com.bgsoftware.wildtools.utils.items.ItemsDropper;
 import org.bukkit.Bukkit;
 import org.bukkit.event.player.PlayerInteractEvent;
 import com.bgsoftware.wildtools.api.objects.tools.PillarTool;
@@ -27,6 +28,7 @@ public final class WPillarTool extends WTool implements PillarTool {
         short firstData = e.getClickedBlock().getState().getData().toItemStack().getDurability();
 
         BlocksController blocksController = new BlocksController();
+        ItemsDropper itemsDropper = new ItemsDropper();
         int toolDurability = getDurability(e.getPlayer(), e.getItem());
         boolean usingDurability = isUsingDurability();
         int toolUsages = 0;
@@ -40,7 +42,7 @@ public final class WPillarTool extends WTool implements PillarTool {
             if(!BukkitUtils.canBreakBlock(e.getPlayer(), targetBlock, firstType, firstData, this))
                 continue;
 
-            if(!BukkitUtils.breakBlock(e.getPlayer(), blocksController, targetBlock, e.getItem(), this, itemStack -> itemStack))
+            if(!BukkitUtils.breakBlock(e.getPlayer(), blocksController, itemsDropper, targetBlock, e.getItem(), this, itemStack -> itemStack))
                 break;
 
             toolUsages++;
@@ -51,6 +53,7 @@ public final class WPillarTool extends WTool implements PillarTool {
             Bukkit.getPluginManager().callEvent(pillarWandUseEvent);
 
             blocksController.updateSession();
+            itemsDropper.dropItems();
 
             reduceDurablility(e.getPlayer(), usingDurability ? toolUsages : 1, e.getItem());
         }
