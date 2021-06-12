@@ -3,6 +3,7 @@ package com.bgsoftware.wildtools.utils.items;
 import com.bgsoftware.wildtools.Locale;
 import com.bgsoftware.wildtools.objects.WMaterial;
 import com.bgsoftware.wildtools.objects.tools.WHarvesterTool;
+import com.bgsoftware.wildtools.utils.Executor;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -28,7 +29,7 @@ public final class ItemUtils {
     public static void addItem(ItemStack itemStack, Inventory inventory, Location location, ItemsDropper itemsDropper){
         HashMap<Integer, ItemStack> additionalItems = inventory.addItem(itemStack);
         if(location != null && !additionalItems.isEmpty()){
-            Bukkit.getScheduler().runTask(plugin, () -> {
+            Executor.sync(() -> {
                 for(ItemStack additional : additionalItems.values()) {
                     if (additional != null && additional.getType() != Material.AIR) {
                         if(itemsDropper != null) {
