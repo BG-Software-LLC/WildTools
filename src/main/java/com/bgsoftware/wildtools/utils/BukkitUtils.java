@@ -2,6 +2,7 @@ package com.bgsoftware.wildtools.utils;
 
 import com.bgsoftware.wildtools.utils.blocks.BlocksController;
 import com.bgsoftware.wildtools.utils.items.ItemUtils;
+import com.bgsoftware.wildtools.utils.items.ItemsDropper;
 import org.bukkit.CropState;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -57,7 +58,8 @@ public final class BukkitUtils {
         return !playerInteractEvent.isCancelled();
     }
 
-    public static boolean breakBlock(Player player, BlocksController blocksController, Block block, ItemStack usedItem, Tool tool, Function<ItemStack, ItemStack> dropItemFunction){
+    public static boolean breakBlock(Player player, BlocksController blocksController, ItemsDropper itemsDropper, Block block, ItemStack usedItem,
+                                     Tool tool, Function<ItemStack, ItemStack> dropItemFunction){
         BlockBreakEvent blockBreakEvent = new BlockBreakEvent(block, player);
         List<ItemStack> drops = getBlockDrops(player, block, tool);
         block.setMetadata("drop-items", new FixedMetadataValue(plugin, tool == null));
@@ -83,16 +85,23 @@ public final class BukkitUtils {
         }
 
         if(tool != null) {
-            tool.filterDrops(drops).forEach(itemStack -> {
+            boolean nullDropper = itemsDropper == null;
+            if(nullDropper)
+                itemsDropper = new ItemsDropper();
+
+            for(ItemStack itemStack : tool.filterDrops(drops)){
                 itemStack = dropItemFunction.apply(itemStack);
                 if(itemStack != null) {
                     if (tool.isAutoCollect()) {
-                        ItemUtils.addItem(itemStack, player.getInventory(), block.getLocation());
+                        ItemUtils.addItem(itemStack, player.getInventory(), block.getLocation(), itemsDropper);
                     } else {
-                        block.getWorld().dropItemNaturally(block.getLocation(), itemStack);
+                        itemsDropper.addDrop(itemStack, block.getLocation());
                     }
                 }
-            });
+            }
+
+            if(nullDropper)
+                itemsDropper.dropItems();
         }
 
         if(blockBreakEvent.getExpToDrop() > 0) {
@@ -104,11 +113,11 @@ public final class BukkitUtils {
     }
 
     @SuppressWarnings("UnusedReturnValue")
-    public static boolean breakBlockAsBoolean(Player player, BlocksController blocksController, Block block, ItemStack usedItem, Tool tool, Function<ItemStack, Boolean> dropItemFunction){
-        return breakBlock(player, blocksController, block, usedItem, tool, itemStack -> dropItemFunction.apply(itemStack) ? itemStack : null);
+    public static boolean breakBlockAsBoolean(Player player, BlocksController blocksController, ItemsDropper itemsDropper, Block block, ItemStack usedItem, Tool tool, Function<ItemStack, Boolean> dropItemFunction){
+        return breakBlock(player, blocksController, itemsDropper, block, usedItem, tool, itemStack -> dropItemFunction.apply(itemStack) ? itemStack : null);
     }
 
-    public static boolean seedBlock(Player player, Block block, Tool tool, Function<ItemStack, ItemStack> dropItemFunction){
+    public static boolean seedBlock(Player player, Block block, Tool tool, Function<ItemStack, ItemStack> dropItemFunction, ItemsDropper itemsDropper){
         List<ItemStack> drops = getBlockDrops(player, block, tool);
         BlockBreakEvent blockBreakEvent = new BlockBreakEvent(block, player);
         block.setMetadata("drop-items", new FixedMetadataValue(plugin, tool == null));
@@ -125,29 +134,35 @@ public final class BukkitUtils {
 
         plugin.getNMSAdapter().setCropState(block, CropState.SEEDED);
 
-        if (tool != null) {
-            tool.filterDrops(drops).forEach(itemStack -> {
+        if(tool != null) {
+            boolean nullDropper = itemsDropper == null;
+            if(nullDropper)
+                itemsDropper = new ItemsDropper();
+
+            for(ItemStack itemStack : tool.filterDrops(drops)){
                 itemStack = dropItemFunction.apply(itemStack);
                 if(itemStack != null) {
                     if (tool.isAutoCollect()) {
-                        ItemUtils.addItem(itemStack, player.getInventory(), block.getLocation());
+                        ItemUtils.addItem(itemStack, player.getInventory(), block.getLocation(), itemsDropper);
                     } else {
-                        block.getWorld().dropItemNaturally(block.getLocation(), itemStack);
+                        itemsDropper.addDrop(itemStack, block.getLocation());
                     }
                 }
-            });
+            }
+
+            if(nullDropper)
+                itemsDropper.dropItems();
         }
 
         return true;
     }
 
-    public static boolean seedBlockAsBoolean(Player player, Block block, Tool tool, Function<ItemStack, Boolean> dropItemFunction){
-        return seedBlock(player, block, tool, itemStack -> dropItemFunction.apply(itemStack) ? itemStack : null);
+    public static boolean seedBlockAsBoolean(Player player, Block block, Tool tool, Function<ItemStack, Boolean> dropItemFunction, ItemsDropper itemsDropper){
+        return seedBlock(player, block, tool, itemStack -> dropItemFunction.apply(itemStack) ? itemStack : null, itemsDropper);
     }
 
     public static boolean placeBlock(Player player, BlocksController blocksController, Block block, Block materialBlock){
         BlockPlaceEvent blockPlaceEvent = plugin.getNMSAdapter().getFakePlaceEvent(player, block.getLocation(), materialBlock);
-        //plugin.getProviders().runWithBypass(player, () -> Bukkit.getPluginManager().callEvent(blockPlaceEvent));
         plugin.getEvents().callPlaceEvent(blockPlaceEvent);
 
         if(blockPlaceEvent.isCancelled())

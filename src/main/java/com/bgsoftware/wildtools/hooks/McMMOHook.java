@@ -13,7 +13,7 @@ public final class McMMOHook {
 
     public static void markAsPlaced(Location loc){
         if(isEnabled)
-            com.gmail.nossr50.mcMMO.getPlaceStore().setTrue(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ(), loc.getWorld());
+            com.gmail.nossr50.mcMMO.getPlaceStore().setTrue(loc.getBlock());
     }
 
 }

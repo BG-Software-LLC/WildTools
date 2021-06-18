@@ -6,29 +6,31 @@ import com.bgsoftware.wildtools.objects.WMaterial;
 import com.bgsoftware.wildtools.recipes.AdvancedShapedRecipe;
 import com.bgsoftware.wildtools.utils.items.ToolItemStack;
 import com.bgsoftware.wildtools.utils.reflections.ReflectField;
-import net.minecraft.server.v1_16_R1.Block;
-import net.minecraft.server.v1_16_R1.BlockPosition;
-import net.minecraft.server.v1_16_R1.Blocks;
-import net.minecraft.server.v1_16_R1.Chunk;
-import net.minecraft.server.v1_16_R1.ContainerAnvil;
-import net.minecraft.server.v1_16_R1.EntityItem;
-import net.minecraft.server.v1_16_R1.EntityLiving;
-import net.minecraft.server.v1_16_R1.EntityPlayer;
-import net.minecraft.server.v1_16_R1.EnumItemSlot;
-import net.minecraft.server.v1_16_R1.IBlockData;
-import net.minecraft.server.v1_16_R1.Item;
-import net.minecraft.server.v1_16_R1.ItemStack;
-import net.minecraft.server.v1_16_R1.Items;
-import net.minecraft.server.v1_16_R1.NBTTagCompound;
-import net.minecraft.server.v1_16_R1.Packet;
-import net.minecraft.server.v1_16_R1.PacketPlayOutCollect;
-import net.minecraft.server.v1_16_R1.PacketPlayOutMultiBlockChange;
-import net.minecraft.server.v1_16_R1.PlayerChunkMap;
-import net.minecraft.server.v1_16_R1.PlayerMap;
-import net.minecraft.server.v1_16_R1.StatisticList;
-import net.minecraft.server.v1_16_R1.TileEntity;
-import net.minecraft.server.v1_16_R1.World;
-import net.minecraft.server.v1_16_R1.WorldServer;
+import net.minecraft.core.BlockPosition;
+import net.minecraft.core.SectionPosition;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.PacketPlayOutCollect;
+import net.minecraft.network.protocol.game.PacketPlayOutMultiBlockChange;
+import net.minecraft.server.level.EntityPlayer;
+import net.minecraft.server.level.PlayerChunkMap;
+import net.minecraft.server.level.PlayerMap;
+import net.minecraft.server.level.WorldServer;
+import net.minecraft.stats.StatisticList;
+import net.minecraft.world.entity.EntityLiving;
+import net.minecraft.world.entity.EnumItemSlot;
+import net.minecraft.world.entity.item.EntityItem;
+import net.minecraft.world.inventory.ContainerAnvil;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.World;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.entity.TileEntity;
+import net.minecraft.world.level.block.state.IBlockData;
+import net.minecraft.world.level.chunk.Chunk;
+import net.minecraft.world.level.chunk.ChunkSection;
 import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.CropState;
@@ -40,16 +42,18 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.data.Ageable;
 import org.bukkit.block.data.BlockData;
-import org.bukkit.craftbukkit.v1_16_R1.CraftChunk;
-import org.bukkit.craftbukkit.v1_16_R1.CraftWorld;
-import org.bukkit.craftbukkit.v1_16_R1.block.CraftBlock;
-import org.bukkit.craftbukkit.v1_16_R1.block.data.CraftBlockData;
-import org.bukkit.craftbukkit.v1_16_R1.entity.CraftItem;
-import org.bukkit.craftbukkit.v1_16_R1.entity.CraftLivingEntity;
-import org.bukkit.craftbukkit.v1_16_R1.entity.CraftPlayer;
-import org.bukkit.craftbukkit.v1_16_R1.event.CraftEventFactory;
-import org.bukkit.craftbukkit.v1_16_R1.inventory.CraftInventoryView;
-import org.bukkit.craftbukkit.v1_16_R1.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.libs.it.unimi.dsi.fastutil.shorts.ShortArraySet;
+import org.bukkit.craftbukkit.libs.it.unimi.dsi.fastutil.shorts.ShortSet;
+import org.bukkit.craftbukkit.v1_17_R1.CraftChunk;
+import org.bukkit.craftbukkit.v1_17_R1.CraftWorld;
+import org.bukkit.craftbukkit.v1_17_R1.block.CraftBlock;
+import org.bukkit.craftbukkit.v1_17_R1.block.data.CraftBlockData;
+import org.bukkit.craftbukkit.v1_17_R1.entity.CraftItem;
+import org.bukkit.craftbukkit.v1_17_R1.entity.CraftLivingEntity;
+import org.bukkit.craftbukkit.v1_17_R1.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_17_R1.event.CraftEventFactory;
+import org.bukkit.craftbukkit.v1_17_R1.inventory.CraftInventoryView;
+import org.bukkit.craftbukkit.v1_17_R1.inventory.CraftItemStack;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.LivingEntity;
@@ -68,20 +72,32 @@ import org.bukkit.inventory.ShapelessRecipe;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 @SuppressWarnings({"unused", "ConstantConditions"})
-public final class NMSAdapter_v1_16_R1 implements NMSAdapter {
+public final class NMSAdapter_v1_17_R1 implements NMSAdapter {
 
-    private static final ReflectField<PlayerMap> PLAYER_MAP_FIELD = new ReflectField<>(PlayerChunkMap.class, PlayerMap.class, "playerMap");
+    private static final ReflectField<PlayerMap> PLAYER_MAP_FIELD = new ReflectField<>(PlayerChunkMap.class, PlayerMap.class, "F");
     private static final ReflectField<ItemStack> ITEM_STACK_HANDLE = new ReflectField<>(CraftItemStack.class, ItemStack.class, "handle");
+//    private static final ReflectConstructor<PacketPlayOutMultiBlockChange> MULTI_BLOCK_CHANGE_CONSTRUCTOR = new ReflectConstructor<>(PacketPlayOutMultiBlockChange.class, constructor -> constructor.getParameterCount() > 0);
+
+//    private static Class<?> SHORT_ARRAY_SET_CLASS = null;
+//
+//    static {
+//        try {
+//            SHORT_ARRAY_SET_CLASS = Class.forName("it.unimi.dsi.fastutil.shorts.ShortArraySet");
+//            Class<?> shortSetClass = Class.forName("it.unimi.dsi.fastutil.shorts.ShortSet");
+//        }catch (Exception ignored){}
+//    }
+//    TODO: Paper
 
     @Override
     public String getVersion() {
-        return "v1_16_R1";
+        return "v1_17_R1";
     }
 
     @Override
@@ -95,7 +111,7 @@ public final class NMSAdapter_v1_16_R1 implements NMSAdapter {
 
         EntityPlayer player = ((CraftPlayer) pl).getHandle();
         BlockPosition blockPosition = new BlockPosition(bl.getX(), bl.getY(), bl.getZ());
-        WorldServer worldServer = player.playerInteractManager.world;
+        WorldServer worldServer = player.getWorldServer();
         IBlockData blockData = worldServer.getType(blockPosition);
         Block block = blockData.getBlock();
         ItemStack itemStack = player.getItemInMainHand();
@@ -114,7 +130,7 @@ public final class NMSAdapter_v1_16_R1 implements NMSAdapter {
 
     @Override
     public int getExpFromBlock(org.bukkit.block.Block block, Player player) {
-        World world = ((CraftWorld) block.getWorld()).getHandle();
+        WorldServer world = ((CraftWorld) block.getWorld()).getHandle();
         EntityPlayer entityPlayer = ((CraftPlayer) player).getHandle();
         BlockPosition blockPosition = new BlockPosition(block.getX(), block.getY(), block.getZ());
         IBlockData blockData = world.getType(blockPosition);
@@ -162,7 +178,7 @@ public final class NMSAdapter_v1_16_R1 implements NMSAdapter {
         ItemStack nmsStack = (ItemStack) toolItemStack.getNMSItem();
         EntityPlayer entityPlayer = ((CraftPlayer) player).getHandle();
 
-        entityPlayer.broadcastItemBreak(EnumItemSlot.MAINHAND);
+        entityPlayer.broadcastItemBreak(EnumItemSlot.a);
         Item item = nmsStack.getItem();
 
         if (nmsStack.getCount() == 1)
@@ -170,7 +186,7 @@ public final class NMSAdapter_v1_16_R1 implements NMSAdapter {
 
         nmsStack.subtract(1);
 
-        entityPlayer.b(StatisticList.ITEM_BROKEN.b(item));
+        entityPlayer.b(StatisticList.d.b(item));
 
         nmsStack.setDamage(0);
     }
@@ -182,7 +198,7 @@ public final class NMSAdapter_v1_16_R1 implements NMSAdapter {
         if(other instanceof CraftItemStack){
             craftItemStack = (CraftItemStack) other;
             handle = ITEM_STACK_HANDLE.get(other);
-        }else{
+        } else{
             handle = CraftItemStack.asNMSCopy(other);
             craftItemStack = CraftItemStack.asCraftMirror(handle);
         }
@@ -259,21 +275,24 @@ public final class NMSAdapter_v1_16_R1 implements NMSAdapter {
     @Override
     public void refreshChunk(org.bukkit.Chunk bukkitChunk, Set<Location> blocksList) {
         Chunk chunk = ((CraftChunk) bukkitChunk).getHandle();
-        int blocksAmount = blocksList.size();
-        short[] values = new short[blocksAmount];
+        Map<Integer, Set<Short>> blocks = new HashMap<>();
 
         Location firstLocation = null;
 
-        int counter = 0;
-        for(Location location : blocksList) {
+        for(Location location : blocksList){
             if(firstLocation == null)
                 firstLocation = location;
 
-            values[counter++] = (short) ((location.getBlockX() & 15) << 12 | (location.getBlockZ() & 15) << 8 | location.getBlockY());
+            Set<Short> shortSet = blocks.computeIfAbsent(location.getBlockY() >> 4, i -> createShortSet());
+            shortSet.add((short)((location.getBlockX() & 15) << 8 | (location.getBlockZ() & 15) << 4 | (location.getBlockY() & 15)));
         }
 
-        sendPacketToRelevantPlayers(chunk.world, chunk.getPos().x, chunk.getPos().z,
-                new PacketPlayOutMultiBlockChange(blocksAmount, values, chunk));
+        for(Map.Entry<Integer,  Set<Short>> entry : blocks.entrySet()){
+            PacketPlayOutMultiBlockChange packetPlayOutMultiBlockChange = createMultiBlockChangePacket(
+                    SectionPosition.a(chunk.getPos(), entry.getKey()), entry.getValue(), chunk.getSections()[entry.getKey()]);
+            if(packetPlayOutMultiBlockChange != null)
+                sendPacketToRelevantPlayers(chunk.i, chunk.getPos().b, chunk.getPos().c, packetPlayOutMultiBlockChange);
+        }
     }
 
     @Override
@@ -285,7 +304,7 @@ public final class NMSAdapter_v1_16_R1 implements NMSAdapter {
 
     @Override
     public int getFarmlandId() {
-        return Block.getCombinedId(Blocks.FARMLAND.getBlockData());
+        return Block.getCombinedId(Blocks.ce.getBlockData());
     }
 
     @Override
@@ -369,20 +388,21 @@ public final class NMSAdapter_v1_16_R1 implements NMSAdapter {
     public void playPickupAnimation(LivingEntity livingEntity, org.bukkit.entity.Item item) {
         EntityLiving entityLiving = ((CraftLivingEntity) livingEntity).getHandle();
         EntityItem entityItem = (EntityItem) ((CraftItem) item).getHandle();
-        ((WorldServer) entityLiving.world).getChunkProvider().broadcast(entityItem, new PacketPlayOutCollect(entityItem.getId(), entityLiving.getId(), item.getItemStack().getAmount()));
+        ((WorldServer) entityLiving.getWorld()).getChunkProvider()
+                .broadcast(entityItem, new PacketPlayOutCollect(entityItem.getId(), entityLiving.getId(), item.getItemStack().getAmount()));
     }
 
     @Override
     public boolean isAxeType(Material material) {
-        float destroySpeed = Items.DIAMOND_AXE.getDestroySpeed(
-                new ItemStack(Items.DIAMOND_AXE), ((CraftBlockData) material.createBlockData()).getState());
+        float destroySpeed = Items.mU.getDestroySpeed(
+                new ItemStack(Items.mU), ((CraftBlockData) material.createBlockData()).getState());
         return destroySpeed == 8.0F;
     }
 
     @Override
     public boolean isShovelType(Material material) {
-        float destroySpeed = Items.DIAMOND_SHOVEL.getDestroySpeed(
-                new ItemStack(Items.DIAMOND_SHOVEL), ((CraftBlockData) material.createBlockData()).getState());
+        float destroySpeed = Items.mS.getDestroySpeed(
+                new ItemStack(Items.mS), ((CraftBlockData) material.createBlockData()).getState());
         return destroySpeed == 8.0F;
     }
 
@@ -416,17 +436,17 @@ public final class NMSAdapter_v1_16_R1 implements NMSAdapter {
     @Override
     public void setExpCost(InventoryView inventoryView, int expCost) {
         ContainerAnvil container = (ContainerAnvil) ((CraftInventoryView) inventoryView).getHandle();
-        container.levelCost.set(expCost);
+        container.w.set(expCost);
     }
 
     @Override
     public int getExpCost(InventoryView inventoryView) {
-        return ((ContainerAnvil) ((CraftInventoryView) inventoryView).getHandle()).levelCost.get();
+        return ((ContainerAnvil) ((CraftInventoryView) inventoryView).getHandle()).w.get();
     }
 
     @Override
     public String getRenameText(InventoryView inventoryView) {
-        return ((ContainerAnvil) ((CraftInventoryView) inventoryView).getHandle()).renameText;
+        return ((ContainerAnvil) ((CraftInventoryView) inventoryView).getHandle()).v;
     }
 
     @Override
@@ -438,7 +458,7 @@ public final class NMSAdapter_v1_16_R1 implements NMSAdapter {
     public Object getDroppedItem(org.bukkit.inventory.ItemStack itemStack, Location location) {
         WorldServer world = ((CraftWorld) location.getWorld()).getHandle();
         EntityItem entityitem = new EntityItem(world, location.getX(), location.getY(), location.getZ(), CraftItemStack.asNMSCopy(itemStack));
-        entityitem.pickupDelay = 10;
+        entityitem.ap = 10;
         return entityitem;
     }
 
@@ -460,7 +480,7 @@ public final class NMSAdapter_v1_16_R1 implements NMSAdapter {
         droppedItemsRaw.forEach(droppedItemObject -> {
             EntityItem entityItem = (EntityItem) droppedItemObject;
             if(entityItem.isAlive()){
-                entityItem.world.addEntity(entityItem);
+                entityItem.getWorld().addEntity(entityItem);
             }
         });
     }
@@ -476,15 +496,15 @@ public final class NMSAdapter_v1_16_R1 implements NMSAdapter {
         if (EntityItem.a(itemOfEntity, itemOfOtherEntity)) {
             if (!CraftEventFactory.callItemMergeEvent(otherEntity, entityItem).isCancelled()) {
                 mergeItems(entityItem, itemOfEntity, itemOfOtherEntity);
-                entityItem.pickupDelay = Math.max(entityItem.pickupDelay, otherEntity.pickupDelay);
-                entityItem.age = Math.min(entityItem.age, otherEntity.age);
+                entityItem.ap = Math.max(entityItem.ap, otherEntity.ap);
+                entityItem.ao = Math.min(entityItem.ao, otherEntity.ao);
                 if (itemOfOtherEntity.isEmpty()) {
                     otherEntity.die();
                 }
             }
         }
 
-        return entityItem.dead;
+        return entityItem.isRemoved();
     }
 
     private static void mergeItems(EntityItem entityItem, ItemStack itemStack, ItemStack otherItem) {
@@ -494,10 +514,50 @@ public final class NMSAdapter_v1_16_R1 implements NMSAdapter {
         }
     }
 
+//    @SuppressWarnings("all")
+    private static Set<Short> createShortSet(){
+//        if(SHORT_ARRAY_SET_CLASS == null)
+//            return new ShortArraySet();
+//
+//        try{
+//            return (Set<Short>) SHORT_ARRAY_SET_CLASS.newInstance();
+//        }catch (Throwable ex){
+//            ex.printStackTrace();
+//            return null;
+//        }
+//        TODO: Paper
+        return new ShortArraySet();
+    }
+
+    private static PacketPlayOutMultiBlockChange createMultiBlockChangePacket(SectionPosition sectionPosition, Set<Short> shortSet, ChunkSection chunkSection){
+//        if(MULTI_BLOCK_CHANGE_CONSTRUCTOR == null){
+//            return new PacketPlayOutMultiBlockChange(
+//                    sectionPosition,
+//                    (ShortSet) shortSet,
+//                    chunkSection,
+//                    true
+//            );
+//        }
+//
+//        try{
+//            return MULTI_BLOCK_CHANGE_CONSTRUCTOR.newInstance(sectionPosition, shortSet, chunkSection, true);
+//        }catch (Throwable ex){
+//            ex.printStackTrace();
+//            return null;
+//        }
+//        TODO: Paper
+        return new PacketPlayOutMultiBlockChange(
+                    sectionPosition,
+                    (ShortSet) shortSet,
+                    chunkSection,
+                    true
+            );
+    }
+
     private static void sendPacketToRelevantPlayers(WorldServer worldServer, int chunkX, int chunkZ, Packet<?> packet){
-        PlayerChunkMap playerChunkMap = worldServer.getChunkProvider().playerChunkMap;
+        PlayerChunkMap playerChunkMap = worldServer.getChunkProvider().a;
         PLAYER_MAP_FIELD.get(playerChunkMap).a(1)
-                .forEach(entityPlayer -> entityPlayer.playerConnection.sendPacket(packet));
+                .forEach(entityPlayer -> entityPlayer.b.sendPacket(packet));
     }
 
     @SuppressWarnings("NullableProblems")

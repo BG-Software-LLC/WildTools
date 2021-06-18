@@ -83,13 +83,13 @@ public final class WCannonTool extends WTool implements CannonTool {
                 continue;
 
             if(e.getPlayer().getInventory().containsAtLeast(new ItemStack(Material.TNT), amount)){
-                ItemUtils.addItem(new ItemStack(Material.TNT, amount), dispenser.getInventory(), null);
+                ItemUtils.addItem(new ItemStack(Material.TNT, amount), dispenser.getInventory(), null, null);
                 e.getPlayer().getInventory().removeItem(new ItemStack(Material.TNT, amount));
                 filledDispensers++;
                 totalTNT += amount;
             }
             else if(plugin.getProviders().getTNTAmountFromBank(e.getPlayer()) >= amount){
-                ItemUtils.addItem(new ItemStack(Material.TNT, amount), dispenser.getInventory(), null);
+                ItemUtils.addItem(new ItemStack(Material.TNT, amount), dispenser.getInventory(), null, null);
                 plugin.getProviders().takeTNTFromBank(e.getPlayer(), amount);
                 filledDispensers++;
                 totalTNT += amount;

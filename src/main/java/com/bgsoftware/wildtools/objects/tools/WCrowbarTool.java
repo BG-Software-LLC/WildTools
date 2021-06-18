@@ -50,7 +50,7 @@ public final class WCrowbarTool extends WTool implements CrowbarTool {
         }
 
         try {
-            if (!BukkitUtils.breakBlock(e.getPlayer(), null, e.getClickedBlock(), e.getItem(), this, itemStack -> null))
+            if (!BukkitUtils.breakBlock(e.getPlayer(), null, null, e.getClickedBlock(), e.getItem(), this, itemStack -> null))
                 return true;
         }finally {
             if(addedSilktouch)
@@ -61,7 +61,7 @@ public final class WCrowbarTool extends WTool implements CrowbarTool {
             if(!itemsToDrop.isEmpty()) {
                 ItemStack dropItem = itemsToDrop.get(0);
                 if (isAutoCollect())
-                    ItemUtils.addItem(dropItem, e.getPlayer().getInventory(), e.getClickedBlock().getLocation());
+                    ItemUtils.addItem(dropItem, e.getPlayer().getInventory(), e.getClickedBlock().getLocation(), null);
                 else
                     e.getClickedBlock().getWorld().dropItemNaturally(e.getClickedBlock().getLocation(), dropItem);
             }

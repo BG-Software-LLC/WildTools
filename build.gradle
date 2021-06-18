@@ -1,21 +1,11 @@
-group 'WildTools'
-apply plugin: 'java'
-apply plugin: 'maven'
-apply plugin: 'base'
-apply plugin: 'com.github.johnrengelman.shadow'
-apply plugin: 'maven-publish'
-
-version = "2.10.4"
-
-buildscript {
-    repositories {
-        jcenter()
-        maven { url "https://plugins.gradle.org/m2/" }
-    }
-    dependencies {
-        classpath 'com.github.jengelman.gradle.plugins:shadow:6.1.0'
-    }
+plugins {
+    id 'java'
+    id 'com.github.johnrengelman.shadow' version '7.0.0'
+    id 'maven-publish'
 }
+
+group 'WildTools'
+version = "2.11.0"
 
 subprojects {
     apply plugin: 'java'
@@ -26,8 +16,8 @@ subprojects {
     }
 
     shadowJar {
-        archiveName = "${project.name}.jar"
-        destinationDir = file("../archive/")
+        archiveFileName = "${project.name}.jar"
+        destinationDirectory = file("../archive/")
     }
 
     build {
@@ -56,8 +46,8 @@ repositories {
 }
 
 dependencies {
-    compile project(":API")
-    compile fileTree("archive")
+    implementation project(":API")
+    implementation fileTree("archive")
 
     // Spigot jars
     compileOnly "org.spigotmc:v1_7_R3:latest"
@@ -90,6 +80,7 @@ dependencies {
     compileOnly "com.stefthedev:Villages:latest"
     compileOnly "com.bgsoftware:WildChestsAPI:latest"
     compileOnly "com.bgsoftware:WildStackerAPI:latest"
+    compileOnly "dev.rosewood:RoseStacker:latest"
 }
 
 jar {
@@ -98,37 +89,55 @@ jar {
             zipTree(file)
         }
     }
+}
 
-    processResources {
-        outputs.upToDateWhen {false}
-        eachFile { details ->
-            if (details.name.contentEquals('plugin.yml')) {
-                filter { String line ->
-                    line.replace('${project.version}', version)
-                }
+processResources {
+    outputs.upToDateWhen {false}
+    String versionNumber = System.getenv("BUILD_NUMBER") == null ? version : version + "-DEVb" + System.getenv("BUILD_NUMBER")
+    eachFile { details ->
+        if (details.name.contentEquals('plugin.yml')) {
+            filter { String line ->
+                line.replace('${project.version}', versionNumber)
             }
         }
     }
-
 }
 
 shadowJar {
     dependsOn(jar)
-    archiveName = rootProject.name + ".jar"
+
+    if(System.getenv("BUILD_NUMBER") == null){
+        archiveName = rootProject.name + ".jar"
+    }
+    else{
+        archiveName = rootProject.name + "-b" + System.getenv("BUILD_NUMBER") + ".jar"
+    }
+
+    delete fileTree('./target/') {
+        exclude archiveName
+    }
+
     destinationDir = file("./target/")
     from sourceSets.getByName("main").output
     configurations = [project.configurations.getByName("runtimeClasspath")]
 }
 
+task copyAPI(type: Copy) {
+    from './archive/API.jar'
+    into './target/'
+    rename('API.jar', rootProject.name + 'API.jar')
+}
+
+clean {
+    delete file('./archive/')
+}
+
 build {
     dependsOn shadowJar
-    dependsOn publish
+    dependsOn copyAPI
+    dependsOn clean
 }
+
 publish.shouldRunAfter shadowJar
 shadowJar.shouldRunAfter build
-
-publishing {
-    repositories {
-        mavenLocal()
-    }
-}
+build.shouldRunAfter subprojects.build

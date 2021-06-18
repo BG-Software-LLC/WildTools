@@ -532,6 +532,83 @@ public final class NMSAdapter_v1_13_R2 implements NMSAdapter {
         return new AdvancedRecipeClassImpl(toolName, result);
     }
 
+    @Override
+    public Object getDroppedItem(org.bukkit.inventory.ItemStack itemStack, Location location) {
+        WorldServer world = ((CraftWorld) location.getWorld()).getHandle();
+        EntityItem entityitem = new EntityItem(world, location.getX(), location.getY(), location.getZ(), CraftItemStack.asNMSCopy(itemStack));
+        entityitem.pickupDelay = 10;
+        return entityitem;
+    }
+
+    @Override
+    public void dropItems(List<Object> droppedItemsRaw) {
+        droppedItemsRaw.removeIf(droppedItem -> !(droppedItem instanceof EntityItem));
+
+        for(Object entityItem : droppedItemsRaw){
+            if(canMerge((EntityItem) entityItem)) {
+                for (Object otherEntityItem : droppedItemsRaw) {
+                    if (entityItem != otherEntityItem && canMerge((EntityItem) otherEntityItem)) {
+                        if(mergeEntityItems((EntityItem) entityItem, (EntityItem) otherEntityItem))
+                            break;
+                    }
+                }
+            }
+        }
+
+        droppedItemsRaw.forEach(droppedItemObject -> {
+            EntityItem entityItem = (EntityItem) droppedItemObject;
+            if(entityItem.isAlive()){
+                entityItem.world.addEntity(entityItem);
+            }
+        });
+    }
+
+    private static boolean canMerge(EntityItem entityItem){
+        ItemStack itemStack = entityItem.getItemStack();
+        return !itemStack.isEmpty() && itemStack.getCount() < itemStack.getMaxStackSize();
+    }
+
+    private static boolean mergeEntityItems(EntityItem entityItem, EntityItem otherEntity){
+        ItemStack itemOfEntity = entityItem.getItemStack();
+        ItemStack itemOfOtherEntity = otherEntity.getItemStack();
+        if (canMergeTogether(itemOfEntity, itemOfOtherEntity)) {
+            if (!CraftEventFactory.callItemMergeEvent(otherEntity, entityItem).isCancelled()) {
+                mergeItems(entityItem, itemOfEntity, otherEntity, itemOfOtherEntity);
+                entityItem.pickupDelay = Math.max(entityItem.pickupDelay, otherEntity.pickupDelay);
+                entityItem.age = Math.min(entityItem.age, otherEntity.age);
+                if (itemOfOtherEntity.isEmpty()) {
+                    otherEntity.die();
+                }
+            }
+        }
+
+        return entityItem.dead;
+    }
+
+    private static boolean canMergeTogether(ItemStack itemStack, ItemStack otherItem){
+        if(itemStack.getItem() != otherItem.getItem())
+            return false;
+
+        if(itemStack.getCount() + otherItem.getCount() > otherItem.getMaxStackSize())
+            return false;
+
+        if(itemStack.hasTag() ^ otherItem.hasTag())
+            return false;
+
+        return !otherItem.hasTag() || otherItem.getTag().equals(itemStack.getTag());
+    }
+
+    private static void mergeItems(EntityItem entityItem, ItemStack itemStack, EntityItem otherEntity, ItemStack otherItem) {
+        int amountLeftUntilFullStack = Math.min(itemStack.getMaxStackSize() - itemStack.getCount(), otherItem.getCount());
+        ItemStack itemStackClone = itemStack.cloneItemStack();
+        itemStackClone.add(amountLeftUntilFullStack);
+        entityItem.setItemStack(itemStackClone);
+        otherItem.subtract(amountLeftUntilFullStack);
+        if (!otherItem.isEmpty()) {
+            otherEntity.setItemStack(otherItem);
+        }
+    }
+
     private void sendPacketToRelevantPlayers(WorldServer worldServer, int chunkX, int chunkZ, Packet<?> packet){
         PlayerChunkMap playerChunkMap = worldServer.getPlayerChunkMap();
         for(EntityHuman entityHuman : worldServer.players){

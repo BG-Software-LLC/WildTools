@@ -123,16 +123,19 @@ public interface RecipeChoice extends Predicate<ItemStack> {
 
         @Override
         public void remove(Inventory inventory) {
+            int amountLeft = this.itemStack.getAmount();
             for(int i = 0; i < inventory.getSize(); i++){
                 ItemStack itemStack = inventory.getItem(i);
                 if(test(itemStack)) {
-                    int leftOvers = itemStack.getAmount() - this.itemStack.getAmount();
+                    int leftOvers = itemStack.getAmount() - amountLeft;
                     if(leftOvers <= 0) {
+                        amountLeft -= itemStack.getAmount();
                         inventory.setItem(i, null);
                     }
                     else{
-                        itemStack.setAmount(itemStack.getAmount() - this.itemStack.getAmount());
+                        itemStack.setAmount(itemStack.getAmount() - amountLeft);
                         inventory.setItem(i, itemStack);
+                        break;
                     }
                 }
             }
