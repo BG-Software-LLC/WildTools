@@ -463,13 +463,55 @@ public final class NMSAdapter_v1_17_R1 implements NMSAdapter {
     }
 
     @Override
-    public void dropItems(List<Object> droppedItems) {
-        droppedItems.forEach(droppedItemObject -> {
-            if(droppedItemObject instanceof EntityItem){
-                EntityItem entityItem = (EntityItem) droppedItemObject;
+    public void dropItems(List<Object> droppedItemsRaw) {
+        droppedItemsRaw.removeIf(droppedItem -> !(droppedItem instanceof EntityItem));
+
+        for(Object entityItem : droppedItemsRaw){
+            if(canMerge((EntityItem) entityItem)) {
+                for (Object otherEntityItem : droppedItemsRaw) {
+                    if (entityItem != otherEntityItem && canMerge((EntityItem) otherEntityItem)) {
+                        if(mergeEntityItems((EntityItem) entityItem, (EntityItem) otherEntityItem))
+                            break;
+                    }
+                }
+            }
+        }
+
+        droppedItemsRaw.forEach(droppedItemObject -> {
+            EntityItem entityItem = (EntityItem) droppedItemObject;
+            if(entityItem.isAlive()){
                 entityItem.getWorld().addEntity(entityItem);
             }
         });
+    }
+
+    private static boolean canMerge(EntityItem entityItem){
+        ItemStack itemStack = entityItem.getItemStack();
+        return !itemStack.isEmpty() && itemStack.getCount() < itemStack.getMaxStackSize();
+    }
+
+    private static boolean mergeEntityItems(EntityItem entityItem, EntityItem otherEntity){
+        ItemStack itemOfEntity = entityItem.getItemStack();
+        ItemStack itemOfOtherEntity = otherEntity.getItemStack();
+        if (EntityItem.a(itemOfEntity, itemOfOtherEntity)) {
+            if (!CraftEventFactory.callItemMergeEvent(otherEntity, entityItem).isCancelled()) {
+                mergeItems(entityItem, itemOfEntity, itemOfOtherEntity);
+                entityItem.ap = Math.max(entityItem.ap, otherEntity.ap);
+                entityItem.ao = Math.min(entityItem.ao, otherEntity.ao);
+                if (itemOfOtherEntity.isEmpty()) {
+                    otherEntity.die();
+                }
+            }
+        }
+
+        return entityItem.isRemoved();
+    }
+
+    private static void mergeItems(EntityItem entityItem, ItemStack itemStack, ItemStack otherItem) {
+        ItemStack leftOver = EntityItem.a(itemStack, otherItem, 64);
+        if (!leftOver.isEmpty()) {
+            entityItem.setItemStack(leftOver);
+        }
     }
 
 //    @SuppressWarnings("all")
