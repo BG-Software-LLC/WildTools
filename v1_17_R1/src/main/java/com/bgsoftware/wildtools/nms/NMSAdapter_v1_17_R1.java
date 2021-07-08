@@ -5,6 +5,7 @@ import com.bgsoftware.wildtools.hooks.PaperHook;
 import com.bgsoftware.wildtools.objects.WMaterial;
 import com.bgsoftware.wildtools.recipes.AdvancedShapedRecipe;
 import com.bgsoftware.wildtools.utils.items.ToolItemStack;
+import com.bgsoftware.wildtools.utils.reflections.ReflectConstructor;
 import com.bgsoftware.wildtools.utils.reflections.ReflectField;
 import net.minecraft.core.BlockPosition;
 import net.minecraft.core.SectionPosition;
@@ -83,17 +84,16 @@ public final class NMSAdapter_v1_17_R1 implements NMSAdapter {
 
     private static final ReflectField<PlayerMap> PLAYER_MAP_FIELD = new ReflectField<>(PlayerChunkMap.class, PlayerMap.class, "F");
     private static final ReflectField<ItemStack> ITEM_STACK_HANDLE = new ReflectField<>(CraftItemStack.class, ItemStack.class, "handle");
-//    private static final ReflectConstructor<PacketPlayOutMultiBlockChange> MULTI_BLOCK_CHANGE_CONSTRUCTOR = new ReflectConstructor<>(PacketPlayOutMultiBlockChange.class, constructor -> constructor.getParameterCount() > 0);
+    private static final ReflectConstructor<PacketPlayOutMultiBlockChange> MULTI_BLOCK_CHANGE_CONSTRUCTOR = new ReflectConstructor<>(PacketPlayOutMultiBlockChange.class, constructor -> constructor.getParameterCount() > 0);
 
-//    private static Class<?> SHORT_ARRAY_SET_CLASS = null;
-//
-//    static {
-//        try {
-//            SHORT_ARRAY_SET_CLASS = Class.forName("it.unimi.dsi.fastutil.shorts.ShortArraySet");
-//            Class<?> shortSetClass = Class.forName("it.unimi.dsi.fastutil.shorts.ShortSet");
-//        }catch (Exception ignored){}
-//    }
-//    TODO: Paper
+    private static Class<?> SHORT_ARRAY_SET_CLASS = null;
+
+    static {
+        try {
+            SHORT_ARRAY_SET_CLASS = Class.forName("it.unimi.dsi.fastutil.shorts.ShortArraySet");
+            Class<?> shortSetClass = Class.forName("it.unimi.dsi.fastutil.shorts.ShortSet");
+        }catch (Exception ignored){}
+    }
 
     @Override
     public String getVersion() {
@@ -514,44 +514,35 @@ public final class NMSAdapter_v1_17_R1 implements NMSAdapter {
         }
     }
 
-//    @SuppressWarnings("all")
+    @SuppressWarnings("all")
     private static Set<Short> createShortSet(){
-//        if(SHORT_ARRAY_SET_CLASS == null)
-//            return new ShortArraySet();
-//
-//        try{
-//            return (Set<Short>) SHORT_ARRAY_SET_CLASS.newInstance();
-//        }catch (Throwable ex){
-//            ex.printStackTrace();
-//            return null;
-//        }
-//        TODO: Paper
-        return new ShortArraySet();
+        if(SHORT_ARRAY_SET_CLASS == null)
+            return new ShortArraySet();
+
+        try{
+            return (Set<Short>) SHORT_ARRAY_SET_CLASS.newInstance();
+        }catch (Throwable ex){
+            ex.printStackTrace();
+            return null;
+        }
     }
 
     private static PacketPlayOutMultiBlockChange createMultiBlockChangePacket(SectionPosition sectionPosition, Set<Short> shortSet, ChunkSection chunkSection){
-//        if(MULTI_BLOCK_CHANGE_CONSTRUCTOR == null){
-//            return new PacketPlayOutMultiBlockChange(
-//                    sectionPosition,
-//                    (ShortSet) shortSet,
-//                    chunkSection,
-//                    true
-//            );
-//        }
-//
-//        try{
-//            return MULTI_BLOCK_CHANGE_CONSTRUCTOR.newInstance(sectionPosition, shortSet, chunkSection, true);
-//        }catch (Throwable ex){
-//            ex.printStackTrace();
-//            return null;
-//        }
-//        TODO: Paper
-        return new PacketPlayOutMultiBlockChange(
+        if(MULTI_BLOCK_CHANGE_CONSTRUCTOR == null){
+            return new PacketPlayOutMultiBlockChange(
                     sectionPosition,
                     (ShortSet) shortSet,
                     chunkSection,
                     true
             );
+        }
+
+        try{
+            return MULTI_BLOCK_CHANGE_CONSTRUCTOR.newInstance(sectionPosition, shortSet, chunkSection, true);
+        }catch (Throwable ex){
+            ex.printStackTrace();
+            return null;
+        }
     }
 
     private static void sendPacketToRelevantPlayers(WorldServer worldServer, int chunkX, int chunkZ, Packet<?> packet){
