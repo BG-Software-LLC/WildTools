@@ -291,7 +291,8 @@ public final class NMSAdapter_v1_17_R1 implements NMSAdapter {
             PacketPlayOutMultiBlockChange packetPlayOutMultiBlockChange = createMultiBlockChangePacket(
                     SectionPosition.a(chunk.getPos(), entry.getKey()), entry.getValue(), chunk.getSections()[entry.getKey()]);
             if(packetPlayOutMultiBlockChange != null)
-                sendPacketToRelevantPlayers(chunk.i, chunk.getPos().b, chunk.getPos().c, packetPlayOutMultiBlockChange);
+                sendPacketToRelevantPlayers((WorldServer) chunk.getWorld(),
+                        chunk.getPos().b, chunk.getPos().c, packetPlayOutMultiBlockChange);
         }
     }
 
