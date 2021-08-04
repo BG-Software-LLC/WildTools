@@ -1,5 +1,7 @@
 package com.bgsoftware.wildtools.handlers;
 
+import com.bgsoftware.wildtools.WildToolsPlugin;
+import com.bgsoftware.wildtools.api.objects.tools.Tool;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
@@ -26,12 +28,18 @@ public final class EventsHandler {
     private final List<CachedListenerMethod> claimingPluginsInteractMethods = new ArrayList<>();
     private final List<CachedListenerMethod> otherPluginsBreakMethods = new ArrayList<>();
 
+    private static final WildToolsPlugin plugin = WildToolsPlugin.getPlugin();
+
     public EventsHandler(){
 
     }
 
     public void callBreakEvent(BlockBreakEvent blockBreakEvent, boolean claimingCheck){
-        callMethods(claimingCheck ? claimingPluginsBreakMethods : otherPluginsBreakMethods, blockBreakEvent);
+        Tool tool = plugin.getToolsManager().getTool(blockBreakEvent.getPlayer().getItemInHand());
+        List<CachedListenerMethod> tempOtherPluginsBreakMethods = new ArrayList<>();
+        this.loadOtherPlugins(new ArrayList<>(tool.otherPluginsEvents()), tempOtherPluginsBreakMethods);
+        tempOtherPluginsBreakMethods.addAll(otherPluginsBreakMethods);
+        callMethods(claimingCheck ? claimingPluginsBreakMethods : tempOtherPluginsBreakMethods, blockBreakEvent);
     }
 
     public void callPlaceEvent(BlockPlaceEvent blockPlaceEvent){
@@ -68,7 +76,11 @@ public final class EventsHandler {
         claimingPluginsInteractMethods.sort(CachedListenerMethod::compareTo);
     }
 
-    public void loadOtherPlugins(List<String> otherPlugins){
+    public void loadOtherPlugins(List<String> otherPlugins) {
+        this.loadOtherPlugins(otherPlugins, otherPluginsBreakMethods);
+    }
+
+    public void loadOtherPlugins(List<String> otherPlugins, List<CachedListenerMethod> otherPluginsBreakMethods) {
         otherPluginsBreakMethods.clear();
         for(RegisteredListener registeredListener : BlockBreakEvent.getHandlerList().getRegisteredListeners()){
             if(otherPlugins.contains(registeredListener.getPlugin().getName()))
