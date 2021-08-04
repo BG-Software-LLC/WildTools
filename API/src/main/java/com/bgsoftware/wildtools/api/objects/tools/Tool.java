@@ -188,6 +188,13 @@ public interface Tool {
      */
     void setWhitelistedWorlds(List<String> worlds);
 
+
+    /**
+     * Add event in other-plugins event list
+     * @param otherPluginsEvents The events list.
+     */
+    void setOtherPluginsEvents(List<String> otherPluginsEvents);
+
     /**
      * Set whether broken blocks should be counted towards statistics of the player or not.
      */
@@ -321,6 +328,11 @@ public interface Tool {
      * Get all the whitelisted block drops.
      */
     Set<String> getWhitelistedDrops();
+
+    /**
+     * Get events to add in other-plugins event list
+     */
+    Set<String> otherPluginsEvents();
 
     /**
      * Check whether or not the tool has blacklisted block materials.
