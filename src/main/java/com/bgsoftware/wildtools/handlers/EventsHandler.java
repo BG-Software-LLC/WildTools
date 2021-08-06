@@ -39,7 +39,10 @@ public final class EventsHandler {
     public void callBreakEvent(BlockBreakEvent blockBreakEvent, boolean claimingCheck){
         ToolItemStack toolItemStack = ToolItemStack.of(plugin.getNMSAdapter().getItemInHand(blockBreakEvent.getPlayer()));
         Tool tool = toolItemStack.getTool();
-        callMethods(claimingCheck ? claimingPluginsBreakMethods : otherPluginsBreakMethodsTools.get(tool), blockBreakEvent);
+        List<CachedListenerMethod> getOtherPluginsMethods = otherPluginsBreakMethodsTools.get(tool);
+        if(getOtherPluginsMethods == null)
+            return;
+        callMethods(claimingCheck ? claimingPluginsBreakMethods : getOtherPluginsMethods, blockBreakEvent);
     }
 
     public void callPlaceEvent(BlockPlaceEvent blockPlaceEvent){
@@ -77,17 +80,15 @@ public final class EventsHandler {
     }
 
     public void loadOtherPlugins(List<String> otherPlugins) {
-        List<CachedListenerMethod> globalOtherPluginsMethods = new ArrayList<>();
-        loadOtherPlugins(otherPlugins, globalOtherPluginsMethods);
         otherPluginsBreakMethodsTools.clear();
         List<Tool> tools = plugin.getToolsManager().getTools();
         for (Tool tool : tools) {
             otherPluginsBreakMethodsTools.put(tool, new ArrayList<>());
             List<CachedListenerMethod> otherPluginsMethods = otherPluginsBreakMethodsTools.get(tool);
-            loadOtherPlugins(new ArrayList<>(tool.otherPluginsEvents()), otherPluginsMethods);
-            otherPluginsMethods.addAll(globalOtherPluginsMethods);
+            List<String> plugins = new ArrayList<>(tool.otherPluginsEvents());
+            plugins.addAll(otherPlugins);
+            loadOtherPlugins(plugins, otherPluginsMethods);
         }
-
     }
 
     public void loadOtherPlugins(List<String> otherPlugins, List<CachedListenerMethod> otherPluginsBreakMethods) {
