@@ -2,6 +2,7 @@ package com.bgsoftware.wildtools.handlers;
 
 import com.bgsoftware.wildtools.WildToolsPlugin;
 import com.bgsoftware.wildtools.api.objects.tools.Tool;
+import com.bgsoftware.wildtools.utils.items.ToolItemStack;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
@@ -15,6 +16,7 @@ import org.jetbrains.annotations.NotNull;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 public final class EventsHandler {
@@ -26,7 +28,7 @@ public final class EventsHandler {
     private final List<CachedListenerMethod> claimingPluginsBreakMethods = new ArrayList<>();
     private final List<CachedListenerMethod> claimingPluginsPlaceMethods = new ArrayList<>();
     private final List<CachedListenerMethod> claimingPluginsInteractMethods = new ArrayList<>();
-    private final List<CachedListenerMethod> otherPluginsBreakMethods = new ArrayList<>();
+    private final HashMap<Tool, List<CachedListenerMethod>> otherPluginsBreakMethodsTools = new HashMap<>();
 
     private static final WildToolsPlugin plugin = WildToolsPlugin.getPlugin();
 
@@ -35,11 +37,9 @@ public final class EventsHandler {
     }
 
     public void callBreakEvent(BlockBreakEvent blockBreakEvent, boolean claimingCheck){
-        Tool tool = plugin.getToolsManager().getTool(blockBreakEvent.getPlayer().getItemInHand());
-        List<CachedListenerMethod> tempOtherPluginsBreakMethods = new ArrayList<>();
-        this.loadOtherPlugins(new ArrayList<>(tool.otherPluginsEvents()), tempOtherPluginsBreakMethods);
-        tempOtherPluginsBreakMethods.addAll(otherPluginsBreakMethods);
-        callMethods(claimingCheck ? claimingPluginsBreakMethods : tempOtherPluginsBreakMethods, blockBreakEvent);
+        ToolItemStack toolItemStack = ToolItemStack.of(plugin.getNMSAdapter().getItemInHand(blockBreakEvent.getPlayer()));
+        Tool tool = toolItemStack.getTool();
+        callMethods(claimingCheck ? claimingPluginsBreakMethods : otherPluginsBreakMethodsTools.get(tool), blockBreakEvent);
     }
 
     public void callPlaceEvent(BlockPlaceEvent blockPlaceEvent){
@@ -77,10 +77,21 @@ public final class EventsHandler {
     }
 
     public void loadOtherPlugins(List<String> otherPlugins) {
-        this.loadOtherPlugins(otherPlugins, otherPluginsBreakMethods);
+        List<CachedListenerMethod> globalOtherPluginsMethods = new ArrayList<>();
+        loadOtherPlugins(otherPlugins, globalOtherPluginsMethods);
+        otherPluginsBreakMethodsTools.clear();
+        List<Tool> tools = plugin.getToolsManager().getTools();
+        for (Tool tool : tools) {
+            otherPluginsBreakMethodsTools.put(tool, new ArrayList<>());
+            List<CachedListenerMethod> otherPluginsMethods = otherPluginsBreakMethodsTools.get(tool);
+            loadOtherPlugins(new ArrayList<>(tool.otherPluginsEvents()), otherPluginsMethods);
+            otherPluginsMethods.addAll(globalOtherPluginsMethods);
+        }
+
     }
 
     public void loadOtherPlugins(List<String> otherPlugins, List<CachedListenerMethod> otherPluginsBreakMethods) {
+
         otherPluginsBreakMethods.clear();
         for(RegisteredListener registeredListener : BlockBreakEvent.getHandlerList().getRegisteredListeners()){
             if(otherPlugins.contains(registeredListener.getPlugin().getName()))
