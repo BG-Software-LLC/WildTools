@@ -332,7 +332,7 @@ public interface Tool {
     /**
      * Get events to add in other-plugins event list
      */
-    Set<String> otherPluginsEvents();
+    Set<String> getOtherPluginsEvents();
 
     /**
      * Check whether or not the tool has blacklisted block materials.

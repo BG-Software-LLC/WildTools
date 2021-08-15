@@ -364,7 +364,7 @@ public abstract class WTool implements Tool {
     }
 
     @Override
-    public Set<String> otherPluginsEvents() {
+    public Set<String> getOtherPluginsEvents() {
         return otherPluginsEvents;
     }
 

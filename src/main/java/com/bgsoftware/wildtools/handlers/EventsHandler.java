@@ -37,12 +37,16 @@ public final class EventsHandler {
     }
 
     public void callBreakEvent(BlockBreakEvent blockBreakEvent, boolean claimingCheck){
+        if(claimingCheck) {
+            callMethods(claimingPluginsBreakMethods, blockBreakEvent);
+            return;
+        }
         ToolItemStack toolItemStack = ToolItemStack.of(plugin.getNMSAdapter().getItemInHand(blockBreakEvent.getPlayer()));
         Tool tool = toolItemStack.getTool();
         List<CachedListenerMethod> getOtherPluginsMethods = otherPluginsBreakMethodsTools.get(tool);
         if(getOtherPluginsMethods == null)
             return;
-        callMethods(claimingCheck ? claimingPluginsBreakMethods : getOtherPluginsMethods, blockBreakEvent);
+        callMethods(getOtherPluginsMethods, blockBreakEvent);
     }
 
     public void callPlaceEvent(BlockPlaceEvent blockPlaceEvent){
@@ -85,20 +89,16 @@ public final class EventsHandler {
         for (Tool tool : tools) {
             otherPluginsBreakMethodsTools.put(tool, new ArrayList<>());
             List<CachedListenerMethod> otherPluginsMethods = otherPluginsBreakMethodsTools.get(tool);
-            List<String> plugins = new ArrayList<>(tool.otherPluginsEvents());
+            List<String> plugins = new ArrayList<>(tool.getOtherPluginsEvents());
             plugins.addAll(otherPlugins);
-            loadOtherPlugins(plugins, otherPluginsMethods);
-        }
-    }
 
-    public void loadOtherPlugins(List<String> otherPlugins, List<CachedListenerMethod> otherPluginsBreakMethods) {
-
-        otherPluginsBreakMethods.clear();
-        for(RegisteredListener registeredListener : BlockBreakEvent.getHandlerList().getRegisteredListeners()){
-            if(otherPlugins.contains(registeredListener.getPlugin().getName()))
-                addAllMethods(otherPluginsBreakMethods, registeredListener.getListener(), BlockBreakEvent.class);
+            otherPluginsMethods.clear();
+            for(RegisteredListener registeredListener : BlockBreakEvent.getHandlerList().getRegisteredListeners()){
+                if(plugins.contains(registeredListener.getPlugin().getName()))
+                    addAllMethods(otherPluginsMethods, registeredListener.getListener(), BlockBreakEvent.class);
+            }
+            otherPluginsMethods.sort(CachedListenerMethod::compareTo);
         }
-        otherPluginsBreakMethods.sort(CachedListenerMethod::compareTo);
     }
 
     private static void callMethods(List<CachedListenerMethod> methodList, Event event){
