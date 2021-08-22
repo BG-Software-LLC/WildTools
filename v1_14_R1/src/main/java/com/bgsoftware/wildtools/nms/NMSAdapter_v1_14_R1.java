@@ -285,7 +285,7 @@ public final class NMSAdapter_v1_14_R1 implements NMSAdapter {
 
         Executor.sync(() -> sendPacketToRelevantPlayers(worldServer, chunk.getPos().x, chunk.getPos().z,
                         new PacketPlayOutLightUpdate(chunk.getPos(), lightEngine)),
-                1L);
+                2L);
     }
 
     @Override
