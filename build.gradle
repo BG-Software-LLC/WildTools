@@ -13,6 +13,11 @@ subprojects {
 
     repositories {
         maven { url 'https://repo.bg-software.com/repository/nms/' }
+        maven { url 'https://repo.bg-software.com/repository/common/' }
+    }
+
+    dependencies {
+        compileOnly "com.bgsoftware.common.reflection:ReflectionUtils:latest"
     }
 
     shadowJar {
@@ -28,6 +33,7 @@ subprojects {
 repositories {
     maven { url 'https://repo.bg-software.com/repository/nms/' }
     maven { url 'https://repo.bg-software.com/repository/api/' }
+    maven { url 'https://repo.bg-software.com/repository/common/' }
     maven { url 'https://repo.bg-software.com/repository/public-libs/' }
 
     String mavenUsername = project.hasProperty('mavenUsername') ? project.mavenUsername : System.getenv('mavenUsername');
@@ -49,9 +55,12 @@ dependencies {
     implementation project(":API")
     implementation fileTree("archive")
 
+    implementation 'com.bgsoftware.common.reflection:ReflectionUtils:latest'
+
     // Spigot jars
     compileOnly "org.spigotmc:v1_7_R3:latest"
     compileOnly 'org.spigotmc:v1_16_R3-Tuinity:latest'
+
     // Plugin Hooks
     compileOnly "com.cloth:ChunkCollectors:latest"
     compileOnly "dev.warse:ChunkHoppers:latest"

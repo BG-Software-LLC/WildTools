@@ -1,12 +1,11 @@
 package com.bgsoftware.wildtools.nms;
 
+import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.wildtools.WildToolsPlugin;
 import com.bgsoftware.wildtools.hooks.PaperHook;
 import com.bgsoftware.wildtools.objects.WMaterial;
 import com.bgsoftware.wildtools.recipes.AdvancedShapedRecipe;
 import com.bgsoftware.wildtools.utils.items.ToolItemStack;
-import com.bgsoftware.wildtools.utils.reflections.ReflectConstructor;
-import com.bgsoftware.wildtools.utils.reflections.ReflectField;
 import net.minecraft.core.BlockPosition;
 import net.minecraft.core.SectionPosition;
 import net.minecraft.nbt.NBTTagCompound;
@@ -70,8 +69,10 @@ import org.bukkit.inventory.RecipeChoice;
 import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.inventory.ShapelessRecipe;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -84,12 +85,14 @@ public final class NMSAdapter_v1_17_R1 implements NMSAdapter {
 
     private static final ReflectField<PlayerMap> PLAYER_MAP_FIELD = new ReflectField<>(PlayerChunkMap.class, PlayerMap.class, "F");
     private static final ReflectField<ItemStack> ITEM_STACK_HANDLE = new ReflectField<>(CraftItemStack.class, ItemStack.class, "handle");
-    private static final ReflectConstructor<PacketPlayOutMultiBlockChange> MULTI_BLOCK_CHANGE_CONSTRUCTOR = new ReflectConstructor<>(PacketPlayOutMultiBlockChange.class, constructor -> constructor.getParameterCount() > 0);
 
+    private static Constructor<?> MULTI_BLOCK_CHANGE_CONSTRUCTOR;
     private static Class<?> SHORT_ARRAY_SET_CLASS = null;
 
     static {
         try {
+            MULTI_BLOCK_CHANGE_CONSTRUCTOR = Arrays.stream(PacketPlayOutMultiBlockChange.class.getConstructors())
+                    .filter(constructor -> constructor.getParameterCount() == 4).findFirst().orElse(null);
             SHORT_ARRAY_SET_CLASS = Class.forName("it.unimi.dsi.fastutil.shorts.ShortArraySet");
             Class<?> shortSetClass = Class.forName("it.unimi.dsi.fastutil.shorts.ShortSet");
         }catch (Exception ignored){}
@@ -539,7 +542,8 @@ public final class NMSAdapter_v1_17_R1 implements NMSAdapter {
         }
 
         try{
-            return MULTI_BLOCK_CHANGE_CONSTRUCTOR.newInstance(sectionPosition, shortSet, chunkSection, true);
+            return (PacketPlayOutMultiBlockChange) MULTI_BLOCK_CHANGE_CONSTRUCTOR.newInstance(
+                    sectionPosition, shortSet, chunkSection, true);
         }catch (Throwable ex){
             ex.printStackTrace();
             return null;

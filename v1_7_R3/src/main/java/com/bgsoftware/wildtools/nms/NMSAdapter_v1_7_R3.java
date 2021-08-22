@@ -1,7 +1,7 @@
 package com.bgsoftware.wildtools.nms;
 
+import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.wildtools.utils.items.ToolItemStack;
-import com.bgsoftware.wildtools.utils.reflections.ReflectField;
 import net.minecraft.server.v1_7_R3.Block;
 import net.minecraft.server.v1_7_R3.BlockCarrots;
 import net.minecraft.server.v1_7_R3.BlockCocoa;
@@ -27,9 +27,9 @@ import net.minecraft.server.v1_7_R3.StatisticList;
 import net.minecraft.server.v1_7_R3.TileEntity;
 import net.minecraft.server.v1_7_R3.TileEntitySkull;
 import net.minecraft.server.v1_7_R3.World;
-
 import net.minecraft.server.v1_7_R3.WorldServer;
 import org.bukkit.Bukkit;
+import org.bukkit.CropState;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.NetherWartsState;
@@ -43,8 +43,6 @@ import org.bukkit.craftbukkit.v1_7_R3.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_7_R3.event.CraftEventFactory;
 import org.bukkit.craftbukkit.v1_7_R3.inventory.CraftInventoryPlayer;
 import org.bukkit.craftbukkit.v1_7_R3.inventory.CraftItemStack;
-
-import org.bukkit.CropState;
 import org.bukkit.craftbukkit.v1_7_R3.util.CraftMagicNumbers;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.enchantments.EnchantmentTarget;

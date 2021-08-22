@@ -1,8 +1,8 @@
 package com.bgsoftware.wildtools.nms;
 
+import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.wildtools.hooks.PaperHook;
 import com.bgsoftware.wildtools.utils.items.ToolItemStack;
-import com.bgsoftware.wildtools.utils.reflections.ReflectField;
 import net.minecraft.server.v1_10_R1.Block;
 import net.minecraft.server.v1_10_R1.BlockBeetroot;
 import net.minecraft.server.v1_10_R1.BlockCarrots;

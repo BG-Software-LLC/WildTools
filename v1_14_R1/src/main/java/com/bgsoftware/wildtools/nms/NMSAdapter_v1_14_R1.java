@@ -1,11 +1,11 @@
 package com.bgsoftware.wildtools.nms;
 
+import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.wildtools.WildToolsPlugin;
 import com.bgsoftware.wildtools.hooks.PaperHook;
 import com.bgsoftware.wildtools.objects.WMaterial;
 import com.bgsoftware.wildtools.recipes.AdvancedShapedRecipe;
 import com.bgsoftware.wildtools.utils.items.ToolItemStack;
-import com.bgsoftware.wildtools.utils.reflections.ReflectField;
 import net.minecraft.server.v1_14_R1.Block;
 import net.minecraft.server.v1_14_R1.BlockPosition;
 import net.minecraft.server.v1_14_R1.Blocks;
