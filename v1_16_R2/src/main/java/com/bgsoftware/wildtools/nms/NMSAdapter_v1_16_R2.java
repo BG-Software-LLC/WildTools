@@ -5,6 +5,7 @@ import com.bgsoftware.wildtools.WildToolsPlugin;
 import com.bgsoftware.wildtools.hooks.PaperHook;
 import com.bgsoftware.wildtools.objects.WMaterial;
 import com.bgsoftware.wildtools.recipes.AdvancedShapedRecipe;
+import com.bgsoftware.wildtools.utils.Executor;
 import com.bgsoftware.wildtools.utils.items.ToolItemStack;
 import net.minecraft.server.v1_16_R2.Block;
 import net.minecraft.server.v1_16_R2.BlockPosition;
@@ -20,9 +21,11 @@ import net.minecraft.server.v1_16_R2.IBlockData;
 import net.minecraft.server.v1_16_R2.Item;
 import net.minecraft.server.v1_16_R2.ItemStack;
 import net.minecraft.server.v1_16_R2.Items;
+import net.minecraft.server.v1_16_R2.LightEngineThreaded;
 import net.minecraft.server.v1_16_R2.NBTTagCompound;
 import net.minecraft.server.v1_16_R2.Packet;
 import net.minecraft.server.v1_16_R2.PacketPlayOutCollect;
+import net.minecraft.server.v1_16_R2.PacketPlayOutLightUpdate;
 import net.minecraft.server.v1_16_R2.PacketPlayOutMultiBlockChange;
 import net.minecraft.server.v1_16_R2.PlayerChunkMap;
 import net.minecraft.server.v1_16_R2.PlayerMap;
@@ -78,6 +81,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 @SuppressWarnings({"unused", "ConstantConditions"})
@@ -279,13 +283,9 @@ public final class NMSAdapter_v1_16_R2 implements NMSAdapter {
     public void refreshChunk(org.bukkit.Chunk bukkitChunk, Set<Location> blocksList) {
         Chunk chunk = ((CraftChunk) bukkitChunk).getHandle();
         Map<Integer, Set<Short>> blocks = new HashMap<>();
-
-        Location firstLocation = null;
+        WorldServer worldServer = (WorldServer) chunk.getWorld();
 
         for(Location location : blocksList){
-            if(firstLocation == null)
-                firstLocation = location;
-
             Set<Short> shortSet = blocks.computeIfAbsent(location.getBlockY() >> 4, i -> createShortSet());
             shortSet.add((short)((location.getBlockX() & 15) << 8 | (location.getBlockZ() & 15) << 4 | (location.getBlockY() & 15)));
         }
@@ -296,6 +296,19 @@ public final class NMSAdapter_v1_16_R2 implements NMSAdapter {
             if(packetPlayOutMultiBlockChange != null)
                 sendPacketToRelevantPlayers(chunk.world, chunk.getPos().x, chunk.getPos().z, packetPlayOutMultiBlockChange);
         }
+
+        LightEngineThreaded lightEngine = worldServer.getChunkProvider().getLightEngine();
+        List<CompletableFuture<Void>> lightQueueFutures = new ArrayList<>();
+
+        for (Location location : blocksList) {
+            BlockPosition blockPosition = new BlockPosition(location.getX(), location.getY(), location.getZ());
+            lightEngine.a(blockPosition);
+        }
+
+        Executor.sync(() -> sendPacketToRelevantPlayers(worldServer, chunk.getPos().x, chunk.getPos().z,
+                        new PacketPlayOutLightUpdate(chunk.getPos(), lightEngine, true)),
+                1L);
+
     }
 
     @Override

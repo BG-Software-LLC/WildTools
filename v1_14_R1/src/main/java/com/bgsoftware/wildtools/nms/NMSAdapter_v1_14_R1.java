@@ -5,6 +5,7 @@ import com.bgsoftware.wildtools.WildToolsPlugin;
 import com.bgsoftware.wildtools.hooks.PaperHook;
 import com.bgsoftware.wildtools.objects.WMaterial;
 import com.bgsoftware.wildtools.recipes.AdvancedShapedRecipe;
+import com.bgsoftware.wildtools.utils.Executor;
 import com.bgsoftware.wildtools.utils.items.ToolItemStack;
 import net.minecraft.server.v1_14_R1.Block;
 import net.minecraft.server.v1_14_R1.BlockPosition;
@@ -19,9 +20,11 @@ import net.minecraft.server.v1_14_R1.IBlockData;
 import net.minecraft.server.v1_14_R1.Item;
 import net.minecraft.server.v1_14_R1.ItemStack;
 import net.minecraft.server.v1_14_R1.Items;
+import net.minecraft.server.v1_14_R1.LightEngineThreaded;
 import net.minecraft.server.v1_14_R1.NBTTagCompound;
 import net.minecraft.server.v1_14_R1.Packet;
 import net.minecraft.server.v1_14_R1.PacketPlayOutCollect;
+import net.minecraft.server.v1_14_R1.PacketPlayOutLightUpdate;
 import net.minecraft.server.v1_14_R1.PacketPlayOutMultiBlockChange;
 import net.minecraft.server.v1_14_R1.PlayerChunkMap;
 import net.minecraft.server.v1_14_R1.PlayerMap;
@@ -71,6 +74,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 @SuppressWarnings({"unused", "ConstantConditions"})
@@ -259,21 +263,29 @@ public final class NMSAdapter_v1_14_R1 implements NMSAdapter {
     @Override
     public void refreshChunk(org.bukkit.Chunk bukkitChunk, Set<Location> blocksList) {
         Chunk chunk = ((CraftChunk) bukkitChunk).getHandle();
+        WorldServer worldServer = (WorldServer) chunk.getWorld();
         int blocksAmount = blocksList.size();
         short[] values = new short[blocksAmount];
 
-        Location firstLocation = null;
-
         int counter = 0;
         for(Location location : blocksList) {
-            if(firstLocation == null)
-                firstLocation = location;
-
             values[counter++] = (short) ((location.getBlockX() & 15) << 12 | (location.getBlockZ() & 15) << 8 | location.getBlockY());
         }
 
         sendPacketToRelevantPlayers((WorldServer) chunk.world, chunk.getPos().x, chunk.getPos().z,
                 new PacketPlayOutMultiBlockChange(blocksAmount, values, chunk));
+
+        LightEngineThreaded lightEngine = worldServer.getChunkProvider().getLightEngine();
+        List<CompletableFuture<Void>> lightQueueFutures = new ArrayList<>();
+
+        for (Location location : blocksList) {
+            BlockPosition blockPosition = new BlockPosition(location.getX(), location.getY(), location.getZ());
+            lightEngine.a(blockPosition);
+        }
+
+        Executor.sync(() -> sendPacketToRelevantPlayers(worldServer, chunk.getPos().x, chunk.getPos().z,
+                        new PacketPlayOutLightUpdate(chunk.getPos(), lightEngine)),
+                1L);
     }
 
     @Override

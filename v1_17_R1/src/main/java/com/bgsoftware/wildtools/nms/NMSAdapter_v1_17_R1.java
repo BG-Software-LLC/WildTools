@@ -1,22 +1,32 @@
 package com.bgsoftware.wildtools.nms;
 
+import ca.spottedleaf.starlight.light.StarLightInterface;
 import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.wildtools.WildToolsPlugin;
 import com.bgsoftware.wildtools.hooks.PaperHook;
 import com.bgsoftware.wildtools.objects.WMaterial;
 import com.bgsoftware.wildtools.recipes.AdvancedShapedRecipe;
+import com.bgsoftware.wildtools.utils.Executor;
 import com.bgsoftware.wildtools.utils.items.ToolItemStack;
+import io.papermc.paper.enchantments.EnchantmentRarity;
+import it.unimi.dsi.fastutil.shorts.ShortArraySet;
+import it.unimi.dsi.fastutil.shorts.ShortSet;
+import net.kyori.adventure.text.Component;
 import net.minecraft.core.BlockPosition;
 import net.minecraft.core.SectionPosition;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.PacketPlayOutCollect;
+import net.minecraft.network.protocol.game.PacketPlayOutLightUpdate;
 import net.minecraft.network.protocol.game.PacketPlayOutMultiBlockChange;
+import net.minecraft.server.level.ChunkProviderServer;
 import net.minecraft.server.level.EntityPlayer;
+import net.minecraft.server.level.LightEngineThreaded;
 import net.minecraft.server.level.PlayerChunkMap;
 import net.minecraft.server.level.PlayerMap;
 import net.minecraft.server.level.WorldServer;
 import net.minecraft.stats.StatisticList;
+import net.minecraft.util.thread.ThreadedMailbox;
 import net.minecraft.world.entity.EntityLiving;
 import net.minecraft.world.entity.EnumItemSlot;
 import net.minecraft.world.entity.item.EntityItem;
@@ -42,8 +52,6 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.data.Ageable;
 import org.bukkit.block.data.BlockData;
-import org.bukkit.craftbukkit.libs.it.unimi.dsi.fastutil.shorts.ShortArraySet;
-import org.bukkit.craftbukkit.libs.it.unimi.dsi.fastutil.shorts.ShortSet;
 import org.bukkit.craftbukkit.v1_17_R1.CraftChunk;
 import org.bukkit.craftbukkit.v1_17_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_17_R1.block.CraftBlock;
@@ -56,6 +64,7 @@ import org.bukkit.craftbukkit.v1_17_R1.inventory.CraftInventoryView;
 import org.bukkit.craftbukkit.v1_17_R1.inventory.CraftItemStack;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.enchantments.EnchantmentTarget;
+import org.bukkit.entity.EntityCategory;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
@@ -74,10 +83,12 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 @SuppressWarnings({"unused", "ConstantConditions"})
@@ -85,6 +96,8 @@ public final class NMSAdapter_v1_17_R1 implements NMSAdapter {
 
     private static final ReflectField<PlayerMap> PLAYER_MAP_FIELD = new ReflectField<>(PlayerChunkMap.class, PlayerMap.class, "F");
     private static final ReflectField<ItemStack> ITEM_STACK_HANDLE = new ReflectField<>(CraftItemStack.class, ItemStack.class, "handle");
+    private static final ReflectField<Object> STAR_LIGHT_INTERFACE = new ReflectField<>(LightEngineThreaded.class, Object.class, "theLightEngine");
+    private static final ReflectField<ThreadedMailbox<Runnable>> LIGHT_ENGINE_EXECUTOR = new ReflectField<>(LightEngineThreaded.class, ThreadedMailbox.class, "e");
 
     private static Constructor<?> MULTI_BLOCK_CHANGE_CONSTRUCTOR;
     private static Class<?> SHORT_ARRAY_SET_CLASS = null;
@@ -93,8 +106,8 @@ public final class NMSAdapter_v1_17_R1 implements NMSAdapter {
         try {
             MULTI_BLOCK_CHANGE_CONSTRUCTOR = Arrays.stream(PacketPlayOutMultiBlockChange.class.getConstructors())
                     .filter(constructor -> constructor.getParameterCount() == 4).findFirst().orElse(null);
-            SHORT_ARRAY_SET_CLASS = Class.forName("it.unimi.dsi.fastutil.shorts.ShortArraySet");
-            Class<?> shortSetClass = Class.forName("it.unimi.dsi.fastutil.shorts.ShortSet");
+            SHORT_ARRAY_SET_CLASS = Class.forName("org.bukkit.craftbukkit.libs.it.unimi.dsi.fastutil.shorts.ShortArraySet");
+            Class<?> shortSetClass = Class.forName("org.bukkit.craftbukkit.libs.it.unimi.dsi.fastutil.shorts.ShortSet");
         }catch (Exception ignored){}
     }
 
@@ -264,8 +277,8 @@ public final class NMSAdapter_v1_17_R1 implements NMSAdapter {
     @Override
     public void setBlockFast(Location location, int combinedId) {
         World world = ((CraftWorld) location.getWorld()).getHandle();
-        Chunk chunk = world.getChunkAt(location.getChunk().getX(), location.getChunk().getZ());
         BlockPosition blockPosition = new BlockPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ());
+        Chunk chunk = world.getChunkAtWorldCoords(blockPosition);
 
         if(combinedId == 0)
             world.a(null, 2001, blockPosition, Block.getCombinedId(world.getType(blockPosition)));
@@ -279,13 +292,9 @@ public final class NMSAdapter_v1_17_R1 implements NMSAdapter {
     public void refreshChunk(org.bukkit.Chunk bukkitChunk, Set<Location> blocksList) {
         Chunk chunk = ((CraftChunk) bukkitChunk).getHandle();
         Map<Integer, Set<Short>> blocks = new HashMap<>();
-
-        Location firstLocation = null;
+        WorldServer worldServer = (WorldServer) chunk.getWorld();
 
         for(Location location : blocksList){
-            if(firstLocation == null)
-                firstLocation = location;
-
             Set<Short> shortSet = blocks.computeIfAbsent(location.getBlockY() >> 4, i -> createShortSet());
             shortSet.add((short)((location.getBlockX() & 15) << 8 | (location.getBlockZ() & 15) << 4 | (location.getBlockY() & 15)));
         }
@@ -294,8 +303,30 @@ public final class NMSAdapter_v1_17_R1 implements NMSAdapter {
             PacketPlayOutMultiBlockChange packetPlayOutMultiBlockChange = createMultiBlockChangePacket(
                     SectionPosition.a(chunk.getPos(), entry.getKey()), entry.getValue(), chunk.getSections()[entry.getKey()]);
             if(packetPlayOutMultiBlockChange != null)
-                sendPacketToRelevantPlayers((WorldServer) chunk.getWorld(),
-                        chunk.getPos().b, chunk.getPos().c, packetPlayOutMultiBlockChange);
+                sendPacketToRelevantPlayers(worldServer, chunk.getPos().b, chunk.getPos().c, packetPlayOutMultiBlockChange);
+        }
+
+        if (STAR_LIGHT_INTERFACE.isValid()) {
+            LightEngineThreaded lightEngineThreaded = (LightEngineThreaded) worldServer.k_();
+            StarLightInterface starLightInterface = (StarLightInterface) STAR_LIGHT_INTERFACE.get(lightEngineThreaded);
+            ChunkProviderServer chunkProviderServer = worldServer.getChunkProvider();
+            LIGHT_ENGINE_EXECUTOR.get(lightEngineThreaded).a(() ->
+                    starLightInterface.relightChunks(Collections.singleton(chunk.getPos()), chunkPos ->
+                            chunkProviderServer.h.execute(() -> sendPacketToRelevantPlayers(worldServer, chunkPos.b, chunkPos.c,
+                                    new PacketPlayOutLightUpdate(chunkPos, lightEngineThreaded, null, null, true))
+                            ), null));
+        } else {
+            LightEngineThreaded lightEngine = worldServer.getChunkProvider().getLightEngine();
+            List<CompletableFuture<Void>> lightQueueFutures = new ArrayList<>();
+
+            for (Location location : blocksList) {
+                BlockPosition blockPosition = new BlockPosition(location.getX(), location.getY(), location.getZ());
+                lightEngine.a(blockPosition);
+            }
+
+            Executor.sync(() -> sendPacketToRelevantPlayers(worldServer, chunk.getPos().b, chunk.getPos().c,
+                    new PacketPlayOutLightUpdate(chunk.getPos(), lightEngine, null, null, true)),
+                    1L);
         }
     }
 
@@ -360,6 +391,30 @@ public final class NMSAdapter_v1_17_R1 implements NMSAdapter {
             @Override
             public boolean isCursed() {
                 return false;
+            }
+
+            public Component displayName(int i) {
+                return null;
+            }
+
+            public boolean isTradeable() {
+                return false;
+            }
+
+            public boolean isDiscoverable() {
+                return false;
+            }
+
+            public EnchantmentRarity getRarity() {
+                return null;
+            }
+
+            public float getDamageIncrease(int i, EntityCategory entityCategory) {
+                return 0;
+            }
+
+            public Set<EquipmentSlot> getActiveSlots() {
+                return null;
             }
         };
     }
@@ -531,7 +586,9 @@ public final class NMSAdapter_v1_17_R1 implements NMSAdapter {
         }
     }
 
-    private static PacketPlayOutMultiBlockChange createMultiBlockChangePacket(SectionPosition sectionPosition, Set<Short> shortSet, ChunkSection chunkSection){
+    private static PacketPlayOutMultiBlockChange createMultiBlockChangePacket(SectionPosition sectionPosition,
+                                                                              Set<Short> shortSet,
+                                                                              ChunkSection chunkSection){
         if(MULTI_BLOCK_CHANGE_CONSTRUCTOR == null){
             return new PacketPlayOutMultiBlockChange(
                     sectionPosition,
