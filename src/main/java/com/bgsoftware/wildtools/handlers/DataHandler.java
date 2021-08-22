@@ -276,7 +276,7 @@ public final class DataHandler {
             }
 
             if(cfg.contains("tools." + name + ".whitelisted-worlds")){
-                tool.setBlacklistedWorlds(cfg.getStringList("tools." + name + ".whitelisted-worlds"));
+                tool.setWhitelistedWorlds(cfg.getStringList("tools." + name + ".whitelisted-worlds"));
             }
 
             toolsAmount++;
