@@ -40,12 +40,13 @@ public abstract class WTool implements Tool {
     private int usesLeft;
     private String name, toolMode;
     private boolean onlySameType, onlyInsideClaim, unbreakable, vanillaDamage, autoCollect, instantBreak, silkTouch,
-            keepInventory, omni, privateTool, usesProgress;
+            keepInventory, omni, privateTool, usesProgress, statistics;
     private long cooldown;
     private double multiplier;
     private int anvilCombineExp, anvilCombineLimit;
 
-    private Set<String> blacklistedMaterials, whitelistedMaterials, blacklistedDrops, whitelistedDrops, blacklistedWorlds, whitelistedWorlds;
+    private Set<String> blacklistedMaterials, whitelistedMaterials, blacklistedDrops, whitelistedDrops,
+            blacklistedWorlds, whitelistedWorlds;
 
     /***********************************************************************************/
 
@@ -71,7 +72,8 @@ public abstract class WTool implements Tool {
         this.lastUses = new HashMap<>();
         this.multiplier = 1;
         this.anvilCombineExp = -1;
-        toolBlockBreak = new HashSet<>();
+        this.toolBlockBreak = new HashSet<>();
+        this.statistics = true;
     }
 
     @Override
@@ -217,6 +219,11 @@ public abstract class WTool implements Tool {
     @Override
     public void setWhitelistedWorlds(List<String> worlds) {
         this.whitelistedWorlds.addAll(worlds);
+    }
+
+    @Override
+    public void setStatistics(boolean statistics) {
+        this.statistics = statistics;
     }
 
     /***********************************************************************************/
@@ -413,6 +420,11 @@ public abstract class WTool implements Tool {
     @Override
     public boolean isWhitelistedWorld(String world) {
         return whitelistedWorlds.isEmpty() || whitelistedWorlds.contains(world);
+    }
+
+    @Override
+    public boolean hasStatistics() {
+        return statistics;
     }
 
     /***********************************************************************************/

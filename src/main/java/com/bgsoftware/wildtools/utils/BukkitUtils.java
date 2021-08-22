@@ -5,6 +5,7 @@ import com.bgsoftware.wildtools.utils.items.ItemUtils;
 import com.bgsoftware.wildtools.utils.items.ItemsDropper;
 import org.bukkit.CropState;
 import org.bukkit.Material;
+import org.bukkit.Statistic;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.enchantments.Enchantment;
@@ -76,8 +77,9 @@ public final class BukkitUtils {
             return false;
 
         plugin.getEvents().callBreakEvent(blockBreakEvent, false);
+        Material originalType = block.getType();
 
-        if(blocksController == null || (tool != null && tool.isOmni()) || block.getType().hasGravity() || hasNearbyWater(block)) {
+        if(blocksController == null || (tool != null && tool.isOmni()) || originalType.hasGravity() || hasNearbyWater(block)) {
             block.setType(Material.AIR);
         }
         else {
@@ -102,6 +104,9 @@ public final class BukkitUtils {
 
             if(nullDropper)
                 itemsDropper.dropItems();
+
+            if(tool.hasStatistics())
+                player.incrementStatistic(Statistic.MINE_BLOCK, originalType);
         }
 
         if(blockBreakEvent.getExpToDrop() > 0) {

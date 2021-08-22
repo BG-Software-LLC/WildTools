@@ -189,6 +189,11 @@ public interface Tool {
     void setWhitelistedWorlds(List<String> worlds);
 
     /**
+     * Set whether broken blocks should be counted towards statistics of the player or not.
+     */
+    void setStatistics(boolean statistics);
+
+    /**
      * Get the raw item stack of the tool.
      * This item will not have parsed placeholders, or injected data.
      */
@@ -393,6 +398,11 @@ public interface Tool {
      * @param world The world to check.
      */
     boolean isWhitelistedWorld(String world);
+
+    /**
+     * Check whether broken blocks should be counted towards statistics of the player or not.
+     */
+    boolean hasStatistics();
 
     /**
      * Reduce durability of an item of this tool.

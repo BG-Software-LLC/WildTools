@@ -136,6 +136,7 @@ events-manipulations:
 #      Please follow the "TYPE" or "TYPE:DATA" format for drops and blocks.
 # blacklisted-worlds: A list of worlds that the tool will not work inside. [LIST]
 # whitelisted-worlds: A list of worlds that the tool will only work inside. [LIST]
+# statistics: Should broken blocks be counted towards the statistics of the player? (BOOLEAN) (Default true)
 
 tools:
   trench_pickaxe:
