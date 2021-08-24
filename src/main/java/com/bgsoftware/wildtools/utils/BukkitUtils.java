@@ -105,8 +105,11 @@ public final class BukkitUtils {
             if(nullDropper)
                 itemsDropper.dropItems();
 
-            if(tool.hasStatistics())
-                player.incrementStatistic(Statistic.MINE_BLOCK, originalType);
+            if(tool.hasStatistics()) {
+                try {
+                    player.incrementStatistic(Statistic.MINE_BLOCK, originalType);
+                } catch (IllegalArgumentException e) {}
+            }
         }
 
         if(blockBreakEvent.getExpToDrop() > 0) {
