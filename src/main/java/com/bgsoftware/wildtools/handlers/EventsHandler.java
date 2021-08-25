@@ -87,17 +87,15 @@ public final class EventsHandler {
         otherPluginsBreakMethodsTools.clear();
         List<Tool> tools = plugin.getToolsManager().getTools();
         for (Tool tool : tools) {
-            otherPluginsBreakMethodsTools.put(tool, new ArrayList<>());
-            List<CachedListenerMethod> otherPluginsMethods = otherPluginsBreakMethodsTools.get(tool);
+            List<CachedListenerMethod> otherPluginsMethods = new ArrayList<>();
             List<String> plugins = new ArrayList<>(tool.getOtherPluginsEvents());
             plugins.addAll(otherPlugins);
-
-            otherPluginsMethods.clear();
             for(RegisteredListener registeredListener : BlockBreakEvent.getHandlerList().getRegisteredListeners()){
                 if(plugins.contains(registeredListener.getPlugin().getName()))
                     addAllMethods(otherPluginsMethods, registeredListener.getListener(), BlockBreakEvent.class);
             }
             otherPluginsMethods.sort(CachedListenerMethod::compareTo);
+            otherPluginsBreakMethodsTools.put(tool, otherPluginsMethods);
         }
     }
 
