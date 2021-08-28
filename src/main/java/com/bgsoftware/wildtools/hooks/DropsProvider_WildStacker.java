@@ -22,13 +22,18 @@ public final class DropsProvider_WildStacker implements DropsProvider {
 
         StackedSpawner stackedSpawner = WildStackerAPI.getStackedSpawner((CreatureSpawner) block.getState());
 
+        int spawnerStackAmount = stackedSpawner.getStackAmount();
+
         try {
             drops.add(stackedSpawner.getDropItem());
         }catch(Throwable ex){
             ItemStack itemStack = DropsProviders_WildToolsSpawners.getSpawnerItem((CreatureSpawner) block.getState());
-            itemStack.setAmount(stackedSpawner.getStackAmount());
+            itemStack.setAmount(spawnerStackAmount);
             drops.add(itemStack);
         }
+
+        // We want to unstack the spawner when getting drops from stacked spawners.
+        stackedSpawner.runUnstack(spawnerStackAmount);
 
         return drops;
     }
