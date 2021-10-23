@@ -60,6 +60,7 @@ public final class WHarvesterTool extends WTool implements HarvesterTool {
         this.radius = radius;
         this.farmlandRadius = -1;
         this.oneLayerOnly = false;
+        this.activateAction = "RIGHT_CLICK";
     }
 
     @Override
