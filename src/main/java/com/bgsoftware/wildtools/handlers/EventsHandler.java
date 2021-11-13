@@ -90,7 +90,10 @@ public final class EventsHandler {
 
     public void loadOtherPlugins(List<String> otherPlugins) {
         loadOtherPluginListeners0(otherPlugins, globalOtherPluginsBreakMethods);
+        loadOtherPluginsForTools();
+    }
 
+    public void loadOtherPluginsForTools() {
         plugin.getToolsManager().getTools().stream()
                 .filter(tool -> !tool.getOtherPluginsEvents().isEmpty())
                 .forEach(tool -> {
