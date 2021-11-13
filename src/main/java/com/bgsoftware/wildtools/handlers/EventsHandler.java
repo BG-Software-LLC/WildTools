@@ -30,8 +30,8 @@ public final class EventsHandler {
     private final List<CachedListenerMethod> claimingPluginsBreakMethods = new ArrayList<>();
     private final List<CachedListenerMethod> claimingPluginsPlaceMethods = new ArrayList<>();
     private final List<CachedListenerMethod> claimingPluginsInteractMethods = new ArrayList<>();
-    private final List<CachedListenerMethod> globalOtherPluginsBreakMethods = new ArrayList<>();
-    private final Map<Tool, List<CachedListenerMethod>> otherPluginsBreakMethodsTools = new HashMap<>();
+    private final List<CachedListenerMethod> globalNotifiedPluginsBreakMethods = new ArrayList<>();
+    private final Map<Tool, List<CachedListenerMethod>> notifiedPluginsBreakMethodsTools = new HashMap<>();
 
     private static final WildToolsPlugin plugin = WildToolsPlugin.getPlugin();
 
@@ -45,11 +45,11 @@ public final class EventsHandler {
             return;
         }
 
-        callMethods(globalOtherPluginsBreakMethods, blockBreakEvent);
+        callMethods(globalNotifiedPluginsBreakMethods, blockBreakEvent);
 
         ToolItemStack toolItemStack = ToolItemStack.of(plugin.getNMSAdapter().getItemInHand(blockBreakEvent.getPlayer()));
         Tool tool = toolItemStack.getTool();
-        List<CachedListenerMethod> getOtherPluginsMethods = otherPluginsBreakMethodsTools.get(tool);
+        List<CachedListenerMethod> getOtherPluginsMethods = notifiedPluginsBreakMethodsTools.get(tool);
         if(getOtherPluginsMethods != null)
             callMethods(getOtherPluginsMethods, blockBreakEvent);
     }
@@ -88,27 +88,27 @@ public final class EventsHandler {
         claimingPluginsInteractMethods.sort(CachedListenerMethod::compareTo);
     }
 
-    public void loadOtherPlugins(List<String> otherPlugins) {
-        loadOtherPluginListeners0(otherPlugins, globalOtherPluginsBreakMethods);
-        loadOtherPluginsForTools();
+    public void loadNotifiedPlugins(List<String> otherPlugins) {
+        loadNotifiedPluginListeners0(otherPlugins, globalNotifiedPluginsBreakMethods);
+        loadNotifiedForTools();
     }
 
-    public void loadOtherPluginsForTools() {
+    public void loadNotifiedForTools() {
         plugin.getToolsManager().getTools().stream()
-                .filter(tool -> !tool.getOtherPluginsEvents().isEmpty())
+                .filter(tool -> !tool.getNotifiedPlugins().isEmpty())
                 .forEach(tool -> {
-                    List<CachedListenerMethod> otherPluginsMethods = otherPluginsBreakMethodsTools
+                    List<CachedListenerMethod> notifiedPlugins = notifiedPluginsBreakMethodsTools
                             .computeIfAbsent(tool, t -> new ArrayList<>());
-                    loadOtherPluginListeners0(tool.getOtherPluginsEvents(), otherPluginsMethods);
-                    if(otherPluginsMethods.isEmpty())
-                        otherPluginsBreakMethodsTools.remove(tool);
+                    loadNotifiedPluginListeners0(tool.getNotifiedPlugins(), notifiedPlugins);
+                    if(notifiedPlugins.isEmpty())
+                        notifiedPluginsBreakMethodsTools.remove(tool);
                 });
     }
 
-    private void loadOtherPluginListeners0(Collection<String> otherPlugins, List<CachedListenerMethod> cachedListenerMethods) {
+    private void loadNotifiedPluginListeners0(Collection<String> notifiedPlugins, List<CachedListenerMethod> cachedListenerMethods) {
         cachedListenerMethods.clear();
         for(RegisteredListener registeredListener : BlockBreakEvent.getHandlerList().getRegisteredListeners()){
-            if(otherPlugins.contains(registeredListener.getPlugin().getName()))
+            if(notifiedPlugins.contains(registeredListener.getPlugin().getName()))
                 addAllMethods(cachedListenerMethods, registeredListener.getListener(), BlockBreakEvent.class);
         }
         cachedListenerMethods.sort(CachedListenerMethod::compareTo);

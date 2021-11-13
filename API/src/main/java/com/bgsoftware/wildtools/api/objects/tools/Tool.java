@@ -190,10 +190,10 @@ public interface Tool {
 
 
     /**
-     * Set events that should be notified about broken blocks by this tool.
-     * @param otherPluginsEvents The events.
+     * Set plugins that should be notified about broken blocks by this tool.
+     * @param notifiedPlugins The plugins to notify.
      */
-    void setOtherPluginsEvents(List<String> otherPluginsEvents);
+    void setNotifiedPlugins(List<String> notifiedPlugins);
 
     /**
      * Set whether broken blocks should be counted towards statistics of the player or not.
@@ -330,9 +330,9 @@ public interface Tool {
     Set<String> getWhitelistedDrops();
 
     /**
-     * Get events that should be notified about broken blocks by the tool.
+     * Get plugins that should be notified about broken blocks by the tool.
      */
-    Set<String> getOtherPluginsEvents();
+    Set<String> getNotifiedPlugins();
 
     /**
      * Check whether or not the tool has blacklisted block materials.

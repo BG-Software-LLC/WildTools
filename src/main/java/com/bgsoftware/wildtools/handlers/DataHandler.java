@@ -61,7 +61,7 @@ public final class DataHandler {
 
         Executor.sync(() -> {
             plugin.getEvents().loadClaimingPlugins(cfg.getStringList("events-manipulations.claiming-plugins"));
-            plugin.getEvents().loadOtherPlugins(cfg.getStringList("events-manipulations.other-plugins"));
+            plugin.getEvents().loadNotifiedPlugins(cfg.getStringList("events-manipulations.other-plugins"));
         }, 20L);
 
         SellWandLogger.setLogsFile(cfg.getString("logs-file", "logs.txt"));
@@ -280,7 +280,7 @@ public final class DataHandler {
             }
 
             if(cfg.contains("tools." + name + ".other-plugins-events"))
-                tool.setOtherPluginsEvents(cfg.getStringList("tools." + name + ".other-plugins-events"));
+                tool.setNotifiedPlugins(cfg.getStringList("tools." + name + ".notified-plugins"));
 
             toolsAmount++;
         }
