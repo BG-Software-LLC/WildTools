@@ -190,8 +190,8 @@ public interface Tool {
 
 
     /**
-     * Add event in other-plugins event list
-     * @param otherPluginsEvents The events list.
+     * Set events that should be notified about broken blocks by this tool.
+     * @param otherPluginsEvents The events.
      */
     void setOtherPluginsEvents(List<String> otherPluginsEvents);
 
@@ -330,7 +330,7 @@ public interface Tool {
     Set<String> getWhitelistedDrops();
 
     /**
-     * Get events to add in other-plugins event list
+     * Get events that should be notified about broken blocks by the tool.
      */
     Set<String> getOtherPluginsEvents();
 
