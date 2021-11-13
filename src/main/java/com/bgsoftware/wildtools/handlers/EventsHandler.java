@@ -1,5 +1,8 @@
 package com.bgsoftware.wildtools.handlers;
 
+import com.bgsoftware.wildtools.WildToolsPlugin;
+import com.bgsoftware.wildtools.api.objects.tools.Tool;
+import com.bgsoftware.wildtools.utils.items.ToolItemStack;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
@@ -13,7 +16,10 @@ import org.jetbrains.annotations.NotNull;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public final class EventsHandler {
 
@@ -24,14 +30,28 @@ public final class EventsHandler {
     private final List<CachedListenerMethod> claimingPluginsBreakMethods = new ArrayList<>();
     private final List<CachedListenerMethod> claimingPluginsPlaceMethods = new ArrayList<>();
     private final List<CachedListenerMethod> claimingPluginsInteractMethods = new ArrayList<>();
-    private final List<CachedListenerMethod> otherPluginsBreakMethods = new ArrayList<>();
+    private final List<CachedListenerMethod> globalNotifiedPluginsBreakMethods = new ArrayList<>();
+    private final Map<Tool, List<CachedListenerMethod>> notifiedPluginsBreakMethodsTools = new HashMap<>();
+
+    private static final WildToolsPlugin plugin = WildToolsPlugin.getPlugin();
 
     public EventsHandler(){
 
     }
 
     public void callBreakEvent(BlockBreakEvent blockBreakEvent, boolean claimingCheck){
-        callMethods(claimingCheck ? claimingPluginsBreakMethods : otherPluginsBreakMethods, blockBreakEvent);
+        if(claimingCheck) {
+            callMethods(claimingPluginsBreakMethods, blockBreakEvent);
+            return;
+        }
+
+        callMethods(globalNotifiedPluginsBreakMethods, blockBreakEvent);
+
+        ToolItemStack toolItemStack = ToolItemStack.of(plugin.getNMSAdapter().getItemInHand(blockBreakEvent.getPlayer()));
+        Tool tool = toolItemStack.getTool();
+        List<CachedListenerMethod> getOtherPluginsMethods = notifiedPluginsBreakMethodsTools.get(tool);
+        if(getOtherPluginsMethods != null)
+            callMethods(getOtherPluginsMethods, blockBreakEvent);
     }
 
     public void callPlaceEvent(BlockPlaceEvent blockPlaceEvent){
@@ -68,13 +88,30 @@ public final class EventsHandler {
         claimingPluginsInteractMethods.sort(CachedListenerMethod::compareTo);
     }
 
-    public void loadOtherPlugins(List<String> otherPlugins){
-        otherPluginsBreakMethods.clear();
+    public void loadNotifiedPlugins(List<String> otherPlugins) {
+        loadNotifiedPluginListeners0(otherPlugins, globalNotifiedPluginsBreakMethods);
+        loadNotifiedForTools();
+    }
+
+    public void loadNotifiedForTools() {
+        plugin.getToolsManager().getTools().stream()
+                .filter(tool -> !tool.getNotifiedPlugins().isEmpty())
+                .forEach(tool -> {
+                    List<CachedListenerMethod> notifiedPlugins = notifiedPluginsBreakMethodsTools
+                            .computeIfAbsent(tool, t -> new ArrayList<>());
+                    loadNotifiedPluginListeners0(tool.getNotifiedPlugins(), notifiedPlugins);
+                    if(notifiedPlugins.isEmpty())
+                        notifiedPluginsBreakMethodsTools.remove(tool);
+                });
+    }
+
+    private void loadNotifiedPluginListeners0(Collection<String> notifiedPlugins, List<CachedListenerMethod> cachedListenerMethods) {
+        cachedListenerMethods.clear();
         for(RegisteredListener registeredListener : BlockBreakEvent.getHandlerList().getRegisteredListeners()){
-            if(otherPlugins.contains(registeredListener.getPlugin().getName()))
-                addAllMethods(otherPluginsBreakMethods, registeredListener.getListener(), BlockBreakEvent.class);
+            if(notifiedPlugins.contains(registeredListener.getPlugin().getName()))
+                addAllMethods(cachedListenerMethods, registeredListener.getListener(), BlockBreakEvent.class);
         }
-        otherPluginsBreakMethods.sort(CachedListenerMethod::compareTo);
+        cachedListenerMethods.sort(CachedListenerMethod::compareTo);
     }
 
     private static void callMethods(List<CachedListenerMethod> methodList, Event event){

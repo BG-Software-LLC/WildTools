@@ -46,7 +46,7 @@ public abstract class WTool implements Tool {
     private int anvilCombineExp, anvilCombineLimit;
 
     private Set<String> blacklistedMaterials, whitelistedMaterials, blacklistedDrops, whitelistedDrops,
-            blacklistedWorlds, whitelistedWorlds;
+            blacklistedWorlds, whitelistedWorlds, notifiedPlugins;
 
     /***********************************************************************************/
 
@@ -69,6 +69,7 @@ public abstract class WTool implements Tool {
         this.whitelistedDrops = new HashSet<>();
         this.blacklistedWorlds = new HashSet<>();
         this.whitelistedWorlds = new HashSet<>();
+        this.notifiedPlugins = new HashSet<>();
         this.lastUses = new HashMap<>();
         this.multiplier = 1;
         this.anvilCombineExp = -1;
@@ -226,6 +227,11 @@ public abstract class WTool implements Tool {
         this.statistics = statistics;
     }
 
+    @Override
+    public void setNotifiedPlugins(List<String> notifiedPlugins) {
+        this.notifiedPlugins.addAll(notifiedPlugins);
+    }
+
     /***********************************************************************************/
 
     @Override
@@ -355,6 +361,11 @@ public abstract class WTool implements Tool {
     @Override
     public Set<String> getWhitelistedDrops() {
         return new HashSet<>(whitelistedDrops);
+    }
+
+    @Override
+    public Set<String> getNotifiedPlugins() {
+        return notifiedPlugins;
     }
 
     @Override

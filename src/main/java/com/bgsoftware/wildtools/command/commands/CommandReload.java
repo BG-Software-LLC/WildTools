@@ -54,6 +54,7 @@ public final class CommandReload implements ICommand {
             plugin.getEditor().reloadConfiguration();
             Locale.reload();
             ProvidersHandler.reload();
+            plugin.getEvents().loadNotifiedForTools();
             WildToolsPlugin.log("******** RELOAD DONE ********");
             Locale.RELOAD_SUCCESS.send(sender);
         });
