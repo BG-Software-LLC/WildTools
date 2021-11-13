@@ -16,8 +16,10 @@ import org.jetbrains.annotations.NotNull;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public final class EventsHandler {
 
@@ -28,7 +30,8 @@ public final class EventsHandler {
     private final List<CachedListenerMethod> claimingPluginsBreakMethods = new ArrayList<>();
     private final List<CachedListenerMethod> claimingPluginsPlaceMethods = new ArrayList<>();
     private final List<CachedListenerMethod> claimingPluginsInteractMethods = new ArrayList<>();
-    private final HashMap<Tool, List<CachedListenerMethod>> otherPluginsBreakMethodsTools = new HashMap<>();
+    private final List<CachedListenerMethod> globalOtherPluginsBreakMethods = new ArrayList<>();
+    private final Map<Tool, List<CachedListenerMethod>> otherPluginsBreakMethodsTools = new HashMap<>();
 
     private static final WildToolsPlugin plugin = WildToolsPlugin.getPlugin();
 
@@ -41,12 +44,14 @@ public final class EventsHandler {
             callMethods(claimingPluginsBreakMethods, blockBreakEvent);
             return;
         }
+
+        callMethods(globalOtherPluginsBreakMethods, blockBreakEvent);
+
         ToolItemStack toolItemStack = ToolItemStack.of(plugin.getNMSAdapter().getItemInHand(blockBreakEvent.getPlayer()));
         Tool tool = toolItemStack.getTool();
         List<CachedListenerMethod> getOtherPluginsMethods = otherPluginsBreakMethodsTools.get(tool);
-        if(getOtherPluginsMethods == null)
-            return;
-        callMethods(getOtherPluginsMethods, blockBreakEvent);
+        if(getOtherPluginsMethods != null)
+            callMethods(getOtherPluginsMethods, blockBreakEvent);
     }
 
     public void callPlaceEvent(BlockPlaceEvent blockPlaceEvent){
@@ -84,19 +89,26 @@ public final class EventsHandler {
     }
 
     public void loadOtherPlugins(List<String> otherPlugins) {
-        otherPluginsBreakMethodsTools.clear();
-        List<Tool> tools = plugin.getToolsManager().getTools();
-        for (Tool tool : tools) {
-            List<CachedListenerMethod> otherPluginsMethods = new ArrayList<>();
-            List<String> plugins = new ArrayList<>(tool.getOtherPluginsEvents());
-            plugins.addAll(otherPlugins);
-            for(RegisteredListener registeredListener : BlockBreakEvent.getHandlerList().getRegisteredListeners()){
-                if(plugins.contains(registeredListener.getPlugin().getName()))
-                    addAllMethods(otherPluginsMethods, registeredListener.getListener(), BlockBreakEvent.class);
-            }
-            otherPluginsMethods.sort(CachedListenerMethod::compareTo);
-            otherPluginsBreakMethodsTools.put(tool, otherPluginsMethods);
+        loadOtherPluginListeners0(otherPlugins, globalOtherPluginsBreakMethods);
+
+        plugin.getToolsManager().getTools().stream()
+                .filter(tool -> !tool.getOtherPluginsEvents().isEmpty())
+                .forEach(tool -> {
+                    List<CachedListenerMethod> otherPluginsMethods = otherPluginsBreakMethodsTools
+                            .computeIfAbsent(tool, t -> new ArrayList<>());
+                    loadOtherPluginListeners0(tool.getOtherPluginsEvents(), otherPluginsMethods);
+                    if(otherPluginsMethods.isEmpty())
+                        otherPluginsBreakMethodsTools.remove(tool);
+                });
+    }
+
+    private void loadOtherPluginListeners0(Collection<String> otherPlugins, List<CachedListenerMethod> cachedListenerMethods) {
+        cachedListenerMethods.clear();
+        for(RegisteredListener registeredListener : BlockBreakEvent.getHandlerList().getRegisteredListeners()){
+            if(otherPlugins.contains(registeredListener.getPlugin().getName()))
+                addAllMethods(cachedListenerMethods, registeredListener.getListener(), BlockBreakEvent.class);
         }
+        cachedListenerMethods.sort(CachedListenerMethod::compareTo);
     }
 
     private static void callMethods(List<CachedListenerMethod> methodList, Event event){
