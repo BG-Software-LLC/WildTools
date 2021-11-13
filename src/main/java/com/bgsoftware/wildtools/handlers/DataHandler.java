@@ -279,7 +279,7 @@ public final class DataHandler {
                 tool.setWhitelistedWorlds(cfg.getStringList("tools." + name + ".whitelisted-worlds"));
             }
 
-            if(cfg.contains("tools." + name + ".other-plugins-events"))
+            if(cfg.contains("tools." + name + ".notified-plugins"))
                 tool.setNotifiedPlugins(cfg.getStringList("tools." + name + ".notified-plugins"));
 
             toolsAmount++;
