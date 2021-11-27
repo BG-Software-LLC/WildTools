@@ -29,6 +29,7 @@ import com.bgsoftware.wildtools.hooks.FactionsProvider;
 import com.bgsoftware.wildtools.hooks.FactionsProvider_Default;
 import com.bgsoftware.wildtools.api.hooks.PricesProvider;
 import com.bgsoftware.wildtools.hooks.PricesProvider_Default;
+import com.bgsoftware.wildtools.hooks.PricesProvider_EconomyShopGUI;
 import com.bgsoftware.wildtools.hooks.PricesProvider_Essentials;
 import com.bgsoftware.wildtools.hooks.PricesProvider_GUIShop;
 import com.bgsoftware.wildtools.hooks.PricesProvider_NewtShop;
@@ -199,6 +200,8 @@ public final class ProvidersHandler implements ProvidersManager {
                 pricesProvider = new PricesProvider_NewtShop();
             else if (pricesPlugin.equalsIgnoreCase("QuantumShop") && Bukkit.getPluginManager().isPluginEnabled("QuantumShop"))
                 pricesProvider = new PricesProvider_QuantumShop();
+            else if (pricesPlugin.equalsIgnoreCase("EconomyShopGUI") && Bukkit.getPluginManager().isPluginEnabled("EconomyShopGUI"))
+                pricesProvider = new PricesProvider_EconomyShopGUI();
             else pricesProvider = new PricesProvider_Default();
         }
 

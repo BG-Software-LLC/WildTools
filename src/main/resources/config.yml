@@ -5,7 +5,7 @@
 ##                                                ##
 ####################################################
 
-# Choose which prices plugin to check for prices (ShopGUIPlus, Essentials, CMI, newtShop, QuantumShop, WildTools).
+# Choose which prices plugin to check for prices (ShopGUIPlus, Essentials, CMI, newtShop, QuantumShop, EconomyShopGUI, WildTools).
 prices-plugin: 'ShopGUIPlus'
 
 # Path to the logs file.
