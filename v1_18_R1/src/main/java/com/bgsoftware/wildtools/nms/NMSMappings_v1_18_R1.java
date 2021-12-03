@@ -15,6 +15,7 @@ import net.minecraft.world.inventory.ContainerProperty;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ChunkCoordIntPair;
+import net.minecraft.world.level.LevelHeightAccessor;
 import net.minecraft.world.level.World;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.TileEntity;
@@ -203,6 +204,10 @@ public final class NMSMappings_v1_18_R1 {
 
     public static void sendPacket(PlayerConnection playerConnection, Packet<?> packet) {
         playerConnection.a(packet);
+    }
+
+    public static int getSectionIndex(LevelHeightAccessor levelHeightAccessor, int y) {
+        return levelHeightAccessor.e(y);
     }
 
 }
