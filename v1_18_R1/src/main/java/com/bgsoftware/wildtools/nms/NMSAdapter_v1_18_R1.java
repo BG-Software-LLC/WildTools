@@ -16,6 +16,7 @@ import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.PacketPlayOutCollect;
 import net.minecraft.network.protocol.game.PacketPlayOutLightUpdate;
 import net.minecraft.network.protocol.game.PacketPlayOutMultiBlockChange;
+import net.minecraft.server.level.ChunkProviderServer;
 import net.minecraft.server.level.EntityPlayer;
 import net.minecraft.server.level.LightEngineThreaded;
 import net.minecraft.server.level.PlayerChunkMap;
@@ -287,23 +288,16 @@ public final class NMSAdapter_v1_18_R1 implements NMSAdapter {
         Map<Integer, Set<Short>> blocks = new HashMap<>();
         WorldServer worldServer = getWorld(chunk);
 
-        for (Location location : blocksList) {
-            Set<Short> shortSet = blocks.computeIfAbsent(getSectionIndex(worldServer, location.getBlockY()), i -> createShortSet());
-            shortSet.add((short) ((location.getBlockX() & 15) << 8 | (location.getBlockZ() & 15) << 4 | (location.getBlockY() & 15)));
+        ChunkProviderServer chunkProviderServer = getChunkProvider(worldServer);
+
+        for(Location location : blocksList) {
+            BlockPosition blockPosition = new BlockPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ());
+            chunkProviderServer.a(blockPosition);
         }
 
         ChunkCoordIntPair chunkCoords = getPos(chunk);
-        ChunkSection[] chunkSections = getSections(chunk);
-
-        for (Map.Entry<Integer, Set<Short>> entry : blocks.entrySet()) {
-            PacketPlayOutMultiBlockChange packetPlayOutMultiBlockChange = createMultiBlockChangePacket(
-                    SectionPosition.a(chunkCoords, entry.getKey()), entry.getValue(), chunkSections[entry.getKey()]);
-            if (packetPlayOutMultiBlockChange != null)
-                sendPacketToRelevantPlayers(worldServer, chunkCoords.c, chunkCoords.d, packetPlayOutMultiBlockChange);
-        }
 
         LightEngineThreaded lightEngine = (LightEngineThreaded) getLightEngine(worldServer);
-        List<CompletableFuture<Void>> lightQueueFutures = new ArrayList<>();
 
         for (Location location : blocksList) {
             BlockPosition blockPosition = new BlockPosition(location.getX(), location.getY(), location.getZ());
