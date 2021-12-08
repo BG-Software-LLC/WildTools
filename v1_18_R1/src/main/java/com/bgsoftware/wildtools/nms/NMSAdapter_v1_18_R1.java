@@ -7,8 +7,10 @@ import com.bgsoftware.wildtools.objects.WMaterial;
 import com.bgsoftware.wildtools.recipes.AdvancedShapedRecipe;
 import com.bgsoftware.wildtools.utils.Executor;
 import com.bgsoftware.wildtools.utils.items.ToolItemStack;
+import io.papermc.paper.enchantments.EnchantmentRarity;
 import it.unimi.dsi.fastutil.shorts.ShortArraySet;
 import it.unimi.dsi.fastutil.shorts.ShortSet;
+import net.kyori.adventure.text.Component;
 import net.minecraft.core.BlockPosition;
 import net.minecraft.core.SectionPosition;
 import net.minecraft.nbt.NBTTagCompound;
@@ -60,6 +62,7 @@ import org.bukkit.craftbukkit.v1_18_R1.inventory.CraftInventoryView;
 import org.bukkit.craftbukkit.v1_18_R1.inventory.CraftItemStack;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.enchantments.EnchantmentTarget;
+import org.bukkit.entity.EntityCategory;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
@@ -371,30 +374,34 @@ public final class NMSAdapter_v1_18_R1 implements NMSAdapter {
                 return false;
             }
 
-//            public Component displayName(int i) {
-//                return null;
-//            }
-//
-//            public boolean isTradeable() {
-//                return false;
-//            }
-//
-//            public boolean isDiscoverable() {
-//                return false;
-//            }
-//
-//            public EnchantmentRarity getRarity() {
-//                return null;
-//            }
-//
-//            public float getDamageIncrease(int i, EntityCategory entityCategory) {
-//                return 0;
-//            }
-//
-//            public Set<EquipmentSlot> getActiveSlots() {
-//                return null;
-//            }
-            // TODO: Paper
+            public Component displayName(int i) {
+                return null;
+            }
+
+            public boolean isTradeable() {
+                return false;
+            }
+
+            public boolean isDiscoverable() {
+                return false;
+            }
+
+            public EnchantmentRarity getRarity() {
+                return null;
+            }
+
+            public float getDamageIncrease(int i, EntityCategory entityCategory) {
+                return 0;
+            }
+
+            public Set<EquipmentSlot> getActiveSlots() {
+                return null;
+            }
+
+            @Override
+            public String translationKey() {
+                return "";
+            }
         };
     }
 
