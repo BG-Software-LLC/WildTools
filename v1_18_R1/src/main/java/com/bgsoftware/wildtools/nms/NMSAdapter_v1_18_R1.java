@@ -8,16 +8,12 @@ import com.bgsoftware.wildtools.recipes.AdvancedShapedRecipe;
 import com.bgsoftware.wildtools.utils.Executor;
 import com.bgsoftware.wildtools.utils.items.ToolItemStack;
 import io.papermc.paper.enchantments.EnchantmentRarity;
-import it.unimi.dsi.fastutil.shorts.ShortArraySet;
-import it.unimi.dsi.fastutil.shorts.ShortSet;
 import net.kyori.adventure.text.Component;
 import net.minecraft.core.BlockPosition;
-import net.minecraft.core.SectionPosition;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.PacketPlayOutCollect;
 import net.minecraft.network.protocol.game.PacketPlayOutLightUpdate;
-import net.minecraft.network.protocol.game.PacketPlayOutMultiBlockChange;
 import net.minecraft.server.level.ChunkProviderServer;
 import net.minecraft.server.level.EntityPlayer;
 import net.minecraft.server.level.LightEngineThreaded;
@@ -39,7 +35,6 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.TileEntity;
 import net.minecraft.world.level.block.state.IBlockData;
 import net.minecraft.world.level.chunk.Chunk;
-import net.minecraft.world.level.chunk.ChunkSection;
 import org.bukkit.Bukkit;
 import org.bukkit.CropState;
 import org.bukkit.Location;
@@ -76,10 +71,8 @@ import org.bukkit.inventory.RecipeChoice;
 import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.inventory.ShapelessRecipe;
 
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -94,18 +87,6 @@ public final class NMSAdapter_v1_18_R1 implements NMSAdapter {
 
     private static final ReflectField<PlayerMap> PLAYER_MAP_FIELD = new ReflectField<>(PlayerChunkMap.class, PlayerMap.class, "H");
     private static final ReflectField<ItemStack> ITEM_STACK_HANDLE = new ReflectField<>(CraftItemStack.class, ItemStack.class, "handle");
-    private static Constructor<?> MULTI_BLOCK_CHANGE_CONSTRUCTOR;
-    private static Class<?> SHORT_ARRAY_SET_CLASS = null;
-
-    static {
-        try {
-            MULTI_BLOCK_CHANGE_CONSTRUCTOR = Arrays.stream(PacketPlayOutMultiBlockChange.class.getConstructors())
-                    .filter(constructor -> constructor.getParameterCount() == 4).findFirst().orElse(null);
-            SHORT_ARRAY_SET_CLASS = Class.forName("org.bukkit.craftbukkit.libs.it.unimi.dsi.fastutil.shorts.ShortArraySet");
-            Class<?> shortSetClass = Class.forName("org.bukkit.craftbukkit.libs.it.unimi.dsi.fastutil.shorts.ShortSet");
-        } catch (Exception ignored) {
-        }
-    }
 
     @Override
     public String getVersion() {
@@ -398,7 +379,6 @@ public final class NMSAdapter_v1_18_R1 implements NMSAdapter {
                 return null;
             }
 
-            @Override
             public String translationKey() {
                 return "";
             }
@@ -557,40 +537,6 @@ public final class NMSAdapter_v1_18_R1 implements NMSAdapter {
         ItemStack leftOver = EntityItem.a(itemStack, otherItem, 64);
         if (!isEmpty(leftOver)) {
             setItemStack(entityItem, leftOver);
-        }
-    }
-
-    @SuppressWarnings("all")
-    private static Set<Short> createShortSet() {
-        if (SHORT_ARRAY_SET_CLASS == null)
-            return new ShortArraySet();
-
-        try {
-            return (Set<Short>) SHORT_ARRAY_SET_CLASS.newInstance();
-        } catch (Throwable ex) {
-            ex.printStackTrace();
-            return null;
-        }
-    }
-
-    private static PacketPlayOutMultiBlockChange createMultiBlockChangePacket(SectionPosition sectionPosition,
-                                                                              Set<Short> shortSet,
-                                                                              ChunkSection chunkSection) {
-        if (MULTI_BLOCK_CHANGE_CONSTRUCTOR == null) {
-            return new PacketPlayOutMultiBlockChange(
-                    sectionPosition,
-                    (ShortSet) shortSet,
-                    chunkSection,
-                    true
-            );
-        }
-
-        try {
-            return (PacketPlayOutMultiBlockChange) MULTI_BLOCK_CHANGE_CONSTRUCTOR.newInstance(
-                    sectionPosition, shortSet, chunkSection, true);
-        } catch (Throwable ex) {
-            ex.printStackTrace();
-            return null;
         }
     }
 
