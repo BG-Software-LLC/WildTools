@@ -294,22 +294,16 @@ public final class NMSAdapter_v1_16_R3 implements NMSAdapter {
         Map<Integer, Set<Short>> blocks = new HashMap<>();
         WorldServer worldServer = (WorldServer) chunk.getWorld();
 
-        for(Location location : blocksList){
-            Set<Short> shortSet = blocks.computeIfAbsent(location.getBlockY() >> 4, i -> createShortSet());
-            shortSet.add((short)((location.getBlockX() & 15) << 8 | (location.getBlockZ() & 15) << 4 | (location.getBlockY() & 15)));
-        }
+        ChunkProviderServer chunkProviderServer = worldServer.getChunkProvider();
 
-        for(Map.Entry<Integer,  Set<Short>> entry : blocks.entrySet()){
-            PacketPlayOutMultiBlockChange packetPlayOutMultiBlockChange = createMultiBlockChangePacket(
-                    SectionPosition.a(chunk.getPos(), entry.getKey()), entry.getValue(), chunk.getSections()[entry.getKey()]);
-            if(packetPlayOutMultiBlockChange != null)
-                sendPacketToRelevantPlayers(chunk.world, chunk.getPos().x, chunk.getPos().z, packetPlayOutMultiBlockChange);
+        for(Location location : blocksList){
+            BlockPosition blockPosition = new BlockPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ());
+            chunkProviderServer.flagDirty(blockPosition);
         }
 
         if (STAR_LIGHT_INTERFACE.isValid()) {
             LightEngineThreaded lightEngineThreaded = (LightEngineThreaded) worldServer.e();
             StarLightInterface starLightInterface = (StarLightInterface) STAR_LIGHT_INTERFACE.get(lightEngineThreaded);
-            ChunkProviderServer chunkProviderServer = worldServer.getChunkProvider();
             LIGHT_ENGINE_EXECUTOR.get(lightEngineThreaded).a(() ->
                     starLightInterface.relightChunks(Collections.singleton(chunk.getPos()), chunkPos ->
                             chunkProviderServer.serverThreadQueue.execute(() -> sendPacketToRelevantPlayers(
@@ -543,6 +537,11 @@ public final class NMSAdapter_v1_16_R3 implements NMSAdapter {
                 entityItem.world.addEntity(entityItem);
             }
         });
+    }
+
+    @Override
+    public int getMinHeight(org.bukkit.World world) {
+        return world.getMinHeight();
     }
 
     private static boolean canMerge(EntityItem entityItem){

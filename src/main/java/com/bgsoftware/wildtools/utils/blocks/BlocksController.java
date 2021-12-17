@@ -38,9 +38,6 @@ public final class BlocksController {
             combinedId = blockId;
         }
 
-        if(location.getBlockY() >= location.getWorld().getMaxHeight() || location.getBlockY() < 0)
-            return;
-
         affectedBlocks.add(location);
         cachedChunks.computeIfAbsent(new CachedChunk(location), map -> new HashMap<>()).put(location, blockId);
     }
@@ -79,7 +76,8 @@ public final class BlocksController {
     }
 
     private static boolean isLocationValid(Location location){
-        return NumberUtils.range(location.getBlockY(), 0, location.getWorld().getMaxHeight()) &&
+        return NumberUtils.range(location.getBlockY(), plugin.getNMSAdapter().getMinHeight(location.getWorld()),
+                location.getWorld().getMaxHeight()) &&
                 NumberUtils.range(location.getBlockX(), -MAX_BLOCK_LOCATION, MAX_BLOCK_LOCATION) &&
                 NumberUtils.range(location.getBlockZ(), -MAX_BLOCK_LOCATION, MAX_BLOCK_LOCATION);
     }

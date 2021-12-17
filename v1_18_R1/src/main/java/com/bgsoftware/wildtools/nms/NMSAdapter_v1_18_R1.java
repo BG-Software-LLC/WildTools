@@ -511,6 +511,11 @@ public final class NMSAdapter_v1_18_R1 implements NMSAdapter {
         });
     }
 
+    @Override
+    public int getMinHeight(org.bukkit.World world) {
+        return world.getMinHeight();
+    }
+
     private static boolean canMerge(EntityItem entityItem) {
         ItemStack itemStack = getItemStack(entityItem);
         return !isEmpty(itemStack) && getCount(itemStack) < getMaxStackSize(itemStack);
