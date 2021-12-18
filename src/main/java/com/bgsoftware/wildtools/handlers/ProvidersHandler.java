@@ -200,7 +200,8 @@ public final class ProvidersHandler implements ProvidersManager {
                 pricesProvider = new PricesProvider_NewtShop();
             else if (pricesPlugin.equalsIgnoreCase("QuantumShop") && Bukkit.getPluginManager().isPluginEnabled("QuantumShop"))
                 pricesProvider = new PricesProvider_QuantumShop();
-            else if (pricesPlugin.equalsIgnoreCase("EconomyShopGUI") && Bukkit.getPluginManager().isPluginEnabled("EconomyShopGUI"))
+            else if (pricesPlugin.equalsIgnoreCase("EconomyShopGUI") && (Bukkit.getPluginManager().isPluginEnabled("EconomyShopGUI") ||
+                    Bukkit.getPluginManager().isPluginEnabled("EconomyShopGUI-Premium")))
                 pricesProvider = new PricesProvider_EconomyShopGUI();
             else pricesProvider = new PricesProvider_Default();
         }
