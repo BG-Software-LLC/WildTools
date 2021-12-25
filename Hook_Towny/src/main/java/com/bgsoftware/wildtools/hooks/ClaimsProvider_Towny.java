@@ -17,7 +17,7 @@ public final class ClaimsProvider_Towny implements ClaimsProvider {
             TownBlock townBlock = WorldCoord.parseWorldCoord(location).getTownBlock();
             Resident resident = TownyUniverse.getDataSource().getResident(player.getName());
             return resident != null && resident.hasTown() && resident.getTown().hasTownBlock(townBlock);
-        }catch (NotRegisteredException ex){
+        } catch (NotRegisteredException ex) {
             return false;
         }
     }

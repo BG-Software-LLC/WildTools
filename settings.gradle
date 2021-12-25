@@ -39,4 +39,5 @@ include 'Hook_QuantumShop'
 include 'Hook_Residence'
 include 'Hook_SilkSpawners6'
 include 'Hook_SilkSpawners5'
+include 'Hook_Towny'
 
