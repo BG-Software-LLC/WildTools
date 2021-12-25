@@ -43,4 +43,5 @@ include 'Hook_Towny'
 include 'Hook_Villagers'
 include 'Hook_RoseStacker'
 include 'Hook_WildStacker'
+include 'Hook_EconomyShopGUI'
 

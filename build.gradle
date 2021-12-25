@@ -60,7 +60,6 @@ dependencies {
     // Plugin Hooks
     compileOnly "net.milkbowl:Vault:latest"
     compileOnly "com.bgsoftware:WildChestsAPI:latest"
-    compileOnly "me.gypopo:EconomyShopGUI:4.0.2"
 }
 
 jar {
