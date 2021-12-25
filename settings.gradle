@@ -36,4 +36,5 @@ include 'Hook_McMMO1'
 include 'Hook_MergedSpawner'
 include 'Hook_SuperMobCoins'
 include 'Hook_NewtShop'
+include 'Hook_QuantumShop'
 

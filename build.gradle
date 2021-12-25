@@ -58,8 +58,6 @@ dependencies {
     compileOnly 'org.spigotmc:v1_16_R3-Tuinity:latest'
 
     // Plugin Hooks
-    compileOnly "su.fogus:FogusCore:latest"
-    compileOnly "su.nightexpress:QuantumShop:latest"
     compileOnly "com.zrips:Residence:latest"
     compileOnly "de.dustplanet:SilkSpawners:latest"
     compileOnly "com.palmergames:Towny:latest"

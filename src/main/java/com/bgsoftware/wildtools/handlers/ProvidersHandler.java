@@ -234,7 +234,7 @@ public final class ProvidersHandler implements ProvidersManager {
         } else if (pricesPlugin.equalsIgnoreCase("newtShop") && Bukkit.getPluginManager().isPluginEnabled("newtShop")) {
             pricesProvider = createInstance("PricesProvider_NewtShop");
         } else if (pricesPlugin.equalsIgnoreCase("QuantumShop") && Bukkit.getPluginManager().isPluginEnabled("QuantumShop")) {
-            //pricesProvider = new PricesProvider_QuantumShop();
+            pricesProvider = createInstance("PricesProvider_QuantumShop");
         } else if (pricesPlugin.equalsIgnoreCase("EconomyShopGUI") && (Bukkit.getPluginManager().isPluginEnabled("EconomyShopGUI") ||
                 Bukkit.getPluginManager().isPluginEnabled("EconomyShopGUI-Premium"))) {
             //pricesProvider = new PricesProvider_EconomyShopGUI();
