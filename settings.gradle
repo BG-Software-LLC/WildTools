@@ -33,4 +33,5 @@ include 'Hook_GUIShop'
 include 'Hook_Lands'
 include 'Hook_McMMO2'
 include 'Hook_McMMO1'
+include 'Hook_MergedSpawner'
 
