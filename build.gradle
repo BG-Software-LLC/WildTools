@@ -58,7 +58,6 @@ dependencies {
     compileOnly 'org.spigotmc:v1_16_R3-Tuinity:latest'
 
     // Plugin Hooks
-    compileOnly "com.earth2me:Essentials-2.16:latest"
     compileOnly "com.massivecraft:Factions:latest"
     compileOnly "com.massivecraft:MassiveCore:latest"
     compileOnly "com.drtshock:FactionsUUID:latest"

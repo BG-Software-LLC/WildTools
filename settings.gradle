@@ -9,7 +9,6 @@
 
 rootProject.name = 'WildTools'
 include 'API'
-include 'Hooks_EssentialsOld'
 include 'Hooks_McMMOOld'
 include 'Hooks_SavageFactions'
 include 'Hooks_SilkSpawnersOld'
@@ -23,4 +22,6 @@ include 'v1_18_R1'
 include 'Hook_ChunkCollectors'
 include 'Hook_ChunkHoppers'
 include 'Hook_CMI'
+include 'Hook_Essentials216'
+include 'Hook_Essentials215'
 

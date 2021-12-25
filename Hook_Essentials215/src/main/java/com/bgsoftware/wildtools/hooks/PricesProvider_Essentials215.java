@@ -9,10 +9,10 @@ import org.bukkit.inventory.ItemStack;
 
 import java.math.BigDecimal;
 
-public final class PricesProvider_EssentialsOld implements PricesProvider {
+public final class PricesProvider_Essentials215 implements PricesProvider {
 
 
-    public PricesProvider_EssentialsOld(){
+    public PricesProvider_Essentials215(){
         WildToolsPlugin.log(" - Using Essentials as PricesProvider.");
     }
 
@@ -23,4 +23,5 @@ public final class PricesProvider_EssentialsOld implements PricesProvider {
         BigDecimal price = worth.getPrice(itemStack);
         return price == null ? -1 : price.doubleValue() * itemStack.getAmount();
     }
+
 }

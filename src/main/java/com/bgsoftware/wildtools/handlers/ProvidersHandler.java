@@ -39,6 +39,7 @@ import org.bukkit.block.BlockState;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.Plugin;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
@@ -214,11 +215,12 @@ public final class ProvidersHandler implements ProvidersManager {
         } else if (pricesPlugin.equalsIgnoreCase("GUIShop") && Bukkit.getPluginManager().isPluginEnabled("GUIShop")) {
             //pricesProvider = new PricesProvider_GUIShop();
         } else if (pricesPlugin.equalsIgnoreCase("Essentials") && Bukkit.getPluginManager().isPluginEnabled("Essentials")) {
-//            try {
-//                pricesProvider = new PricesProvider_Essentials();
-//            } catch (Throwable ex) {
-//                pricesProvider = (PricesProvider) getInstance("com.bgsoftware.wildtools.hooks.PricesProvider_EssentialsOld");
-//            }
+            Plugin essentials = Bukkit.getPluginManager().getPlugin("Essentials");
+            if (essentials.getDescription().getVersion().startsWith("2.15")) {
+                pricesProvider = createInstance("PricesProvider_Essentials215");
+            } else {
+                pricesProvider = createInstance("PricesProvider_Essentials216");
+            }
         } else if (pricesPlugin.equals("CMI") && Bukkit.getPluginManager().isPluginEnabled("CMI")) {
             pricesProvider = createInstance("PricesProvider_CMI");
         } else if (pricesPlugin.equalsIgnoreCase("newtShop") && Bukkit.getPluginManager().isPluginEnabled("newtShop")) {
