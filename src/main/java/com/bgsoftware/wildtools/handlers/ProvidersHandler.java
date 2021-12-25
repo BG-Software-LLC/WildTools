@@ -16,14 +16,13 @@ import com.bgsoftware.wildtools.hooks.DropsProvider_MergedSpawner;
 import com.bgsoftware.wildtools.hooks.DropsProvider_RoseStacker;
 import com.bgsoftware.wildtools.hooks.DropsProvider_SilkSpawners;
 import com.bgsoftware.wildtools.hooks.DropsProvider_WildStacker;
-import com.bgsoftware.wildtools.hooks.DropsProvider_mcMMO;
 import com.bgsoftware.wildtools.hooks.DropsProviders_WildToolsSpawners;
 import com.bgsoftware.wildtools.hooks.FactionsProvider;
 import com.bgsoftware.wildtools.hooks.FactionsProvider_Default;
 import com.bgsoftware.wildtools.hooks.PricesProvider_Default;
 import com.bgsoftware.wildtools.hooks.SuperMobCoinsHook;
+import com.bgsoftware.wildtools.hooks.listener.IToolBlockListener;
 import com.bgsoftware.wildtools.utils.Executor;
-import com.gmail.nossr50.datatypes.skills.PrimarySkillType;
 import com.google.common.collect.Lists;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
@@ -59,6 +58,8 @@ public final class ProvidersHandler implements ProvidersManager {
     private final List<ClaimsProvider> claimsProviders = Lists.newArrayList();
     private PricesProvider pricesProvider;
     private FactionsProvider factionsProvider;
+
+    private final List<IToolBlockListener> toolBlockListeners = Lists.newArrayList();
 
     public ProvidersHandler(WildToolsPlugin plugin) {
         this.plugin = plugin;
@@ -174,12 +175,21 @@ public final class ProvidersHandler implements ProvidersManager {
         claimsProviders.add(claimsProvider);
     }
 
+    public void registerToolBlockListener(IToolBlockListener toolBlockListener) {
+        this.toolBlockListeners.add(toolBlockListener);
+    }
+
+    public void notifyToolBlockListeners(Location location, IToolBlockListener.Action action) {
+        this.toolBlockListeners.forEach(toolBlockListener -> toolBlockListener.recordBlockChange(location, action));
+    }
+
     private void loadProviders() {
         WildToolsPlugin.log("Loading providers started...");
         long startTime = System.currentTimeMillis();
 
         WildToolsPlugin.log(" - Using " + plugin.getNMSAdapter().getVersion() + " adapter.");
 
+        loadGeneralHooks();
         loadPricesProvider();
         loadFactionsProvider();
         loadDropsProviders();
@@ -195,6 +205,12 @@ public final class ProvidersHandler implements ProvidersManager {
             WildToolsPlugin.log("");
             WildToolsPlugin.log("If you want sell-wands to be enabled, please install Vault with an economy plugin.");
             WildToolsPlugin.log("");
+        }
+    }
+
+    private void loadGeneralHooks() {
+        if (Bukkit.getPluginManager().isPluginEnabled("mcMMO")) {
+            registerHook("McMMOHook");
         }
     }
 
@@ -257,11 +273,13 @@ public final class ProvidersHandler implements ProvidersManager {
             dropsProvider.ifPresent(this::addDropsProvider);
         }
         if (Bukkit.getPluginManager().isPluginEnabled("mcMMO")) {
-            try {
-                PrimarySkillType.valueOf("HERBALISM");
-                addDropsProvider(new DropsProvider_mcMMO());
-            } catch (Throwable ex) {
-                addDropsProvider((DropsProvider) getInstance("com.bgsoftware.wildtools.hooks.DropsProvider_mcMMOOld"));
+            Plugin mcMMO = Bukkit.getPluginManager().getPlugin("mcMMO");
+            if (mcMMO.getDescription().getVersion().startsWith("1")) {
+                Optional<DropsProvider> dropsProvider = createInstance("DropsProvider_mcMMO1");
+                dropsProvider.ifPresent(this::addDropsProvider);
+            } else {
+                Optional<DropsProvider> dropsProvider = createInstance("DropsProvider_mcMMO2");
+                dropsProvider.ifPresent(this::addDropsProvider);
             }
         }
 

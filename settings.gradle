@@ -9,7 +9,6 @@
 
 rootProject.name = 'WildTools'
 include 'API'
-include 'Hooks_McMMOOld'
 include 'Hooks_SavageFactions'
 include 'Hooks_SilkSpawnersOld'
 include 'v1_7_R4'
@@ -32,4 +31,6 @@ include 'Hook_FactionsX'
 include 'Hook_GriefPrevention'
 include 'Hook_GUIShop'
 include 'Hook_Lands'
+include 'Hook_McMMO2'
+include 'Hook_McMMO1'
 

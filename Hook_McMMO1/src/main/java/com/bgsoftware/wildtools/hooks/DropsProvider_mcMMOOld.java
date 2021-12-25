@@ -24,10 +24,8 @@ public final class DropsProvider_mcMMOOld implements DropsProvider {
 
     @Override
     public List<ItemStack> getBlockDrops(Player player, Block block) {
-        if(!ItemUtils.isCrops(block.getType()) || !shouldBonusDrops(player))
+        if (!ItemUtils.isCrops(block.getType()) || !shouldBonusDrops(player))
             return new ArrayList<>();
-
-        McMMOHook.doubleDropLocations.add(block.getLocation());
 
         return plugin.getNMSAdapter().getCropDrops(player, block).stream()
                 .peek(itemStack -> itemStack.setAmount(itemStack.getAmount() * 2)).collect(Collectors.toList());
@@ -38,7 +36,7 @@ public final class DropsProvider_mcMMOOld implements DropsProvider {
         return false;
     }
 
-    private boolean shouldBonusDrops(Player player){
+    private boolean shouldBonusDrops(Player player) {
         McMMOPlayer mcMMOPlayer = UserManager.getPlayer(player);
         HerbalismManager herbalismManager = mcMMOPlayer.getHerbalismManager();
         int activationChance = PerksUtils.handleLuckyPerks(player, SkillType.HERBALISM);

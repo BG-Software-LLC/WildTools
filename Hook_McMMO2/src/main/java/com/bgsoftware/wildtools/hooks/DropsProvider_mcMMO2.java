@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public final class DropsProvider_mcMMO implements DropsProvider {
+public final class DropsProvider_mcMMO2 implements DropsProvider {
 
     private static final WildToolsPlugin plugin = WildToolsPlugin.getPlugin();
 
@@ -22,8 +22,6 @@ public final class DropsProvider_mcMMO implements DropsProvider {
     public List<ItemStack> getBlockDrops(Player player, Block block) {
         if(!ItemUtils.isCrops(block.getType()) || !shouldBonusDrops(player, block))
             return new ArrayList<>();
-
-        McMMOHook.doubleDropLocations.add(block.getLocation());
 
         return plugin.getNMSAdapter().getCropDrops(player, block).stream()
                 .peek(itemStack -> itemStack.setAmount(itemStack.getAmount() * 2)).collect(Collectors.toList());

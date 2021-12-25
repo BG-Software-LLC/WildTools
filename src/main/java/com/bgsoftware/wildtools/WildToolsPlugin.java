@@ -19,7 +19,6 @@ import com.bgsoftware.wildtools.handlers.DataHandler;
 import com.bgsoftware.wildtools.handlers.RecipesHandler;
 import com.bgsoftware.wildtools.listeners.BlocksListener;
 import com.bgsoftware.wildtools.listeners.EditorListener;
-import com.bgsoftware.wildtools.listeners.McMMOListener;
 import com.bgsoftware.wildtools.listeners.PlayerListener;
 import com.bgsoftware.wildtools.nms.NMSAdapter;
 
@@ -58,8 +57,6 @@ public final class WildToolsPlugin extends JavaPlugin implements WildTools {
         getServer().getPluginManager().registerEvents(new BlocksListener(this), this);
         getServer().getPluginManager().registerEvents(new PlayerListener(this), this);
         getServer().getPluginManager().registerEvents(new EditorListener(this), this);
-        if(getServer().getPluginManager().isPluginEnabled("mcMMO"))
-            getServer().getPluginManager().registerEvents(new McMMOListener(this), this);
 
         CommandsHandler commandsHandler = new CommandsHandler(this);
         getCommand("tools").setExecutor(commandsHandler);
