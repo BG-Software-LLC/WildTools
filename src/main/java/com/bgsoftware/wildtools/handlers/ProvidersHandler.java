@@ -209,7 +209,7 @@ public final class ProvidersHandler implements ProvidersManager {
         Optional<PricesProvider> pricesProvider = Optional.empty();
 
         if (pricesPlugin.equalsIgnoreCase("ShopGUIPlus") && Bukkit.getPluginManager().isPluginEnabled("ShopGUIPlus")) {
-            //pricesProvider = new PricesProvider_ShopGUIPlus();
+            pricesProvider = createInstance("PricesProvider_ShopGUIPlus");
         } else if (pricesPlugin.equalsIgnoreCase("GUIShop") && Bukkit.getPluginManager().isPluginEnabled("GUIShop")) {
             //pricesProvider = new PricesProvider_GUIShop();
         } else if (pricesPlugin.equalsIgnoreCase("Essentials") && Bukkit.getPluginManager().isPluginEnabled("Essentials")) {

@@ -27,4 +27,5 @@ include 'Hook_Essentials215'
 include 'Hook_MassiveFactions'
 include 'Hook_FactionsUUID02'
 include 'Hook_FactionsUUID05'
+include 'Hook_ShopGUIPlus'
 
