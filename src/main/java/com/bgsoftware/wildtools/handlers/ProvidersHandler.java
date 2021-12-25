@@ -19,7 +19,6 @@ import com.bgsoftware.wildtools.hooks.DropsProviders_WildToolsSpawners;
 import com.bgsoftware.wildtools.hooks.FactionsProvider;
 import com.bgsoftware.wildtools.hooks.FactionsProvider_Default;
 import com.bgsoftware.wildtools.hooks.PricesProvider_Default;
-import com.bgsoftware.wildtools.hooks.SuperMobCoinsHook;
 import com.bgsoftware.wildtools.hooks.listener.IToolBlockListener;
 import com.bgsoftware.wildtools.utils.Executor;
 import com.google.common.collect.Lists;
@@ -197,9 +196,6 @@ public final class ProvidersHandler implements ProvidersManager {
 
         WildToolsPlugin.log("Loading providers done (Took " + (System.currentTimeMillis() - startTime) + "ms)");
 
-        if (Bukkit.getPluginManager().isPluginEnabled("SuperMobCoins"))
-            SuperMobCoinsHook.register();
-
         if (!isVaultEnabled()) {
             WildToolsPlugin.log("");
             WildToolsPlugin.log("If you want sell-wands to be enabled, please install Vault with an economy plugin.");
@@ -210,6 +206,9 @@ public final class ProvidersHandler implements ProvidersManager {
     private void loadGeneralHooks() {
         if (Bukkit.getPluginManager().isPluginEnabled("mcMMO")) {
             registerHook("McMMOHook");
+        }
+        if (Bukkit.getPluginManager().isPluginEnabled("SuperMobCoins")) {
+            registerHook("SuperMobCoinsHook");
         }
     }
 

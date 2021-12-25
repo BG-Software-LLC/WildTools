@@ -58,7 +58,6 @@ dependencies {
     compileOnly 'org.spigotmc:v1_16_R3-Tuinity:latest'
 
     // Plugin Hooks
-    compileOnly "me.swanis:SuperMobCoins:latest"
     compileOnly "com.newtjam:NewtShop:latest"
     compileOnly "su.fogus:FogusCore:latest"
     compileOnly "su.nightexpress:QuantumShop:latest"

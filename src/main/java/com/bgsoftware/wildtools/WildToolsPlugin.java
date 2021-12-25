@@ -7,7 +7,6 @@ import com.bgsoftware.wildtools.handlers.EditorHandler;
 import com.bgsoftware.wildtools.handlers.EventsHandler;
 import com.bgsoftware.wildtools.handlers.ToolsHandler;
 import com.bgsoftware.wildtools.hooks.PaperHook;
-import com.bgsoftware.wildtools.hooks.SuperMobCoinsHook;
 import com.bgsoftware.wildtools.listeners.AnvilListener;
 import com.bgsoftware.wildtools.metrics.Metrics;
 import org.bukkit.enchantments.Enchantment;
