@@ -4,13 +4,15 @@ import com.bgsoftware.wildstacker.api.WildStackerAPI;
 import org.bukkit.entity.Item;
 import org.bukkit.inventory.ItemStack;
 
-public final class WildStackerHook {
+public final class StackedItemProvider_WildStacker implements StackedItemProvider {
 
-    public static ItemStack getItemStack(Item item){
+    @Override
+    public ItemStack getItemStack(Item item) {
         return WildStackerAPI.getStackedItem(item).getItemStack();
     }
 
-    public static void setItemStack(Item item, ItemStack itemStack){
+    @Override
+    public void setItemStack(Item item, ItemStack itemStack) {
         WildStackerAPI.getStackedItem(item).setStackAmount(itemStack.getAmount(), true);
     }
 

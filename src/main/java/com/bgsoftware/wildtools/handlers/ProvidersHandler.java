@@ -9,11 +9,12 @@ import com.bgsoftware.wildtools.api.hooks.PricesProvider;
 import com.bgsoftware.wildtools.api.hooks.SellInfo;
 import com.bgsoftware.wildtools.hooks.ContainerProvider_Default;
 import com.bgsoftware.wildtools.hooks.ContainerProvider_WildChests;
-import com.bgsoftware.wildtools.hooks.DropsProvider_WildStacker;
 import com.bgsoftware.wildtools.hooks.DropsProviders_WildToolsSpawners;
 import com.bgsoftware.wildtools.hooks.FactionsProvider;
 import com.bgsoftware.wildtools.hooks.FactionsProvider_Default;
 import com.bgsoftware.wildtools.hooks.PricesProvider_Default;
+import com.bgsoftware.wildtools.hooks.StackedItemProvider;
+import com.bgsoftware.wildtools.hooks.StackedItemProvider_Default;
 import com.bgsoftware.wildtools.hooks.listener.IToolBlockListener;
 import com.bgsoftware.wildtools.utils.Executor;
 import com.google.common.collect.Lists;
@@ -51,6 +52,7 @@ public final class ProvidersHandler implements ProvidersManager {
     private final List<ClaimsProvider> claimsProviders = Lists.newArrayList();
     private PricesProvider pricesProvider;
     private FactionsProvider factionsProvider;
+    private StackedItemProvider stackedItemProvider;
 
     private final List<IToolBlockListener> toolBlockListeners = Lists.newArrayList();
 
@@ -176,6 +178,10 @@ public final class ProvidersHandler implements ProvidersManager {
         this.toolBlockListeners.forEach(toolBlockListener -> toolBlockListener.recordBlockChange(location, action));
     }
 
+    public StackedItemProvider getStackedItemProvider() {
+        return stackedItemProvider;
+    }
+
     private void loadProviders() {
         WildToolsPlugin.log("Loading providers started...");
         long startTime = System.currentTimeMillis();
@@ -188,6 +194,7 @@ public final class ProvidersHandler implements ProvidersManager {
         loadDropsProviders();
         loadContainerProviders();
         loadClaimsProviders();
+        loadStackedItemProviders();
 
         WildToolsPlugin.log("Loading providers done (Took " + (System.currentTimeMillis() - startTime) + "ms)");
 
@@ -249,15 +256,13 @@ public final class ProvidersHandler implements ProvidersManager {
         } else if (Bukkit.getPluginManager().isPluginEnabled("FactionsX") &&
                 containsClass("net.prosavage.factionsx.persist.TNTAddonData")) {
             factionsProvider = createInstance("FactionsProvider_FactionsX");
-        } else {
+        }
+
+        if(!factionsProvider.isPresent()) {
             factionsProvider = Optional.of(new FactionsProvider_Default());
         }
 
-        factionsProvider.ifPresent(this::setFactionsProvider);
-    }
-
-    private void setFactionsProvider(FactionsProvider factionsProvider) {
-        this.factionsProvider = factionsProvider;
+        this.factionsProvider = factionsProvider.get();
     }
 
     private void loadDropsProviders() {
@@ -278,7 +283,8 @@ public final class ProvidersHandler implements ProvidersManager {
 
         // Spawners related drops
         if (Bukkit.getPluginManager().isPluginEnabled("WildStacker")) {
-            addDropsProvider(new DropsProvider_WildStacker());
+            Optional<DropsProvider> dropsProvider = createInstance("DropsProvider_WildStacker");
+            dropsProvider.ifPresent(this::addDropsProvider);
         } else if (Bukkit.getPluginManager().isPluginEnabled("SilkSpawners")) {
             Plugin silkSpawners = Bukkit.getPluginManager().getPlugin("SilkSpawners");
             if (silkSpawners.getDescription().getVersion().startsWith("5")) {
@@ -350,6 +356,20 @@ public final class ProvidersHandler implements ProvidersManager {
             Optional<ClaimsProvider> claimsProvider = createInstance("ClaimsProvider_Villages");
             claimsProvider.ifPresent(this::addClaimsProvider);
         }
+    }
+
+    private void loadStackedItemProviders() {
+        Optional<StackedItemProvider> stackedItemProvider = Optional.empty();
+
+        if (Bukkit.getPluginManager().isPluginEnabled("WildStacker")) {
+            stackedItemProvider = createInstance("StackedItemProvider_WildStacker");
+        }
+
+        if(!stackedItemProvider.isPresent()) {
+            stackedItemProvider = Optional.of(new StackedItemProvider_Default());
+        }
+
+        this.stackedItemProvider = stackedItemProvider.get();
     }
 
     public static void reload() {

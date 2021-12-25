@@ -3,7 +3,6 @@ package com.bgsoftware.wildtools.objects.tools;
 import com.bgsoftware.wildtools.api.events.MagnetWandUseEvent;
 import com.bgsoftware.wildtools.api.objects.ToolMode;
 import com.bgsoftware.wildtools.api.objects.tools.MagnetTool;
-import com.bgsoftware.wildtools.hooks.WildStackerHook;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Item;
@@ -22,7 +21,7 @@ public final class WMagnetTool extends WTool implements MagnetTool {
 
     private final int radius;
 
-    public WMagnetTool(Material type, String name, int radius){
+    public WMagnetTool(Material type, String name, int radius) {
         super(type, name, ToolMode.MAGNET);
         this.radius = radius;
     }
@@ -44,7 +43,7 @@ public final class WMagnetTool extends WTool implements MagnetTool {
         return true;
     }
 
-    private void handleUse(Player player, ItemStack usedItem, Event e){
+    private void handleUse(Player player, ItemStack usedItem, Event e) {
         List<Item> nearbyItems = player.getNearbyEntities(radius, radius, radius).stream()
                 .filter(entity -> entity instanceof Item).map(entity -> (Item) entity).collect(Collectors.toList());
 
@@ -54,18 +53,17 @@ public final class WMagnetTool extends WTool implements MagnetTool {
 
         List<Item> affectedItems = new ArrayList<>();
 
-        for(Item item : nearbyItems) {
+        for (Item item : nearbyItems) {
             if (!item.isValid() || item.isDead())
                 continue;
 
             PlayerPickupItemEvent playerPickupItemEvent = new PlayerPickupItemEvent(player, item, item.getItemStack().getAmount());
             Bukkit.getPluginManager().callEvent(playerPickupItemEvent);
 
-            if(playerPickupItemEvent.isCancelled())
+            if (playerPickupItemEvent.isCancelled())
                 continue;
 
-            ItemStack itemStack = Bukkit.getPluginManager().isPluginEnabled("WildStacker") ?
-                    WildStackerHook.getItemStack(item) : item.getItemStack();
+            ItemStack itemStack = plugin.getProviders().getStackedItemProvider().getItemStack(item);
 
             Map<Integer, ItemStack> additionalItems = player.getInventory().addItem(itemStack);
 
@@ -77,11 +75,7 @@ public final class WMagnetTool extends WTool implements MagnetTool {
             } else {
                 ItemStack additionalItem = additionalItems.get(0);
                 affectedItems.add(item);
-                if (Bukkit.getPluginManager().isPluginEnabled("WildStacker")) {
-                    WildStackerHook.setItemStack(item, additionalItem);
-                } else {
-                    item.setItemStack(additionalItem);
-                }
+                plugin.getProviders().getStackedItemProvider().setItemStack(item, additionalItem);
                 reduceDurability = true;
             }
         }
@@ -89,13 +83,12 @@ public final class WMagnetTool extends WTool implements MagnetTool {
         MagnetWandUseEvent magnetWandUseEvent = new MagnetWandUseEvent(player, this, affectedItems);
         Bukkit.getPluginManager().callEvent(magnetWandUseEvent);
 
-        if(reduceDurability) {
+        if (reduceDurability) {
             // We need to check if the held item is different than the used item.
             // If it is, we need to split it so a duplication glitch doesn't occur
-            if(originalItem.equals(usedItem)){
+            if (originalItem.equals(usedItem)) {
                 reduceDurablility(player, 1, usedItem);
-            }
-            else{
+            } else {
                 usedItem = plugin.getNMSAdapter().getItemInHand(player, e);
 
                 ItemStack clonedTool = usedItem.clone();
