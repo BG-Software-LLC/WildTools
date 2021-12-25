@@ -12,8 +12,8 @@ public final class ClaimsProvider_Lands implements ClaimsProvider {
 
     private final LandsIntegration landsIntegration;
 
-    public ClaimsProvider_Lands(){
-        landsIntegration = new LandsIntegration(WildToolsPlugin.getPlugin(), false);
+    public ClaimsProvider_Lands(WildToolsPlugin plugin) {
+        landsIntegration = new LandsIntegration(plugin, false);
         landsIntegration.initialize();
     }
 

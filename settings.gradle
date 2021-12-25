@@ -31,4 +31,5 @@ include 'Hook_ShopGUIPlus'
 include 'Hook_FactionsX'
 include 'Hook_GriefPrevention'
 include 'Hook_GUIShop'
+include 'Hook_Lands'
 
