@@ -1,12 +1,15 @@
 package com.bgsoftware.wildtools.objects.tools;
 
+import com.bgsoftware.wildtools.Locale;
 import com.bgsoftware.wildtools.api.events.CraftingWandUseEvent;
+import com.bgsoftware.wildtools.api.objects.ToolMode;
+import com.bgsoftware.wildtools.api.objects.tools.CraftingTool;
 import com.bgsoftware.wildtools.utils.BukkitUtils;
 import com.bgsoftware.wildtools.utils.Executor;
 import com.bgsoftware.wildtools.utils.recipes.RecipeChoice;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.block.Chest;
+import org.bukkit.block.BlockState;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.FurnaceRecipe;
 import org.bukkit.inventory.Inventory;
@@ -15,11 +18,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.Recipe;
 import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.inventory.ShapelessRecipe;
-
-import com.bgsoftware.wildtools.hooks.WildChestsHook;
-import com.bgsoftware.wildtools.Locale;
-import com.bgsoftware.wildtools.api.objects.tools.CraftingTool;
-import com.bgsoftware.wildtools.api.objects.ToolMode;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -33,36 +31,33 @@ public final class WCraftingTool extends WTool implements CraftingTool {
 
     private final List<Recipe> craftings;
 
-    public WCraftingTool(Material type, String name, List<String> craftings){
+    public WCraftingTool(Material type, String name, List<String> craftings) {
         super(type, name, ToolMode.CRAFTING);
         this.craftings = parseCraftings(craftings);
     }
 
     @Override
-    public Iterator<Recipe> getCraftings(){
+    public Iterator<Recipe> getCraftings() {
         return craftings.iterator();
     }
 
     @Override
     public boolean onBlockInteract(PlayerInteractEvent e) {
-        if(!BukkitUtils.canInteractBlock(e.getPlayer(), e.getClickedBlock(), e.getItem()))
+        if (!BukkitUtils.canInteractBlock(e.getPlayer(), e.getClickedBlock(), e.getItem()))
             return false;
 
-        if(e.getClickedBlock().getType() != Material.CHEST && e.getClickedBlock().getType() != Material.TRAPPED_CHEST){
+        BlockState blockState = e.getClickedBlock().getState();
+        Inventory chestInventory = ((InventoryHolder) e.getClickedBlock().getState()).getInventory();
+        List<Inventory> inventories = plugin.getProviders().getAllInventories(blockState, chestInventory);
+
+        if (inventories.isEmpty()) {
             Locale.INVALID_CONTAINER_CRAFTING.send(e.getPlayer());
             return false;
         }
 
         Iterator<Recipe> craftings = getCraftings();
-
         List<ItemStack> toAdd = new ArrayList<>();
-
-        Chest chest = (Chest) e.getClickedBlock().getState();
-        Inventory chestInventory = ((InventoryHolder) e.getClickedBlock().getState()).getInventory();
-
         int craftedItemsAmount = 0;
-
-        List<Inventory> inventories = WildChestsHook.getAllInventories(chest, chestInventory);
 
         while (craftings.hasNext()) {
             Recipe recipe = craftings.next();
@@ -113,7 +108,7 @@ public final class WCraftingTool extends WTool implements CraftingTool {
             Bukkit.getPluginManager().callEvent(craftingWandUseEvent);
         });
 
-        WildChestsHook.addItems(chest.getLocation(), chestInventory, toAdd);
+        plugin.getProviders().addItems(blockState, chestInventory, toAdd);
 
         if (craftedItemsAmount > 0) {
             reduceDurablility(e.getPlayer(), 1, e.getItem());
@@ -125,15 +120,15 @@ public final class WCraftingTool extends WTool implements CraftingTool {
         return true;
     }
 
-    private List<Recipe> parseCraftings(List<String> recipes){
+    private List<Recipe> parseCraftings(List<String> recipes) {
         List<Recipe> recipeList = new ArrayList<>();
 
         Recipe current;
         Iterator<Recipe> bukkitRecipes = Bukkit.recipeIterator();
 
-        while (bukkitRecipes.hasNext()){
+        while (bukkitRecipes.hasNext()) {
             current = bukkitRecipes.next();
-            if(recipes.contains(current.getResult().getType().name()) ||
+            if (recipes.contains(current.getResult().getType().name()) ||
                     recipes.contains(current.getResult().getType() + ":" + current.getResult().getDurability()))
                 recipeList.add(current);
         }
@@ -142,23 +137,23 @@ public final class WCraftingTool extends WTool implements CraftingTool {
     }
 
     @SuppressWarnings("deprecation")
-    private List<RecipeChoice> getIngredients(Recipe recipe, List<ItemStack> oldList){
+    private List<RecipeChoice> getIngredients(Recipe recipe, List<ItemStack> oldList) {
         Map<RecipeChoice, Integer> counts = new HashMap<>();
         List<RecipeChoice> ingredients = new ArrayList<>();
 
-        for(ItemStack itemStack : oldList){
+        for (ItemStack itemStack : oldList) {
             RecipeChoice recipeChoice;
 
-            if(itemStack.getData().getData() < 0){
+            if (itemStack.getData().getData() < 0) {
                 recipeChoice = RecipeChoice.of(plugin.getNMSAdapter().parseChoice(recipe, itemStack));
-            }else {
+            } else {
                 recipeChoice = RecipeChoice.of(itemStack);
             }
 
             counts.put(recipeChoice, counts.getOrDefault(recipeChoice, 0) + itemStack.getAmount());
         }
 
-        for(RecipeChoice ingredient : counts.keySet()){
+        for (RecipeChoice ingredient : counts.keySet()) {
             ingredient.setAmount(counts.get(ingredient));
             ingredients.add(ingredient);
         }
@@ -166,11 +161,11 @@ public final class WCraftingTool extends WTool implements CraftingTool {
         return ingredients;
     }
 
-    private int countItems(RecipeChoice recipeChoice, Inventory inventory){
+    private int countItems(RecipeChoice recipeChoice, Inventory inventory) {
         int amount = 0;
 
-        for(ItemStack _itemStack : inventory.getContents()){
-            if(recipeChoice.test(_itemStack)) {
+        for (ItemStack _itemStack : inventory.getContents()) {
+            if (recipeChoice.test(_itemStack)) {
                 amount += _itemStack.getAmount();
             }
         }

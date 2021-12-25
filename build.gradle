@@ -59,7 +59,6 @@ dependencies {
 
     // Plugin Hooks
     compileOnly "net.milkbowl:Vault:latest"
-    compileOnly "com.bgsoftware:WildChestsAPI:latest"
 }
 
 jar {

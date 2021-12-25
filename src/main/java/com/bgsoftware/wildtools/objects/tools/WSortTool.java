@@ -1,16 +1,14 @@
 package com.bgsoftware.wildtools.objects.tools;
 
-import com.bgsoftware.wildtools.api.events.SortWandUseEvent;
-import com.bgsoftware.wildtools.hooks.WildChestsHook;
 import com.bgsoftware.wildtools.Locale;
+import com.bgsoftware.wildtools.api.events.SortWandUseEvent;
 import com.bgsoftware.wildtools.api.objects.ToolMode;
 import com.bgsoftware.wildtools.api.objects.tools.SortTool;
-
 import com.bgsoftware.wildtools.utils.BukkitUtils;
 import com.bgsoftware.wildtools.utils.Executor;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.block.Chest;
+import org.bukkit.block.BlockState;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
@@ -27,24 +25,29 @@ import java.util.stream.Collectors;
 
 public final class WSortTool extends WTool implements SortTool {
 
-    public WSortTool(Material type, String name){
+    public WSortTool(Material type, String name) {
         super(type, name, ToolMode.SORT);
     }
 
     @Override
     public boolean onBlockInteract(PlayerInteractEvent e) {
-        if(!BukkitUtils.canInteractBlock(e.getPlayer(), e.getClickedBlock(), e.getItem()))
+        if (!BukkitUtils.canInteractBlock(e.getPlayer(), e.getClickedBlock(), e.getItem()))
             return false;
 
-        if(e.getClickedBlock().getType() != Material.CHEST && e.getClickedBlock().getType() != Material.TRAPPED_CHEST){
+        if (e.getClickedBlock().getType() != Material.CHEST && e.getClickedBlock().getType() != Material.TRAPPED_CHEST) {
             Locale.INVALID_CONTAINER_SORT_WAND.send(e.getPlayer());
             return false;
         }
 
-        Chest chest = (Chest) e.getClickedBlock().getState();
+        BlockState blockState = e.getClickedBlock().getState();
         Inventory chestInventory = ((InventoryHolder) e.getClickedBlock().getState()).getInventory();
+        List<Inventory> inventories = plugin.getProviders().getAllInventories(blockState, chestInventory);
 
-        List<Inventory> inventories = WildChestsHook.getAllInventories(chest, chestInventory);
+        if (inventories.isEmpty()) {
+            Locale.INVALID_CONTAINER_SORT_WAND.send(e.getPlayer());
+            return false;
+        }
+
         List<InventoryItem> inventoryItems = new ArrayList<>();
         Map<Inventory, ItemStack[]> originContents = new HashMap<>();
 
@@ -66,7 +69,7 @@ public final class WSortTool extends WTool implements SortTool {
             Bukkit.getPluginManager().callEvent(sortWandUseEvent);
         });
 
-        WildChestsHook.addItems(chest.getLocation(), chestInventory, affectedItems);
+        plugin.getProviders().addItems(blockState, chestInventory, affectedItems);
 
         for (Inventory inventory : inventories) {
             if (!Arrays.equals(originContents.get(inventory), inventory.getContents())) {
@@ -81,15 +84,15 @@ public final class WSortTool extends WTool implements SortTool {
         return true;
     }
 
-    private List<ItemStack> convert(List<InventoryItem> original){
+    private List<ItemStack> convert(List<InventoryItem> original) {
         return original.stream().map(InventoryItem::getItemStack).collect(Collectors.toList());
     }
 
-    private static class InventoryItem implements Comparable<InventoryItem>{
+    private static class InventoryItem implements Comparable<InventoryItem> {
 
         public ItemStack itemStack;
 
-        InventoryItem(ItemStack itemStack){
+        InventoryItem(ItemStack itemStack) {
             this.itemStack = itemStack;
         }
 
@@ -100,9 +103,9 @@ public final class WSortTool extends WTool implements SortTool {
         @Override
         public int compareTo(InventoryItem o) {
             //Comparing itemstack types
-            if(itemStack.getType().ordinal() > o.itemStack.getType().ordinal())
+            if (itemStack.getType().ordinal() > o.itemStack.getType().ordinal())
                 return 1;
-            else if(itemStack.getType().ordinal() < o.itemStack.getType().ordinal())
+            else if (itemStack.getType().ordinal() < o.itemStack.getType().ordinal())
                 return -1;
 
             //Comparing durabilities

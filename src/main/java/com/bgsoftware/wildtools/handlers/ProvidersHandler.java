@@ -8,8 +8,8 @@ import com.bgsoftware.wildtools.api.hooks.DropsProvider;
 import com.bgsoftware.wildtools.api.hooks.PricesProvider;
 import com.bgsoftware.wildtools.api.hooks.SellInfo;
 import com.bgsoftware.wildtools.hooks.ContainerProvider_Default;
-import com.bgsoftware.wildtools.hooks.ContainerProvider_WildChests;
 import com.bgsoftware.wildtools.hooks.DropsProviders_Default;
+import com.bgsoftware.wildtools.hooks.ExtendedContainerProvider;
 import com.bgsoftware.wildtools.hooks.FactionsProvider;
 import com.bgsoftware.wildtools.hooks.FactionsProvider_Default;
 import com.bgsoftware.wildtools.hooks.PricesProvider_Default;
@@ -31,6 +31,7 @@ import org.bukkit.plugin.Plugin;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
@@ -48,7 +49,7 @@ public final class ProvidersHandler implements ProvidersManager {
 
     private final List<DropsProvider> dropsProviders = Lists.newArrayList();
     private final List<ContainerProvider> containerProviders = Lists.newArrayList();
-    private final ContainerProvider defaultContainer;
+    private final ExtendedContainerProvider defaultContainer;
     private final List<ClaimsProvider> claimsProviders = Lists.newArrayList();
     private PricesProvider pricesProvider;
     private FactionsProvider factionsProvider;
@@ -123,6 +124,31 @@ public final class ProvidersHandler implements ProvidersManager {
 
         if (defaultContainer.isContainer(blockState))
             defaultContainer.removeContainer(blockState, inventory, sellInfo);
+    }
+
+    public List<Inventory> getAllInventories(BlockState blockState, Inventory chestInventory) {
+        for (ContainerProvider containerProvider : containerProviders) {
+            if (containerProvider instanceof ExtendedContainerProvider && containerProvider.isContainer(blockState)) {
+                return ((ExtendedContainerProvider) containerProvider).getAllInventories(blockState, chestInventory);
+            }
+        }
+
+        if (defaultContainer.isContainer(blockState))
+            return defaultContainer.getAllInventories(blockState, chestInventory);
+
+        return Collections.emptyList();
+    }
+
+    public void addItems(BlockState blockState, Inventory chestInventory, List<ItemStack> itemStackList) {
+        for (ContainerProvider containerProvider : containerProviders) {
+            if (containerProvider instanceof ExtendedContainerProvider && containerProvider.isContainer(blockState)) {
+                ((ExtendedContainerProvider) containerProvider).addItems(blockState, chestInventory, itemStackList);
+                return;
+            }
+        }
+
+        if (defaultContainer.isContainer(blockState))
+            defaultContainer.addItems(blockState, chestInventory, itemStackList);
     }
 
     public boolean isInsideClaim(Player player, Location location) {
@@ -312,7 +338,8 @@ public final class ProvidersHandler implements ProvidersManager {
             containerProvider.ifPresent(this::addContainerProvider);
         }
         if (Bukkit.getPluginManager().isPluginEnabled("WildChests")) {
-            addContainerProvider(new ContainerProvider_WildChests(plugin));
+            Optional<ContainerProvider> containerProvider = createInstance("ContainerProvider_WildChests");
+            containerProvider.ifPresent(this::addContainerProvider);
         }
     }
 
