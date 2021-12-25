@@ -273,7 +273,7 @@ public final class ProvidersHandler implements ProvidersManager {
 
         if (Bukkit.getPluginManager().isPluginEnabled("Factions") &&
                 Bukkit.getPluginManager().getPlugin("Factions").getDescription().getAuthors().contains("ProSavage")) {
-            //factionsProvider = (FactionsProvider) getInstance("com.bgsoftware.wildtools.hooks.FactionsProvider_SavageFactions");
+            factionsProvider = createInstance("FactionsProvider_SavageFactions");
         } else if (Bukkit.getPluginManager().isPluginEnabled("FactionsX") &&
                 containsClass("net.prosavage.factionsx.persist.TNTAddonData")) {
             factionsProvider = createInstance("FactionsProvider_FactionsX");
