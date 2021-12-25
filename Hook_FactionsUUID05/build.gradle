@@ -1,0 +1,13 @@
+group 'Hook_FactionsUUID05'
+
+dependencies {
+    compileOnly "com.drtshock:FactionsUUID-New:latest"
+    compileOnly "org.spigotmc:v1_8_R3-Taco:latest"
+    compileOnly project(":API")
+    compileOnly parent
+}
+
+if (project.hasProperty('hook.compile_factionsuuid05') &&
+        !Boolean.valueOf(project.findProperty("hook.compile_factionsuuid05").toString())) {
+    project.tasks.all { task -> task.enabled = false }
+}

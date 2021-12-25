@@ -7,7 +7,6 @@ import com.bgsoftware.wildtools.api.hooks.ContainerProvider;
 import com.bgsoftware.wildtools.api.hooks.DropsProvider;
 import com.bgsoftware.wildtools.api.hooks.PricesProvider;
 import com.bgsoftware.wildtools.api.hooks.SellInfo;
-import com.bgsoftware.wildtools.hooks.ClaimsProvider_FactionsUUID;
 import com.bgsoftware.wildtools.hooks.ClaimsProvider_FactionsX;
 import com.bgsoftware.wildtools.hooks.ClaimsProvider_GriefPrevention;
 import com.bgsoftware.wildtools.hooks.ClaimsProvider_Lands;
@@ -292,8 +291,15 @@ public final class ProvidersHandler implements ProvidersManager {
 
     private void loadClaimsProviders() {
         if (Bukkit.getPluginManager().isPluginEnabled("Factions")) {
-            if (Bukkit.getPluginManager().getPlugin("Factions").getDescription().getAuthors().contains("drtshock")) {
-                addClaimsProvider(new ClaimsProvider_FactionsUUID());
+            Plugin factions = Bukkit.getPluginManager().getPlugin("Factions");
+            if (factions.getDescription().getAuthors().contains("drtshock")) {
+                if (factions.getDescription().getVersion().startsWith("1.6.9.5-U0.5")) {
+                    Optional<ClaimsProvider> claimsProvider = createInstance("ClaimsProvider_FactionsUUID05");
+                    claimsProvider.ifPresent(this::addClaimsProvider);
+                } else {
+                    Optional<ClaimsProvider> claimsProvider = createInstance("ClaimsProvider_FactionsUUID02");
+                    claimsProvider.ifPresent(this::addClaimsProvider);
+                }
             } else {
                 Optional<ClaimsProvider> claimsProvider = createInstance("ClaimsProvider_MassiveFactions");
                 claimsProvider.ifPresent(this::addClaimsProvider);
