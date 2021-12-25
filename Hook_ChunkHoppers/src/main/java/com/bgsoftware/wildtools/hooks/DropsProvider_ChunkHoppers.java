@@ -30,4 +30,5 @@ public final class DropsProvider_ChunkHoppers implements DropsProvider {
     public boolean isSpawnersOnly() {
         return false;
     }
+
 }

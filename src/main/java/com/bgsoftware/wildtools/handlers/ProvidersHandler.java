@@ -17,7 +17,6 @@ import com.bgsoftware.wildtools.hooks.ClaimsProvider_Towny;
 import com.bgsoftware.wildtools.hooks.ClaimsProvider_Villages;
 import com.bgsoftware.wildtools.hooks.ContainerProvider_Default;
 import com.bgsoftware.wildtools.hooks.ContainerProvider_WildChests;
-import com.bgsoftware.wildtools.hooks.DropsProvider_ChunkHoppers;
 import com.bgsoftware.wildtools.hooks.DropsProvider_MergedSpawner;
 import com.bgsoftware.wildtools.hooks.DropsProvider_RoseStacker;
 import com.bgsoftware.wildtools.hooks.DropsProvider_SilkSpawners;
@@ -249,7 +248,8 @@ public final class ProvidersHandler implements ProvidersManager {
 
     private void loadDropsProviders() {
         if (Bukkit.getPluginManager().isPluginEnabled("ChunkHoppers")) {
-            addDropsProvider(new DropsProvider_ChunkHoppers());
+            Optional<DropsProvider> dropsProvider = createInstance("DropsProvider_ChunkHoppers");
+            dropsProvider.ifPresent(this::addDropsProvider);
         }
         if (Bukkit.getPluginManager().isPluginEnabled("mcMMO")) {
             try {
