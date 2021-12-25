@@ -1,8 +1,8 @@
 package com.bgsoftware.wildtools.nms;
 
 import com.bgsoftware.common.reflection.ReflectField;
+import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.wildtools.WildToolsPlugin;
-import com.bgsoftware.wildtools.hooks.PaperHook;
 import com.bgsoftware.wildtools.objects.WMaterial;
 import com.bgsoftware.wildtools.recipes.AdvancedShapedRecipe;
 import com.bgsoftware.wildtools.utils.Executor;
@@ -82,6 +82,10 @@ public final class NMSAdapter_v1_15_R1 implements NMSAdapter {
 
     private static final ReflectField<PlayerMap> PLAYER_MAP_FIELD = new ReflectField<>(PlayerChunkMap.class, PlayerMap.class, "playerMap");
     private static final ReflectField<ItemStack> ITEM_STACK_HANDLE = new ReflectField<>(CraftItemStack.class, ItemStack.class, "handle");
+
+    private static final ReflectMethod<Void> UPDATE_NEARBY_BLOCKS = new ReflectMethod<>(
+            "com.destroystokyo.paper.antixray.ChunkPacketBlockControllerAntiXray",
+            "updateNearbyBlocks", World.class, BlockPosition.class);
 
     @Override
     public String getVersion() {
@@ -256,8 +260,9 @@ public final class NMSAdapter_v1_15_R1 implements NMSAdapter {
             world.a(null, 2001, blockPosition, Block.getCombinedId(world.getType(blockPosition)));
 
         chunk.setType(blockPosition, Block.getByCombinedId(combinedId), true);
-        if(PaperHook.isAntiXRayAvailable())
-            PaperHook.handleLeftClickBlockMethod(world, blockPosition);
+
+        if(UPDATE_NEARBY_BLOCKS.isValid())
+            UPDATE_NEARBY_BLOCKS.invoke(world.chunkPacketBlockController, world, blockPosition);
     }
 
     @Override

@@ -6,7 +6,6 @@ import com.bgsoftware.wildtools.command.CommandsHandler;
 import com.bgsoftware.wildtools.handlers.EditorHandler;
 import com.bgsoftware.wildtools.handlers.EventsHandler;
 import com.bgsoftware.wildtools.handlers.ToolsHandler;
-import com.bgsoftware.wildtools.hooks.PaperHook;
 import com.bgsoftware.wildtools.listeners.AnvilListener;
 import com.bgsoftware.wildtools.metrics.Metrics;
 import org.bukkit.enchantments.Enchantment;
@@ -71,7 +70,6 @@ public final class WildToolsPlugin extends JavaPlugin implements WildTools {
         DataHandler.loadData();
         Locale.reload();
         loadAPI();
-        PaperHook.init();
 
         editorHandler = new EditorHandler(this);
         recipesHandler = new RecipesHandler(this);

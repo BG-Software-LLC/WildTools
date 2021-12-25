@@ -2,7 +2,6 @@ package com.bgsoftware.wildtools.nms;
 
 import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.wildtools.WildToolsPlugin;
-import com.bgsoftware.wildtools.hooks.PaperHook;
 import com.bgsoftware.wildtools.recipes.AdvancedShapedRecipe;
 import com.bgsoftware.wildtools.utils.items.ToolItemStack;
 import net.minecraft.server.v1_12_R1.Block;
@@ -389,8 +388,12 @@ public final class NMSAdapter_v1_12_R1 implements NMSAdapter {
             world.a(null, 2001, blockPosition, Block.getCombinedId(world.getType(blockPosition)));
 
         chunk.a(blockPosition, Block.getByCombinedId(combinedId));
-        if(PaperHook.isAntiXRayAvailable())
-            PaperHook.handleLeftClickBlockMethod(world, blockPosition);
+
+        try {
+            // Paper method to update anti-xray blocks
+            world.chunkPacketBlockController.updateNearbyBlocks(world, blockPosition);
+        } catch (Throwable ignored) {
+        }
     }
 
     @Override

@@ -1,7 +1,6 @@
 package com.bgsoftware.wildtools.nms;
 
 import com.bgsoftware.common.reflection.ReflectField;
-import com.bgsoftware.wildtools.hooks.PaperHook;
 import com.bgsoftware.wildtools.utils.items.ToolItemStack;
 import net.minecraft.server.v1_8_R3.Block;
 import net.minecraft.server.v1_8_R3.BlockCarrots;
@@ -85,14 +84,14 @@ public final class NMSAdapter_v1_8_R3 implements NMSAdapter {
         Block block = blockData.getBlock();
 
         //Checks if player cannot break the block or player in creative mode
-        if(!player.b(block) || player.playerInteractManager.isCreative())
+        if (!player.b(block) || player.playerInteractManager.isCreative())
             return drops;
 
         TileEntity tileEntity = world.getTileEntity(blockPosition);
 
-        if(tileEntity instanceof TileEntitySkull){
+        if (tileEntity instanceof TileEntitySkull) {
             TileEntitySkull tileEntitySkull = (TileEntitySkull) tileEntity;
-            if(tileEntitySkull.getSkullType() == 3){
+            if (tileEntitySkull.getSkullType() == 3) {
                 ItemStack itemStack = new ItemStack(Items.SKULL, 1, 3);
                 NBTTagCompound nbtTagCompound = itemStack.hasTag() ? itemStack.getTag() : new NBTTagCompound();
                 assert nbtTagCompound != null;
@@ -115,9 +114,7 @@ public final class NMSAdapter_v1_8_R3 implements NMSAdapter {
             }
             //Adds item to drops
             drops.add(CraftItemStack.asBukkitCopy(new ItemStack(item, 1, data)));
-        }
-
-        else{
+        } else {
             int fortuneLevel = getItemInHand(pl).getEnchantmentLevel(Enchantment.LOOT_BONUS_BLOCKS),
                     dropCount = block.getDropCount(fortuneLevel, world.random);
 
@@ -142,40 +139,37 @@ public final class NMSAdapter_v1_8_R3 implements NMSAdapter {
         int age = ((CraftBlock) bl).getData();
         int fortuneLevel = getItemInHand(pl).getEnchantmentLevel(Enchantment.LOOT_BONUS_BLOCKS);
 
-        if(block instanceof BlockCrops){
+        if (block instanceof BlockCrops) {
             if (age >= 7) {
                 //Give the item itself to the player
-                if(block instanceof BlockCarrots) {
+                if (block instanceof BlockCarrots) {
                     drops.add(CraftItemStack.asBukkitCopy(new ItemStack(Items.CARROT, 1, 0)));
-                }else if(block instanceof BlockPotatoes){
+                } else if (block instanceof BlockPotatoes) {
                     drops.add(CraftItemStack.asBukkitCopy(new ItemStack(Items.POTATO, 1, 0)));
-                }else{
+                } else {
                     drops.add(CraftItemStack.asBukkitCopy(new ItemStack(Items.WHEAT, 1, 0)));
                 }
                 //Give the "seeds" to the player. I run -1 iteration for "replant"
-                for(int i = 0; i < (fortuneLevel + 3) - 1; i++) {
+                for (int i = 0; i < (fortuneLevel + 3) - 1; i++) {
                     if (world.random.nextInt(15) <= age) {
-                        if(block instanceof BlockCarrots) {
+                        if (block instanceof BlockCarrots) {
                             drops.add(CraftItemStack.asBukkitCopy(new ItemStack(Items.CARROT, 1, 0)));
-                        }else if(block instanceof BlockPotatoes){
+                        } else if (block instanceof BlockPotatoes) {
                             drops.add(CraftItemStack.asBukkitCopy(new ItemStack(Items.POTATO, 1, 0)));
                             if (world.random.nextInt(50) == 0) {
                                 drops.add(CraftItemStack.asBukkitCopy(new ItemStack(Items.POISONOUS_POTATO, 1, 0)));
                             }
-                        }
-                        else{
+                        } else {
                             drops.add(CraftItemStack.asBukkitCopy(new ItemStack(Items.WHEAT_SEEDS, 1, 0)));
                         }
                     }
                 }
             }
-        }
-        else if(block instanceof BlockCocoa){
-            if(age >= 2) {
+        } else if (block instanceof BlockCocoa) {
+            if (age >= 2) {
                 drops.add(CraftItemStack.asBukkitCopy(new ItemStack(Items.DYE, 3, EnumColor.BROWN.getInvColorIndex())));
             }
-        }
-        else if(block instanceof BlockNetherWart){
+        } else if (block instanceof BlockNetherWart) {
             if (age >= 3) {
                 int amount = 2 + world.random.nextInt(3);
                 if (fortuneLevel > 0) {
@@ -207,7 +201,7 @@ public final class NMSAdapter_v1_8_R3 implements NMSAdapter {
     public void setTag(ToolItemStack toolItemStack, String key, int value) {
         ItemStack nmsStack = (ItemStack) toolItemStack.getNMSItem();
         NBTTagCompound tagCompound = nmsStack.getTag();
-        if(tagCompound == null){
+        if (tagCompound == null) {
             nmsStack.setTag(new NBTTagCompound());
             tagCompound = nmsStack.getTag();
         }
@@ -225,7 +219,7 @@ public final class NMSAdapter_v1_8_R3 implements NMSAdapter {
     public void setTag(ToolItemStack toolItemStack, String key, String value) {
         ItemStack nmsStack = (ItemStack) toolItemStack.getNMSItem();
         NBTTagCompound tagCompound = nmsStack.getTag();
-        if(tagCompound == null){
+        if (tagCompound == null) {
             nmsStack.setTag(new NBTTagCompound());
             tagCompound = nmsStack.getTag();
         }
@@ -236,7 +230,7 @@ public final class NMSAdapter_v1_8_R3 implements NMSAdapter {
     public void clearTasks(ToolItemStack toolItemStack) {
         ItemStack nmsStack = (ItemStack) toolItemStack.getNMSItem();
         NBTTagCompound tagCompound = nmsStack.getTag();
-        if(tagCompound != null)
+        if (tagCompound != null)
             tagCompound.remove("task-id");
     }
 
@@ -266,15 +260,15 @@ public final class NMSAdapter_v1_8_R3 implements NMSAdapter {
     public Object[] createSyncedItem(org.bukkit.inventory.ItemStack other) {
         CraftItemStack craftItemStack;
         ItemStack handle;
-        if(other instanceof CraftItemStack){
+        if (other instanceof CraftItemStack) {
             craftItemStack = (CraftItemStack) other;
             handle = ITEM_STACK_HANDLE.get(other);
-        }else{
+        } else {
             handle = CraftItemStack.asNMSCopy(other);
             craftItemStack = CraftItemStack.asCraftMirror(handle);
         }
 
-        return new Object[] {craftItemStack, handle};
+        return new Object[]{craftItemStack, handle};
     }
 
     @Override
@@ -289,13 +283,13 @@ public final class NMSAdapter_v1_8_R3 implements NMSAdapter {
 
     @Override
     public boolean isFullyGrown(org.bukkit.block.Block block) {
-        if(block.getState().getData() instanceof Crops)
+        if (block.getState().getData() instanceof Crops)
             return ((Crops) block.getState().getData()).getState() == CropState.RIPE;
-        else if(block.getState().getData() instanceof CocoaPlant)
+        else if (block.getState().getData() instanceof CocoaPlant)
             return ((CocoaPlant) block.getState().getData()).getSize() == CocoaPlant.CocoaPlantSize.LARGE;
-        else if(block.getState().getData() instanceof NetherWarts)
+        else if (block.getState().getData() instanceof NetherWarts)
             return ((NetherWarts) block.getState().getData()).getState() == NetherWartsState.RIPE;
-        else if(block.getType() == Material.CARROT || block.getType() == Material.POTATO)
+        else if (block.getType() == Material.CARROT || block.getType() == Material.POTATO)
             return ((CraftBlock) block).getData() == CropState.RIPE.getData();
 
         return true;
@@ -303,9 +297,9 @@ public final class NMSAdapter_v1_8_R3 implements NMSAdapter {
 
     @Override
     public void setCropState(org.bukkit.block.Block block, CropState cropState) {
-        if(block.getType() == Material.COCOA){
+        if (block.getType() == Material.COCOA) {
             CocoaPlant cocoaPlant = (CocoaPlant) block.getState().getData();
-            switch (cropState){
+            switch (cropState) {
                 case SEEDED:
                 case GERMINATED:
                 case VERY_SMALL:
@@ -322,9 +316,9 @@ public final class NMSAdapter_v1_8_R3 implements NMSAdapter {
                     break;
             }
             ((CraftBlock) block).setData(cocoaPlant.getData());
-        }else if(block.getType() == Material.MELON_BLOCK || block.getType() == Material.PUMPKIN){
+        } else if (block.getType() == Material.MELON_BLOCK || block.getType() == Material.PUMPKIN) {
             block.setType(Material.AIR);
-        }else {
+        } else {
             ((CraftBlock) block).setData(cropState.getData());
         }
     }
@@ -340,12 +334,10 @@ public final class NMSAdapter_v1_8_R3 implements NMSAdapter {
         Chunk chunk = world.getChunkAt(location.getChunk().getX(), location.getChunk().getZ());
         BlockPosition blockPosition = new BlockPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ());
 
-        if(combinedId == 0)
+        if (combinedId == 0)
             world.a(null, 2001, blockPosition, Block.getCombinedId(world.getType(blockPosition)));
 
         chunk.a(blockPosition, Block.getByCombinedId(combinedId));
-        if(PaperHook.isAntiXRayAvailable())
-            PaperHook.handleLeftClickBlockMethod(world, blockPosition);
     }
 
     @Override
@@ -357,8 +349,8 @@ public final class NMSAdapter_v1_8_R3 implements NMSAdapter {
         Location firstLocation = null;
 
         int counter = 0;
-        for(Location location : blocksList) {
-            if(firstLocation == null)
+        for (Location location : blocksList) {
+            if (firstLocation == null)
                 firstLocation = location;
 
             values[counter++] = (short) ((location.getBlockX() & 15) << 12 | (location.getBlockZ() & 15) << 8 | location.getBlockY());
@@ -387,10 +379,10 @@ public final class NMSAdapter_v1_8_R3 implements NMSAdapter {
         world.setTypeAndData(blockPosition, Block.getByCombinedId(combinedId), 18);
     }
 
-    private void sendPacketToRelevantPlayers(WorldServer worldServer, int chunkX, int chunkZ, Packet<?> packet){
+    private void sendPacketToRelevantPlayers(WorldServer worldServer, int chunkX, int chunkZ, Packet<?> packet) {
         PlayerChunkMap playerChunkMap = worldServer.getPlayerChunkMap();
-        for(EntityHuman entityHuman : worldServer.players){
-            if(entityHuman instanceof EntityPlayer && playerChunkMap.a((EntityPlayer) entityHuman, chunkX, chunkZ))
+        for (EntityHuman entityHuman : worldServer.players) {
+            if (entityHuman instanceof EntityPlayer && playerChunkMap.a((EntityPlayer) entityHuman, chunkX, chunkZ))
                 ((EntityPlayer) entityHuman).playerConnection.sendPacket(packet);
         }
     }
@@ -481,11 +473,11 @@ public final class NMSAdapter_v1_8_R3 implements NMSAdapter {
     public void dropItems(List<Object> droppedItemsRaw) {
         droppedItemsRaw.removeIf(droppedItem -> !(droppedItem instanceof EntityItem));
 
-        for(Object entityItem : droppedItemsRaw){
-            if(canMerge((EntityItem) entityItem)) {
+        for (Object entityItem : droppedItemsRaw) {
+            if (canMerge((EntityItem) entityItem)) {
                 for (Object otherEntityItem : droppedItemsRaw) {
                     if (entityItem != otherEntityItem && canMerge((EntityItem) otherEntityItem)) {
-                        if(mergeEntityItems((EntityItem) entityItem, (EntityItem) otherEntityItem))
+                        if (mergeEntityItems((EntityItem) entityItem, (EntityItem) otherEntityItem))
                             break;
                     }
                 }
@@ -494,18 +486,18 @@ public final class NMSAdapter_v1_8_R3 implements NMSAdapter {
 
         droppedItemsRaw.forEach(droppedItemObject -> {
             EntityItem entityItem = (EntityItem) droppedItemObject;
-            if(entityItem.isAlive()){
+            if (entityItem.isAlive()) {
                 entityItem.world.addEntity(entityItem);
             }
         });
     }
 
-    private static boolean canMerge(EntityItem entityItem){
+    private static boolean canMerge(EntityItem entityItem) {
         ItemStack itemStack = entityItem.getItemStack();
         return itemStack.count < itemStack.getMaxStackSize();
     }
 
-    private static boolean mergeEntityItems(EntityItem entityItem, EntityItem otherEntity){
+    private static boolean mergeEntityItems(EntityItem entityItem, EntityItem otherEntity) {
         ItemStack itemOfEntity = entityItem.getItemStack();
         ItemStack itemOfOtherEntity = otherEntity.getItemStack();
         if (canMergeTogether(itemOfEntity, itemOfOtherEntity)) {
@@ -521,14 +513,14 @@ public final class NMSAdapter_v1_8_R3 implements NMSAdapter {
         return entityItem.dead;
     }
 
-    private static boolean canMergeTogether(ItemStack itemStack, ItemStack otherItem){
-        if(itemStack.getItem() != otherItem.getItem())
+    private static boolean canMergeTogether(ItemStack itemStack, ItemStack otherItem) {
+        if (itemStack.getItem() != otherItem.getItem())
             return false;
 
-        if(itemStack.count + otherItem.count > otherItem.getMaxStackSize())
+        if (itemStack.count + otherItem.count > otherItem.getMaxStackSize())
             return false;
 
-        if(itemStack.hasTag() ^ otherItem.hasTag())
+        if (itemStack.hasTag() ^ otherItem.hasTag())
             return false;
 
         return !otherItem.hasTag() || otherItem.getTag().equals(itemStack.getTag());
@@ -545,11 +537,11 @@ public final class NMSAdapter_v1_8_R3 implements NMSAdapter {
         }
     }
 
-    private static class FakeCraftBlock extends CraftBlock{
+    private static class FakeCraftBlock extends CraftBlock {
 
         private Material blockType;
 
-        FakeCraftBlock(CraftChunk craftChunk, int x, int y, int z, Material material){
+        FakeCraftBlock(CraftChunk craftChunk, int x, int y, int z, Material material) {
             super(craftChunk, x, y, z);
             this.blockType = material;
         }
@@ -565,7 +557,7 @@ public final class NMSAdapter_v1_8_R3 implements NMSAdapter {
             super.setType(type);
         }
 
-        static FakeCraftBlock at(Location location, Material type){
+        static FakeCraftBlock at(Location location, Material type) {
             CraftChunk craftChunk = (CraftChunk) location.getChunk();
             return new FakeCraftBlock(craftChunk, location.getBlockX(), location.getBlockY(), location.getBlockZ(), type);
         }

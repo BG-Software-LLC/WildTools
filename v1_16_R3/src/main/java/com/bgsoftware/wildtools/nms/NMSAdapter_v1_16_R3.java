@@ -1,14 +1,16 @@
 package com.bgsoftware.wildtools.nms;
 
 import com.bgsoftware.common.reflection.ReflectField;
+import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.wildtools.WildToolsPlugin;
-import com.bgsoftware.wildtools.hooks.PaperHook;
 import com.bgsoftware.wildtools.objects.WMaterial;
 import com.bgsoftware.wildtools.recipes.AdvancedShapedRecipe;
 import com.bgsoftware.wildtools.utils.Executor;
 import com.bgsoftware.wildtools.utils.items.ToolItemStack;
 import com.tuinity.tuinity.chunk.light.StarLightInterface;
 import io.papermc.paper.enchantments.EnchantmentRarity;
+import it.unimi.dsi.fastutil.shorts.ShortArraySet;
+import it.unimi.dsi.fastutil.shorts.ShortSet;
 import net.kyori.adventure.text.Component;
 import net.minecraft.server.v1_16_R3.Block;
 import net.minecraft.server.v1_16_R3.BlockPosition;
@@ -50,8 +52,6 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.data.Ageable;
 import org.bukkit.block.data.BlockData;
-import it.unimi.dsi.fastutil.shorts.ShortArraySet;
-import it.unimi.dsi.fastutil.shorts.ShortSet;
 import org.bukkit.craftbukkit.v1_16_R3.CraftChunk;
 import org.bukkit.craftbukkit.v1_16_R3.CraftWorld;
 import org.bukkit.craftbukkit.v1_16_R3.block.CraftBlock;
@@ -98,6 +98,9 @@ public final class NMSAdapter_v1_16_R3 implements NMSAdapter {
     private static final ReflectField<ItemStack> ITEM_STACK_HANDLE = new ReflectField<>(CraftItemStack.class, ItemStack.class, "handle");
     private static final ReflectField<Object> STAR_LIGHT_INTERFACE = new ReflectField<>(LightEngineThreaded.class, Object.class, "theLightEngine");
     private static final ReflectField<ThreadedMailbox<Runnable>> LIGHT_ENGINE_EXECUTOR = new ReflectField<>(LightEngineThreaded.class, ThreadedMailbox.class, "b");
+    private static final ReflectMethod<Void> UPDATE_NEARBY_BLOCKS = new ReflectMethod<>(
+            "com.destroystokyo.paper.antixray.ChunkPacketBlockControllerAntiXray",
+            "updateNearbyBlocks", World.class, BlockPosition.class);
 
     private static Constructor<?> MULTI_BLOCK_CHANGE_CONSTRUCTOR;
     private static Class<?> SHORT_ARRAY_SET_CLASS = null;
@@ -284,8 +287,9 @@ public final class NMSAdapter_v1_16_R3 implements NMSAdapter {
             world.a(null, 2001, blockPosition, Block.getCombinedId(world.getType(blockPosition)));
 
         chunk.setType(blockPosition, Block.getByCombinedId(combinedId), true);
-        if(PaperHook.isAntiXRayAvailable())
-            PaperHook.handleLeftClickBlockMethod(world, blockPosition);
+
+        if(UPDATE_NEARBY_BLOCKS.isValid())
+            UPDATE_NEARBY_BLOCKS.invoke(world.chunkPacketBlockController, world, blockPosition);
     }
 
     @Override
