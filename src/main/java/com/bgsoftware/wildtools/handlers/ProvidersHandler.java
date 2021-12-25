@@ -12,7 +12,6 @@ import com.bgsoftware.wildtools.hooks.ClaimsProvider_Villages;
 import com.bgsoftware.wildtools.hooks.ContainerProvider_Default;
 import com.bgsoftware.wildtools.hooks.ContainerProvider_WildChests;
 import com.bgsoftware.wildtools.hooks.DropsProvider_RoseStacker;
-import com.bgsoftware.wildtools.hooks.DropsProvider_SilkSpawners;
 import com.bgsoftware.wildtools.hooks.DropsProvider_WildStacker;
 import com.bgsoftware.wildtools.hooks.DropsProviders_WildToolsSpawners;
 import com.bgsoftware.wildtools.hooks.FactionsProvider;
@@ -284,11 +283,13 @@ public final class ProvidersHandler implements ProvidersManager {
         if (Bukkit.getPluginManager().isPluginEnabled("WildStacker")) {
             addDropsProvider(new DropsProvider_WildStacker());
         } else if (Bukkit.getPluginManager().isPluginEnabled("SilkSpawners")) {
-            try {
-                de.dustplanet.util.SilkUtil.class.getMethod("getCreatureName", String.class);
-                addDropsProvider(new DropsProvider_SilkSpawners());
-            } catch (Throwable ex) {
-                addDropsProvider((DropsProvider) getInstance("com.bgsoftware.wildtools.hooks.DropsProvider_SilkSpawnersOld"));
+            Plugin silkSpawners = Bukkit.getPluginManager().getPlugin("SilkSpawners");
+            if (silkSpawners.getDescription().getVersion().startsWith("5")) {
+                Optional<DropsProvider> dropsProvider = createInstance("DropsProvider_SilkSpawners5");
+                dropsProvider.ifPresent(this::addDropsProvider);
+            } else if (silkSpawners.getDescription().getVersion().startsWith("6")) {
+                Optional<DropsProvider> dropsProvider = createInstance("DropsProvider_SilkSpawners6");
+                dropsProvider.ifPresent(this::addDropsProvider);
             }
         } else if (Bukkit.getPluginManager().isPluginEnabled("MergedSpawner")) {
             Optional<DropsProvider> dropsProvider = createInstance("DropsProvider_MergedSpawner");

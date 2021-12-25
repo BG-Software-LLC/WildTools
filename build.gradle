@@ -58,7 +58,6 @@ dependencies {
     compileOnly 'org.spigotmc:v1_16_R3-Tuinity:latest'
 
     // Plugin Hooks
-    compileOnly "de.dustplanet:SilkSpawners:latest"
     compileOnly "com.palmergames:Towny:latest"
     compileOnly "net.milkbowl:Vault:latest"
     compileOnly "com.stefthedev:Villages:latest"
