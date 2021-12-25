@@ -29,4 +29,5 @@ include 'Hook_FactionsUUID02'
 include 'Hook_FactionsUUID05'
 include 'Hook_ShopGUIPlus'
 include 'Hook_FactionsX'
+include 'Hook_GriefPrevention'
 

@@ -7,7 +7,6 @@ import com.bgsoftware.wildtools.api.hooks.ContainerProvider;
 import com.bgsoftware.wildtools.api.hooks.DropsProvider;
 import com.bgsoftware.wildtools.api.hooks.PricesProvider;
 import com.bgsoftware.wildtools.api.hooks.SellInfo;
-import com.bgsoftware.wildtools.hooks.ClaimsProvider_GriefPrevention;
 import com.bgsoftware.wildtools.hooks.ClaimsProvider_Lands;
 import com.bgsoftware.wildtools.hooks.ClaimsProvider_Residence;
 import com.bgsoftware.wildtools.hooks.ClaimsProvider_Towny;
@@ -318,7 +317,8 @@ public final class ProvidersHandler implements ProvidersManager {
             claimsProvider.ifPresent(this::addClaimsProvider);
         }
         if (Bukkit.getPluginManager().isPluginEnabled("GriefPrevention")) {
-            addClaimsProvider(new ClaimsProvider_GriefPrevention());
+            Optional<ClaimsProvider> claimsProvider = createInstance("ClaimsProvider_GriefPrevention");
+            claimsProvider.ifPresent(this::addClaimsProvider);
         }
         if (Bukkit.getPluginManager().isPluginEnabled("Lands")) {
             addClaimsProvider(new ClaimsProvider_Lands());

@@ -1,0 +1,13 @@
+group 'Hook_GriefPrevention'
+
+dependencies {
+    compileOnly "me.ryanhamshire:GriefPrevention:latest"
+    compileOnly "org.spigotmc:v1_8_R3-Taco:latest"
+    compileOnly project(":API")
+    compileOnly parent
+}
+
+if (project.hasProperty('hook.compile_griefprevention') &&
+        !Boolean.valueOf(project.findProperty("hook.compile_griefprevention").toString())) {
+    project.tasks.all { task -> task.enabled = false }
+}
