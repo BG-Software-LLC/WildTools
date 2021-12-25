@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public final class DropsProvider_mcMMOOld implements DropsProvider {
+public final class DropsProvider_mcMMO1 implements DropsProvider {
 
     private static final WildToolsPlugin plugin = WildToolsPlugin.getPlugin();
 
