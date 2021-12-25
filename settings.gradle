@@ -45,4 +45,5 @@ include 'Hook_RoseStacker'
 include 'Hook_WildStacker'
 include 'Hook_EconomyShopGUI'
 include 'Hook_WildChests'
+include 'Hook_Vault'
 

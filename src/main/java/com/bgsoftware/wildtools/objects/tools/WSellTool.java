@@ -28,7 +28,7 @@ public final class WSellTool extends WTool implements SellTool {
 
     @Override
     public boolean onBlockInteract(PlayerInteractEvent e) {
-        if(!plugin.getProviders().isVaultEnabled()){
+        if(!plugin.getProviders().hasEconomyProvider()){
             e.getPlayer().sendMessage(ChatColor.RED + "You tried to use a sell-wand, but the server doesn't have Vault installed. " +
                     "Please contact the server administrators if you believe that this is an error.");
             return false;
@@ -63,7 +63,7 @@ public final class WSellTool extends WTool implements SellTool {
         multiplier = sellWandUseEvent.getMultiplier();
         totalEarnings = sellWandUseEvent.getPrice() * multiplier;
 
-        plugin.getProviders().depositPlayer(e.getPlayer(), totalEarnings);
+        plugin.getProviders().getEconomyProvider().depositPlayer(e.getPlayer(), totalEarnings);
 
         plugin.getProviders().removeContainer(blockState, inventory, sellInfo);
 

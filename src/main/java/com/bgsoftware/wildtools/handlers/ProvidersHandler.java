@@ -9,6 +9,8 @@ import com.bgsoftware.wildtools.api.hooks.PricesProvider;
 import com.bgsoftware.wildtools.api.hooks.SellInfo;
 import com.bgsoftware.wildtools.hooks.ContainerProvider_Default;
 import com.bgsoftware.wildtools.hooks.DropsProviders_Default;
+import com.bgsoftware.wildtools.hooks.EconomyProvider;
+import com.bgsoftware.wildtools.hooks.EconomyProvider_Default;
 import com.bgsoftware.wildtools.hooks.ExtendedContainerProvider;
 import com.bgsoftware.wildtools.hooks.FactionsProvider;
 import com.bgsoftware.wildtools.hooks.FactionsProvider_Default;
@@ -18,7 +20,6 @@ import com.bgsoftware.wildtools.hooks.StackedItemProvider_Default;
 import com.bgsoftware.wildtools.hooks.listener.IToolBlockListener;
 import com.bgsoftware.wildtools.utils.Executor;
 import com.google.common.collect.Lists;
-import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
@@ -44,9 +45,6 @@ public final class ProvidersHandler implements ProvidersManager {
 
     private final WildToolsPlugin plugin;
 
-    private boolean isVaultEnabled = false;
-    private Economy economy;
-
     private final List<DropsProvider> dropsProviders = Lists.newArrayList();
     private final List<ContainerProvider> containerProviders = Lists.newArrayList();
     private final ExtendedContainerProvider defaultContainer;
@@ -54,6 +52,7 @@ public final class ProvidersHandler implements ProvidersManager {
     private PricesProvider pricesProvider;
     private FactionsProvider factionsProvider;
     private StackedItemProvider stackedItemProvider;
+    private EconomyProvider economyProvider;
 
     private final List<IToolBlockListener> toolBlockListeners = Lists.newArrayList();
 
@@ -159,21 +158,8 @@ public final class ProvidersHandler implements ProvidersManager {
      * Handler' methods
      */
 
-    public void enableVault() {
-        isVaultEnabled = true;
-        economy = Bukkit.getServicesManager().getRegistration(Economy.class).getProvider();
-    }
-
-    public void depositPlayer(Player player, double price) {
-        economy.depositPlayer(player, price);
-    }
-
     public boolean canSellItem(Player player, ItemStack itemStack) {
-        return isVaultEnabled && getPrice(player, itemStack) > 0;
-    }
-
-    public boolean isVaultEnabled() {
-        return isVaultEnabled;
+        return getPrice(player, itemStack) > 0;
     }
 
     @Override
@@ -204,8 +190,16 @@ public final class ProvidersHandler implements ProvidersManager {
         this.toolBlockListeners.forEach(toolBlockListener -> toolBlockListener.recordBlockChange(location, action));
     }
 
+    public boolean hasEconomyProvider() {
+        return !(economyProvider instanceof EconomyProvider_Default);
+    }
+
     public StackedItemProvider getStackedItemProvider() {
         return stackedItemProvider;
+    }
+
+    public EconomyProvider getEconomyProvider() {
+        return economyProvider;
     }
 
     private void loadProviders() {
@@ -221,10 +215,11 @@ public final class ProvidersHandler implements ProvidersManager {
         loadContainerProviders();
         loadClaimsProviders();
         loadStackedItemProviders();
+        loadEconomyProvider();
 
         WildToolsPlugin.log("Loading providers done (Took " + (System.currentTimeMillis() - startTime) + "ms)");
 
-        if (!isVaultEnabled()) {
+        if (!hasEconomyProvider()) {
             WildToolsPlugin.log("");
             WildToolsPlugin.log("If you want sell-wands to be enabled, please install Vault with an economy plugin.");
             WildToolsPlugin.log("");
@@ -397,6 +392,20 @@ public final class ProvidersHandler implements ProvidersManager {
         }
 
         this.stackedItemProvider = stackedItemProvider.get();
+    }
+
+    private void loadEconomyProvider() {
+        Optional<EconomyProvider> economyProvider = Optional.empty();
+
+        if (Bukkit.getPluginManager().isPluginEnabled("Vault")) {
+            economyProvider = createInstance("EconomyProvider_Vault");
+        }
+
+        if (!economyProvider.isPresent()) {
+            economyProvider = Optional.of(new EconomyProvider_Default());
+        }
+
+        this.economyProvider = economyProvider.get();
     }
 
     public static void reload() {
