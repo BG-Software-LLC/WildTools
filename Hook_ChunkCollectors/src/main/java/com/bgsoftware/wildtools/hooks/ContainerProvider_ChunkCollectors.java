@@ -1,8 +1,8 @@
 package com.bgsoftware.wildtools.hooks;
 
 import com.bgsoftware.wildtools.api.hooks.ContainerProvider;
-import com.bgsoftware.wildtools.api.hooks.SoldItem;
 import com.bgsoftware.wildtools.api.hooks.SellInfo;
+import com.bgsoftware.wildtools.api.hooks.SoldItem;
 import com.cloth.ChunkCollectorPlugin;
 import com.cloth.collectors.ChunkCollector;
 import com.cloth.collectors.CollectorHandler;
@@ -37,7 +37,7 @@ public final class ContainerProvider_ChunkCollectors implements ContainerProvide
             ItemStack itemStack = inventory.getItem(slot);
             double price = itemStack == null || !collectorInventory.isCollecting(itemStack.getType()) ? 0 :
                     collectorInventory.getPrice(itemStack.getType()) * chunkCollector.getItemCollection().get(itemStack.getType());
-            if(price > 0){
+            if (price > 0) {
                 SoldItem soldItem = new SoldItem(itemStack, price);
                 toSell.put(slot, soldItem);
                 totalEarnings += price;
@@ -51,10 +51,11 @@ public final class ContainerProvider_ChunkCollectors implements ContainerProvide
     public void removeContainer(BlockState blockState, Inventory inventory, SellInfo sellInfo) {
         ChunkCollector chunkCollector = ChunkCollectorPlugin.getInstance().getCollectorHandler().getCollectorAtLocation(blockState.getLocation());
 
-        for(SoldItem soldItem : sellInfo.getSoldItems().values()){
+        for (SoldItem soldItem : sellInfo.getSoldItems().values()) {
             chunkCollector.getItemCollection().put(soldItem.getItem().getType(), 0);
         }
 
         chunkCollector.update(true);
     }
+
 }

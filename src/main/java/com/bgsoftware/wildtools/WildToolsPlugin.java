@@ -68,7 +68,7 @@ public final class WildToolsPlugin extends JavaPlugin implements WildTools {
         loadNMSAdapter();
         registerGlowEnchantment();
 
-        providersHandler = new ProvidersHandler();
+        providersHandler = new ProvidersHandler(this);
         toolsManager = new ToolsHandler(this);
         eventsHandler = new EventsHandler();
 
@@ -88,8 +88,6 @@ public final class WildToolsPlugin extends JavaPlugin implements WildTools {
         }
 
         log("******** ENABLE DONE ********");
-
-        Bukkit.getScheduler().runTask(plugin, this::loadProviders);
     }
 
     @Override
@@ -107,23 +105,6 @@ public final class WildToolsPlugin extends JavaPlugin implements WildTools {
             nmsAdapter = (NMSAdapter) Class.forName("com.bgsoftware.wildtools.nms.NMSAdapter_" + version).newInstance();
         } catch (ClassNotFoundException | IllegalAccessException | InstantiationException e){
             getLogger().info("Error while loading adapter - unknown adapter " + version + "... Please contact @Ome_R");
-        }
-    }
-
-    private void loadProviders(){
-        log("Loading providers started...");
-        long startTime = System.currentTimeMillis();
-        log(" - Using " + nmsAdapter.getVersion() + " adapter.");
-        providersHandler.loadData();
-        log("Loading providers done (Took " + (System.currentTimeMillis() - startTime) + "ms)");
-
-        if(Bukkit.getPluginManager().isPluginEnabled("SuperMobCoins"))
-            SuperMobCoinsHook.register();
-
-        if(!isVaultEnabled()) {
-            log("");
-            log("If you want sell-wands to be enabled, please install Vault with an economy plugin.");
-            log("");
         }
     }
 
