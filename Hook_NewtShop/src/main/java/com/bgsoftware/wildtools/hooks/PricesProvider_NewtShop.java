@@ -8,7 +8,7 @@ import org.bukkit.inventory.ItemStack;
 
 public final class PricesProvider_NewtShop implements PricesProvider {
 
-    public PricesProvider_NewtShop(){
+    public PricesProvider_NewtShop() {
         WildToolsPlugin.log(" - Using NewtShop as PricesProvider.");
     }
 

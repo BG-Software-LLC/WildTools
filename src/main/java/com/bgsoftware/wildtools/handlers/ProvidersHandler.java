@@ -232,7 +232,7 @@ public final class ProvidersHandler implements ProvidersManager {
         } else if (pricesPlugin.equals("CMI") && Bukkit.getPluginManager().isPluginEnabled("CMI")) {
             pricesProvider = createInstance("PricesProvider_CMI");
         } else if (pricesPlugin.equalsIgnoreCase("newtShop") && Bukkit.getPluginManager().isPluginEnabled("newtShop")) {
-            //pricesProvider = new PricesProvider_NewtShop();
+            pricesProvider = createInstance("PricesProvider_NewtShop");
         } else if (pricesPlugin.equalsIgnoreCase("QuantumShop") && Bukkit.getPluginManager().isPluginEnabled("QuantumShop")) {
             //pricesProvider = new PricesProvider_QuantumShop();
         } else if (pricesPlugin.equalsIgnoreCase("EconomyShopGUI") && (Bukkit.getPluginManager().isPluginEnabled("EconomyShopGUI") ||
