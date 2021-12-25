@@ -59,7 +59,6 @@ dependencies {
 
     // Plugin Hooks
     compileOnly "net.milkbowl:Vault:latest"
-    compileOnly "com.stefthedev:Villages:latest"
     compileOnly "com.bgsoftware:WildChestsAPI:latest"
     compileOnly "com.bgsoftware:WildStackerAPI:latest"
     compileOnly "dev.rosewood:RoseStacker:latest"
