@@ -24,4 +24,5 @@ include 'Hook_ChunkHoppers'
 include 'Hook_CMI'
 include 'Hook_Essentials216'
 include 'Hook_Essentials215'
+include 'Hook_MassiveFactions'
 

@@ -11,7 +11,6 @@ import com.bgsoftware.wildtools.hooks.ClaimsProvider_FactionsUUID;
 import com.bgsoftware.wildtools.hooks.ClaimsProvider_FactionsX;
 import com.bgsoftware.wildtools.hooks.ClaimsProvider_GriefPrevention;
 import com.bgsoftware.wildtools.hooks.ClaimsProvider_Lands;
-import com.bgsoftware.wildtools.hooks.ClaimsProvider_MassiveFactions;
 import com.bgsoftware.wildtools.hooks.ClaimsProvider_Residence;
 import com.bgsoftware.wildtools.hooks.ClaimsProvider_Towny;
 import com.bgsoftware.wildtools.hooks.ClaimsProvider_Villages;
@@ -296,7 +295,8 @@ public final class ProvidersHandler implements ProvidersManager {
             if (Bukkit.getPluginManager().getPlugin("Factions").getDescription().getAuthors().contains("drtshock")) {
                 addClaimsProvider(new ClaimsProvider_FactionsUUID());
             } else {
-                addClaimsProvider(new ClaimsProvider_MassiveFactions());
+                Optional<ClaimsProvider> claimsProvider = createInstance("ClaimsProvider_MassiveFactions");
+                claimsProvider.ifPresent(this::addClaimsProvider);
             }
         }
         if (Bukkit.getPluginManager().isPluginEnabled("FactionsX")) {
