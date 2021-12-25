@@ -208,7 +208,7 @@ public final class ProvidersHandler implements ProvidersManager {
         if (pricesPlugin.equalsIgnoreCase("ShopGUIPlus") && Bukkit.getPluginManager().isPluginEnabled("ShopGUIPlus")) {
             pricesProvider = createInstance("PricesProvider_ShopGUIPlus");
         } else if (pricesPlugin.equalsIgnoreCase("GUIShop") && Bukkit.getPluginManager().isPluginEnabled("GUIShop")) {
-            //pricesProvider = new PricesProvider_GUIShop();
+            pricesProvider = createInstance("PricesProvider_GUIShop");
         } else if (pricesPlugin.equalsIgnoreCase("Essentials") && Bukkit.getPluginManager().isPluginEnabled("Essentials")) {
             Plugin essentials = Bukkit.getPluginManager().getPlugin("Essentials");
             if (essentials.getDescription().getVersion().startsWith("2.15")) {

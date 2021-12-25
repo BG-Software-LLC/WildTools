@@ -8,9 +8,9 @@ import org.bukkit.inventory.ItemStack;
 
 public final class PricesProvider_GUIShop implements PricesProvider {
 
-    private Main plugin;
+    private final Main plugin;
 
-    public PricesProvider_GUIShop(){
+    public PricesProvider_GUIShop() {
         WildToolsPlugin.log(" - Using GUIShop as PricesProvider.");
         plugin = Main.getINSTANCE();
     }

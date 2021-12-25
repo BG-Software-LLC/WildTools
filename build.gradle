@@ -58,7 +58,6 @@ dependencies {
     compileOnly 'org.spigotmc:v1_16_R3-Tuinity:latest'
 
     // Plugin Hooks
-    compileOnly "com.pablo67340:GUIShop:latest"
     compileOnly "me.angeschossen:Lands:latest"
     compileOnly "com.nossr50:mcMMO-2:latest"
     compileOnly "com.nossr50:mcMMO-1:latest"
