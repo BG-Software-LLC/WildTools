@@ -61,7 +61,6 @@ dependencies {
     compileOnly "net.milkbowl:Vault:latest"
     compileOnly "com.bgsoftware:WildChestsAPI:latest"
     compileOnly "com.bgsoftware:WildStackerAPI:latest"
-    compileOnly "dev.rosewood:RoseStacker:latest"
     compileOnly "me.gypopo:EconomyShopGUI:4.0.2"
 }
 

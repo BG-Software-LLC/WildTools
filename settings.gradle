@@ -41,4 +41,5 @@ include 'Hook_SilkSpawners6'
 include 'Hook_SilkSpawners5'
 include 'Hook_Towny'
 include 'Hook_Villagers'
+include 'Hook_RoseStacker'
 

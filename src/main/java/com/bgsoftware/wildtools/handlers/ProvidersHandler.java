@@ -9,7 +9,6 @@ import com.bgsoftware.wildtools.api.hooks.PricesProvider;
 import com.bgsoftware.wildtools.api.hooks.SellInfo;
 import com.bgsoftware.wildtools.hooks.ContainerProvider_Default;
 import com.bgsoftware.wildtools.hooks.ContainerProvider_WildChests;
-import com.bgsoftware.wildtools.hooks.DropsProvider_RoseStacker;
 import com.bgsoftware.wildtools.hooks.DropsProvider_WildStacker;
 import com.bgsoftware.wildtools.hooks.DropsProviders_WildToolsSpawners;
 import com.bgsoftware.wildtools.hooks.FactionsProvider;
@@ -293,7 +292,8 @@ public final class ProvidersHandler implements ProvidersManager {
             Optional<DropsProvider> dropsProvider = createInstance("DropsProvider_MergedSpawner");
             dropsProvider.ifPresent(this::addDropsProvider);
         } else if (Bukkit.getPluginManager().isPluginEnabled("RoseStacker")) {
-            addDropsProvider(new DropsProvider_RoseStacker());
+            Optional<DropsProvider> dropsProvider = createInstance("DropsProvider_RoseStacker");
+            dropsProvider.ifPresent(this::addDropsProvider);
         } else {
             addDropsProvider(new DropsProviders_WildToolsSpawners());
         }
