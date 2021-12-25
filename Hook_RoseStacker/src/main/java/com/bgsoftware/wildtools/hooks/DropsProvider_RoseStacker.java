@@ -27,7 +27,7 @@ public final class DropsProvider_RoseStacker implements DropsProvider {
             stackedSpawner.updateDisplay();
             RoseStackerAPI.getInstance().removeSpawnerStack(stackedSpawner);
         } else {
-            drops.add(DropsProviders_WildToolsSpawners.getSpawnerItem((CreatureSpawner) block.getState()));
+            drops.add(DropsProviders_Default.getSpawnerItem((CreatureSpawner) block.getState()));
         }
 
         return drops;

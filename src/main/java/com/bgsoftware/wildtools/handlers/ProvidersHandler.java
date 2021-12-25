@@ -9,7 +9,7 @@ import com.bgsoftware.wildtools.api.hooks.PricesProvider;
 import com.bgsoftware.wildtools.api.hooks.SellInfo;
 import com.bgsoftware.wildtools.hooks.ContainerProvider_Default;
 import com.bgsoftware.wildtools.hooks.ContainerProvider_WildChests;
-import com.bgsoftware.wildtools.hooks.DropsProviders_WildToolsSpawners;
+import com.bgsoftware.wildtools.hooks.DropsProviders_Default;
 import com.bgsoftware.wildtools.hooks.FactionsProvider;
 import com.bgsoftware.wildtools.hooks.FactionsProvider_Default;
 import com.bgsoftware.wildtools.hooks.PricesProvider_Default;
@@ -301,7 +301,7 @@ public final class ProvidersHandler implements ProvidersManager {
             Optional<DropsProvider> dropsProvider = createInstance("DropsProvider_RoseStacker");
             dropsProvider.ifPresent(this::addDropsProvider);
         } else {
-            addDropsProvider(new DropsProviders_WildToolsSpawners());
+            addDropsProvider(new DropsProviders_Default());
         }
 
     }

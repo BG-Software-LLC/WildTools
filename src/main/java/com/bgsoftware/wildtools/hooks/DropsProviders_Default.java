@@ -11,7 +11,7 @@ import org.bukkit.inventory.meta.BlockStateMeta;
 import java.util.ArrayList;
 import java.util.List;
 
-public final class DropsProviders_WildToolsSpawners implements DropsProvider {
+public final class DropsProviders_Default implements DropsProvider {
 
     @Override
     public List<ItemStack> getBlockDrops(Player player, Block block) {

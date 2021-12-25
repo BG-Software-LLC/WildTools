@@ -27,7 +27,7 @@ public final class DropsProvider_WildStacker implements DropsProvider {
         try {
             drops.add(stackedSpawner.getDropItem());
         }catch(Throwable ex){
-            ItemStack itemStack = DropsProviders_WildToolsSpawners.getSpawnerItem((CreatureSpawner) block.getState());
+            ItemStack itemStack = DropsProviders_Default.getSpawnerItem((CreatureSpawner) block.getState());
             itemStack.setAmount(spawnerStackAmount);
             drops.add(itemStack);
         }
