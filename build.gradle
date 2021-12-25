@@ -58,8 +58,6 @@ dependencies {
     compileOnly 'org.spigotmc:v1_16_R3-Tuinity:latest'
 
     // Plugin Hooks
-    compileOnly "net.prosavage:FactionsX:latest"
-    compileOnly "net.prosavage:FactionsX-TNTAddon:latest"
     compileOnly "me.ryanhamshire:GriefPrevention:latest"
     compileOnly "com.pablo67340:GUIShop:latest"
     compileOnly "me.angeschossen:Lands:latest"

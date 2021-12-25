@@ -7,7 +7,6 @@ import com.bgsoftware.wildtools.api.hooks.ContainerProvider;
 import com.bgsoftware.wildtools.api.hooks.DropsProvider;
 import com.bgsoftware.wildtools.api.hooks.PricesProvider;
 import com.bgsoftware.wildtools.api.hooks.SellInfo;
-import com.bgsoftware.wildtools.hooks.ClaimsProvider_FactionsX;
 import com.bgsoftware.wildtools.hooks.ClaimsProvider_GriefPrevention;
 import com.bgsoftware.wildtools.hooks.ClaimsProvider_Lands;
 import com.bgsoftware.wildtools.hooks.ClaimsProvider_Residence;
@@ -23,7 +22,6 @@ import com.bgsoftware.wildtools.hooks.DropsProvider_mcMMO;
 import com.bgsoftware.wildtools.hooks.DropsProviders_WildToolsSpawners;
 import com.bgsoftware.wildtools.hooks.FactionsProvider;
 import com.bgsoftware.wildtools.hooks.FactionsProvider_Default;
-import com.bgsoftware.wildtools.hooks.FactionsProvider_FactionsX;
 import com.bgsoftware.wildtools.hooks.PricesProvider_Default;
 import com.bgsoftware.wildtools.hooks.SuperMobCoinsHook;
 import com.bgsoftware.wildtools.utils.Executor;
@@ -236,13 +234,23 @@ public final class ProvidersHandler implements ProvidersManager {
     }
 
     private void loadFactionsProvider() {
+        Optional<FactionsProvider> factionsProvider = Optional.empty();
+
         if (Bukkit.getPluginManager().isPluginEnabled("Factions") &&
-                Bukkit.getPluginManager().getPlugin("Factions").getDescription().getAuthors().contains("ProSavage"))
-            factionsProvider = (FactionsProvider) getInstance("com.bgsoftware.wildtools.hooks.FactionsProvider_SavageFactions");
-        else if (Bukkit.getPluginManager().isPluginEnabled("FactionsX") &&
+                Bukkit.getPluginManager().getPlugin("Factions").getDescription().getAuthors().contains("ProSavage")) {
+            //factionsProvider = (FactionsProvider) getInstance("com.bgsoftware.wildtools.hooks.FactionsProvider_SavageFactions");
+        } else if (Bukkit.getPluginManager().isPluginEnabled("FactionsX") &&
                 containsClass("net.prosavage.factionsx.persist.TNTAddonData")) {
-            factionsProvider = new FactionsProvider_FactionsX();
-        } else factionsProvider = new FactionsProvider_Default();
+            factionsProvider = createInstance("FactionsProvider_FactionsX");
+        } else {
+            factionsProvider = Optional.of(new FactionsProvider_Default());
+        }
+
+        factionsProvider.ifPresent(this::setFactionsProvider);
+    }
+
+    private void setFactionsProvider(FactionsProvider factionsProvider) {
+        this.factionsProvider = factionsProvider;
     }
 
     private void loadDropsProviders() {
@@ -306,7 +314,8 @@ public final class ProvidersHandler implements ProvidersManager {
             }
         }
         if (Bukkit.getPluginManager().isPluginEnabled("FactionsX")) {
-            addClaimsProvider(new ClaimsProvider_FactionsX());
+            Optional<ClaimsProvider> claimsProvider = createInstance("ClaimsProvider_FactionsX");
+            claimsProvider.ifPresent(this::addClaimsProvider);
         }
         if (Bukkit.getPluginManager().isPluginEnabled("GriefPrevention")) {
             addClaimsProvider(new ClaimsProvider_GriefPrevention());
