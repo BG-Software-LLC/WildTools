@@ -414,7 +414,7 @@ public final class ProvidersHandler implements ProvidersManager {
 
     private void registerHook(String className) {
         try {
-            Class<?> clazz = Class.forName("com.bgsoftware.superiorskyblock.hooks.support." + className);
+            Class<?> clazz = Class.forName("com.bgsoftware.wildtools.hooks." + className);
             Method registerMethod = clazz.getMethod("register", WildToolsPlugin.class);
             registerMethod.invoke(null, plugin);
         } catch (Exception ignored) {
@@ -423,7 +423,7 @@ public final class ProvidersHandler implements ProvidersManager {
 
     private <T> Optional<T> createInstance(String className) {
         try {
-            Class<?> clazz = Class.forName("com.bgsoftware.superiorskyblock.hooks.provider." + className);
+            Class<?> clazz = Class.forName("com.bgsoftware.wildtools.hooks." + className);
             try {
                 Method compatibleMethod = clazz.getDeclaredMethod("isCompatible");
                 if (!(boolean) compatibleMethod.invoke(null))
@@ -444,14 +444,6 @@ public final class ProvidersHandler implements ProvidersManager {
         } catch (Exception error) {
             error.printStackTrace();
             return Optional.empty();
-        }
-    }
-
-    private static Object getInstance(String clazz) {
-        try {
-            return Class.forName(clazz).newInstance();
-        } catch (Exception ex) {
-            throw new RuntimeException(ex);
         }
     }
 
