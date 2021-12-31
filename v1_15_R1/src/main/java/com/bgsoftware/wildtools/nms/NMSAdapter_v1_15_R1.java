@@ -261,7 +261,7 @@ public final class NMSAdapter_v1_15_R1 implements NMSAdapter {
 
         chunk.setType(blockPosition, Block.getByCombinedId(combinedId), true);
 
-        if(UPDATE_NEARBY_BLOCKS.isValid())
+        if(UPDATE_NEARBY_BLOCKS.isValid() && world.paperConfig.antiXray)
             UPDATE_NEARBY_BLOCKS.invoke(world.chunkPacketBlockController, world, blockPosition);
     }
 
