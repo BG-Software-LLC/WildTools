@@ -236,10 +236,10 @@ public final class ProvidersHandler implements ProvidersManager {
     }
 
     private void loadPricesProvider() {
-        if (!(pricesProvider instanceof PricesProvider_Default))
+        if (pricesProvider != null && !(pricesProvider instanceof PricesProvider_Default))
             return;
 
-        Optional<PricesProvider> pricesProvider;
+        Optional<PricesProvider> pricesProvider = Optional.empty();
 
         if (pricesPlugin.equalsIgnoreCase("ShopGUIPlus") && Bukkit.getPluginManager().isPluginEnabled("ShopGUIPlus")) {
             pricesProvider = createInstance("PricesProvider_ShopGUIPlus");
@@ -261,11 +261,9 @@ public final class ProvidersHandler implements ProvidersManager {
         } else if (pricesPlugin.equalsIgnoreCase("EconomyShopGUI") && (Bukkit.getPluginManager().isPluginEnabled("EconomyShopGUI") ||
                 Bukkit.getPluginManager().isPluginEnabled("EconomyShopGUI-Premium"))) {
             pricesProvider = createInstance("PricesProvider_EconomyShopGUI");
-        } else {
-            pricesProvider = Optional.of(new PricesProvider_Default());
         }
 
-        pricesProvider.ifPresent(this::setPricesProvider);
+        setPricesProvider(pricesProvider.orElse(new PricesProvider_Default()));
     }
 
     private void loadFactionsProvider() {
@@ -279,11 +277,7 @@ public final class ProvidersHandler implements ProvidersManager {
             factionsProvider = createInstance("FactionsProvider_FactionsX");
         }
 
-        if (!factionsProvider.isPresent()) {
-            factionsProvider = Optional.of(new FactionsProvider_Default());
-        }
-
-        this.factionsProvider = factionsProvider.get();
+        this.factionsProvider = factionsProvider.orElse(new FactionsProvider_Default());
     }
 
     private void loadDropsProviders() {
@@ -387,11 +381,7 @@ public final class ProvidersHandler implements ProvidersManager {
             stackedItemProvider = createInstance("StackedItemProvider_WildStacker");
         }
 
-        if (!stackedItemProvider.isPresent()) {
-            stackedItemProvider = Optional.of(new StackedItemProvider_Default());
-        }
-
-        this.stackedItemProvider = stackedItemProvider.get();
+        this.stackedItemProvider = stackedItemProvider.orElse(new StackedItemProvider_Default());
     }
 
     private void loadEconomyProvider() {
@@ -401,11 +391,7 @@ public final class ProvidersHandler implements ProvidersManager {
             economyProvider = createInstance("EconomyProvider_Vault");
         }
 
-        if (!economyProvider.isPresent()) {
-            economyProvider = Optional.of(new EconomyProvider_Default());
-        }
-
-        this.economyProvider = economyProvider.get();
+        this.economyProvider = economyProvider.orElse(new EconomyProvider_Default());
     }
 
     public static void reload() {
