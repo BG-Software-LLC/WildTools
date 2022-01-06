@@ -24,7 +24,12 @@ public final class McMMOHook {
 
     static {
         try {
-            Class<?> placeStoreRetClass = Class.forName("com.gmail.nossr50.util.blockmeta.chunkmeta.ChunkManager");
+            Class<?> placeStoreRetClass;
+            try {
+                placeStoreRetClass = Class.forName("com.gmail.nossr50.util.blockmeta.chunkmeta.ChunkManager");
+            } catch (ClassNotFoundException error) {
+                placeStoreRetClass = Class.forName("com.gmail.nossr50.util.blockmeta.ChunkManager");
+            }
             MCMMO_PLACESTORE_SET = new ReflectMethod<>(placeStoreRetClass, "setTrue", Block.class);
         } catch (Throwable ignored) {
         }
