@@ -1,6 +1,8 @@
 package com.bgsoftware.wildtools.handlers;
 
-import com.bgsoftware.wildtools.config.CommentedConfiguration;
+import com.bgsoftware.common.config.CommentedConfiguration;
+import com.bgsoftware.wildtools.WildToolsPlugin;
+import com.bgsoftware.wildtools.api.objects.ToolMode;
 import com.bgsoftware.wildtools.objects.WMaterial;
 import com.bgsoftware.wildtools.utils.items.ItemBuilder;
 import org.bukkit.Bukkit;
@@ -10,10 +12,8 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
-import com.bgsoftware.wildtools.WildToolsPlugin;
-import com.bgsoftware.wildtools.api.objects.ToolMode;
-
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -32,13 +32,24 @@ public final class EditorHandler {
         File file = new File(plugin.getDataFolder(), "config.yml");
 
         this.config = CommentedConfiguration.loadConfiguration(file);
-        this.config.syncWithConfig(file, plugin.getResource("config.yml"), "tools");
+
+        try {
+            this.config.syncWithConfig(file, plugin.getResource("config.yml"), "tools");
+        } catch (IOException error) {
+            error.printStackTrace();
+            return;
+        }
 
         loadSettingsEditor();
     }
 
     public void saveConfiguration(){
-        config.save(new File(plugin.getDataFolder(), "config.yml"));
+        try {
+            config.save(new File(plugin.getDataFolder(), "config.yml"));
+        } catch (IOException error) {
+            error.printStackTrace();
+            return;
+        }
         ToolsHandler.reload();
         DataHandler.reload();
     }
