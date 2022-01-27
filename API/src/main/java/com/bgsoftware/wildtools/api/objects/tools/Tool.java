@@ -34,6 +34,12 @@ public interface Tool {
     void setSpigotUnbreakable(boolean spigotUnbreakable);
 
     /**
+     * Set custom-model for the item.
+     * @param customModel The custom model for the item.
+     */
+    void setCustomModel(int customModel);
+
+    /**
      * Set whether or not the tool should only affect blocks of the same type.
      * @param onlySameType True if tool should only affect similar blocks, otherwise false.
      */

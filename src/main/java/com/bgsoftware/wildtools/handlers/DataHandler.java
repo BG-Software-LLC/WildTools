@@ -226,6 +226,9 @@ public final class DataHandler {
             if (cfg.getBoolean("tools." + name + ".spigot-unbreakable", false))
                 tool.setSpigotUnbreakable(cfg.getBoolean("tools." + name + ".spigot-unbreakable"));
 
+            if (cfg.contains("tools." + name + ".custom-model"))
+                tool.setCustomModel(cfg.getInt("tools." + name + ".custom-model"));
+
             if (cfg.contains("tools." + name + ".enchants")) {
                 List<String> enchants = cfg.getStringList("tools." + name + ".enchants");
                 for (String line : enchants)

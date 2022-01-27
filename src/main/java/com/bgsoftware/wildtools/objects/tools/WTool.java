@@ -1,5 +1,6 @@
 package com.bgsoftware.wildtools.objects.tools;
 
+import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.wildtools.utils.items.ToolItemStack;
 import com.bgsoftware.wildtools.utils.items.ItemUtils;
 import org.bukkit.block.Block;
@@ -27,6 +28,12 @@ import java.util.stream.Collectors;
 
 @SuppressWarnings("all")
 public abstract class WTool implements Tool {
+
+    private static final ReflectMethod<Void> SET_SPIGOT_UNBREAKABLE = new ReflectMethod<>(
+            ItemMeta.class, "setUnbreakable", boolean.class);
+
+    private static final ReflectMethod<Void> SET_CUSTOM_MODEL_DATA = new ReflectMethod<>(
+            ItemMeta.class, "setCustomModelData", Integer.class);
 
     protected static WildToolsPlugin plugin = WildToolsPlugin.getPlugin();
 
@@ -98,11 +105,20 @@ public abstract class WTool implements Tool {
 
     @Override
     public void setSpigotUnbreakable(boolean spigotUnbreakable) {
-        try {
+        if(SET_SPIGOT_UNBREAKABLE.isValid()) {
             ItemMeta itemMeta = toolItemStack.getItemMeta();
-            ItemMeta.class.getMethod("setUnbreakable", boolean.class).invoke(itemMeta, spigotUnbreakable);
+            SET_SPIGOT_UNBREAKABLE.invoke(itemMeta, spigotUnbreakable);
             toolItemStack.setItemMeta(itemMeta);
-        }catch(Throwable ignored){}
+        }
+    }
+
+    @Override
+    public void setCustomModel(int customModel) {
+        if(SET_CUSTOM_MODEL_DATA.isValid()) {
+            ItemMeta itemMeta = toolItemStack.getItemMeta();
+            SET_CUSTOM_MODEL_DATA.invoke(itemMeta, customModel);
+            toolItemStack.setItemMeta(itemMeta);
+        }
     }
 
     @Override

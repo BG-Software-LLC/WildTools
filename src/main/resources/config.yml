@@ -112,6 +112,7 @@ events-manipulations:
 # unbreakable: Tool will never be broken (BOOLEAN) (Default false)
 # vanilla-damage: Tool will be damaged by vanilla actions (BOOLEAN) (Default false)
 # spigot-unbreakable: Set spigot's unbreakable flag (BOOLEAN) (Default false)
+# custom-model: Set a custom model for the tool. (INTEGER) (Default null)
 # omni-tool: Tool will change it's type depends on broken block (BOOLEAN) (Default false)
 #      Tool's default type must be a tool, such as pickaxe, shovel or axe.
 # uses: Custom durability for the tool (INTEGER)
