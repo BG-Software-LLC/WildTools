@@ -107,11 +107,11 @@ public final class NMSAdapter_v1_18_R2 implements NMSAdapter {
 
         EntityPlayer player = ((CraftPlayer) pl).getHandle();
         BlockPosition blockPosition = new BlockPosition(bl.getX(), bl.getY(), bl.getZ());
-        WorldServer worldServer = getWorldServer(player);
-        IBlockData blockData = getType(worldServer, blockPosition);
+        WorldServer worldServer = getLevel(player);
+        IBlockData blockData = getBlockState(worldServer, blockPosition);
         Block block = getBlock(blockData);
         ItemStack itemStack = CraftItemStack.asNMSCopy(pl.getInventory().getItemInMainHand());
-        TileEntity tileEntity = getTileEntity(worldServer, blockPosition);
+        TileEntity tileEntity = getBlockEntity(worldServer, blockPosition);
 
         return getDrops(blockData, worldServer, blockPosition, tileEntity, player, itemStack)
                 .stream().map(CraftItemStack::asBukkitCopy).collect(Collectors.toList());
@@ -128,7 +128,7 @@ public final class NMSAdapter_v1_18_R2 implements NMSAdapter {
         WorldServer world = ((CraftWorld) block.getWorld()).getHandle();
         EntityPlayer entityPlayer = ((CraftPlayer) player).getHandle();
         BlockPosition blockPosition = new BlockPosition(block.getX(), block.getY(), block.getZ());
-        IBlockData blockData = getType(world, blockPosition);
+        IBlockData blockData = getBlockState(world, blockPosition);
         return getBlock(blockData).getExpDrop(blockData, world, blockPosition,
                 CraftItemStack.asNMSCopy(player.getInventory().getItemInMainHand()));
     }
@@ -137,28 +137,28 @@ public final class NMSAdapter_v1_18_R2 implements NMSAdapter {
     public int getTag(ToolItemStack toolItemStack, String key, int def) {
         ItemStack nmsStack = (ItemStack) toolItemStack.getNMSItem();
         NBTTagCompound tagCompound = NMSMappings_v1_18_R2.getTag(nmsStack);
-        return tagCompound == null || !hasKey(tagCompound, key) ? def : getInt(tagCompound, key);
+        return tagCompound == null || !contains(tagCompound, key) ? def : getInt(tagCompound, key);
     }
 
     @Override
     public void setTag(ToolItemStack toolItemStack, String key, int value) {
         ItemStack nmsStack = (ItemStack) toolItemStack.getNMSItem();
         NBTTagCompound tagCompound = getOrCreateTag(nmsStack);
-        setInt(tagCompound, key, value);
+        putInt(tagCompound, key, value);
     }
 
     @Override
     public String getTag(ToolItemStack toolItemStack, String key, String def) {
         ItemStack nmsStack = (ItemStack) toolItemStack.getNMSItem();
         NBTTagCompound tagCompound = NMSMappings_v1_18_R2.getTag(nmsStack);
-        return tagCompound == null || !hasKey(tagCompound, key) ? def : getString(tagCompound, key);
+        return tagCompound == null || !contains(tagCompound, key) ? def : getString(tagCompound, key);
     }
 
     @Override
     public void setTag(ToolItemStack toolItemStack, String key, String value) {
         ItemStack nmsStack = (ItemStack) toolItemStack.getNMSItem();
         NBTTagCompound tagCompound = getOrCreateTag(nmsStack);
-        setString(tagCompound, key, value);
+        putString(tagCompound, key, value);
     }
 
     @Override
@@ -174,17 +174,17 @@ public final class NMSAdapter_v1_18_R2 implements NMSAdapter {
         ItemStack nmsStack = (ItemStack) toolItemStack.getNMSItem();
         EntityPlayer entityPlayer = ((CraftPlayer) player).getHandle();
 
-        broadcastItemBreak(entityPlayer, EnumItemSlot.a);
+        broadcastBreakEvent(entityPlayer, EnumItemSlot.a);
         Item item = getItem(nmsStack);
 
         if (getCount(nmsStack) == 1)
             CraftEventFactory.callPlayerItemBreakEvent(entityPlayer, nmsStack);
 
-        subtract(nmsStack, 1);
+        shrink(nmsStack, 1);
 
         entityPlayer.b(StatisticList.d.b(item));
 
-        setDamage(nmsStack, 0);
+        setDamageValue(nmsStack, 0);
     }
 
     @Override
@@ -256,14 +256,14 @@ public final class NMSAdapter_v1_18_R2 implements NMSAdapter {
     public void setBlockFast(Location location, int combinedId) {
         World world = ((CraftWorld) location.getWorld()).getHandle();
         BlockPosition blockPosition = new BlockPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ());
-        Chunk chunk = getChunkAtWorldCoords(world, blockPosition);
+        Chunk chunk = getChunkAt(world, blockPosition);
 
         if (combinedId == 0) {
             world.a(null, 2001, blockPosition,
-                    NMSMappings_v1_18_R2.getCombinedId(getType(world, blockPosition)));
+                    NMSMappings_v1_18_R2.getId(getBlockState(world, blockPosition)));
         }
 
-        setType(chunk, blockPosition, getByCombinedId(combinedId), true);
+        setBlockState(chunk, blockPosition, getByCombinedId(combinedId), true);
 
         if(UPDATE_NEARBY_BLOCKS.isValid() && world.paperConfig.antiXray)
             UPDATE_NEARBY_BLOCKS.invoke(world.chunkPacketBlockController, world, blockPosition);
@@ -273,9 +273,9 @@ public final class NMSAdapter_v1_18_R2 implements NMSAdapter {
     public void refreshChunk(org.bukkit.Chunk bukkitChunk, Set<Location> blocksList) {
         Chunk chunk = ((CraftChunk) bukkitChunk).getHandle();
         Map<Integer, Set<Short>> blocks = new HashMap<>();
-        WorldServer worldServer = getWorld(chunk);
+        WorldServer worldServer = NMSMappings_v1_18_R2.getLevel(chunk);
 
-        ChunkProviderServer chunkProviderServer = getChunkProvider(worldServer);
+        ChunkProviderServer chunkProviderServer = getChunkSource(worldServer);
 
         for(Location location : blocksList) {
             BlockPosition blockPosition = new BlockPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ());
@@ -300,19 +300,19 @@ public final class NMSAdapter_v1_18_R2 implements NMSAdapter {
     public int getCombinedId(Location location) {
         World world = ((CraftWorld) location.getWorld()).getHandle();
         BlockPosition blockPosition = new BlockPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ());
-        return NMSMappings_v1_18_R2.getCombinedId(getType(world, blockPosition));
+        return NMSMappings_v1_18_R2.getId(getBlockState(world, blockPosition));
     }
 
     @Override
     public int getFarmlandId() {
-        return NMSMappings_v1_18_R2.getCombinedId(getBlockData(Blocks.ce));
+        return NMSMappings_v1_18_R2.getId(NMSMappings_v1_18_R2.defaultBlockState(Blocks.ce));
     }
 
     @Override
     public void setCombinedId(Location location, int combinedId) {
         WorldServer world = ((CraftWorld) location.getWorld()).getHandle();
         BlockPosition blockPosition = new BlockPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ());
-        setTypeAndData(world, blockPosition, getByCombinedId(combinedId), 18);
+        setBlock(world, blockPosition, getByCombinedId(combinedId), 18);
     }
 
     @Override
@@ -418,7 +418,7 @@ public final class NMSAdapter_v1_18_R2 implements NMSAdapter {
         EntityLiving entityLiving = ((CraftLivingEntity) livingEntity).getHandle();
         EntityItem entityItem = (EntityItem) ((CraftItem) item).getHandle();
         WorldServer worldServer = ((CraftWorld) livingEntity.getWorld()).getHandle();
-        broadcast(getChunkProvider(worldServer), entityItem, new PacketPlayOutCollect(item.getEntityId(),
+        broadcast(getChunkSource(worldServer), entityItem, new PacketPlayOutCollect(item.getEntityId(),
                 livingEntity.getEntityId(), item.getItemStack().getAmount()));
     }
 
@@ -510,7 +510,7 @@ public final class NMSAdapter_v1_18_R2 implements NMSAdapter {
         droppedItemsRaw.forEach(droppedItemObject -> {
             EntityItem entityItem = (EntityItem) droppedItemObject;
             if (isAlive(entityItem)) {
-                addEntity(getWorld(entityItem), entityItem);
+                addFreshEntity(NMSMappings_v1_18_R2.getLevel(entityItem), entityItem);
             }
         });
     }
@@ -521,38 +521,38 @@ public final class NMSAdapter_v1_18_R2 implements NMSAdapter {
     }
 
     private static boolean canMerge(EntityItem entityItem) {
-        ItemStack itemStack = getItemStack(entityItem);
+        ItemStack itemStack = NMSMappings_v1_18_R2.getItem(entityItem);
         return !isEmpty(itemStack) && getCount(itemStack) < getMaxStackSize(itemStack);
     }
 
     private static boolean mergeEntityItems(EntityItem entityItem, EntityItem otherEntity) {
-        ItemStack itemOfEntity = getItemStack(entityItem);
-        ItemStack itemOfOtherEntity = getItemStack(otherEntity);
+        ItemStack itemOfEntity = NMSMappings_v1_18_R2.getItem(entityItem);
+        ItemStack itemOfOtherEntity = NMSMappings_v1_18_R2.getItem(otherEntity);
         if (EntityItem.a(itemOfEntity, itemOfOtherEntity)) {
             if (!CraftEventFactory.callItemMergeEvent(otherEntity, entityItem).isCancelled()) {
                 mergeItems(entityItem, itemOfEntity, itemOfOtherEntity);
                 entityItem.aq = Math.max(entityItem.aq, otherEntity.aq);
                 entityItem.ap = Math.min(entityItem.ap, otherEntity.ap);
                 if (isEmpty(itemOfOtherEntity)) {
-                    die(otherEntity);
+                    discard(otherEntity);
                 }
             }
         }
 
-        return isRemoved(entityItem);
+        return !isAlive(entityItem);
     }
 
     private static void mergeItems(EntityItem entityItem, ItemStack itemStack, ItemStack otherItem) {
         ItemStack leftOver = EntityItem.a(itemStack, otherItem, 64);
         if (!isEmpty(leftOver)) {
-            setItemStack(entityItem, leftOver);
+            setItem(entityItem, leftOver);
         }
     }
 
     private static void sendPacketToRelevantPlayers(WorldServer worldServer, int chunkX, int chunkZ, Packet<?> packet) {
-        PlayerChunkMap playerChunkMap = getChunkProvider(worldServer).a;
+        PlayerChunkMap playerChunkMap = getChunkSource(worldServer).a;
         PLAYER_MAP_FIELD.get(playerChunkMap).a(1)
-                .forEach(entityPlayer -> sendPacket(entityPlayer.b, packet));
+                .forEach(entityPlayer -> send(entityPlayer.b, packet));
     }
 
     @SuppressWarnings("NullableProblems")

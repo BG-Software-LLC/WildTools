@@ -15,13 +15,12 @@ import net.minecraft.world.inventory.ContainerProperty;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ChunkCoordIntPair;
-import net.minecraft.world.level.LevelHeightAccessor;
+import net.minecraft.world.level.IWorldWriter;
 import net.minecraft.world.level.World;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.TileEntity;
 import net.minecraft.world.level.block.state.IBlockData;
 import net.minecraft.world.level.chunk.Chunk;
-import net.minecraft.world.level.chunk.ChunkSection;
 import net.minecraft.world.level.chunk.IChunkAccess;
 import net.minecraft.world.level.lighting.LightEngine;
 
@@ -33,20 +32,36 @@ public final class NMSMappings_v1_18_R2 {
 
     }
 
-    public static WorldServer getWorldServer(EntityPlayer entityPlayer) {
+    public static WorldServer getLevel(EntityPlayer entityPlayer) {
         return entityPlayer.x();
     }
 
-    public static IBlockData getType(World world, BlockPosition blockPosition) {
+    public static IBlockData getBlockState(World world, BlockPosition blockPosition) {
         return world.a_(blockPosition);
+    }
+
+    public static TileEntity getBlockEntity(World world, BlockPosition blockPosition) {
+        return world.c_(blockPosition);
+    }
+
+    public static Chunk getChunkAt(World world, BlockPosition blockPosition) {
+        return world.l(blockPosition);
+    }
+
+    public static LightEngine getLightEngine(World world) {
+        return world.l_();
+    }
+
+    public static void setBlock(World world, BlockPosition blockPosition, IBlockData blockData, int i) {
+        world.a(blockPosition, blockData, i);
+    }
+
+    public static void addFreshEntity(IWorldWriter worldWriter, Entity entity) {
+        worldWriter.b(entity);
     }
 
     public static Block getBlock(IBlockData blockData) {
         return blockData.b();
-    }
-
-    public static TileEntity getTileEntity(World world, BlockPosition blockPosition) {
-        return world.c_(blockPosition);
     }
 
     public static List<ItemStack> getDrops(IBlockData blockData, WorldServer worldServer, BlockPosition blockPosition,
@@ -58,7 +73,27 @@ public final class NMSMappings_v1_18_R2 {
         return itemStack.t();
     }
 
-    public static boolean hasKey(NBTTagCompound nbtTagCompound, String key) {
+    public static NBTTagCompound getOrCreateTag(ItemStack itemStack) {
+        return itemStack.u();
+    }
+
+    public static Item getItem(ItemStack itemStack) {
+        return itemStack.c();
+    }
+
+    public static int getCount(ItemStack itemStack) {
+        return itemStack.J();
+    }
+
+    public static void shrink(ItemStack itemStack, int amount) {
+        itemStack.g(amount);
+    }
+
+    public static void setDamageValue(ItemStack itemStack, int damage) {
+        itemStack.b(damage);
+    }
+
+    public static boolean contains(NBTTagCompound nbtTagCompound, String key) {
         return nbtTagCompound.e(key);
     }
 
@@ -66,11 +101,7 @@ public final class NMSMappings_v1_18_R2 {
         return nbtTagCompound.h(key);
     }
 
-    public static NBTTagCompound getOrCreateTag(ItemStack itemStack) {
-        return itemStack.t();
-    }
-
-    public static void setInt(NBTTagCompound nbtTagCompound, String key, int value) {
+    public static void putInt(NBTTagCompound nbtTagCompound, String key, int value) {
         nbtTagCompound.a(key, value);
     }
 
@@ -78,7 +109,7 @@ public final class NMSMappings_v1_18_R2 {
         return nbtTagCompound.l(key);
     }
 
-    public static void setString(NBTTagCompound nbtTagCompound, String key, String value) {
+    public static void putString(NBTTagCompound nbtTagCompound, String key, String value) {
         nbtTagCompound.a(key, value);
     }
 
@@ -86,31 +117,11 @@ public final class NMSMappings_v1_18_R2 {
         nbtTagCompound.r(key);
     }
 
-    public static Item getItem(ItemStack itemStack) {
-        return itemStack.c();
-    }
-
-    public static void broadcastItemBreak(EntityLiving entityLiving, EnumItemSlot enumItemSlot) {
+    public static void broadcastBreakEvent(EntityLiving entityLiving, EnumItemSlot enumItemSlot) {
         entityLiving.c(enumItemSlot);
     }
 
-    public static int getCount(ItemStack itemStack) {
-        return itemStack.I();
-    }
-
-    public static void subtract(ItemStack itemStack, int amount) {
-        itemStack.g(amount);
-    }
-
-    public static void setDamage(ItemStack itemStack, int damage) {
-        itemStack.b(damage);
-    }
-
-    public static Chunk getChunkAtWorldCoords(World world, BlockPosition blockPosition) {
-        return world.l(blockPosition);
-    }
-
-    public static int getCombinedId(IBlockData blockData) {
+    public static int getId(IBlockData blockData) {
         return Block.i(blockData);
     }
 
@@ -118,36 +129,24 @@ public final class NMSMappings_v1_18_R2 {
         return Block.a(combinedId);
     }
 
-    public static void setType(Chunk chunk, BlockPosition blockPosition, IBlockData blockData, boolean flag) {
+    public static void setBlockState(Chunk chunk, BlockPosition blockPosition, IBlockData blockData, boolean flag) {
         chunk.a(blockPosition, blockData, flag);
     }
 
-    public static WorldServer getWorld(Chunk chunk) {
+    public static WorldServer getLevel(Chunk chunk) {
         return chunk.q;
-    }
-
-    public static ChunkSection[] getSections(IChunkAccess chunkAccess) {
-        return chunkAccess.d();
     }
 
     public static ChunkCoordIntPair getPos(IChunkAccess chunk) {
         return chunk.f();
     }
 
-    public static LightEngine getLightEngine(WorldServer worldServer) {
-        return worldServer.l_();
-    }
-
-    public static IBlockData getBlockData(Block block) {
-        return block.n();
-    }
-
-    public static void setTypeAndData(WorldServer worldServer, BlockPosition blockPosition, IBlockData blockData, int i) {
-        worldServer.a(blockPosition, blockData, i);
-    }
-
-    public static ChunkProviderServer getChunkProvider(WorldServer worldServer) {
+    public static ChunkProviderServer getChunkSource(WorldServer worldServer) {
         return worldServer.k();
+    }
+
+    public static IBlockData defaultBlockState(Block block) {
+        return block.n();
     }
 
     public static void broadcast(ChunkProviderServer chunkProviderServer, Entity entity, Packet<?> packet) {
@@ -166,48 +165,36 @@ public final class NMSMappings_v1_18_R2 {
         return containerProperty.b();
     }
 
-    public static World getWorld(Entity entity) {
-        return entity.cA();
-    }
-
-    public static void addEntity(World world, Entity entity) {
-        world.b(entity);
+    public static World getLevel(Entity entity) {
+        return entity.W();
     }
 
     public static boolean isAlive(Entity entity) {
         return entity.bl();
     }
 
-    public static ItemStack getItemStack(EntityItem entityItem) {
+    public static void discard(Entity entity) {
+        entity.ah();
+    }
+
+    public static ItemStack getItem(EntityItem entityItem) {
         return entityItem.h();
+    }
+
+    public static void setItem(EntityItem entityItem, ItemStack itemStack) {
+        entityItem.a(itemStack);
     }
 
     public static boolean isEmpty(ItemStack itemStack) {
         return itemStack.b();
     }
 
-    public static boolean isRemoved(Entity entity) {
-        return !isAlive(entity);
-    }
-
     public static int getMaxStackSize(ItemStack itemStack) {
         return itemStack.e();
     }
 
-    public static void die(Entity entity) {
-        entity.ah();
-    }
-
-    public static void setItemStack(EntityItem entityItem, ItemStack itemStack) {
-        entityItem.a(itemStack);
-    }
-
-    public static void sendPacket(PlayerConnection playerConnection, Packet<?> packet) {
+    public static void send(PlayerConnection playerConnection, Packet<?> packet) {
         playerConnection.a(packet);
-    }
-
-    public static int getSectionIndex(LevelHeightAccessor levelHeightAccessor, int y) {
-        return levelHeightAccessor.e(y);
     }
 
 }
