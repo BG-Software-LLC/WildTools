@@ -11,6 +11,7 @@ import org.bukkit.block.Block;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
+import javax.annotation.Nullable;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -21,20 +22,16 @@ public final class McMMOHook {
     private static final ReflectMethod<Object> EVENT_GET_ABILITY = new ReflectMethod<>(
             McMMOPlayerAbilityActivateEvent.class, "getAbility");
     private static final ReflectMethod<Object> MCMMO_GET_PLACESTORE = new ReflectMethod<>(com.gmail.nossr50.mcMMO.class, "getPlaceStore");
-    private static ReflectMethod<Void> MCMMO_PLACESTORE_SET = null;
+    private static final ReflectMethod<Void> MCMMO_PLACESTORE_SET;
     private static WildToolsPlugin plugin;
 
     static {
-        try {
-            Class<?> placeStoreRetClass;
-            try {
-                placeStoreRetClass = Class.forName("com.gmail.nossr50.util.blockmeta.chunkmeta.ChunkManager");
-            } catch (ClassNotFoundException error) {
-                placeStoreRetClass = Class.forName("com.gmail.nossr50.util.blockmeta.ChunkManager");
-            }
-            MCMMO_PLACESTORE_SET = new ReflectMethod<>(placeStoreRetClass, "setTrue", Block.class);
-        } catch (Throwable ignored) {
-        }
+        Class<?> placeStoreRetClass = findClass(
+                "com.gmail.nossr50.util.blockmeta.UserBlockTracker",
+                "com.gmail.nossr50.util.blockmeta.chunkmeta.ChunkManager",
+                "com.gmail.nossr50.util.blockmeta.ChunkManager");
+
+        MCMMO_PLACESTORE_SET = new ReflectMethod<>(placeStoreRetClass, "setTrue", Block.class);
     }
 
     public static void register(WildToolsPlugin plugin) {
@@ -55,6 +52,18 @@ public final class McMMOHook {
             Object placeStore = MCMMO_GET_PLACESTORE.invoke(null);
             MCMMO_PLACESTORE_SET.invoke(placeStore, block);
         }
+    }
+
+    @Nullable
+    private static Class<?> findClass(String... classes) {
+        for (String clazz : classes) {
+            try {
+                return Class.forName(clazz);
+            } catch (ClassNotFoundException ignored) {
+            }
+        }
+
+        return null;
     }
 
     private static final class McMMOListener implements Listener {
