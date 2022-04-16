@@ -31,7 +31,6 @@ import org.bukkit.plugin.Plugin;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -85,11 +84,19 @@ public final class ProvidersHandler implements ProvidersManager {
         factionsProvider.takeTNTFromBank(player, amount);
     }
 
-    public List<ItemStack> getBlockDrops(Player player, Block block, boolean onlySpawner) {
-        List<ItemStack> drops = new ArrayList<>();
-        dropsProviders.stream().filter(dropsProvider -> onlySpawner == dropsProvider.isSpawnersOnly())
-                .forEach(dropsProvider -> drops.addAll(dropsProvider.getBlockDrops(player, block)));
-        return drops;
+    public boolean getBlockDrops(List<ItemStack> drops, Player player, Block block, boolean onlySpawner) {
+        boolean foundDropsProvider = false;
+
+        for (DropsProvider dropsProvider : this.dropsProviders) {
+            if (dropsProvider.isSpawnersOnly() == onlySpawner) {
+                foundDropsProvider = true;
+                List<ItemStack> hookDrops = dropsProvider.getBlockDrops(player, block);
+                if (hookDrops != null)
+                    drops.addAll(hookDrops);
+            }
+        }
+
+        return foundDropsProvider;
     }
 
     public boolean isContainer(BlockState blockState) {

@@ -4,6 +4,7 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import javax.annotation.Nullable;
 import java.util.List;
 
 public interface DropsProvider {
@@ -15,7 +16,10 @@ public interface DropsProvider {
      * drop the items of the block on your own. Otherwise, WildTools will handle that part.
      * @param player The player that broke the block.
      * @param block The block that was broken.
+     * @return If you want WildTools to handle block drops, return null. Otherwise, WildTools will drop the items
+     * returned by this method, even if the list is empty.
      */
+    @Nullable
     List<ItemStack> getBlockDrops(Player player, Block block);
 
     /**
