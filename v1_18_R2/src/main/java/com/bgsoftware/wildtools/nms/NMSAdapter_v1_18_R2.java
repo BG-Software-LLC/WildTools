@@ -534,7 +534,7 @@ public final class NMSAdapter_v1_18_R2 implements NMSAdapter {
         if (EntityItem.a(itemOfEntity, itemOfOtherEntity)) {
             if (!CraftEventFactory.callItemMergeEvent(otherEntity, entityItem).isCancelled()) {
                 mergeItems(entityItem, itemOfEntity, itemOfOtherEntity);
-                entityItem.aq = Math.max(entityItem.aq, otherEntity.aq);
+                entityItem.ao = Math.max(entityItem.ao, otherEntity.ao);
                 entityItem.ap = Math.min(entityItem.ap, otherEntity.ap);
                 if (isEmpty(itemOfOtherEntity)) {
                     discard(otherEntity);
