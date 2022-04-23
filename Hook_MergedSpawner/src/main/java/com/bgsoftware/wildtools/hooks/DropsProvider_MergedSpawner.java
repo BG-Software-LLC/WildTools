@@ -8,25 +8,20 @@ import org.bukkit.block.CreatureSpawner;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public final class DropsProvider_MergedSpawner implements DropsProvider {
 
     @Override
     public List<ItemStack> getBlockDrops(Player player, Block block) {
-        List<ItemStack> drops = new ArrayList<>();
-
         BlockState blockState = block.getState();
 
-        if(!(blockState instanceof CreatureSpawner))
-            return drops;
+        if (!(blockState instanceof CreatureSpawner))
+            return null;
 
         int count = MergedSpawnerAPI.getInstance().getCountFor(block);
-
-        drops.add(MergedSpawnerAPI.getInstance().getSpawnerFor(((CreatureSpawner) blockState).getSpawnedType(), count));
-
-        return drops;
+        return Collections.singletonList(MergedSpawnerAPI.getInstance().getSpawnerFor(((CreatureSpawner) blockState).getSpawnedType(), count));
     }
 
     @Override

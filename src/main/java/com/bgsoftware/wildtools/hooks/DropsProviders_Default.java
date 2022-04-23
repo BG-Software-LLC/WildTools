@@ -15,10 +15,10 @@ public final class DropsProviders_Default implements DropsProvider {
 
     @Override
     public List<ItemStack> getBlockDrops(Player player, Block block) {
-        List<ItemStack> drops = new ArrayList<>();
+        if (!(block.getState() instanceof CreatureSpawner))
+            return null;
 
-        if(!(block.getState() instanceof CreatureSpawner))
-            return drops;
+        List<ItemStack> drops = new ArrayList<>();
 
         drops.add(getSpawnerItem((CreatureSpawner) block.getState()));
 
@@ -30,12 +30,12 @@ public final class DropsProviders_Default implements DropsProvider {
         return true;
     }
 
-    public static ItemStack getSpawnerItem(CreatureSpawner creatureSpawner){
+    public static ItemStack getSpawnerItem(CreatureSpawner creatureSpawner) {
         ItemStack itemStack;
 
-        try{
+        try {
             itemStack = new ItemStack(Material.MOB_SPAWNER);
-        }catch(Throwable ex){
+        } catch (Throwable ex) {
             itemStack = new ItemStack(Material.matchMaterial("SPAWNER"));
         }
 
@@ -43,7 +43,7 @@ public final class DropsProviders_Default implements DropsProvider {
             BlockStateMeta blockStateMeta = (BlockStateMeta) itemStack.getItemMeta();
             blockStateMeta.setBlockState(creatureSpawner);
             itemStack.setItemMeta(blockStateMeta);
-        }catch(Throwable ex){
+        } catch (Throwable ex) {
             //noinspection deprecation
             itemStack.setDurability(creatureSpawner.getSpawnedType().getTypeId());
         }

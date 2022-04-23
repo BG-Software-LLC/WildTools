@@ -21,7 +21,7 @@ public final class DropsProvider_mcMMO2 implements DropsProvider {
     @Override
     public List<ItemStack> getBlockDrops(Player player, Block block) {
         if(!ItemUtils.isCrops(block.getType()) || !shouldBonusDrops(player, block))
-            return new ArrayList<>();
+            return null;
 
         return plugin.getNMSAdapter().getCropDrops(player, block).stream()
                 .peek(itemStack -> itemStack.setAmount(itemStack.getAmount() * 2)).collect(Collectors.toList());

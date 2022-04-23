@@ -89,10 +89,11 @@ public final class ProvidersHandler implements ProvidersManager {
 
         for (DropsProvider dropsProvider : this.dropsProviders) {
             if (dropsProvider.isSpawnersOnly() == onlySpawner) {
-                foundDropsProvider = true;
                 List<ItemStack> hookDrops = dropsProvider.getBlockDrops(player, block);
-                if (hookDrops != null)
+                if (hookDrops != null) {
                     drops.addAll(hookDrops);
+                    foundDropsProvider = true;
+                }
             }
         }
 

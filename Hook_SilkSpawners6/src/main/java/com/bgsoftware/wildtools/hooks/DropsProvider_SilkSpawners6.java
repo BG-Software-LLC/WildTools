@@ -14,19 +14,19 @@ public final class DropsProvider_SilkSpawners6 implements DropsProvider {
 
     private final SilkUtil silkUtil;
 
-    public DropsProvider_SilkSpawners6(){
+    public DropsProvider_SilkSpawners6() {
         silkUtil = SilkUtil.hookIntoSilkSpanwers();
     }
 
     @Override
     public List<ItemStack> getBlockDrops(Player player, Block block) {
+        if (!(block.getState() instanceof CreatureSpawner))
+            return null;
+
         List<ItemStack> drops = new ArrayList<>();
 
-        if(!(block.getState() instanceof CreatureSpawner))
-            return drops;
-
         String entityId = silkUtil.getSpawnerEntityID(block);
-        if(entityId == null)
+        if (entityId == null)
             entityId = silkUtil.getDefaultEntityID();
 
         String mobName = silkUtil.getCreatureName(entityId).toLowerCase().replace(" ", "");

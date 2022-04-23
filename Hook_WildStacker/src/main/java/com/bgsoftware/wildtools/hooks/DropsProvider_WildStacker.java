@@ -15,10 +15,10 @@ public final class DropsProvider_WildStacker implements DropsProvider {
 
     @Override
     public List<ItemStack> getBlockDrops(Player player, Block block) {
-        List<ItemStack> drops = new ArrayList<>();
+        if (!(block.getState() instanceof CreatureSpawner))
+            return null;
 
-        if(!(block.getState() instanceof CreatureSpawner))
-            return drops;
+        List<ItemStack> drops = new ArrayList<>();
 
         StackedSpawner stackedSpawner = WildStackerAPI.getStackedSpawner((CreatureSpawner) block.getState());
 
@@ -26,7 +26,7 @@ public final class DropsProvider_WildStacker implements DropsProvider {
 
         try {
             drops.add(stackedSpawner.getDropItem());
-        }catch(Throwable ex){
+        } catch (Throwable ex) {
             ItemStack itemStack = DropsProviders_Default.getSpawnerItem((CreatureSpawner) block.getState());
             itemStack.setAmount(spawnerStackAmount);
             drops.add(itemStack);
