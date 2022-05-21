@@ -5,7 +5,7 @@ plugins {
 }
 
 group 'WildTools'
-version = "2.12.0"
+version = "2.12.1"
 
 allprojects {
     apply plugin: 'java'
