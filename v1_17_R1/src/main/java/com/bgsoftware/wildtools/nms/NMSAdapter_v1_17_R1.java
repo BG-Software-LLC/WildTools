@@ -8,6 +8,7 @@ import com.bgsoftware.wildtools.objects.WMaterial;
 import com.bgsoftware.wildtools.recipes.AdvancedShapedRecipe;
 import com.bgsoftware.wildtools.utils.Executor;
 import com.bgsoftware.wildtools.utils.items.ToolItemStack;
+import com.destroystokyo.paper.antixray.ChunkPacketBlockControllerAntiXray;
 import io.papermc.paper.enchantments.EnchantmentRarity;
 import it.unimi.dsi.fastutil.shorts.ShortArraySet;
 import it.unimi.dsi.fastutil.shorts.ShortSet;
@@ -111,7 +112,8 @@ public final class NMSAdapter_v1_17_R1 implements NMSAdapter {
                     .filter(constructor -> constructor.getParameterCount() == 4).findFirst().orElse(null);
             SHORT_ARRAY_SET_CLASS = Class.forName("org.bukkit.craftbukkit.libs.it.unimi.dsi.fastutil.shorts.ShortArraySet");
             Class<?> shortSetClass = Class.forName("org.bukkit.craftbukkit.libs.it.unimi.dsi.fastutil.shorts.ShortSet");
-        }catch (Exception ignored){}
+        } catch (Exception ignored) {
+        }
     }
 
     @Override
@@ -188,7 +190,7 @@ public final class NMSAdapter_v1_17_R1 implements NMSAdapter {
     public void clearTasks(ToolItemStack toolItemStack) {
         ItemStack nmsStack = (ItemStack) toolItemStack.getNMSItem();
         NBTTagCompound tagCompound = nmsStack.getTag();
-        if(tagCompound != null)
+        if (tagCompound != null)
             tagCompound.remove("task-id");
     }
 
@@ -214,15 +216,15 @@ public final class NMSAdapter_v1_17_R1 implements NMSAdapter {
     public Object[] createSyncedItem(org.bukkit.inventory.ItemStack other) {
         CraftItemStack craftItemStack;
         ItemStack handle;
-        if(other instanceof CraftItemStack){
+        if (other instanceof CraftItemStack) {
             craftItemStack = (CraftItemStack) other;
             handle = ITEM_STACK_HANDLE.get(other);
-        } else{
+        } else {
             handle = CraftItemStack.asNMSCopy(other);
             craftItemStack = CraftItemStack.asCraftMirror(handle);
         }
 
-        return new Object[] {craftItemStack, handle};
+        return new Object[]{craftItemStack, handle};
     }
 
     @Override
@@ -234,9 +236,9 @@ public final class NMSAdapter_v1_17_R1 implements NMSAdapter {
     public org.bukkit.inventory.ItemStack getItemInHand(Player player, Event e) {
         boolean offHand = false;
 
-        if(e instanceof PlayerInteractEvent) {
+        if (e instanceof PlayerInteractEvent) {
             offHand = ((PlayerInteractEvent) e).getHand() == EquipmentSlot.OFF_HAND;
-        }else if(e instanceof PlayerInteractEntityEvent){
+        } else if (e instanceof PlayerInteractEntityEvent) {
             offHand = ((PlayerInteractEntityEvent) e).getHand() == EquipmentSlot.OFF_HAND;
         }
 
@@ -245,8 +247,8 @@ public final class NMSAdapter_v1_17_R1 implements NMSAdapter {
 
     @Override
     public boolean isFullyGrown(org.bukkit.block.Block block) {
-        if(block.getType() == Material.CACTUS || block.getType() == WMaterial.SUGAR_CANE.parseMaterial() ||
-            block.getType() == Material.PUMPKIN || block.getType() == WMaterial.MELON.parseMaterial() ||
+        if (block.getType() == Material.CACTUS || block.getType() == WMaterial.SUGAR_CANE.parseMaterial() ||
+                block.getType() == Material.PUMPKIN || block.getType() == WMaterial.MELON.parseMaterial() ||
                 block.getType().name().equals("BAMBOO"))
             return true;
         CraftBlock craftBlock = (CraftBlock) block;
@@ -256,17 +258,15 @@ public final class NMSAdapter_v1_17_R1 implements NMSAdapter {
 
     @Override
     public void setCropState(org.bukkit.block.Block block, CropState cropState) {
-        if(block.getType() == Material.CHORUS_PLANT){
+        if (block.getType() == Material.CHORUS_PLANT) {
             block.setType(Material.CHORUS_FLOWER);
-        }
-        else {
+        } else {
             CraftBlock craftBlock = (CraftBlock) block;
             BlockData blockData = craftBlock.getBlockData();
-            if(blockData instanceof Ageable) {
+            if (blockData instanceof Ageable) {
                 ((Ageable) blockData).setAge(cropState.ordinal());
                 craftBlock.setBlockData(blockData, true);
-            }
-            else{
+            } else {
                 block.setType(Material.AIR);
             }
         }
@@ -283,13 +283,15 @@ public final class NMSAdapter_v1_17_R1 implements NMSAdapter {
         BlockPosition blockPosition = new BlockPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ());
         Chunk chunk = world.getChunkAtWorldCoords(blockPosition);
 
-        if(combinedId == 0)
+        if (combinedId == 0)
             world.a(null, 2001, blockPosition, Block.getCombinedId(world.getType(blockPosition)));
 
         chunk.setType(blockPosition, Block.getByCombinedId(combinedId), true);
 
-        if(UPDATE_NEARBY_BLOCKS.isValid() && world.paperConfig.antiXray)
+        if (UPDATE_NEARBY_BLOCKS.isValid() && world.paperConfig.antiXray &&
+                world.chunkPacketBlockController instanceof ChunkPacketBlockControllerAntiXray) {
             UPDATE_NEARBY_BLOCKS.invoke(world.chunkPacketBlockController, world, blockPosition);
+        }
     }
 
     @Override
@@ -300,7 +302,7 @@ public final class NMSAdapter_v1_17_R1 implements NMSAdapter {
 
         ChunkProviderServer chunkProviderServer = worldServer.getChunkProvider();
 
-        for(Location location : blocksList){
+        for (Location location : blocksList) {
             BlockPosition blockPosition = new BlockPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ());
             chunkProviderServer.flagDirty(blockPosition);
         }
@@ -323,7 +325,7 @@ public final class NMSAdapter_v1_17_R1 implements NMSAdapter {
             }
 
             Executor.sync(() -> sendPacketToRelevantPlayers(worldServer, chunk.getPos().b, chunk.getPos().c,
-                    new PacketPlayOutLightUpdate(chunk.getPos(), lightEngine, null, null, true)),
+                            new PacketPlayOutLightUpdate(chunk.getPos(), lightEngine, null, null, true)),
                     2L);
         }
     }
@@ -476,7 +478,7 @@ public final class NMSAdapter_v1_17_R1 implements NMSAdapter {
             recipeChoices.addAll(((ShapelessRecipe) recipe).getChoiceList());
         }
 
-        if(!recipeChoices.isEmpty()) {
+        if (!recipeChoices.isEmpty()) {
             for (RecipeChoice recipeChoice : recipeChoices) {
                 if (recipeChoice instanceof RecipeChoice.MaterialChoice && recipeChoice.test(itemStack)) {
                     ingredients.clear();
@@ -523,11 +525,11 @@ public final class NMSAdapter_v1_17_R1 implements NMSAdapter {
     public void dropItems(List<Object> droppedItemsRaw) {
         droppedItemsRaw.removeIf(droppedItem -> !(droppedItem instanceof EntityItem));
 
-        for(Object entityItem : droppedItemsRaw){
-            if(canMerge((EntityItem) entityItem)) {
+        for (Object entityItem : droppedItemsRaw) {
+            if (canMerge((EntityItem) entityItem)) {
                 for (Object otherEntityItem : droppedItemsRaw) {
                     if (entityItem != otherEntityItem && canMerge((EntityItem) otherEntityItem)) {
-                        if(mergeEntityItems((EntityItem) entityItem, (EntityItem) otherEntityItem))
+                        if (mergeEntityItems((EntityItem) entityItem, (EntityItem) otherEntityItem))
                             break;
                     }
                 }
@@ -536,7 +538,7 @@ public final class NMSAdapter_v1_17_R1 implements NMSAdapter {
 
         droppedItemsRaw.forEach(droppedItemObject -> {
             EntityItem entityItem = (EntityItem) droppedItemObject;
-            if(entityItem.isAlive()){
+            if (entityItem.isAlive()) {
                 entityItem.getWorld().addEntity(entityItem);
             }
         });
@@ -547,12 +549,12 @@ public final class NMSAdapter_v1_17_R1 implements NMSAdapter {
         return world.getMinHeight();
     }
 
-    private static boolean canMerge(EntityItem entityItem){
+    private static boolean canMerge(EntityItem entityItem) {
         ItemStack itemStack = entityItem.getItemStack();
         return !itemStack.isEmpty() && itemStack.getCount() < itemStack.getMaxStackSize();
     }
 
-    private static boolean mergeEntityItems(EntityItem entityItem, EntityItem otherEntity){
+    private static boolean mergeEntityItems(EntityItem entityItem, EntityItem otherEntity) {
         ItemStack itemOfEntity = entityItem.getItemStack();
         ItemStack itemOfOtherEntity = otherEntity.getItemStack();
         if (EntityItem.a(itemOfEntity, itemOfOtherEntity)) {
@@ -577,13 +579,13 @@ public final class NMSAdapter_v1_17_R1 implements NMSAdapter {
     }
 
     @SuppressWarnings("all")
-    private static Set<Short> createShortSet(){
-        if(SHORT_ARRAY_SET_CLASS == null)
+    private static Set<Short> createShortSet() {
+        if (SHORT_ARRAY_SET_CLASS == null)
             return new ShortArraySet();
 
-        try{
+        try {
             return (Set<Short>) SHORT_ARRAY_SET_CLASS.newInstance();
-        }catch (Throwable ex){
+        } catch (Throwable ex) {
             ex.printStackTrace();
             return null;
         }
@@ -591,8 +593,8 @@ public final class NMSAdapter_v1_17_R1 implements NMSAdapter {
 
     private static PacketPlayOutMultiBlockChange createMultiBlockChangePacket(SectionPosition sectionPosition,
                                                                               Set<Short> shortSet,
-                                                                              ChunkSection chunkSection){
-        if(MULTI_BLOCK_CHANGE_CONSTRUCTOR == null){
+                                                                              ChunkSection chunkSection) {
+        if (MULTI_BLOCK_CHANGE_CONSTRUCTOR == null) {
             return new PacketPlayOutMultiBlockChange(
                     sectionPosition,
                     (ShortSet) shortSet,
@@ -601,16 +603,16 @@ public final class NMSAdapter_v1_17_R1 implements NMSAdapter {
             );
         }
 
-        try{
+        try {
             return (PacketPlayOutMultiBlockChange) MULTI_BLOCK_CHANGE_CONSTRUCTOR.newInstance(
                     sectionPosition, shortSet, chunkSection, true);
-        }catch (Throwable ex){
+        } catch (Throwable ex) {
             ex.printStackTrace();
             return null;
         }
     }
 
-    private static void sendPacketToRelevantPlayers(WorldServer worldServer, int chunkX, int chunkZ, Packet<?> packet){
+    private static void sendPacketToRelevantPlayers(WorldServer worldServer, int chunkX, int chunkZ, Packet<?> packet) {
         PlayerChunkMap playerChunkMap = worldServer.getChunkProvider().a;
         PLAYER_MAP_FIELD.get(playerChunkMap).a(1)
                 .forEach(entityPlayer -> entityPlayer.b.sendPacket(packet));
@@ -622,17 +624,17 @@ public final class NMSAdapter_v1_17_R1 implements NMSAdapter {
         private static Field ingredientsField;
 
         static {
-            try{
+            try {
                 ingredientsField = ShapedRecipe.class.getDeclaredField("ingredients");
                 ingredientsField.setAccessible(true);
-            }catch(Exception ex){
+            } catch (Exception ex) {
                 ex.printStackTrace();
             }
         }
 
         private Map<Character, RecipeChoice> ingredients;
 
-        public AdvancedRecipeClassImpl(String toolName, org.bukkit.inventory.ItemStack result){
+        public AdvancedRecipeClassImpl(String toolName, org.bukkit.inventory.ItemStack result) {
             super(new NamespacedKey(WildToolsPlugin.getPlugin(), "recipe_" + toolName), result);
             updateIngredients();
         }
@@ -656,11 +658,11 @@ public final class NMSAdapter_v1_17_R1 implements NMSAdapter {
             return this;
         }
 
-        private void updateIngredients(){
-            try{
+        private void updateIngredients() {
+            try {
                 //noinspection unchecked
                 ingredients = (Map<Character, RecipeChoice>) ingredientsField.get(this);
-            }catch(Exception ex){
+            } catch (Exception ex) {
                 throw new RuntimeException(ex);
             }
         }
@@ -668,12 +670,12 @@ public final class NMSAdapter_v1_17_R1 implements NMSAdapter {
     }
 
     @SuppressWarnings("NullableProblems")
-    private static class FakeCraftBlock extends CraftBlock{
+    private static class FakeCraftBlock extends CraftBlock {
 
         private final BlockState originalState;
         private Material blockType;
 
-        FakeCraftBlock(WorldServer worldServer, BlockPosition blockPosition, Material material, BlockState originalState){
+        FakeCraftBlock(WorldServer worldServer, BlockPosition blockPosition, Material material, BlockState originalState) {
             super(worldServer, blockPosition);
             this.blockType = material;
             this.originalState = originalState;
@@ -700,7 +702,7 @@ public final class NMSAdapter_v1_17_R1 implements NMSAdapter {
             return originalState;
         }
 
-        static FakeCraftBlock at(Location location, Material type, BlockState originalState){
+        static FakeCraftBlock at(Location location, Material type, BlockState originalState) {
             WorldServer worldServer = ((CraftWorld) location.getWorld()).getHandle();
             BlockPosition blockPosition = new BlockPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ());
             return new FakeCraftBlock(worldServer, blockPosition, type, originalState);
