@@ -82,7 +82,7 @@ public final class NMSMappings_v1_19_R1 {
     }
 
     public static int getCount(ItemStack itemStack) {
-        return itemStack.J();
+        return itemStack.K();
     }
 
     public static void shrink(ItemStack itemStack, int amount) {
@@ -170,7 +170,7 @@ public final class NMSMappings_v1_19_R1 {
     }
 
     public static boolean isAlive(Entity entity) {
-        return entity.bl();
+        return entity.bp();
     }
 
     public static void discard(Entity entity) {
