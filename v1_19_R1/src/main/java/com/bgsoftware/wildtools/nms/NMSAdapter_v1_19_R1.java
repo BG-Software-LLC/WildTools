@@ -429,14 +429,14 @@ public final class NMSAdapter_v1_19_R1 implements NMSAdapter {
 
     @Override
     public boolean isAxeType(Material material) {
-        float destroySpeed = getDestroySpeed(Items.mU, new ItemStack(Items.mU),
+        float destroySpeed = getDestroySpeed(Items.nE, new ItemStack(Items.nE),
                 ((CraftBlockData) material.createBlockData()).getState());
         return destroySpeed == 8.0F;
     }
 
     @Override
     public boolean isShovelType(Material material) {
-        float destroySpeed = getDestroySpeed(Items.mS, new ItemStack(Items.mS),
+        float destroySpeed = getDestroySpeed(Items.nC, new ItemStack(Items.nC),
                 ((CraftBlockData) material.createBlockData()).getState());
         return destroySpeed == 8.0F;
     }
