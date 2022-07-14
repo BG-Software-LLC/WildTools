@@ -310,7 +310,7 @@ public final class NMSAdapter_v1_19_R1 implements NMSAdapter {
 
     @Override
     public int getFarmlandId() {
-        return NMSMappings_v1_19_R1.getId(NMSMappings_v1_19_R1.defaultBlockState(Blocks.ce));
+        return NMSMappings_v1_19_R1.getId(NMSMappings_v1_19_R1.defaultBlockState(Blocks.cn));
     }
 
     @Override
