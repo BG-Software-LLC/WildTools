@@ -268,8 +268,7 @@ public final class NMSAdapter_v1_19_R1 implements NMSAdapter {
 
         setBlockState(chunk, blockPosition, getByCombinedId(combinedId), true);
 
-        if (UPDATE_NEARBY_BLOCKS.isValid() && world.paperConfig().anticheat.antiXray.enabled &&
-                world.chunkPacketBlockController instanceof ChunkPacketBlockControllerAntiXray) {
+        if (UPDATE_NEARBY_BLOCKS.isValid() && world.chunkPacketBlockController instanceof ChunkPacketBlockControllerAntiXray) {
             UPDATE_NEARBY_BLOCKS.invoke(world.chunkPacketBlockController, world, blockPosition);
         }
     }
