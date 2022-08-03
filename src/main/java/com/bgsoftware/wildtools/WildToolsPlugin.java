@@ -37,9 +37,21 @@ public final class WildToolsPlugin extends JavaPlugin implements WildTools {
 
     private NMSAdapter nmsAdapter;
 
+    private boolean shouldEnable = true;
+
+    @Override
+    public void onLoad() {
+        plugin = this;
+        shouldEnable = loadNMSAdapter();
+    }
+
     @Override
     public void onEnable() {
-        plugin = this;
+        if (!shouldEnable) {
+            getServer().getPluginManager().disablePlugin(this);
+            return;
+        }
+
         new Metrics(this);
 
         log("******** ENABLE START ********");
@@ -57,7 +69,6 @@ public final class WildToolsPlugin extends JavaPlugin implements WildTools {
         getCommand("tools").setExecutor(commandsHandler);
         getCommand("tools").setTabCompleter(commandsHandler);
 
-        loadNMSAdapter();
         registerGlowEnchantment();
 
         providersHandler = new ProvidersHandler(this);
@@ -83,6 +94,9 @@ public final class WildToolsPlugin extends JavaPlugin implements WildTools {
 
     @Override
     public void onDisable() {
+        if (!shouldEnable)
+            return;
+
         for (Player player : nmsAdapter.getOnlinePlayers()) {
             while (player.getOpenInventory().getType() == InventoryType.CHEST)
                 player.closeInventory();
@@ -90,13 +104,16 @@ public final class WildToolsPlugin extends JavaPlugin implements WildTools {
         SellWandLogger.close();
     }
 
-    private void loadNMSAdapter() {
+    private boolean loadNMSAdapter() {
         String version = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];
         try {
-            nmsAdapter = (NMSAdapter) Class.forName("com.bgsoftware.wildtools.nms.NMSAdapter_" + version).newInstance();
+            nmsAdapter = (NMSAdapter) Class.forName(String.format("com.bgsoftware.wildtools.nms.%s.NMSAdapter", version)).newInstance();
         } catch (ClassNotFoundException | IllegalAccessException | InstantiationException e) {
             getLogger().info("Error while loading adapter - unknown adapter " + version + "... Please contact @Ome_R");
+            return false;
         }
+
+        return true;
     }
 
     private void loadAPI() {
