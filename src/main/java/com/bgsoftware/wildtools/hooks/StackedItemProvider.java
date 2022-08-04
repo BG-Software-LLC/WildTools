@@ -9,4 +9,8 @@ public interface StackedItemProvider {
 
     void setItemStack(Item item, ItemStack itemStack);
 
+    default boolean skipPickupItemEventCall() {
+        return false;
+    }
+
 }

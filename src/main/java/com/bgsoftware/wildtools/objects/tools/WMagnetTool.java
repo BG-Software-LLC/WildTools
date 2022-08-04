@@ -57,11 +57,13 @@ public final class WMagnetTool extends WTool implements MagnetTool {
             if (!item.isValid() || item.isDead())
                 continue;
 
-            PlayerPickupItemEvent playerPickupItemEvent = new PlayerPickupItemEvent(player, item, item.getItemStack().getAmount());
-            Bukkit.getPluginManager().callEvent(playerPickupItemEvent);
+            if (!plugin.getProviders().getStackedItemProvider().skipPickupItemEventCall()) {
+                PlayerPickupItemEvent playerPickupItemEvent = new PlayerPickupItemEvent(player, item, item.getItemStack().getAmount());
+                Bukkit.getPluginManager().callEvent(playerPickupItemEvent);
 
-            if (playerPickupItemEvent.isCancelled())
-                continue;
+                if (playerPickupItemEvent.isCancelled())
+                    continue;
+            }
 
             ItemStack itemStack = plugin.getProviders().getStackedItemProvider().getItemStack(item);
 

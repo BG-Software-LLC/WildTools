@@ -15,4 +15,9 @@ public final class StackedItemProvider_Default implements StackedItemProvider {
         item.setItemStack(itemStack);
     }
 
+    @Override
+    public boolean skipPickupItemEventCall() {
+        return false;
+    }
+
 }

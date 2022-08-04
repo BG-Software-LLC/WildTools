@@ -16,4 +16,9 @@ public final class StackedItemProvider_WildStacker implements StackedItemProvide
         WildStackerAPI.getStackedItem(item).setStackAmount(itemStack.getAmount(), true);
     }
 
+    @Override
+    public boolean skipPickupItemEventCall() {
+        return true;
+    }
+
 }

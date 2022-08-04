@@ -53,6 +53,8 @@ public final class ProvidersHandler implements ProvidersManager {
     private StackedItemProvider stackedItemProvider;
     private EconomyProvider economyProvider;
 
+    private boolean checkPickupEventStatus = true;
+
     private final List<IToolBlockListener> toolBlockListeners = Lists.newArrayList();
 
     public ProvidersHandler(WildToolsPlugin plugin) {
