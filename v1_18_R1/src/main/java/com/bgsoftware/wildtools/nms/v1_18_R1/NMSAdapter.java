@@ -60,6 +60,7 @@ import org.bukkit.craftbukkit.v1_18_R1.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_18_R1.event.CraftEventFactory;
 import org.bukkit.craftbukkit.v1_18_R1.inventory.CraftInventoryView;
 import org.bukkit.craftbukkit.v1_18_R1.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_18_R1.util.CraftMagicNumbers;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.EntityCategory;
@@ -104,6 +105,13 @@ public final class NMSAdapter implements com.bgsoftware.wildtools.nms.NMSAdapter
     private static final Item DIAMOND_AXE_ITEM = new Item(Items.mU);
     @Remap(classPath = "net.minecraft.world.item.Items", name = "DIAMOND_SHOVEL", type = Remap.Type.FIELD, remappedName = "mS")
     private static final Item DIAMOND_SHOVEL_ITEM = new Item(Items.mS);
+
+    private static final String BUILT_AGAINST_MAPPING = "20b026e774dbf715e40a0b2afe114792";
+
+    @Override
+    public boolean isMappingsSupported() {
+        return ((CraftMagicNumbers) CraftMagicNumbers.INSTANCE).getMappingsVersion().equals(BUILT_AGAINST_MAPPING);
+    }
 
     @Override
     public String getVersion() {

@@ -28,6 +28,8 @@ import java.util.Set;
 
 public interface NMSAdapter {
 
+    boolean isMappingsSupported();
+
     String getVersion();
 
     default boolean isLegacy(){
