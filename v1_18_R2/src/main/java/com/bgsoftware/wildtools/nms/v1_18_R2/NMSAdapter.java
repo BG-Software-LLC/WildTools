@@ -519,7 +519,7 @@ public final class NMSAdapter implements com.bgsoftware.wildtools.nms.NMSAdapter
         Entity entityitem = new Entity(new EntityItem(world, location.getX(), location.getY(), location.getZ(),
                 CraftItemStack.asNMSCopy(itemStack)));
         entityitem.setPickupDelay(10);
-        return entityitem;
+        return entityitem.getHandle();
     }
 
     @Override
