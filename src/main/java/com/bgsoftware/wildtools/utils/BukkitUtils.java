@@ -22,15 +22,27 @@ import org.bukkit.metadata.FixedMetadataValue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.EnumSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Function;
 
 public final class BukkitUtils {
 
     private static final WildToolsPlugin plugin = WildToolsPlugin.getPlugin();
-    private static final BlockFace[] blockFaces = new BlockFace[]{
-            BlockFace.UP, BlockFace.DOWN, BlockFace.WEST, BlockFace.EAST, BlockFace.SOUTH, BlockFace.NORTH
-    };
+    private static final List<BlockFace> blockFaces = new LinkedList<>(Arrays.asList(
+            BlockFace.UP, BlockFace.DOWN, BlockFace.WEST, BlockFace.EAST, BlockFace.SOUTH, BlockFace.NORTH));
+
+    public static final EnumSet<Material> DISALLOWED_BLOCKS = createDisallowedBlocks(new String[]{
+            "BEDROCK", "COMMAND", "REPEATING_COMMAND_BLOCK", "CHAIN_COMMAND_BLOCK", "COMMAND_BLOCK", "WATER",
+            "STATIONARY_WATER", "LAVA", "STATIONARY_LAVA", "END_PORTAL_FRAME", "ENDER_PORTAL_FRAME", "BARRIER",
+            "STRUCTURE_BLOCK", "STRUCTURE_VOID", "CAVE_AIR", "END_PORTAL", "ENDER_PORTAL", "NETHER_PORTAL", "PORTAL",
+            "BUBBLE_COLUMN", "REINFORCED_DEEPSLATE"
+    });
+    private static final EnumSet<Material> FORCE_UPDATE_MATERIALS = createDisallowedBlocks(new String[]{
+            "WATER", "STATIONARY_WATER", "LAVA", "STATIONARY_LAVA", "ENDER_PORTAL", "NETHER_PORTAL", "PORTAL",
+            "BUBBLE_COLUMN"
+    });
 
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public static boolean canBreakBlock(Player player, Block block, Tool tool) {
@@ -38,15 +50,13 @@ public final class BukkitUtils {
     }
 
     public static boolean canBreakBlock(Player player, Block block, Material firstType, short firstData, Tool tool) {
-        return tool.canBreakBlock(block, firstType, firstData) &&
+        return !DISALLOWED_BLOCKS.contains(block.getType()) && tool.canBreakBlock(block, firstType, firstData) &&
                 (!tool.isOnlyInsideClaim() || plugin.getProviders().isInsideClaim(player, block.getLocation())) &&
-                !plugin.getNMSAdapter().isOutsideWorldborder(block.getLocation()) &&
-                block.getType() != Material.BEDROCK;
+                !plugin.getNMSAdapter().isOutsideWorldborder(block.getLocation());
     }
 
     public static boolean hasBreakAccess(Block block, Player player) {
         BlockBreakEvent blockBreakEvent = new BlockBreakEvent(block, player);
-        //plugin.getProviders().runWithBypass(player, () -> Bukkit.getPluginManager().callEvent(blockBreakEvent));
         plugin.getEvents().callBreakEvent(blockBreakEvent, true);
         return !blockBreakEvent.isCancelled();
     }
@@ -54,7 +64,6 @@ public final class BukkitUtils {
     public static boolean canInteractBlock(Player player, Block block, ItemStack usedItem) {
         PlayerInteractEvent playerInteractEvent =
                 new PlayerInteractEvent(player, Action.RIGHT_CLICK_BLOCK, usedItem, block, BlockFace.SELF);
-        //plugin.getProviders().runWithBypass(player, () -> Bukkit.getPluginManager().callEvent(playerInteractEvent));
         plugin.getEvents().callInteractEvent(playerInteractEvent);
         return !playerInteractEvent.isCancelled();
     }
@@ -68,7 +77,6 @@ public final class BukkitUtils {
         if ((tool == null || !tool.hasSilkTouch()) && usedItem.getEnchantmentLevel(Enchantment.SILK_TOUCH) == 0)
             blockBreakEvent.setExpToDrop(plugin.getNMSAdapter().getExpFromBlock(block, player));
 
-        //plugin.getProviders().runWithBypass(player, () -> Bukkit.getPluginManager().callEvent(blockBreakEvent));
         plugin.getEvents().callBreakEvent(blockBreakEvent, true);
 
         block.removeMetadata("drop-items", plugin);
@@ -79,7 +87,7 @@ public final class BukkitUtils {
         plugin.getEvents().callBreakEvent(blockBreakEvent, false);
         Material originalType = block.getType();
 
-        if (blocksController == null || (tool != null && tool.isOmni()) || originalType.hasGravity() || hasNearbyWater(block)) {
+        if (blocksController == null || (tool != null && tool.isOmni()) || originalType.hasGravity() || shouldForceUpdate(block)) {
             block.setType(Material.AIR);
         } else {
             blocksController.setAir(block.getLocation());
@@ -130,7 +138,6 @@ public final class BukkitUtils {
         BlockBreakEvent blockBreakEvent = new BlockBreakEvent(block, player);
         block.setMetadata("drop-items", new FixedMetadataValue(plugin, tool == null));
 
-        //plugin.getProviders().runWithBypass(player, () -> Bukkit.getPluginManager().callEvent(blockBreakEvent));
         plugin.getEvents().callBreakEvent(blockBreakEvent, true);
 
         block.removeMetadata("drop-items", plugin);
@@ -194,11 +201,26 @@ public final class BukkitUtils {
                 plugin.getNMSAdapter().getBlockDrops(player, block, tool.hasSilkTouch());
     }
 
-    private static boolean hasNearbyWater(Block block) {
-        return Arrays.stream(blockFaces).anyMatch(blockFace -> {
-            Material blockType = block.getRelative(blockFace).getType();
-            return blockType.name().contains("WATER") || blockType.name().contains("LAVA");
-        });
+    private static boolean shouldForceUpdate(Block frameBlock) {
+        for (BlockFace blockFace : blockFaces) {
+            if (FORCE_UPDATE_MATERIALS.contains(frameBlock.getRelative(blockFace).getType()))
+                return true;
+        }
+
+        return false;
+    }
+
+    private static EnumSet<Material> createDisallowedBlocks(String[] materialNames) {
+        EnumSet<Material> materials = EnumSet.noneOf(Material.class);
+
+        for (String materialName : materialNames) {
+            try {
+                materials.add(Material.valueOf(materialName));
+            } catch (IllegalArgumentException ignored) {
+            }
+        }
+
+        return materials;
     }
 
 }

@@ -1,6 +1,7 @@
 package com.bgsoftware.wildtools.objects.tools;
 
 import com.bgsoftware.common.reflection.ReflectMethod;
+import com.bgsoftware.wildtools.utils.BukkitUtils;
 import com.bgsoftware.wildtools.utils.items.ToolItemStack;
 import com.bgsoftware.wildtools.utils.items.ItemUtils;
 import org.bukkit.block.Block;
@@ -565,7 +566,7 @@ public abstract class WTool implements Tool {
 
     @Override
     public boolean onBlockHit(PlayerInteractEvent e){
-        if(isInstantBreak() && e.getClickedBlock().getType() != Material.BEDROCK)
+        if(isInstantBreak() && !BukkitUtils.DISALLOWED_BLOCKS.contains(e.getClickedBlock().getType()))
             return onBlockBreak(new BlockBreakEvent(e.getClickedBlock(), e.getPlayer()));
 
         return false;

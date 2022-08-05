@@ -57,6 +57,8 @@ public final class WCuboidTool extends WTool implements CuboidTool {
                             !BukkitUtils.canBreakBlock(e.getPlayer(), targetBlock, firstType, firstData, this))
                         continue;
 
+                    Bukkit.broadcastMessage(targetBlock.getType() + "");
+
                    if(BukkitUtils.breakBlock(e.getPlayer(), blocksController, itemsDropper, targetBlock, inHand, this, itemStack -> itemStack))
                         toolUsages++;
                 }
