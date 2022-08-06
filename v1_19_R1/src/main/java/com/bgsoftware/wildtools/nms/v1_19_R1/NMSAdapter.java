@@ -106,11 +106,9 @@ public final class NMSAdapter implements com.bgsoftware.wildtools.nms.NMSAdapter
     @Remap(classPath = "net.minecraft.world.item.Items", name = "DIAMOND_SHOVEL", type = Remap.Type.FIELD, remappedName = "nC")
     private static final Item DIAMOND_SHOVEL_ITEM = new Item(Items.nC);
 
-    private static final String BUILT_AGAINST_MAPPING = "4cc0cc97cac491651bff3af8b124a214";
-
     @Override
-    public boolean isMappingsSupported() {
-        return ((CraftMagicNumbers) CraftMagicNumbers.INSTANCE).getMappingsVersion().equals(BUILT_AGAINST_MAPPING);
+    public String getMappingsHash() {
+        return ((CraftMagicNumbers) CraftMagicNumbers.INSTANCE).getMappingsVersion();
     }
 
     @Override

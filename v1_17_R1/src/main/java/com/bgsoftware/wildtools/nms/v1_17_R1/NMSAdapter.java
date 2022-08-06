@@ -63,6 +63,7 @@ import org.bukkit.craftbukkit.v1_17_R1.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_17_R1.event.CraftEventFactory;
 import org.bukkit.craftbukkit.v1_17_R1.inventory.CraftInventoryView;
 import org.bukkit.craftbukkit.v1_17_R1.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_17_R1.util.CraftMagicNumbers;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.EntityCategory;
@@ -117,8 +118,8 @@ public final class NMSAdapter implements com.bgsoftware.wildtools.nms.NMSAdapter
     }
 
     @Override
-    public boolean isMappingsSupported() {
-        return true;
+    public String getMappingsHash() {
+        return ((CraftMagicNumbers) CraftMagicNumbers.INSTANCE).getMappingsVersion();
     }
 
     @Override

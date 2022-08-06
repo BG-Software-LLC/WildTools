@@ -20,6 +20,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.Recipe;
 import org.bukkit.inventory.ShapedRecipe;
 
+import javax.annotation.Nullable;
 import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.List;
@@ -28,11 +29,12 @@ import java.util.Set;
 
 public interface NMSAdapter {
 
-    boolean isMappingsSupported();
+    @Nullable
+    String getMappingsHash();
 
     String getVersion();
 
-    default boolean isLegacy(){
+    default boolean isLegacy() {
         return true;
     }
 
@@ -88,23 +90,23 @@ public interface NMSAdapter {
 
     boolean isShovelType(Material material);
 
-    default ItemStack[] parseChoice(Recipe recipe, ItemStack itemStack){
-        return new ItemStack[] {itemStack};
+    default ItemStack[] parseChoice(Recipe recipe, ItemStack itemStack) {
+        return new ItemStack[]{itemStack};
     }
 
-    default void setExpCost(InventoryView inventoryView, int expCost){
+    default void setExpCost(InventoryView inventoryView, int expCost) {
 
     }
 
-    default int getExpCost(InventoryView inventoryView){
+    default int getExpCost(InventoryView inventoryView) {
         return 0;
     }
 
-    default String getRenameText(InventoryView inventoryView){
+    default String getRenameText(InventoryView inventoryView) {
         return "";
     }
 
-    default AdvancedShapedRecipe createRecipe(String toolName, ItemStack result){
+    default AdvancedShapedRecipe createRecipe(String toolName, ItemStack result) {
         return new AdvancedRecipeClassImpl(result);
     }
 
@@ -121,17 +123,17 @@ public interface NMSAdapter {
         private static Field ingredientsField;
 
         static {
-            try{
+            try {
                 ingredientsField = ShapedRecipe.class.getDeclaredField("ingredients");
                 ingredientsField.setAccessible(true);
-            }catch(Exception ex){
+            } catch (Exception ex) {
                 ex.printStackTrace();
             }
         }
 
         private Map<Character, ItemStack> ingredients;
 
-        public AdvancedRecipeClassImpl(org.bukkit.inventory.ItemStack result){
+        public AdvancedRecipeClassImpl(org.bukkit.inventory.ItemStack result) {
             super(result);
             updateIngredients();
         }
@@ -155,11 +157,11 @@ public interface NMSAdapter {
             return this;
         }
 
-        private void updateIngredients(){
-            try{
+        private void updateIngredients() {
+            try {
                 //noinspection unchecked
                 ingredients = (Map<Character, org.bukkit.inventory.ItemStack>) ingredientsField.get(this);
-            }catch(Exception ex){
+            } catch (Exception ex) {
                 throw new RuntimeException(ex);
             }
         }

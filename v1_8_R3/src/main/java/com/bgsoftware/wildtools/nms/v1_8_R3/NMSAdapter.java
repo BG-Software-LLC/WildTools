@@ -69,8 +69,8 @@ public final class NMSAdapter implements com.bgsoftware.wildtools.nms.NMSAdapter
     private static final ReflectField<ItemStack> ITEM_STACK_HANDLE = new ReflectField<>(CraftItemStack.class, ItemStack.class, "handle");
 
     @Override
-    public boolean isMappingsSupported() {
-        return true;
+    public String getMappingsHash() {
+        return null;
     }
 
     @Override

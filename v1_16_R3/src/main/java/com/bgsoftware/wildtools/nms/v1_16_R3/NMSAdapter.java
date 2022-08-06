@@ -117,8 +117,8 @@ public final class NMSAdapter implements com.bgsoftware.wildtools.nms.NMSAdapter
     }
 
     @Override
-    public boolean isMappingsSupported() {
-        return true;
+    public String getMappingsHash() {
+        return null;
     }
 
     @Override

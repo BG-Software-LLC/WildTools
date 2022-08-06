@@ -1,5 +1,6 @@
 package com.bgsoftware.wildtools;
 
+import com.bgsoftware.common.mappings.MappingsChecker;
 import com.bgsoftware.wildtools.api.WildTools;
 import com.bgsoftware.wildtools.api.WildToolsAPI;
 import com.bgsoftware.wildtools.command.CommandsHandler;
@@ -15,12 +16,14 @@ import com.bgsoftware.wildtools.listeners.EditorListener;
 import com.bgsoftware.wildtools.listeners.PlayerListener;
 import com.bgsoftware.wildtools.metrics.Metrics;
 import com.bgsoftware.wildtools.nms.NMSAdapter;
+import com.bgsoftware.wildtools.nms.mapping.TestRemaps;
 import org.bukkit.Bukkit;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.io.File;
 import java.lang.reflect.Field;
 
 public final class WildToolsPlugin extends JavaPlugin implements WildTools {
@@ -109,13 +112,26 @@ public final class WildToolsPlugin extends JavaPlugin implements WildTools {
         try {
             nmsAdapter = (NMSAdapter) Class.forName(String.format("com.bgsoftware.wildtools.nms.%s.NMSAdapter", version)).newInstance();
 
-            if(!nmsAdapter.isMappingsSupported()) {
+            String mappingVersionHash = nmsAdapter.getMappingsHash();
+
+            if (mappingVersionHash != null && !MappingsChecker.checkMappings(mappingVersionHash, version)) {
                 log("Error while loading adapter - your version mappings are not supported... Please contact @Ome_R");
+                log("Your mappings version: " + mappingVersionHash);
                 return false;
             }
         } catch (ClassNotFoundException | IllegalAccessException | InstantiationException e) {
             getLogger().info("Error while loading adapter - unknown adapter " + version + "... Please contact @Ome_R");
             return false;
+        }
+
+        File mappingsFile = new File("mappings");
+        if (mappingsFile.exists()) {
+            try {
+                TestRemaps.testRemapsForClassesInPackage(mappingsFile,
+                        plugin.getClassLoader(), "com.bgsoftware.wildtools.nms." + version);
+            } catch (Exception error) {
+                error.printStackTrace();
+            }
         }
 
         return true;
