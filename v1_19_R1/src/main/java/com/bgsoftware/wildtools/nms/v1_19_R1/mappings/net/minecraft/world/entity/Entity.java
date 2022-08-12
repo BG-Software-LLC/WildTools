@@ -1,5 +1,6 @@
 package com.bgsoftware.wildtools.nms.v1_19_R1.mappings.net.minecraft.world.entity;
 
+import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.wildtools.nms.mapping.Remap;
 import com.bgsoftware.wildtools.nms.v1_19_R1.mappings.MappedObject;
 import com.bgsoftware.wildtools.nms.v1_19_R1.mappings.net.minecraft.server.network.PlayerConnection;
@@ -12,6 +13,23 @@ import net.minecraft.world.entity.EnumItemSlot;
 import net.minecraft.world.entity.item.EntityItem;
 
 public class Entity extends MappedObject<net.minecraft.world.entity.Entity> {
+
+    private static final ReflectMethod<Boolean> ENTITY_IS_ALIVE;
+    private static final ReflectMethod<net.minecraft.world.item.ItemStack> ENTITY_ITEM_GET_ITEM;
+
+    static {
+        ReflectMethod<?> method119 = new ReflectMethod<>(EntityItem.class, net.minecraft.world.item.ItemStack.class, "h");
+        boolean is119Mappings = method119.isValid();
+
+        if (is119Mappings) {
+            ENTITY_IS_ALIVE = new ReflectMethod<>(net.minecraft.world.entity.Entity.class, "bp");
+            ENTITY_ITEM_GET_ITEM = new ReflectMethod<>(EntityItem.class, "h");
+        } else {
+            ENTITY_IS_ALIVE = null;
+            ENTITY_ITEM_GET_ITEM = null;
+        }
+
+    }
 
     public Entity(net.minecraft.world.entity.Entity handle) {
         super(handle);
@@ -30,7 +48,7 @@ public class Entity extends MappedObject<net.minecraft.world.entity.Entity> {
             type = Remap.Type.METHOD,
             remappedName = "bo")
     public boolean isAlive() {
-        return handle.bo();
+        return ENTITY_IS_ALIVE == null ? handle.bo() : ENTITY_IS_ALIVE.invoke(handle);
     }
 
     @Remap(classPath = "net.minecraft.world.entity.Entity",
@@ -46,7 +64,8 @@ public class Entity extends MappedObject<net.minecraft.world.entity.Entity> {
             type = Remap.Type.METHOD,
             remappedName = "i")
     public ItemStack getItem() {
-        return new ItemStack(((EntityItem) handle).i());
+        return new ItemStack(ENTITY_ITEM_GET_ITEM == null ? ((EntityItem) handle).i() :
+                ENTITY_ITEM_GET_ITEM.invoke(handle));
     }
 
     @Remap(classPath = "net.minecraft.world.entity.item.ItemEntity",
