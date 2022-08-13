@@ -1,6 +1,6 @@
 package com.bgsoftware.wildtools.nms.v1_19_R1.mappings.net.minecraft.world.level.block;
 
-import com.bgsoftware.wildtools.nms.mapping.Remap;
+import com.bgsoftware.common.remaps.Remap;
 import com.bgsoftware.wildtools.nms.v1_19_R1.mappings.MappedObject;
 import net.minecraft.core.BlockPosition;
 import net.minecraft.server.level.WorldServer;

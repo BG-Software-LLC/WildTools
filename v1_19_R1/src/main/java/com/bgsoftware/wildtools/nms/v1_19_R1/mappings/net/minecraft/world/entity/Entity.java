@@ -1,7 +1,7 @@
 package com.bgsoftware.wildtools.nms.v1_19_R1.mappings.net.minecraft.world.entity;
 
 import com.bgsoftware.common.reflection.ReflectMethod;
-import com.bgsoftware.wildtools.nms.mapping.Remap;
+import com.bgsoftware.common.remaps.Remap;
 import com.bgsoftware.wildtools.nms.v1_19_R1.mappings.MappedObject;
 import com.bgsoftware.wildtools.nms.v1_19_R1.mappings.net.minecraft.server.network.PlayerConnection;
 import com.bgsoftware.wildtools.nms.v1_19_R1.mappings.net.minecraft.world.item.ItemStack;

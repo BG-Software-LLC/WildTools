@@ -1,6 +1,6 @@
 package com.bgsoftware.wildtools.nms.v1_18_R2.mappings.net.minecraft.server.network;
 
-import com.bgsoftware.wildtools.nms.mapping.Remap;
+import com.bgsoftware.common.remaps.Remap;
 import com.bgsoftware.wildtools.nms.v1_18_R2.mappings.MappedObject;
 import net.minecraft.network.protocol.Packet;
 

@@ -1,6 +1,7 @@
 package com.bgsoftware.wildtools;
 
 import com.bgsoftware.common.mappings.MappingsChecker;
+import com.bgsoftware.common.remaps.TestRemaps;
 import com.bgsoftware.wildtools.api.WildTools;
 import com.bgsoftware.wildtools.api.WildToolsAPI;
 import com.bgsoftware.wildtools.command.CommandsHandler;
@@ -16,7 +17,6 @@ import com.bgsoftware.wildtools.listeners.EditorListener;
 import com.bgsoftware.wildtools.listeners.PlayerListener;
 import com.bgsoftware.wildtools.metrics.Metrics;
 import com.bgsoftware.wildtools.nms.NMSAdapter;
-import com.bgsoftware.wildtools.nms.mapping.TestRemaps;
 import org.bukkit.Bukkit;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;

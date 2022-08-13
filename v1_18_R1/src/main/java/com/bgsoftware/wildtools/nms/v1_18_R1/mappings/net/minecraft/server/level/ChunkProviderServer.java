@@ -1,6 +1,6 @@
 package com.bgsoftware.wildtools.nms.v1_18_R1.mappings.net.minecraft.server.level;
 
-import com.bgsoftware.wildtools.nms.mapping.Remap;
+import com.bgsoftware.common.remaps.Remap;
 import com.bgsoftware.wildtools.nms.v1_18_R1.mappings.MappedObject;
 import net.minecraft.core.BlockPosition;
 import net.minecraft.network.protocol.Packet;

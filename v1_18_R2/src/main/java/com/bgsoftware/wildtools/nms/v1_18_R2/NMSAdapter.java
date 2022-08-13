@@ -3,7 +3,7 @@ package com.bgsoftware.wildtools.nms.v1_18_R2;
 import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.wildtools.WildToolsPlugin;
-import com.bgsoftware.wildtools.nms.mapping.Remap;
+import com.bgsoftware.common.remaps.Remap;
 import com.bgsoftware.wildtools.nms.v1_18_R2.mappings.net.minecraft.nbt.NBTTagCompound;
 import com.bgsoftware.wildtools.nms.v1_18_R2.mappings.net.minecraft.server.level.ChunkProviderServer;
 import com.bgsoftware.wildtools.nms.v1_18_R2.mappings.net.minecraft.world.entity.Entity;

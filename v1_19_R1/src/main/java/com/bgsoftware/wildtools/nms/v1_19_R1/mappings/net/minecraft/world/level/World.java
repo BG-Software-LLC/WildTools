@@ -1,6 +1,6 @@
 package com.bgsoftware.wildtools.nms.v1_19_R1.mappings.net.minecraft.world.level;
 
-import com.bgsoftware.wildtools.nms.mapping.Remap;
+import com.bgsoftware.common.remaps.Remap;
 import com.bgsoftware.wildtools.nms.v1_19_R1.mappings.MappedObject;
 import com.bgsoftware.wildtools.nms.v1_19_R1.mappings.net.minecraft.server.level.ChunkProviderServer;
 import com.bgsoftware.wildtools.nms.v1_19_R1.mappings.net.minecraft.world.level.block.state.IBlockData;
