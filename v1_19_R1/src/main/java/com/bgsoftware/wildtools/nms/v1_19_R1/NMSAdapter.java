@@ -285,7 +285,7 @@ public final class NMSAdapter implements com.bgsoftware.wildtools.nms.NMSAdapter
         chunk.setBlockState(blockPosition, Block.getByCombinedId(combinedId), true);
 
         if (UPDATE_NEARBY_BLOCKS.isValid() && world.getHandle().chunkPacketBlockController instanceof ChunkPacketBlockControllerAntiXray) {
-            UPDATE_NEARBY_BLOCKS.invoke(world.getHandle().chunkPacketBlockController, world, blockPosition);
+            UPDATE_NEARBY_BLOCKS.invoke(world.getHandle().chunkPacketBlockController, world.getHandle(), blockPosition);
         }
     }
 
