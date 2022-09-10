@@ -6,6 +6,7 @@ import com.bgsoftware.wildtools.utils.NumberUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
+import org.bukkit.block.Block;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -42,7 +43,7 @@ public final class BlocksController {
         cachedChunks.computeIfAbsent(new CachedChunk(location), map -> new HashMap<>()).put(location, blockId);
     }
 
-    public void setType(Location target, Location block) {
+    public void setType(Location target, Block block) {
         setType(target, plugin.getNMSAdapter().getCombinedId(block));
     }
 

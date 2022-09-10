@@ -2,17 +2,17 @@ package com.bgsoftware.wildtools.nms.v1_16_R3;
 
 import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.common.reflection.ReflectMethod;
-import com.bgsoftware.wildtools.WildToolsPlugin;
+import com.bgsoftware.wildtools.nms.alogrithms.PaperGlowEnchantment;
+import com.bgsoftware.wildtools.nms.alogrithms.SpigotGlowEnchantment;
+import com.bgsoftware.wildtools.nms.v1_16_R3.world.FakeCraftBlock;
 import com.bgsoftware.wildtools.objects.WMaterial;
 import com.bgsoftware.wildtools.recipes.AdvancedShapedRecipe;
 import com.bgsoftware.wildtools.utils.Executor;
 import com.bgsoftware.wildtools.utils.items.ToolItemStack;
 import com.destroystokyo.paper.antixray.ChunkPacketBlockControllerAntiXray;
 import com.tuinity.tuinity.chunk.light.StarLightInterface;
-import io.papermc.paper.enchantments.EnchantmentRarity;
 import it.unimi.dsi.fastutil.shorts.ShortArraySet;
 import it.unimi.dsi.fastutil.shorts.ShortSet;
-import net.kyori.adventure.text.Component;
 import net.minecraft.server.v1_16_R3.Block;
 import net.minecraft.server.v1_16_R3.BlockPosition;
 import net.minecraft.server.v1_16_R3.Blocks;
@@ -42,12 +42,10 @@ import net.minecraft.server.v1_16_R3.ThreadedMailbox;
 import net.minecraft.server.v1_16_R3.TileEntity;
 import net.minecraft.server.v1_16_R3.World;
 import net.minecraft.server.v1_16_R3.WorldServer;
-import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.CropState;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
 import org.bukkit.WorldBorder;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
@@ -64,8 +62,6 @@ import org.bukkit.craftbukkit.v1_16_R3.event.CraftEventFactory;
 import org.bukkit.craftbukkit.v1_16_R3.inventory.CraftInventoryView;
 import org.bukkit.craftbukkit.v1_16_R3.inventory.CraftItemStack;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.enchantments.EnchantmentTarget;
-import org.bukkit.entity.EntityCategory;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
@@ -80,7 +76,6 @@ import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.inventory.ShapelessRecipe;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -114,11 +109,6 @@ public final class NMSAdapter implements com.bgsoftware.wildtools.nms.NMSAdapter
             Class<?> shortSetClass = Class.forName("org.bukkit.craftbukkit.libs.it.unimi.dsi.fastutil.shorts.ShortSet");
         } catch (Exception ignored) {
         }
-    }
-
-    @Override
-    public String getMappingsHash() {
-        return null;
     }
 
     @Override
@@ -337,10 +327,8 @@ public final class NMSAdapter implements com.bgsoftware.wildtools.nms.NMSAdapter
     }
 
     @Override
-    public int getCombinedId(Location location) {
-        World world = ((CraftWorld) location.getWorld()).getHandle();
-        BlockPosition blockPosition = new BlockPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ());
-        return Block.getCombinedId(world.getType(blockPosition));
+    public int getCombinedId(org.bukkit.block.Block block) {
+        return Block.getCombinedId(((CraftBlock) block).getNMS());
     }
 
     @Override
@@ -357,73 +345,11 @@ public final class NMSAdapter implements com.bgsoftware.wildtools.nms.NMSAdapter
 
     @Override
     public Enchantment getGlowEnchant() {
-        //noinspection NullableProblems
-        return new Enchantment(NamespacedKey.minecraft("glowing_enchant")) {
-            @Override
-            public String getName() {
-                return "WildToolsGlow";
-            }
-
-            @Override
-            public int getMaxLevel() {
-                return 1;
-            }
-
-            @Override
-            public int getStartLevel() {
-                return 0;
-            }
-
-            @Override
-            public EnchantmentTarget getItemTarget() {
-                return null;
-            }
-
-            @Override
-            public boolean conflictsWith(Enchantment enchantment) {
-                return false;
-            }
-
-            @Override
-            public boolean canEnchantItem(org.bukkit.inventory.ItemStack itemStack) {
-                return true;
-            }
-
-            @Override
-            public boolean isTreasure() {
-                return false;
-            }
-
-            @Override
-            public boolean isCursed() {
-                return false;
-            }
-
-            public Component displayName(int i) {
-                return null;
-            }
-
-            public boolean isTradeable() {
-                return false;
-            }
-
-            public boolean isDiscoverable() {
-                return false;
-            }
-
-            public EnchantmentRarity getRarity() {
-                return null;
-            }
-
-            public float getDamageIncrease(int i, EntityCategory entityCategory) {
-                return 0;
-            }
-
-            public Set<EquipmentSlot> getActiveSlots() {
-                return null;
-            }
-
-        };
+        try {
+            return new PaperGlowEnchantment("wildtools_glowing_enchant");
+        } catch (Throwable error) {
+            return new SpigotGlowEnchantment("wildtools_glowing_enchant");
+        }
     }
 
     @Override
@@ -435,10 +361,9 @@ public final class NMSAdapter implements com.bgsoftware.wildtools.nms.NMSAdapter
     }
 
     @Override
-    public BlockPlaceEvent getFakePlaceEvent(Player player, Location location, org.bukkit.block.Block copyBlock) {
-        org.bukkit.block.Block original = location.getBlock();
-        BlockState originalState = original.getState();
-        FakeCraftBlock fakeBlock = FakeCraftBlock.at(location, copyBlock.getType(), originalState);
+    public BlockPlaceEvent getFakePlaceEvent(Player player, org.bukkit.block.Block block, org.bukkit.block.Block copyBlock) {
+        BlockState originalState = block.getState();
+        FakeCraftBlock fakeBlock = new FakeCraftBlock(block, copyBlock.getType(), originalState);
         return new BlockPlaceEvent(
                 fakeBlock,
                 originalState,
@@ -516,7 +441,7 @@ public final class NMSAdapter implements com.bgsoftware.wildtools.nms.NMSAdapter
 
     @Override
     public AdvancedShapedRecipe createRecipe(String toolName, org.bukkit.inventory.ItemStack result) {
-        return new AdvancedRecipeClassImpl(toolName, result);
+        return new com.bgsoftware.wildtools.nms.recipe.AdvancedRecipeClassImpl(toolName, result);
     }
 
     @Override
@@ -620,98 +545,6 @@ public final class NMSAdapter implements com.bgsoftware.wildtools.nms.NMSAdapter
         PlayerChunkMap playerChunkMap = worldServer.getChunkProvider().playerChunkMap;
         PLAYER_MAP_FIELD.get(playerChunkMap).a(1)
                 .forEach(entityPlayer -> entityPlayer.playerConnection.sendPacket(packet));
-    }
-
-    @SuppressWarnings("NullableProblems")
-    public static class AdvancedRecipeClassImpl extends ShapedRecipe implements AdvancedShapedRecipe {
-
-        private static Field ingredientsField;
-
-        static {
-            try {
-                ingredientsField = ShapedRecipe.class.getDeclaredField("ingredients");
-                ingredientsField.setAccessible(true);
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
-        }
-
-        private Map<Character, RecipeChoice> ingredients;
-
-        public AdvancedRecipeClassImpl(String toolName, org.bukkit.inventory.ItemStack result) {
-            super(new NamespacedKey(WildToolsPlugin.getPlugin(), "recipe_" + toolName), result);
-            updateIngredients();
-        }
-
-        @Override
-        public AdvancedRecipeClassImpl shape(String... shape) {
-            super.shape(shape);
-            updateIngredients();
-            return this;
-        }
-
-        @Override
-        public AdvancedRecipeClassImpl setIngredient(char key, org.bukkit.inventory.ItemStack itemStack) {
-            Validate.isTrue(this.ingredients.containsKey(key), "Symbol does not appear in the shape: ", key);
-            this.ingredients.put(key, new RecipeChoice.MaterialChoice(itemStack.getType()));
-            return this;
-        }
-
-        @Override
-        public ShapedRecipe toRecipe() {
-            return this;
-        }
-
-        private void updateIngredients() {
-            try {
-                //noinspection unchecked
-                ingredients = (Map<Character, RecipeChoice>) ingredientsField.get(this);
-            } catch (Exception ex) {
-                throw new RuntimeException(ex);
-            }
-        }
-
-    }
-
-    @SuppressWarnings("NullableProblems")
-    private static class FakeCraftBlock extends CraftBlock {
-
-        private final BlockState originalState;
-        private Material blockType;
-
-        FakeCraftBlock(WorldServer worldServer, BlockPosition blockPosition, Material material, BlockState originalState) {
-            super(worldServer, blockPosition);
-            this.blockType = material;
-            this.originalState = originalState;
-        }
-
-        @Override
-        public Material getType() {
-            return blockType;
-        }
-
-        @Override
-        public void setType(Material type) {
-            this.blockType = type;
-            super.setType(type);
-        }
-
-        @Override
-        public BlockData getBlockData() {
-            return CraftBlockData.newData(blockType, null);
-        }
-
-        @Override
-        public BlockState getState() {
-            return originalState;
-        }
-
-        static FakeCraftBlock at(Location location, Material type, BlockState originalState) {
-            WorldServer worldServer = ((CraftWorld) location.getWorld()).getHandle();
-            BlockPosition blockPosition = new BlockPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ());
-            return new FakeCraftBlock(worldServer, blockPosition, type, originalState);
-        }
-
     }
 
 }

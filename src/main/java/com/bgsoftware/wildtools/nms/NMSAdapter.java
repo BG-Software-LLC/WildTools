@@ -1,5 +1,6 @@
 package com.bgsoftware.wildtools.nms;
 
+import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.wildtools.recipes.AdvancedShapedRecipe;
 import com.bgsoftware.wildtools.utils.items.ToolItemStack;
 import org.apache.commons.lang.Validate;
@@ -20,17 +21,12 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.Recipe;
 import org.bukkit.inventory.ShapedRecipe;
 
-import javax.annotation.Nullable;
-import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 public interface NMSAdapter {
-
-    @Nullable
-    String getMappingsHash();
 
     String getVersion();
 
@@ -72,7 +68,7 @@ public interface NMSAdapter {
 
     void refreshChunk(Chunk chunk, Set<Location> blocksList);
 
-    int getCombinedId(Location location);
+    int getCombinedId(Block block);
 
     int getFarmlandId();
 
@@ -82,7 +78,7 @@ public interface NMSAdapter {
 
     boolean isOutsideWorldborder(Location location);
 
-    BlockPlaceEvent getFakePlaceEvent(Player player, Location location, Block copyBlock);
+    BlockPlaceEvent getFakePlaceEvent(Player player, Block block, Block copyBlock);
 
     void playPickupAnimation(LivingEntity livingEntity, Item item);
 
@@ -120,16 +116,8 @@ public interface NMSAdapter {
 
     class AdvancedRecipeClassImpl extends ShapedRecipe implements AdvancedShapedRecipe {
 
-        private static Field ingredientsField;
-
-        static {
-            try {
-                ingredientsField = ShapedRecipe.class.getDeclaredField("ingredients");
-                ingredientsField.setAccessible(true);
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
-        }
+        private static final ReflectField<Map<Character, ItemStack>> INGREDIENTS_FIELD = new ReflectField<>(
+                ShapedRecipe.class, Map.class, "ingredients");
 
         private Map<Character, ItemStack> ingredients;
 
@@ -158,12 +146,7 @@ public interface NMSAdapter {
         }
 
         private void updateIngredients() {
-            try {
-                //noinspection unchecked
-                ingredients = (Map<Character, org.bukkit.inventory.ItemStack>) ingredientsField.get(this);
-            } catch (Exception ex) {
-                throw new RuntimeException(ex);
-            }
+            ingredients = INGREDIENTS_FIELD.get(this);
         }
 
     }

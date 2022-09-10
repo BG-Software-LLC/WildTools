@@ -177,13 +177,13 @@ public final class BukkitUtils {
     }
 
     public static boolean placeBlock(Player player, BlocksController blocksController, Block block, Block materialBlock) {
-        BlockPlaceEvent blockPlaceEvent = plugin.getNMSAdapter().getFakePlaceEvent(player, block.getLocation(), materialBlock);
+        BlockPlaceEvent blockPlaceEvent = plugin.getNMSAdapter().getFakePlaceEvent(player, block, materialBlock);
         plugin.getEvents().callPlaceEvent(blockPlaceEvent);
 
         if (blockPlaceEvent.isCancelled())
             return false;
 
-        blocksController.setType(block.getLocation(), materialBlock.getLocation());
+        blocksController.setType(block.getLocation(), materialBlock);
 
         return true;
     }

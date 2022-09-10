@@ -1,7 +1,7 @@
 package com.bgsoftware.wildtools.nms.v1_12_R1;
 
 import com.bgsoftware.common.reflection.ReflectField;
-import com.bgsoftware.wildtools.WildToolsPlugin;
+import com.bgsoftware.wildtools.nms.v1_12_R1.world.FakeCraftBlock;
 import com.bgsoftware.wildtools.recipes.AdvancedShapedRecipe;
 import com.bgsoftware.wildtools.utils.items.ToolItemStack;
 import net.minecraft.server.v1_12_R1.Block;
@@ -38,12 +38,10 @@ import net.minecraft.server.v1_12_R1.TileEntityShulkerBox;
 import net.minecraft.server.v1_12_R1.TileEntitySkull;
 import net.minecraft.server.v1_12_R1.World;
 import net.minecraft.server.v1_12_R1.WorldServer;
-import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.CropState;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
 import org.bukkit.NetherWartsState;
 import org.bukkit.WorldBorder;
 import org.bukkit.block.BlockFace;
@@ -67,27 +65,19 @@ import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.InventoryView;
-import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.material.CocoaPlant;
 import org.bukkit.material.Crops;
 import org.bukkit.material.NetherWarts;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 @SuppressWarnings({"unused", "deprecation", "ConstantConditions"})
 public final class NMSAdapter implements com.bgsoftware.wildtools.nms.NMSAdapter {
 
     private static final ReflectField<ItemStack> ITEM_STACK_HANDLE = new ReflectField<>(CraftItemStack.class, ItemStack.class, "handle");
-
-    @Override
-    public String getMappingsHash() {
-        return null;
-    }
 
     @Override
     public String getVersion() {
@@ -416,9 +406,9 @@ public final class NMSAdapter implements com.bgsoftware.wildtools.nms.NMSAdapter
     }
 
     @Override
-    public int getCombinedId(Location location) {
-        World world = ((CraftWorld) location.getWorld()).getHandle();
-        BlockPosition blockPosition = new BlockPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ());
+    public int getCombinedId(org.bukkit.block.Block block) {
+        World world = ((CraftWorld) block.getWorld()).getHandle();
+        BlockPosition blockPosition = new BlockPosition(block.getX(), block.getY(), block.getZ());
         return Block.getCombinedId(world.getType(blockPosition));
     }
 
@@ -488,12 +478,11 @@ public final class NMSAdapter implements com.bgsoftware.wildtools.nms.NMSAdapter
     }
 
     @Override
-    public BlockPlaceEvent getFakePlaceEvent(Player player, Location location, org.bukkit.block.Block copyBlock) {
-        FakeCraftBlock fakeBlock = FakeCraftBlock.at(location, copyBlock.getType());
-        org.bukkit.block.Block original = location.getBlock();
+    public BlockPlaceEvent getFakePlaceEvent(Player player, org.bukkit.block.Block block, org.bukkit.block.Block copyBlock) {
+        FakeCraftBlock fakeBlock = new FakeCraftBlock(block, copyBlock.getType());
         return new BlockPlaceEvent(
                 fakeBlock,
-                original.getState(),
+                block.getState(),
                 fakeBlock.getRelative(BlockFace.DOWN),
                 new org.bukkit.inventory.ItemStack(copyBlock.getType()),
                 player,
@@ -537,7 +526,7 @@ public final class NMSAdapter implements com.bgsoftware.wildtools.nms.NMSAdapter
 
     @Override
     public AdvancedShapedRecipe createRecipe(String toolName, org.bukkit.inventory.ItemStack result) {
-        return new AdvancedRecipeClassImpl(toolName, result);
+        return new com.bgsoftware.wildtools.nms.recipe.AdvancedRecipeClassImpl(toolName, result);
     }
 
     @Override
@@ -622,83 +611,6 @@ public final class NMSAdapter implements com.bgsoftware.wildtools.nms.NMSAdapter
             if (entityHuman instanceof EntityPlayer && playerChunkMap.a((EntityPlayer) entityHuman, chunkX, chunkZ))
                 ((EntityPlayer) entityHuman).playerConnection.sendPacket(packet);
         }
-    }
-
-    public static class AdvancedRecipeClassImpl extends ShapedRecipe implements AdvancedShapedRecipe {
-
-        private static Field ingredientsField;
-
-        static {
-            try {
-                ingredientsField = ShapedRecipe.class.getDeclaredField("ingredients");
-                ingredientsField.setAccessible(true);
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
-        }
-
-        private Map<Character, org.bukkit.inventory.ItemStack> ingredients;
-
-        public AdvancedRecipeClassImpl(String toolName, org.bukkit.inventory.ItemStack result) {
-            super(new NamespacedKey(WildToolsPlugin.getPlugin(), "recipe_" + toolName), result);
-            updateIngredients();
-        }
-
-        @Override
-        public AdvancedRecipeClassImpl shape(String... shape) {
-            super.shape(shape);
-            updateIngredients();
-            return this;
-        }
-
-        @Override
-        public AdvancedRecipeClassImpl setIngredient(char key, org.bukkit.inventory.ItemStack itemStack) {
-            Validate.isTrue(this.ingredients.containsKey(key), "Symbol does not appear in the shape: ", key);
-            this.ingredients.put(key, itemStack);
-            return this;
-        }
-
-        @Override
-        public ShapedRecipe toRecipe() {
-            return this;
-        }
-
-        private void updateIngredients() {
-            try {
-                //noinspection unchecked
-                ingredients = (Map<Character, org.bukkit.inventory.ItemStack>) ingredientsField.get(this);
-            } catch (Exception ex) {
-                throw new RuntimeException(ex);
-            }
-        }
-
-    }
-
-    private static class FakeCraftBlock extends CraftBlock {
-
-        private Material blockType;
-
-        FakeCraftBlock(CraftChunk craftChunk, int x, int y, int z, Material material) {
-            super(craftChunk, x, y, z);
-            this.blockType = material;
-        }
-
-        @Override
-        public Material getType() {
-            return blockType;
-        }
-
-        @Override
-        public void setType(Material type) {
-            this.blockType = type;
-            super.setType(type);
-        }
-
-        static FakeCraftBlock at(Location location, Material type) {
-            CraftChunk craftChunk = (CraftChunk) location.getChunk();
-            return new FakeCraftBlock(craftChunk, location.getBlockX(), location.getBlockY(), location.getBlockZ(), type);
-        }
-
     }
 
 }

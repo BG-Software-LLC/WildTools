@@ -1,6 +1,7 @@
 package com.bgsoftware.wildtools.nms.v1_8_R3;
 
 import com.bgsoftware.common.reflection.ReflectField;
+import com.bgsoftware.wildtools.nms.v1_8_R3.world.FakeCraftBlock;
 import com.bgsoftware.wildtools.utils.items.ToolItemStack;
 import net.minecraft.server.v1_8_R3.Block;
 import net.minecraft.server.v1_8_R3.BlockCarrots;
@@ -67,11 +68,6 @@ import java.util.Set;
 public final class NMSAdapter implements com.bgsoftware.wildtools.nms.NMSAdapter {
 
     private static final ReflectField<ItemStack> ITEM_STACK_HANDLE = new ReflectField<>(CraftItemStack.class, ItemStack.class, "handle");
-
-    @Override
-    public String getMappingsHash() {
-        return null;
-    }
 
     @Override
     public String getVersion() {
@@ -366,9 +362,9 @@ public final class NMSAdapter implements com.bgsoftware.wildtools.nms.NMSAdapter
     }
 
     @Override
-    public int getCombinedId(Location location) {
-        World world = ((CraftWorld) location.getWorld()).getHandle();
-        BlockPosition blockPosition = new BlockPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ());
+    public int getCombinedId(org.bukkit.block.Block block) {
+        World world = ((CraftWorld) block.getWorld()).getHandle();
+        BlockPosition blockPosition = new BlockPosition(block.getX(), block.getY(), block.getZ());
         return Block.getCombinedId(world.getType(blockPosition));
     }
 
@@ -436,12 +432,11 @@ public final class NMSAdapter implements com.bgsoftware.wildtools.nms.NMSAdapter
     }
 
     @Override
-    public BlockPlaceEvent getFakePlaceEvent(Player player, Location location, org.bukkit.block.Block copyBlock) {
-        FakeCraftBlock fakeBlock = FakeCraftBlock.at(location, copyBlock.getType());
-        org.bukkit.block.Block original = location.getBlock();
+    public BlockPlaceEvent getFakePlaceEvent(Player player, org.bukkit.block.Block block, org.bukkit.block.Block copyBlock) {
+        FakeCraftBlock fakeBlock = new FakeCraftBlock(block, copyBlock.getType());
         return new BlockPlaceEvent(
                 fakeBlock,
-                original.getState(),
+                block.getState(),
                 fakeBlock.getRelative(BlockFace.DOWN),
                 new org.bukkit.inventory.ItemStack(copyBlock.getType()),
                 player,
@@ -540,33 +535,6 @@ public final class NMSAdapter implements com.bgsoftware.wildtools.nms.NMSAdapter
         if (otherItem.count <= 0) {
             otherEntity.setItemStack(otherItem);
         }
-    }
-
-    private static class FakeCraftBlock extends CraftBlock {
-
-        private Material blockType;
-
-        FakeCraftBlock(CraftChunk craftChunk, int x, int y, int z, Material material) {
-            super(craftChunk, x, y, z);
-            this.blockType = material;
-        }
-
-        @Override
-        public Material getType() {
-            return blockType;
-        }
-
-        @Override
-        public void setType(Material type) {
-            this.blockType = type;
-            super.setType(type);
-        }
-
-        static FakeCraftBlock at(Location location, Material type) {
-            CraftChunk craftChunk = (CraftChunk) location.getChunk();
-            return new FakeCraftBlock(craftChunk, location.getBlockX(), location.getBlockY(), location.getBlockZ(), type);
-        }
-
     }
 
 }
