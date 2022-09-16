@@ -1,10 +1,9 @@
-package com.bgsoftware.wildtools.nms.v1_17_R1.world;
+package com.bgsoftware.wildtools.nms.v117.world;
 
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.data.BlockData;
-import org.bukkit.craftbukkit.v1_17_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_17_R1.block.CraftBlock;
 import org.bukkit.craftbukkit.v1_17_R1.block.data.CraftBlockData;
 
@@ -14,7 +13,7 @@ public class FakeCraftBlock extends CraftBlock {
     private Material blockType;
 
     public FakeCraftBlock(Block block, Material material, BlockState originalState) {
-        super(((CraftWorld) block.getWorld()).getHandle(), ((CraftBlock) block).getPosition());
+        super(((CraftBlock) block).getHandle(), ((CraftBlock) block).getPosition());
         this.blockType = material;
         this.originalState = originalState;
     }
