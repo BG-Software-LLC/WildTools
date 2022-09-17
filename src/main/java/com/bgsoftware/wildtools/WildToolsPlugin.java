@@ -153,7 +153,7 @@ public final class WildToolsPlugin extends JavaPlugin implements WildTools {
         log("&cThe plugin doesn't support your minecraft version.");
         log("&cPlease try a different version.");
 
-        return true;
+        return false;
     }
 
     private void loadAPI() {
