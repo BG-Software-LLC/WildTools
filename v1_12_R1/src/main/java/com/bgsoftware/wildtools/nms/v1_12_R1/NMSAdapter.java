@@ -2,7 +2,6 @@ package com.bgsoftware.wildtools.nms.v1_12_R1;
 
 import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.wildtools.nms.v1_12_R1.world.FakeCraftBlock;
-import com.bgsoftware.wildtools.recipes.AdvancedShapedRecipe;
 import com.bgsoftware.wildtools.utils.items.ToolItemStack;
 import net.minecraft.server.v1_12_R1.Block;
 import net.minecraft.server.v1_12_R1.BlockBeetroot;
@@ -522,11 +521,6 @@ public final class NMSAdapter implements com.bgsoftware.wildtools.nms.NMSAdapter
     @Override
     public String getRenameText(InventoryView inventoryView) {
         return ((ContainerAnvil) ((CraftInventoryView) inventoryView).getHandle()).renameText;
-    }
-
-    @Override
-    public AdvancedShapedRecipe createRecipe(String toolName, org.bukkit.inventory.ItemStack result) {
-        return new com.bgsoftware.wildtools.nms.recipe.AdvancedRecipeClassImpl(toolName, result);
     }
 
     @Override
