@@ -133,7 +133,8 @@ public final class BukkitUtils {
         return breakBlock(player, blocksController, itemsDropper, block, usedItem, tool, itemStack -> dropItemFunction.apply(itemStack) ? itemStack : null);
     }
 
-    public static boolean seedBlock(Player player, Block block, Tool tool, Function<ItemStack, ItemStack> dropItemFunction, ItemsDropper itemsDropper) {
+    public static boolean seedBlock(Player player, Block block, Tool tool, Function<ItemStack, ItemStack> dropItemFunction,
+                                    ItemsDropper itemsDropper, BlocksController blocksController) {
         List<ItemStack> drops = getBlockDrops(player, block, tool);
         BlockBreakEvent blockBreakEvent = new BlockBreakEvent(block, player);
         block.setMetadata("drop-items", new FixedMetadataValue(plugin, tool == null));
@@ -148,6 +149,8 @@ public final class BukkitUtils {
         plugin.getEvents().callBreakEvent(blockBreakEvent, false);
 
         plugin.getNMSAdapter().setCropState(block, CropState.SEEDED);
+
+        blocksController.setDirty(block.getLocation());
 
         if (tool != null) {
             boolean nullDropper = itemsDropper == null;
@@ -172,8 +175,9 @@ public final class BukkitUtils {
         return true;
     }
 
-    public static boolean seedBlockAsBoolean(Player player, Block block, Tool tool, Function<ItemStack, Boolean> dropItemFunction, ItemsDropper itemsDropper) {
-        return seedBlock(player, block, tool, itemStack -> dropItemFunction.apply(itemStack) ? itemStack : null, itemsDropper);
+    public static boolean seedBlockAsBoolean(Player player, Block block, Tool tool, Function<ItemStack, Boolean> dropItemFunction,
+                                             ItemsDropper itemsDropper, BlocksController blocksController) {
+        return seedBlock(player, block, tool, itemStack -> dropItemFunction.apply(itemStack) ? itemStack : null, itemsDropper, blocksController);
     }
 
     public static boolean placeBlock(Player player, BlocksController blocksController, Block block, Block materialBlock) {

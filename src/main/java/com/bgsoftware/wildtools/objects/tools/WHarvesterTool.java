@@ -226,7 +226,7 @@ public final class WHarvesterTool extends WTool implements HarvesterTool {
                         continue;
                     }
 
-                    if(BukkitUtils.seedBlockAsBoolean(player, targetBlock, this, itemStack -> !sellInfo.handleItem(player, itemStack), itemsDropper))
+                    if(BukkitUtils.seedBlockAsBoolean(player, targetBlock, this, itemStack -> !sellInfo.handleItem(player, itemStack), itemsDropper, blocksController))
                         toolUsages++;
                 }
             }

@@ -39,8 +39,12 @@ public final class BlocksController {
             combinedId = blockId;
         }
 
-        affectedBlocks.add(location);
+        setDirty(location);
         cachedChunks.computeIfAbsent(new CachedChunk(location), map -> new HashMap<>()).put(location, blockId);
+    }
+
+    public void setDirty(Location location) {
+        affectedBlocks.add(location);
     }
 
     public void setType(Location target, Block block) {
