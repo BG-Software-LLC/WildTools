@@ -1,7 +1,7 @@
 group 'Hook_NewtShop'
 
 dependencies {
-    compileOnly "com.newtjam:NewtShop:latest"
+    compileOnly "com.newtjam:newtShop:2.0.3"
     compileOnly "org.spigotmc:v1_8_R3-Taco:latest"
     compileOnly project(":API")
     compileOnly parent

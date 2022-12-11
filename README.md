@@ -16,25 +16,6 @@ You can compile the project using gradlew.<br>
 Run `gradlew build` in console to build the project.<br>
 You can find already compiled jars on our [Jenkins](https://hub.bg-software.com/) hub!<br>
 
-When compiling you will receive errors about missing dependencies.<br>
-These dependencies are premium plugins that cannot be published on a public repository.<br>
-You can do either of the followings in order to solve it:
-- Add manually all the jar files of the premium plugins.
-- Purchase access to our private repository.
-- Disabling compiling of the modules of these dependencies in the `gradle.properties` file.
-
-<br>
-
-##### Private Jars:
-- ChunkCollectors by Cloth [[link]](https://www.mc-market.org/resources/13522/)
-- CMI by Zrips [[link]](https://www.spigotmc.org/resources/3742/)
-- ShopGUIPlus by brcdev [[link]](https://www.spigotmc.org/resources/6515/)
-- Lands by Angeschossen [[link]](https://www.spigotmc.org/resources/53313/)
-- mcMMO (v1 & v2) by nossr50 [[link]](https://www.spigotmc.org/resources/64348/)
-- SuperMobCoins by Swanis [[link]](https://www.mc-market.org/resources/8309/)
-- QuantumShop by NightExpress [[link]](https://www.spigotmc.org/resources/50696/)
-- Residence by Zrips [[link]](https://www.spigotmc.org/resources/11480/)
-
 ## API
 
 The plugin is packed with a rich API for interacting with tools and more. When hooking into the plugin, it's highly recommended to only use the API and not the compiled plugin, as the API methods are not only commented, but also will not get removed or changed unless they are marked as deprecated. This means that by using the API, you won't have to do any additional changes to your code between updates.

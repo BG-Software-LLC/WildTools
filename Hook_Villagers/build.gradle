@@ -1,7 +1,7 @@
 group 'Hook_Villagers'
 
 dependencies {
-    compileOnly "com.stefthedev:Villages:latest"
+    compileOnly "com.stefthedev:Villages:0.1.3.2"
     compileOnly "org.spigotmc:v1_8_R3-Taco:latest"
     compileOnly project(":API")
     compileOnly parent
