@@ -3,7 +3,7 @@ package com.bgsoftware.wildtools.handlers;
 import com.bgsoftware.common.config.CommentedConfiguration;
 import com.bgsoftware.wildtools.WildToolsPlugin;
 import com.bgsoftware.wildtools.api.objects.ToolMode;
-import com.bgsoftware.wildtools.objects.WMaterial;
+import com.bgsoftware.wildtools.utils.Materials;
 import com.bgsoftware.wildtools.utils.items.ItemBuilder;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -19,7 +19,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 
-public final class EditorHandler {
+public class EditorHandler {
 
     private WildToolsPlugin plugin;
     private ItemStack[] settingsEditor;
@@ -85,7 +85,7 @@ public final class EditorHandler {
                     .withLore("&7Click here to edit " + toolNames.get(i)).build());
         }
 
-        editor.setItem(editor.getSize() - 1, new ItemBuilder(WMaterial.MAP)
+        editor.setItem(editor.getSize() - 1, new ItemBuilder(Materials.MAP)
                 .withName("&bNew tool").withLore("&7Click to create a new tool.").build());
 
         return editor;
@@ -98,7 +98,7 @@ public final class EditorHandler {
 
         Inventory editor = Bukkit.createInventory(null, 9 * 6, "" + ChatColor.DARK_GRAY + ChatColor.BOLD + "Tool Editor");
 
-        ItemStack bluePane = new ItemBuilder(WMaterial.getBlueGlassPane()).withName("&6").build();
+        ItemStack bluePane = new ItemBuilder(Materials.getBlueGlassPane()).withName("&6").build();
 
         for(int i = 0; i < editor.getSize(); i++)
             editor.setItem(i, bluePane);
@@ -107,12 +107,12 @@ public final class EditorHandler {
                 .withName("&bTool Type").withLore("&7Type: " + getFromConfig(toolName, "type", String.class, "")).build());
         editor.setItem(47, new ItemBuilder(Material.NAME_TAG)
                 .withName("&bTool Name").withLore("&7Name: " + getFromConfig(toolName, "name", String.class, "")).build());
-        editor.setItem(48, new ItemBuilder(WMaterial.MAP)
+        editor.setItem(48, new ItemBuilder(Materials.MAP)
                 .withName("&bTool Lore").withLore("&7Lore:", getFromConfig(toolName, "lore", List.class, new ArrayList<>())).build());
 
-        editor.setItem(10, new ItemBuilder(WMaterial.CLOCK)
+        editor.setItem(10, new ItemBuilder(Materials.CLOCK)
                 .withName("&bTool Cooldown").withLore("&7Cooldown: " + getFromConfig(toolName, "cooldown", Integer.class, 0)).build());
-        editor.setItem(11, new ItemBuilder(WMaterial.IRON_BARS)
+        editor.setItem(11, new ItemBuilder(Materials.IRON_BARS)
                 .withName("&bTool Unbreakable").withLore("&7Unbreakable: " + getFromConfig(toolName, "unbreakable", Boolean.class, false)).build());
         editor.setItem(12, new ItemBuilder(Material.CHEST)
                 .withName("&bTool Keep-Inventory").withLore("&7Keep-Inventory: " + getFromConfig(toolName, "keep-inventory", Boolean.class, false)).build());
@@ -123,14 +123,14 @@ public final class EditorHandler {
                 .withName("&bTool Auto-Collect").withLore("&7Auto-Collect: " + getFromConfig(toolName, "auto-collect", Boolean.class, false)).build());
         editor.setItem(15, new ItemBuilder(Material.ANVIL)
                 .withName("&bTool Uses").withLore("&7Uses: " + getFromConfig(toolName, "uses", Integer.class, -1)).build());
-        editor.setItem(16, new ItemBuilder(WMaterial.getGodApple())
+        editor.setItem(16, new ItemBuilder(Materials.getGodApple())
                 .withName("&bTool Enchants").withLore("&7Enchantments:", getEnchants(toolName)).build());
         editor.setItem(19, new ItemBuilder(Material.QUARTZ)
                 .withName("&bTool Whitelisted Drops").withLore("&7Whitelisted Drops: ",
                         getFromConfig(toolName, "whitelisted-drops", List.class, new ArrayList<>())).build());
         editor.setItem(20, new ItemBuilder(Material.ENCHANTED_BOOK)
                 .withName("&bTool Silktouch").withLore("&7Silktouch: " + getFromConfig(toolName, "silk-touch", Boolean.class, false)).build());
-        editor.setItem(21, new ItemBuilder(WMaterial.REDSTONE_TORCH)
+        editor.setItem(21, new ItemBuilder(Materials.REDSTONE_TORCH)
                 .withName("&bTool Only-Inside-Claim").withLore("&7Only-Inside-Claim: " + getFromConfig(toolName, "only-inside-claim", Boolean.class, false)).build());
         editor.setItem(22, new ItemBuilder(Material.TRIPWIRE_HOOK)
                 .withName("&bOmni Tool").withLore("&7Omni Tool: " + getFromConfig(toolName, "omni-tool", Boolean.class, false)).build());
@@ -141,14 +141,14 @@ public final class EditorHandler {
                 .withName("&bTool Only-Same-Type").withLore("&7Only-Same-Type: " + getFromConfig(toolName, "only-same-type", Boolean.class, false)).build());
         editor.setItem(25, new ItemBuilder(Material.NETHER_STAR)
                 .withName("&bTool Glow").withLore("&7Glow: " + getFromConfig(toolName, "glow", Boolean.class, false)).build());
-        editor.setItem(28, new ItemBuilder(WMaterial.CAULDRON)
+        editor.setItem(28, new ItemBuilder(Materials.CAULDRON)
                 .withName("&bTool Spigot Unbreakable").withLore("&7Spigot Unbreakable: " + getFromConfig(toolName, "spigot-unbreakable", Boolean.class, false)).build());
         editor.setItem(29, new ItemBuilder(Material.COAL)
                 .withName("&bTool Blacklisted Drops").withLore("&7Blacklisted Drops: ",
                         getFromConfig(toolName, "blacklisted-drops", List.class, new ArrayList<>())).build());
         editor.setItem(30, new ItemBuilder(Material.SUGAR)
                 .withName("&bTool Instant-Break").withLore("&7Instant-Break: " + getFromConfig(toolName, "instant-break", Boolean.class, false)).build());
-        editor.setItem(31, new ItemBuilder(WMaterial.EXPERIENCE_BOTTLE.parseMaterial())
+        editor.setItem(31, new ItemBuilder(Materials.EXPERIENCE_BOTTLE.parseMaterial())
                 .withName("&bTool Anvil Combine Exp").withLore("&7Anvil Combine Exp: " + getFromConfig(toolName, "anvil-combine-exp", Integer.class, -1)).build());
         editor.setItem(32, new ItemBuilder(Material.GOLD_INGOT)
                 .withName("&bTool Anvil Combine Limit").withLore("&7Anvil Combine Limit: " + getFromConfig(toolName, "anvil-combine-limit", Integer.class, -1)).build());
@@ -167,7 +167,7 @@ public final class EditorHandler {
         }else if(toolMode == ToolMode.HARVESTER){
             editor.setItem(50, new ItemBuilder(Material.FEATHER)
                     .withName("&bTool Radius").withLore("&7Radius: " + getFromConfig(toolName, "radius", Integer.class, 0)).build());
-            editor.setItem(51, new ItemBuilder(WMaterial.FARMLAND)
+            editor.setItem(51, new ItemBuilder(Materials.FARMLAND)
                     .withName("&bTool Farmland Radius").withLore("&7Farmland Radius: " + getFromConfig(toolName, "farmland-radius", Integer.class, 0)).build());
             editor.setItem(52, new ItemBuilder(Material.REDSTONE)
                     .withName("&bTool Active Action").withLore("&7Active Action: " + getFromConfig(toolName, "active-action", String.class, "")).build());
@@ -180,7 +180,7 @@ public final class EditorHandler {
             editor.setItem(50, new ItemBuilder(Material.TNT)
                     .withName("&bTool TNT-Amount").withLore("&7TNT-Amount: " + getFromConfig(toolName, "tnt-amount", Integer.class, 0)).build());
         }else if(toolMode == ToolMode.CRAFTING){
-            editor.setItem(50, new ItemBuilder(WMaterial.CRAFTING_TABLE)
+            editor.setItem(50, new ItemBuilder(Materials.CRAFTING_TABLE)
                     .withName("&bTool Recipes").withLore("&7Recipes: ", getFromConfig(toolName, "craftings", List.class, new ArrayList<>())).build());
         }else if(toolMode == ToolMode.SELL){
             editor.setItem(50, new ItemBuilder(Material.GOLD_INGOT)
@@ -225,7 +225,7 @@ public final class EditorHandler {
     private void loadSettingsEditor(){
         Inventory editor = Bukkit.createInventory(null, 9 * 5);
 
-        ItemStack glassPane = new ItemBuilder(WMaterial.getBlackGlassPane()).withName("&6").build();
+        ItemStack glassPane = new ItemBuilder(Materials.getBlackGlassPane()).withName("&6").build();
 
         for(int i = 0; i < 9; i++)
             editor.setItem(i, glassPane);

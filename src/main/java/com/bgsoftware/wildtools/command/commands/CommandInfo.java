@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-public final class CommandInfo implements ICommand {
+public class CommandInfo implements ICommand {
 
     @Override
     public String getLabel() {

@@ -8,11 +8,10 @@ import org.bukkit.event.HandlerList;
 import java.util.Collections;
 import java.util.List;
 
-@SuppressWarnings("unused")
 /**
  * LightningWandUseEvent is called when a lightning wand is used.
  */
-public final class LightningWandUseEvent extends ToolUseEvent<LightningTool> {
+public class LightningWandUseEvent extends ToolUseEvent<LightningTool> {
 
     private static final HandlerList HANDLERS = new HandlerList();
 

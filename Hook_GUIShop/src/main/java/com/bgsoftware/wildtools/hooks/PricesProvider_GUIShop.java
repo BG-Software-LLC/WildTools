@@ -6,7 +6,7 @@ import com.pablo67340.guishop.Main;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-public final class PricesProvider_GUIShop implements PricesProvider {
+public class PricesProvider_GUIShop implements PricesProvider {
 
     private final Main plugin;
 

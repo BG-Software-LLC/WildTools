@@ -38,7 +38,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
-public final class ProvidersHandler implements ProvidersManager {
+public class ProvidersHandler implements ProvidersManager {
 
     private static final SellInfo EMPTY_INFO = new SellInfo(new HashMap<>(), 0.0);
 
@@ -217,8 +217,6 @@ public final class ProvidersHandler implements ProvidersManager {
     private void loadProviders() {
         WildToolsPlugin.log("Loading providers started...");
         long startTime = System.currentTimeMillis();
-
-        WildToolsPlugin.log(" - Using " + plugin.getNMSAdapter().getVersion() + " adapter.");
 
         loadGeneralHooks();
         loadPricesProvider();

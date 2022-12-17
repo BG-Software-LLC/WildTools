@@ -26,7 +26,7 @@ import java.util.Set;
 import java.util.UUID;
 
 @SuppressWarnings({"unused", "all"})
-public final class EditorListener implements Listener {
+public class EditorListener implements Listener {
 
     private WildToolsPlugin plugin;
 

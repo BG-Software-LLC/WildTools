@@ -9,7 +9,7 @@ import org.bukkit.inventory.ItemStack;
 
 import java.math.BigDecimal;
 
-public final class PricesProvider_Essentials216 implements PricesProvider {
+public class PricesProvider_Essentials216 implements PricesProvider {
 
 
     public PricesProvider_Essentials216() {

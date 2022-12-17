@@ -15,7 +15,7 @@ import org.bukkit.inventory.ItemStack;
 import java.util.HashMap;
 import java.util.Map;
 
-public final class ContainerProvider_ChunkCollectors implements ContainerProvider {
+public class ContainerProvider_ChunkCollectors implements ContainerProvider {
 
     @Override
     public boolean isContainer(BlockState blockState) {

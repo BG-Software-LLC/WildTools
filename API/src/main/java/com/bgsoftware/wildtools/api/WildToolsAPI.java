@@ -13,8 +13,7 @@ import org.bukkit.inventory.ItemStack;
 
 import com.bgsoftware.wildtools.api.objects.tools.SellTool;
 
-@SuppressWarnings("unused")
-public final class WildToolsAPI {
+public class WildToolsAPI {
 
     private static WildTools instance;
 

@@ -9,7 +9,7 @@ import java.util.logging.Formatter;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
-public final class SellWandLogger {
+public class SellWandLogger {
 
     private static final WildToolsPlugin plugin = WildToolsPlugin.getPlugin();
     private static final Logger LOGGER = Logger.getLogger("WildTools-SellWand");
@@ -51,7 +51,7 @@ public final class SellWandLogger {
     public static void close(){
     }
 
-    private static final class LogsFormatter extends Formatter{
+    private static class LogsFormatter extends Formatter{
 
         private static final SimpleDateFormat dateFormat = new SimpleDateFormat("[HH:mm:ss dd:MM:yy]");
 

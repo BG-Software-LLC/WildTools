@@ -6,7 +6,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.RegisteredServiceProvider;
 
-public final class EconomyProvider_Vault implements EconomyProvider {
+public class EconomyProvider_Vault implements EconomyProvider {
 
     private static Economy econ;
 

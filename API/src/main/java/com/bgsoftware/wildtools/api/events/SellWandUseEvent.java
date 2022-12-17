@@ -7,11 +7,10 @@ import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
-@SuppressWarnings("unused")
 /**
  * SellWandUseEvent is called when a sell wand is used.
  */
-public final class SellWandUseEvent extends Event implements Cancellable {
+public class SellWandUseEvent extends Event implements Cancellable {
 
     private static final HandlerList HANDLERS = new HandlerList();
 

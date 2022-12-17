@@ -2,7 +2,7 @@ package com.bgsoftware.wildtools.utils.world;
 
 import com.bgsoftware.wildtools.WildToolsPlugin;
 import com.bgsoftware.wildtools.hooks.listener.IToolBlockListener;
-import com.bgsoftware.wildtools.utils.NumberUtils;
+import com.bgsoftware.wildtools.utils.math.NumberUtils;
 import com.bgsoftware.wildtools.utils.math.Vector2;
 import com.bgsoftware.wildtools.utils.math.Vector3;
 import org.bukkit.Location;
@@ -40,7 +40,7 @@ public class WorldEditSession {
 
     public void setType(Location location, Block block) {
         ensureNotApplied();
-        setType(location, plugin.getNMSAdapter().getCombinedId(block));
+        setType(location, plugin.getNMSWorld().getCombinedId(block));
     }
 
     public void setAir(Location location) {
@@ -50,22 +50,21 @@ public class WorldEditSession {
 
     public void setType(Location bukkitLocation, int blockId) {
         ensureNotApplied();
-
-        Vector3 location = Vector3.of(bukkitLocation);
         boolean isPlace = blockId != 0;
-
         boolean updateBlock = dropLocation == null;
-
-        boolean res = this.setTypeInternal(location, isPlace,
-                vec -> plugin.getNMSAdapter().setBlockFast(this.world, vec, blockId, updateBlock));
-
-        if (res && updateBlock)
-            dropLocation = location;
+        this.setType(bukkitLocation, isPlace, vec -> plugin.getNMSWorld().setBlockFast(this.world, vec, blockId, updateBlock));
     }
 
     public boolean setType(Location bukkitLocation, boolean isPlace, SetBlockFunction setBlockFunction) {
         ensureNotApplied();
-        return this.setTypeInternal(Vector3.of(bukkitLocation), isPlace, setBlockFunction);
+
+        Vector3 location = Vector3.of(bukkitLocation);
+        boolean setTypeResult = this.setTypeInternal(location, isPlace, setBlockFunction);
+
+        if (setTypeResult && dropLocation == null)
+            dropLocation = location;
+
+        return setTypeResult;
     }
 
     private boolean setTypeInternal(Vector3 location, boolean isPlace, SetBlockFunction setBlockFunction) {
@@ -112,12 +111,12 @@ public class WorldEditSession {
                         IToolBlockListener.Action.BLOCK_PLACE : IToolBlockListener.Action.BLOCK_BREAK);
             });
 
-            plugin.getNMSAdapter().refreshChunk(chunkVector.toChunk(this.world), affectedBlocks);
+            plugin.getNMSWorld().refreshChunk(chunkVector.toChunk(this.world), affectedBlocks);
         });
 
         // Drop all the items
         if (this.itemsToDrop != null && !this.itemsToDrop.isEmpty())
-            plugin.getNMSAdapter().dropItems(this.world, this.dropLocation, this.itemsToDrop);
+            plugin.getNMSWorld().dropItems(this.world, this.dropLocation, this.itemsToDrop);
 
         if (this.expToDrop > 0) {
             Location bukkitLocation = this.dropLocation.toLocation(this.world);
@@ -146,7 +145,7 @@ public class WorldEditSession {
     }
 
     private boolean isLocationValid(Vector3 location) {
-        return NumberUtils.range(location.getY(), plugin.getNMSAdapter().getMinHeight(this.world), this.world.getMaxHeight()) &&
+        return NumberUtils.range(location.getY(), plugin.getNMSWorld().getMinHeight(this.world), this.world.getMaxHeight()) &&
                 NumberUtils.range(location.getX(), -MAX_BLOCK_LOCATION, MAX_BLOCK_LOCATION) &&
                 NumberUtils.range(location.getZ(), -MAX_BLOCK_LOCATION, MAX_BLOCK_LOCATION);
     }

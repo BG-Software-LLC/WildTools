@@ -13,7 +13,7 @@ import com.bgsoftware.wildtools.handlers.ToolsHandler;
 import java.util.ArrayList;
 import java.util.List;
 
-public final class CommandReload implements ICommand {
+public class CommandReload implements ICommand {
 
     @Override
     public String getLabel() {

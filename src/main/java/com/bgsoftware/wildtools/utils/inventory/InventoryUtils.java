@@ -3,7 +3,7 @@ package com.bgsoftware.wildtools.utils.inventory;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
-public final class InventoryUtils {
+public class InventoryUtils {
 
     public static int countItems(Inventory inventory, ItemStack itemStack){
         int amount = 0;

@@ -9,7 +9,7 @@ import java.io.InputStreamReader;
 import java.net.URL;
 
 @SuppressWarnings("WeakerAccess")
-public final class Updater {
+public class Updater {
 
     private static final WildToolsPlugin plugin = WildToolsPlugin.getPlugin();
     private static String latestVersion, versionDescription;

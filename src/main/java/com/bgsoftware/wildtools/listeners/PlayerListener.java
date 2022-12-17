@@ -3,8 +3,8 @@ package com.bgsoftware.wildtools.listeners;
 import com.bgsoftware.wildtools.Updater;
 import com.bgsoftware.wildtools.WildToolsPlugin;
 import com.bgsoftware.wildtools.api.objects.tools.Tool;
-import com.bgsoftware.wildtools.objects.WSelection;
-import com.bgsoftware.wildtools.objects.tools.WCannonTool;
+import com.bgsoftware.wildtools.utils.WSelection;
+import com.bgsoftware.wildtools.tools.WCannonTool;
 import com.bgsoftware.wildtools.utils.items.ItemUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -26,8 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-@SuppressWarnings("unused")
-public final class PlayerListener implements Listener {
+public class PlayerListener implements Listener {
 
     /*
     Just notifies me if the server is using WildBuster

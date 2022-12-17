@@ -14,7 +14,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public final class RecipesHandler {
+public class RecipesHandler {
 
     public RecipesHandler(WildToolsPlugin plugin){
         File file = new File(plugin.getDataFolder(), "recipes.yml");

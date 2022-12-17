@@ -3,20 +3,22 @@ package com.bgsoftware.wildtools.api.events;
 import com.bgsoftware.wildtools.api.objects.tools.CuboidTool;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Cancellable;
 import org.bukkit.event.HandlerList;
 
 import java.util.Collections;
 import java.util.List;
 
-@SuppressWarnings("unused")
 /**
  * CuboidWandUseEvent is called when a cuboid wand is used.
  */
-public final class CuboidWandUseEvent extends ToolUseEvent<CuboidTool> {
+public class CuboidWandUseEvent extends ToolUseEvent<CuboidTool> implements Cancellable {
 
     private static final HandlerList HANDLERS = new HandlerList();
 
     private final List<Location> blocks;
+
+    private boolean cancelled = false;
 
     /**
      * The constructor of the event.
@@ -34,6 +36,16 @@ public final class CuboidWandUseEvent extends ToolUseEvent<CuboidTool> {
      */
     public List<Location> getBlocks() {
         return blocks;
+    }
+
+    @Override
+    public boolean isCancelled() {
+        return cancelled;
+    }
+
+    @Override
+    public void setCancelled(boolean cancelled) {
+        this.cancelled = cancelled;
     }
 
     @Override

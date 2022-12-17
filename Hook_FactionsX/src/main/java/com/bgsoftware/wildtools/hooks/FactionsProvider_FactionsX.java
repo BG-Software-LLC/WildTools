@@ -8,7 +8,7 @@ import net.prosavage.factionsx.manager.PlayerManager;
 import net.prosavage.factionsx.persist.TNTAddonData;
 import org.bukkit.entity.Player;
 
-public final class FactionsProvider_FactionsX implements FactionsProvider {
+public class FactionsProvider_FactionsX implements FactionsProvider {
 
     public FactionsProvider_FactionsX(){
         WildToolsPlugin.log(" - Couldn't find any factions providers for tnt banks, using default one.");

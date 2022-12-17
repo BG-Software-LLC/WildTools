@@ -4,7 +4,7 @@ import com.bgsoftware.wildstacker.api.WildStackerAPI;
 import org.bukkit.entity.Item;
 import org.bukkit.inventory.ItemStack;
 
-public final class StackedItemProvider_WildStacker implements StackedItemProvider {
+public class StackedItemProvider_WildStacker implements StackedItemProvider {
 
     @Override
     public ItemStack getItemStack(Item item) {

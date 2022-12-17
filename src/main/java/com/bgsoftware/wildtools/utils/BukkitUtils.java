@@ -29,7 +29,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Function;
 
-public final class BukkitUtils {
+public class BukkitUtils {
 
     private static final ReflectMethod<Boolean> BLOCK_BREAK_EVENT_IS_DROP_ITEMS = new ReflectMethod<>(
             BlockBreakEvent.class, "isDropItems");
@@ -49,7 +49,6 @@ public final class BukkitUtils {
             "BUBBLE_COLUMN"
     });
 
-    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public static boolean canBreakBlock(Player player, Block block, Tool tool) {
         return canBreakBlock(player, block, block.getType(), block.getState().getData().toItemStack().getDurability(), tool);
     }
@@ -57,7 +56,7 @@ public final class BukkitUtils {
     public static boolean canBreakBlock(Player player, Block block, Material firstType, short firstData, Tool tool) {
         return !DISALLOWED_BLOCKS.contains(block.getType()) && tool.canBreakBlock(block, firstType, firstData) &&
                 (!tool.isOnlyInsideClaim() || plugin.getProviders().isInsideClaim(player, block.getLocation())) &&
-                !plugin.getNMSAdapter().isOutsideWorldborder(block.getLocation());
+                !plugin.getNMSWorld().isOutsideWorldBorder(block.getLocation());
     }
 
     public static boolean hasBreakAccess(Block block, Player player) {
@@ -81,7 +80,7 @@ public final class BukkitUtils {
         block.setMetadata("drop-items", new FixedMetadataValue(plugin, tool == null));
 
         if ((tool == null || !tool.hasSilkTouch()) && usedItem.getEnchantmentLevel(Enchantment.SILK_TOUCH) == 0)
-            blockBreakEvent.setExpToDrop(plugin.getNMSAdapter().getExpFromBlock(block, player));
+            blockBreakEvent.setExpToDrop(plugin.getNMSWorld().getExpFromBlock(block, player));
 
         plugin.getEvents().callBreakEvent(blockBreakEvent, true);
 
@@ -142,9 +141,9 @@ public final class BukkitUtils {
         Location blockLocation = block.getLocation();
 
         if (editSession == null) {
-            plugin.getNMSAdapter().setCropState(block, CropState.SEEDED);
+            plugin.getNMSWorld().setCropState(block, CropState.SEEDED);
         } else {
-            editSession.setType(blockLocation, false, vec -> plugin.getNMSAdapter().setCropState(block, CropState.SEEDED));
+            editSession.setType(blockLocation, false, vec -> plugin.getNMSWorld().setCropState(block, CropState.SEEDED));
         }
 
         if (tool != null)
@@ -180,8 +179,7 @@ public final class BukkitUtils {
         if (!Boolean.parseBoolean(block.getWorld().getGameRuleValue("doTileDrops")))
             return new ArrayList<>();
 
-        return ItemUtils.isCrops(block.getType()) ? plugin.getNMSAdapter().getCropDrops(player, block) :
-                plugin.getNMSAdapter().getBlockDrops(player, block, tool.hasSilkTouch());
+        return plugin.getNMSWorld().getBlockDrops(player, block, tool.hasSilkTouch());
     }
 
     private static void collectDropsFromTool(Player player, Block block, Tool tool,

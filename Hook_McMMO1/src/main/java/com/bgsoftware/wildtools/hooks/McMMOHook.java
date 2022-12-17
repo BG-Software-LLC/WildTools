@@ -17,8 +17,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
-@SuppressWarnings("unused")
-public final class McMMOHook {
+public class McMMOHook {
 
     private static final ReflectMethod<Object> EVENT_GET_ABILITY = new ReflectMethod<>(
             McMMOPlayerAbilityActivateEvent.class, "getAbility");
@@ -67,7 +66,7 @@ public final class McMMOHook {
         return null;
     }
 
-    private static final class McMMOListener implements Listener {
+    private static class McMMOListener implements Listener {
 
         private static final Set<UUID> messageCooldowns = new HashSet<>();
 

@@ -9,8 +9,7 @@ import su.nightexpress.quantumshop.modules.list.gui.GUIShop;
 import su.nightexpress.quantumshop.modules.list.gui.objects.ShopGUI;
 import su.nightexpress.quantumshop.modules.list.gui.objects.ShopProduct;
 
-@SuppressWarnings("unused")
-public final class PricesProvider_QuantumShop implements PricesProvider {
+public class PricesProvider_QuantumShop implements PricesProvider {
 
     private final GUIShop guiShop;
 

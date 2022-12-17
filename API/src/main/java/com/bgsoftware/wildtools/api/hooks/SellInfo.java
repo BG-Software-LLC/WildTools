@@ -3,7 +3,7 @@ package com.bgsoftware.wildtools.api.hooks;
 import java.util.HashMap;
 import java.util.Map;
 
-public final class SellInfo {
+public class SellInfo {
 
     private final Map<Integer, SoldItem> soldItems = new HashMap<>();
     private final double totalEarnings;

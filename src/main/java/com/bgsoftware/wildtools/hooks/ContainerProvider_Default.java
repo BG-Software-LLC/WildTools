@@ -3,6 +3,7 @@ package com.bgsoftware.wildtools.hooks;
 import com.bgsoftware.wildtools.WildToolsPlugin;
 import com.bgsoftware.wildtools.api.hooks.SellInfo;
 import com.bgsoftware.wildtools.api.hooks.SoldItem;
+import com.bgsoftware.wildtools.utils.Materials;
 import com.bgsoftware.wildtools.utils.items.ItemUtils;
 import org.bukkit.Material;
 import org.bukkit.block.BlockState;
@@ -15,7 +16,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public final class ContainerProvider_Default implements ExtendedContainerProvider {
+public class ContainerProvider_Default implements ExtendedContainerProvider {
+
+    private static final Material BARREL = Materials.getSafeMaterial("BARREL", null);
+    private static final Material SHULKER_BOX = Materials.getSafeMaterial("SHULKER_BOX", null);
 
     private final WildToolsPlugin plugin;
 
@@ -26,8 +30,7 @@ public final class ContainerProvider_Default implements ExtendedContainerProvide
     @Override
     public boolean isContainer(BlockState blockState) {
         Material type = blockState.getType();
-        return type == Material.CHEST || type == Material.TRAPPED_CHEST ||
-                type.name().equals("BARREL") || type.name().contains("SHULKER_BOX");
+        return type == Material.CHEST || type == Material.TRAPPED_CHEST || type == BARREL || type == SHULKER_BOX;
     }
 
     @Override

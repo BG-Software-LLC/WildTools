@@ -2,18 +2,18 @@ package com.bgsoftware.wildtools.handlers;
 
 import com.bgsoftware.wildtools.api.objects.tools.CrowbarTool;
 import com.bgsoftware.wildtools.api.objects.tools.MagnetTool;
-import com.bgsoftware.wildtools.objects.tools.WBuilderTool;
-import com.bgsoftware.wildtools.objects.tools.WCannonTool;
-import com.bgsoftware.wildtools.objects.tools.WCraftingTool;
-import com.bgsoftware.wildtools.objects.tools.WCrowbarTool;
-import com.bgsoftware.wildtools.objects.tools.WCuboidTool;
-import com.bgsoftware.wildtools.objects.tools.WHarvesterTool;
-import com.bgsoftware.wildtools.objects.tools.WIceTool;
-import com.bgsoftware.wildtools.objects.tools.WLightningTool;
-import com.bgsoftware.wildtools.objects.tools.WMagnetTool;
-import com.bgsoftware.wildtools.objects.tools.WPillarTool;
-import com.bgsoftware.wildtools.objects.tools.WSellTool;
-import com.bgsoftware.wildtools.objects.tools.WSortTool;
+import com.bgsoftware.wildtools.tools.WBuilderTool;
+import com.bgsoftware.wildtools.tools.WCannonTool;
+import com.bgsoftware.wildtools.tools.WCraftingTool;
+import com.bgsoftware.wildtools.tools.WCrowbarTool;
+import com.bgsoftware.wildtools.tools.WCuboidTool;
+import com.bgsoftware.wildtools.tools.WHarvesterTool;
+import com.bgsoftware.wildtools.tools.WIceTool;
+import com.bgsoftware.wildtools.tools.WLightningTool;
+import com.bgsoftware.wildtools.tools.WMagnetTool;
+import com.bgsoftware.wildtools.tools.WPillarTool;
+import com.bgsoftware.wildtools.tools.WSellTool;
+import com.bgsoftware.wildtools.tools.WSortTool;
 import com.bgsoftware.wildtools.utils.items.ToolItemStack;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -35,7 +35,7 @@ import com.bgsoftware.wildtools.api.objects.tools.PillarTool;
 import com.bgsoftware.wildtools.api.objects.tools.SellTool;
 import com.bgsoftware.wildtools.api.objects.tools.SortTool;
 import com.bgsoftware.wildtools.api.objects.tools.Tool;
-import com.bgsoftware.wildtools.objects.tools.WDrainTool;
+import com.bgsoftware.wildtools.tools.WDrainTool;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -45,7 +45,7 @@ import java.util.List;
 import java.util.Map;
 
 @SuppressWarnings("unchecked")
-public final class ToolsHandler implements ToolsManager {
+public class ToolsHandler implements ToolsManager {
 
     private static final Comparator<Tool> toolComparator = (o1, o2) -> {
         int compare = Integer.compare(o1.getToolMode().ordinal(), o2.getToolMode().ordinal());

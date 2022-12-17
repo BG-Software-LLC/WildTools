@@ -11,7 +11,7 @@ import org.bukkit.inventory.ItemStack;
 import java.util.Collections;
 import java.util.List;
 
-public final class DropsProvider_MergedSpawner implements DropsProvider {
+public class DropsProvider_MergedSpawner implements DropsProvider {
 
     @Override
     public List<ItemStack> getBlockDrops(Player player, Block block) {

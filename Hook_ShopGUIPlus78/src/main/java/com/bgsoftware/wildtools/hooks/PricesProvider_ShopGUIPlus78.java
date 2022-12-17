@@ -13,7 +13,7 @@ import org.bukkit.inventory.ItemStack;
 import java.util.HashMap;
 import java.util.Map;
 
-public final class PricesProvider_ShopGUIPlus78 implements PricesProvider {
+public class PricesProvider_ShopGUIPlus78 implements PricesProvider {
 
     // Added cache for shop items for better performance
     private final Map<WrappedItemStack, Pair<ShopItem, Shop>> cachedShopItems = new HashMap<>();
@@ -57,7 +57,7 @@ public final class PricesProvider_ShopGUIPlus78 implements PricesProvider {
         return player == null ? shopItem.getSellPriceForAmount(amount) : shopItem.getSellPriceForAmount(player, amount);
     }
 
-    private static final class WrappedItemStack {
+    private static class WrappedItemStack {
 
         private final ItemStack value;
 

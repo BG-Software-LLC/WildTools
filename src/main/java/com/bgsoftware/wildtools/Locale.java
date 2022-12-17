@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-public final class Locale {
+public class Locale {
 
     private static final WildToolsPlugin plugin = WildToolsPlugin.getPlugin();
     private static Map<String, Locale> localeMap = new HashMap<>();

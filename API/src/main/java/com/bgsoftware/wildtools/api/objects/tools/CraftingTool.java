@@ -4,7 +4,6 @@ import org.bukkit.inventory.Recipe;
 
 import java.util.Iterator;
 
-@SuppressWarnings("unused")
 public interface CraftingTool extends Tool {
 
     /**

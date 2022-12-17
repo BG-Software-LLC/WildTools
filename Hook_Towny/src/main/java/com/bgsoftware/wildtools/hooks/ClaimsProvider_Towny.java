@@ -9,7 +9,7 @@ import com.palmergames.bukkit.towny.object.WorldCoord;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
-public final class ClaimsProvider_Towny implements ClaimsProvider {
+public class ClaimsProvider_Towny implements ClaimsProvider {
 
     @Override
     public boolean isPlayerClaim(Player player, Location location) {

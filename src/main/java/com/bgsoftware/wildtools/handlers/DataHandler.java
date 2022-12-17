@@ -28,7 +28,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public final class DataHandler {
+public class DataHandler {
 
     private static final WildToolsPlugin plugin = WildToolsPlugin.getPlugin();
 

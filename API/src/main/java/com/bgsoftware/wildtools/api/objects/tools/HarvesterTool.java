@@ -1,6 +1,5 @@
 package com.bgsoftware.wildtools.api.objects.tools;
 
-@SuppressWarnings("unused")
 public interface HarvesterTool extends Tool {
 
     /**

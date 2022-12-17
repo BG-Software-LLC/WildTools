@@ -10,7 +10,7 @@ import net.prosavage.factionsx.util.PlayerAction;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
-public final class ClaimsProvider_FactionsX implements ClaimsProvider {
+public class ClaimsProvider_FactionsX implements ClaimsProvider {
 
     @Override
     public boolean isPlayerClaim(Player player, Location location) {

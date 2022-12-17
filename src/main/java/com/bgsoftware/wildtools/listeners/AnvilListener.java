@@ -19,8 +19,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-@SuppressWarnings("unused")
-public final class AnvilListener implements Listener {
+public class AnvilListener implements Listener {
 
     private final Map<AnvilInventory, String> renameTexts = new HashMap<>();
     private final Set<AnvilInventory> recentPrepares = new HashSet<>();

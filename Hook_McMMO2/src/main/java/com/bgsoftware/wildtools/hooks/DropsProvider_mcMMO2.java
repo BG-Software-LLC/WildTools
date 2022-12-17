@@ -10,20 +10,19 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public final class DropsProvider_mcMMO2 implements DropsProvider {
+public class DropsProvider_mcMMO2 implements DropsProvider {
 
     private static final WildToolsPlugin plugin = WildToolsPlugin.getPlugin();
 
     @Override
     public List<ItemStack> getBlockDrops(Player player, Block block) {
-        if(!ItemUtils.isCrops(block.getType()) || !shouldBonusDrops(player, block))
+        if (!ItemUtils.isCrops(block.getType()) || !shouldBonusDrops(player, block))
             return null;
 
-        return plugin.getNMSAdapter().getCropDrops(player, block).stream()
+        return plugin.getNMSWorld().getBlockDrops(player, block, false).stream()
                 .peek(itemStack -> itemStack.setAmount(itemStack.getAmount() * 2)).collect(Collectors.toList());
     }
 
@@ -32,7 +31,7 @@ public final class DropsProvider_mcMMO2 implements DropsProvider {
         return false;
     }
 
-    private boolean shouldBonusDrops(Player player, Block block){
+    private boolean shouldBonusDrops(Player player, Block block) {
         return BlockUtils.checkDoubleDrops(player, block.getState(), PrimarySkillType.HERBALISM, SubSkillType.HERBALISM_DOUBLE_DROPS);
     }
 

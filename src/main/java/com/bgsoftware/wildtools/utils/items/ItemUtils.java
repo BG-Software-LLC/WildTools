@@ -3,9 +3,9 @@ package com.bgsoftware.wildtools.utils.items;
 import com.bgsoftware.wildtools.Locale;
 import com.bgsoftware.wildtools.WildToolsPlugin;
 import com.bgsoftware.wildtools.api.objects.tools.Tool;
-import com.bgsoftware.wildtools.objects.WMaterial;
-import com.bgsoftware.wildtools.objects.tools.WHarvesterTool;
+import com.bgsoftware.wildtools.tools.WHarvesterTool;
 import com.bgsoftware.wildtools.utils.Executor;
+import com.bgsoftware.wildtools.utils.Materials;
 import com.bgsoftware.wildtools.utils.math.Vector3;
 import com.bgsoftware.wildtools.utils.world.WorldEditSession;
 import org.bukkit.Bukkit;
@@ -26,7 +26,9 @@ import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 
-public final class ItemUtils {
+public class ItemUtils {
+
+    private static final Material BAMBOO = Materials.getSafeMaterial("BAMBOO", null);
 
     private static final WildToolsPlugin plugin = WildToolsPlugin.getPlugin();
 
@@ -38,7 +40,7 @@ public final class ItemUtils {
                 additionalItems.forEach((i, drop) -> drops.add(drop));
                 editSession.addDrops(drops);
             } else {
-                Executor.sync(() -> plugin.getNMSAdapter().dropItems(location.getWorld(),
+                Executor.sync(() -> plugin.getNMSWorld().dropItems(location.getWorld(),
                         Vector3.of(location), new LinkedList<>(additionalItems.values())));
             }
         }
@@ -85,13 +87,13 @@ public final class ItemUtils {
         toolItemStack.setItemMeta(meta);
     }
 
-    public static void reduceDurability(ToolItemStack toolItemStack, Player pl, int amount) {
+    public static void reduceDurability(ToolItemStack toolItemStack, Player player, int amount) {
         Tool tool = toolItemStack.getTool();
 
         if (tool == null)
             return;
 
-        if (tool.isUnbreakable() || pl.getGameMode() == GameMode.CREATIVE)
+        if (tool.isUnbreakable() || player.getGameMode() == GameMode.CREATIVE)
             return;
 
         ItemStack clonedTools = null;
@@ -115,16 +117,15 @@ public final class ItemUtils {
             toolItemStack.setDurability((short) (toolItemStack.getDurability() + amount));
 
             if (toolItemStack.getDurability() > toolItemStack.getMaxDurability())
-                plugin.getNMSAdapter().breakTool(toolItemStack, pl);
+                toolItemStack.breakTool(player);
         } else {
             int usesLeft = toolItemStack.getUses();
             toolItemStack.setUses((usesLeft -= amount));
 
-            if (usesLeft <= 0) {
-                plugin.getNMSAdapter().breakTool(toolItemStack, pl);
-            }
+            if (usesLeft <= 0)
+                toolItemStack.breakTool(player);
 
-            //Update name and lore
+                //Update name and lore
             else {
                 // Update durability depends on the uses
                 if (tool.isUsesProgress()) {
@@ -138,7 +139,7 @@ public final class ItemUtils {
         }
 
         if (clonedTools != null)
-            ItemUtils.addItem(clonedTools, pl.getInventory(), pl.getLocation(), null);
+            ItemUtils.addItem(clonedTools, player.getInventory(), player.getLocation(), null);
     }
 
     public static int getDurability(Player player, ToolItemStack toolItemStack) {
@@ -155,8 +156,8 @@ public final class ItemUtils {
 
     public static boolean isCrops(Material type) {
         return WHarvesterTool.crops.contains(type.name()) && type != Material.CACTUS &&
-                type != WMaterial.SUGAR_CANE.parseMaterial() && type != WMaterial.MELON.parseMaterial() &&
-                type != Material.PUMPKIN && !type.name().equals("BAMBOO");
+                type != Materials.SUGAR_CANE.parseMaterial() && type != Materials.MELON.parseMaterial() &&
+                type != Material.PUMPKIN && type != BAMBOO;
     }
 
 }

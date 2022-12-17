@@ -2,7 +2,7 @@ package com.bgsoftware.wildtools.api.hooks;
 
 import org.bukkit.inventory.ItemStack;
 
-public final class SoldItem{
+public class SoldItem{
 
     private final ItemStack item;
     private final double price;

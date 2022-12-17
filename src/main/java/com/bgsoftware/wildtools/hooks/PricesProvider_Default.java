@@ -8,7 +8,7 @@ import org.bukkit.inventory.ItemStack;
 import java.util.HashMap;
 import java.util.Map;
 
-public final class PricesProvider_Default implements PricesProvider {
+public class PricesProvider_Default implements PricesProvider {
 
     @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
     public static Map<String, Double> prices = new HashMap<>();

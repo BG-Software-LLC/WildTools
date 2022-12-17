@@ -10,7 +10,7 @@ import org.bukkit.inventory.ItemStack;
 import java.util.ArrayList;
 import java.util.List;
 
-public final class DropsProvider_SilkSpawners5 implements DropsProvider {
+public class DropsProvider_SilkSpawners5 implements DropsProvider {
 
     private final SilkUtil silkUtil;
 

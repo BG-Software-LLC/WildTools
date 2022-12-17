@@ -8,7 +8,7 @@ import com.bgsoftware.wildtools.WildToolsPlugin;
 
 import java.util.List;
 
-public final class CommandSettings implements ICommand {
+public class CommandSettings implements ICommand {
 
     @Override
     public String getLabel() {
@@ -47,9 +47,9 @@ public final class CommandSettings implements ICommand {
             return;
         }
 
-        Player pl = (Player) sender;
+        Player player = (Player) sender;
 
-        pl.openInventory(plugin.getEditor().getSettingsEditor());
+        player.openInventory(plugin.getEditor().getSettingsEditor());
     }
 
     @Override

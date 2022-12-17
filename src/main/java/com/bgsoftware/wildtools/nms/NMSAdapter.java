@@ -2,15 +2,10 @@ package com.bgsoftware.wildtools.nms;
 
 import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.wildtools.recipes.AdvancedShapedRecipe;
+import com.bgsoftware.wildtools.utils.items.DestroySpeedCategory;
 import com.bgsoftware.wildtools.utils.items.ToolItemStack;
-import com.bgsoftware.wildtools.utils.math.Vector3;
-import com.bgsoftware.wildtools.utils.world.WorldEditSession;
 import org.apache.commons.lang.Validate;
-import org.bukkit.Chunk;
-import org.bukkit.CropState;
-import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Item;
@@ -24,68 +19,27 @@ import org.bukkit.inventory.Recipe;
 import org.bukkit.inventory.ShapedRecipe;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 
 public interface NMSAdapter {
 
-    String getVersion();
-
-    default boolean isLegacy() {
-        return true;
-    }
-
-    List<ItemStack> getBlockDrops(Player pl, Block bl, boolean silkTouch);
-
-    List<ItemStack> getCropDrops(Player pl, Block bl);
-
-    int getExpFromBlock(Block block, Player player);
+    ToolItemStack createToolItemStack(ItemStack other);
 
     ItemStack getItemInHand(Player player);
 
     ItemStack getItemInHand(Player player, Event e);
 
-    Object[] createSyncedItem(ItemStack other);
-
-    void setTag(ToolItemStack toolItemStack, String key, int value);
-
-    void setTag(ToolItemStack toolItemStack, String key, String value);
-
-    int getTag(ToolItemStack toolItemStack, String key, int def);
-
-    String getTag(ToolItemStack toolItemStack, String key, String def);
-
-    void clearTasks(ToolItemStack toolItemStack);
-
-    void breakTool(ToolItemStack toolItemStack, Player player);
-
-    boolean isFullyGrown(Block block);
-
-    void setCropState(Block block, CropState cropState);
-
     Collection<Player> getOnlinePlayers();
-
-    void setBlockFast(World world, Vector3 location, int combinedId, boolean sendUpdate);
-
-    void refreshChunk(Chunk chunk, List<WorldEditSession.BlockData> blocksList);
-
-    int getCombinedId(Block block);
-
-    int getFarmlandId();
 
     Enchantment getGlowEnchant();
 
-    boolean isOutsideWorldborder(Location location);
+    int getFarmlandId();
 
     BlockPlaceEvent getFakePlaceEvent(Player player, Block block, Block copyBlock);
 
     void playPickupAnimation(LivingEntity livingEntity, Item item);
 
-    boolean isAxeType(Material material);
-
-    boolean isShovelType(Material material);
-
-    void dropItems(World world, Vector3 dropLocation, List<ItemStack> droppedItems);
+    DestroySpeedCategory getDestroySpeedCategory(Material material);
 
     default ItemStack[] parseChoice(Recipe recipe, ItemStack itemStack) {
         return new ItemStack[]{itemStack};
@@ -105,10 +59,6 @@ public interface NMSAdapter {
 
     default AdvancedShapedRecipe createRecipe(String toolName, ItemStack result) {
         return new AdvancedRecipeClassImpl(result);
-    }
-
-    default int getMinHeight(World world) {
-        return 0;
     }
 
     class AdvancedRecipeClassImpl extends ShapedRecipe implements AdvancedShapedRecipe {

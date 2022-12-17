@@ -6,7 +6,7 @@ import com.stefthedev.villages.villages.Village;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
-public final class ClaimsProvider_Villages implements ClaimsProvider {
+public class ClaimsProvider_Villages implements ClaimsProvider {
 
     @Override
     public boolean isPlayerClaim(Player player, Location location) {

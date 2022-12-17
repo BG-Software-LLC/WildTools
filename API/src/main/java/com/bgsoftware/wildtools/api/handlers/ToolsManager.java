@@ -20,7 +20,6 @@ import com.bgsoftware.wildtools.api.objects.tools.SellTool;
 
 import java.util.List;
 
-@SuppressWarnings("unused")
 public interface ToolsManager {
 
     /**

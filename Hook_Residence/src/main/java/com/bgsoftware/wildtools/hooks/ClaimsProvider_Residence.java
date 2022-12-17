@@ -7,7 +7,7 @@ import com.bgsoftware.wildtools.api.hooks.ClaimsProvider;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
-public final class ClaimsProvider_Residence implements ClaimsProvider {
+public class ClaimsProvider_Residence implements ClaimsProvider {
 
     @Override
     public boolean isPlayerClaim(Player player, Location location) {

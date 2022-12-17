@@ -6,7 +6,7 @@ import com.massivecraft.factions.FPlayers;
 import com.massivecraft.factions.struct.Role;
 import org.bukkit.entity.Player;
 
-public final class FactionsProvider_SavageFactions implements FactionsProvider {
+public class FactionsProvider_SavageFactions implements FactionsProvider {
 
     public FactionsProvider_SavageFactions(){
         WildToolsPlugin.log(" - Using SavageFactions as FactionsProvider for tnt banks.");

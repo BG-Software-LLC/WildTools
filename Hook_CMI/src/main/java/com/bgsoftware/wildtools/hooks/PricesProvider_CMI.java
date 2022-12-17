@@ -9,7 +9,7 @@ import com.bgsoftware.wildtools.api.hooks.PricesProvider;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-public final class PricesProvider_CMI implements PricesProvider {
+public class PricesProvider_CMI implements PricesProvider {
 
     public PricesProvider_CMI(){
         WildToolsPlugin.log(" - Using CMI as PricesProvider.");

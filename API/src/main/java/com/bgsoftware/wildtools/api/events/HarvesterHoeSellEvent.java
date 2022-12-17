@@ -5,11 +5,10 @@ import org.bukkit.event.Cancellable;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.player.PlayerEvent;
 
-@SuppressWarnings("unused")
 /**
  * HarvesterHoeSellEvent is called when a items are sold by a harvester hoe.
  */
-public final class HarvesterHoeSellEvent extends PlayerEvent implements Cancellable {
+public class HarvesterHoeSellEvent extends PlayerEvent implements Cancellable {
 
     private static final HandlerList HANDLERS = new HandlerList();
 

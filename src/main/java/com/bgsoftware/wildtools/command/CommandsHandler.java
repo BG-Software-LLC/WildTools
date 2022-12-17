@@ -15,7 +15,7 @@ import com.bgsoftware.wildtools.command.commands.CommandSettings;
 import java.util.ArrayList;
 import java.util.List;
 
-public final class CommandsHandler implements CommandExecutor, TabCompleter {
+public class CommandsHandler implements CommandExecutor, TabCompleter {
 
     private WildToolsPlugin plugin;
     private List<ICommand> cmds;

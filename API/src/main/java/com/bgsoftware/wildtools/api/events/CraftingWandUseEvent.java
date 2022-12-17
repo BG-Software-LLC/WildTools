@@ -8,11 +8,10 @@ import org.bukkit.inventory.ItemStack;
 import java.util.Collections;
 import java.util.List;
 
-@SuppressWarnings("unused")
 /**
  * CraftingWandUseEvent is called when a crafting wand is used.
  */
-public final class CraftingWandUseEvent extends ToolUseEvent<CraftingTool> {
+public class CraftingWandUseEvent extends ToolUseEvent<CraftingTool> {
 
     private static final HandlerList HANDLERS = new HandlerList();
 

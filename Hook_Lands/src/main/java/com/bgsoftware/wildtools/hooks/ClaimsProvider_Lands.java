@@ -8,7 +8,7 @@ import me.angeschossen.lands.api.role.enums.RoleSetting;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
-public final class ClaimsProvider_Lands implements ClaimsProvider {
+public class ClaimsProvider_Lands implements ClaimsProvider {
 
     private final LandsIntegration landsIntegration;
 

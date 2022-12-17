@@ -8,11 +8,10 @@ import org.bukkit.inventory.ItemStack;
 import java.util.Collections;
 import java.util.List;
 
-@SuppressWarnings("unused")
 /**
  * SortWandUseEvent is called when a sort wand is used.
  */
-public final class SortWandUseEvent extends ToolUseEvent<SortTool> {
+public class SortWandUseEvent extends ToolUseEvent<SortTool> {
 
     private static final HandlerList HANDLERS = new HandlerList();
 

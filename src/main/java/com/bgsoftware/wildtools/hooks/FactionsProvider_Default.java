@@ -3,7 +3,7 @@ package com.bgsoftware.wildtools.hooks;
 import com.bgsoftware.wildtools.WildToolsPlugin;
 import org.bukkit.entity.Player;
 
-public final class FactionsProvider_Default implements FactionsProvider {
+public class FactionsProvider_Default implements FactionsProvider {
 
     public FactionsProvider_Default(){
         WildToolsPlugin.log(" - Couldn't find any factions providers for tnt banks, using default one.");

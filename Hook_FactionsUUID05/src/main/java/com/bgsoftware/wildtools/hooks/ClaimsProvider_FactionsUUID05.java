@@ -9,7 +9,7 @@ import com.massivecraft.factions.perms.PermissibleAction;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
-public final class ClaimsProvider_FactionsUUID05 implements ClaimsProvider {
+public class ClaimsProvider_FactionsUUID05 implements ClaimsProvider {
 
     @Override
     public boolean isPlayerClaim(Player player, Location location) {

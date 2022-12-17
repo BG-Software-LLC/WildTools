@@ -16,7 +16,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-public final class PricesProvider_ShopGUIPlus implements PricesProvider {
+public class PricesProvider_ShopGUIPlus implements PricesProvider {
 
     private static final ReflectMethod<Set<Shop>> GET_SHOPS_METHOD = new ReflectMethod<>(ShopManager.class, Set.class, "getShops");
 
@@ -67,7 +67,7 @@ public final class PricesProvider_ShopGUIPlus implements PricesProvider {
         return player == null ? shopItem.getSellPriceForAmount(amount) : shopItem.getSellPriceForAmount(player, amount);
     }
 
-    private static final class WrappedItemStack {
+    private static class WrappedItemStack {
 
         private final ItemStack value;
 

@@ -14,11 +14,10 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public final class DropsProvider_mcMMO1 implements DropsProvider {
+public class DropsProvider_mcMMO1 implements DropsProvider {
 
     private static final WildToolsPlugin plugin = WildToolsPlugin.getPlugin();
 
@@ -27,7 +26,7 @@ public final class DropsProvider_mcMMO1 implements DropsProvider {
         if (!ItemUtils.isCrops(block.getType()) || !shouldBonusDrops(player))
             return null;
 
-        return plugin.getNMSAdapter().getCropDrops(player, block).stream()
+        return plugin.getNMSWorld().getBlockDrops(player, block, false).stream()
                 .peek(itemStack -> itemStack.setAmount(itemStack.getAmount() * 2)).collect(Collectors.toList());
     }
 

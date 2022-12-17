@@ -8,7 +8,7 @@ import com.massivecraft.factions.listeners.FactionsBlockListener;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
-public final class ClaimsProvider_FactionsUUID02 implements ClaimsProvider {
+public class ClaimsProvider_FactionsUUID02 implements ClaimsProvider {
 
     @Override
     public boolean isPlayerClaim(Player player, Location location) {

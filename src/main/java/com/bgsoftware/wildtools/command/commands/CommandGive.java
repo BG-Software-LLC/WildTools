@@ -4,7 +4,6 @@ import com.bgsoftware.wildtools.Locale;
 import com.bgsoftware.wildtools.WildToolsPlugin;
 import com.bgsoftware.wildtools.api.objects.tools.Tool;
 import com.bgsoftware.wildtools.command.ICommand;
-import com.bgsoftware.wildtools.utils.NumberUtils;
 import com.bgsoftware.wildtools.utils.items.ItemUtils;
 import com.bgsoftware.wildtools.utils.items.ToolItemStack;
 import org.bukkit.Bukkit;
@@ -14,7 +13,7 @@ import org.bukkit.entity.Player;
 import java.util.ArrayList;
 import java.util.List;
 
-public final class CommandGive implements ICommand {
+public class CommandGive implements ICommand {
 
     @Override
     public String getLabel() {
@@ -55,9 +54,9 @@ public final class CommandGive implements ICommand {
             return;
         }
 
-        Player pl = Bukkit.getPlayer(args[1]);
+        Player player = Bukkit.getPlayer(args[1]);
 
-        if (pl == null) {
+        if (player == null) {
             Locale.INVALID_PLAYER.send(sender, args[1]);
             return;
         }
@@ -66,19 +65,21 @@ public final class CommandGive implements ICommand {
         int amount = 1;
 
         if (args.length >= 4) {
-            if (!NumberUtils.isDigits(args[3])) {
+            try {
+                amount = Integer.parseInt(args[3]);
+            } catch (NumberFormatException error) {
                 Locale.INVALID_NUMBER.send(sender, args[3]);
                 return;
             }
-            amount = Integer.parseInt(args[3]);
         }
 
         if (args.length == 5) {
-            if (!NumberUtils.isDigits(args[4])) {
+            try {
+                uses = Integer.parseInt(args[4]);
+            } catch (NumberFormatException error) {
                 Locale.INVALID_NUMBER.send(sender, args[4]);
                 return;
             }
-            uses = Integer.parseInt(args[4]);
         }
 
         for (int i = 0; i < amount; i++) {
@@ -87,10 +88,10 @@ public final class CommandGive implements ICommand {
             if (uses > -1)
                 toolItem.setUses(uses);
 
-            ItemUtils.addItem(toolItem.getItem(), pl.getInventory(), pl.getLocation(), null);
+            ItemUtils.addItem(toolItem.getItem(), player.getInventory(), player.getLocation(), null);
         }
 
-        Locale.GIVE_TOOL_SUCCESS.send(sender, amount, tool.getName(), pl.getName());
+        Locale.GIVE_TOOL_SUCCESS.send(sender, amount, tool.getName(), player.getName());
     }
 
     @Override

@@ -9,7 +9,7 @@ import com.massivecraft.massivecore.ps.PS;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
-public final class ClaimsProvider_MassiveFactions implements ClaimsProvider {
+public class ClaimsProvider_MassiveFactions implements ClaimsProvider {
 
     @Override
     public boolean isPlayerClaim(Player player, Location location) {

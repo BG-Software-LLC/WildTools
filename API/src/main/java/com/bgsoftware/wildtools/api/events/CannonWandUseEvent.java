@@ -8,11 +8,10 @@ import org.bukkit.event.HandlerList;
 import java.util.Collections;
 import java.util.List;
 
-@SuppressWarnings("unused")
 /**
  * CannonWandUseEvent is called when a cannon wand is used.
  */
-public final class CannonWandUseEvent extends ToolUseEvent<CannonTool> {
+public class CannonWandUseEvent extends ToolUseEvent<CannonTool> {
 
     private static final HandlerList HANDLERS = new HandlerList();
 

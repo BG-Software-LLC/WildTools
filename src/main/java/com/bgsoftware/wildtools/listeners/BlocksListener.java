@@ -2,66 +2,64 @@ package com.bgsoftware.wildtools.listeners;
 
 import com.bgsoftware.wildtools.Locale;
 import com.bgsoftware.wildtools.WildToolsPlugin;
-import com.bgsoftware.wildtools.objects.tools.WTool;
-
+import com.bgsoftware.wildtools.api.objects.tools.Tool;
+import com.bgsoftware.wildtools.tools.WTool;
+import com.bgsoftware.wildtools.utils.ServerVersion;
 import com.bgsoftware.wildtools.utils.items.ToolItemStack;
 import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
-
-import com.bgsoftware.wildtools.api.objects.tools.Tool;
 import org.bukkit.event.player.PlayerItemDamageEvent;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-@SuppressWarnings("unused")
-public final class BlocksListener implements Listener {
+public class BlocksListener implements Listener {
 
     private static final Map<UUID, Material> lastClickedType = new HashMap<>();
 
     private final WildToolsPlugin plugin;
 
-    public BlocksListener(WildToolsPlugin plugin){
+    public BlocksListener(WildToolsPlugin plugin) {
         this.plugin = plugin;
     }
 
     @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
-    public void onBlockBreak(BlockBreakEvent e){
+    public void onBlockBreak(BlockBreakEvent e) {
         //One of the blocks that were broken by a tool
-        if(WTool.toolBlockBreak.contains(e.getPlayer().getUniqueId()))
+        if (WTool.toolBlockBreak.contains(e.getPlayer().getUniqueId()))
             return;
 
-        if(!e.getPlayer().hasPermission("wildtools.use"))
+        if (!e.getPlayer().hasPermission("wildtools.use"))
             return;
 
         ToolItemStack toolItemStack = ToolItemStack.of(plugin.getNMSAdapter().getItemInHand(e.getPlayer()));
         Tool tool = toolItemStack.getTool();
 
-        if(tool == null)
+        if (tool == null)
             return;
 
         String world = e.getBlock().getWorld().getName();
 
-        if(!tool.isWhitelistedWorld(world) || tool.isBlacklistedWorld(world)){
+        if (!tool.isWhitelistedWorld(world) || tool.isBlacklistedWorld(world)) {
             e.setCancelled(true);
             return;
         }
 
-        if(!tool.canUse(e.getPlayer().getUniqueId())){
+        if (!tool.canUse(e.getPlayer().getUniqueId())) {
             e.setCancelled(true);
             Locale.COOLDOWN_TIME.send(e.getPlayer(), getTime(tool.getTimeLeft(e.getPlayer().getUniqueId())));
             return;
         }
 
-        if(!plugin.getToolsManager().isOwningTool(toolItemStack.getItem(), e.getPlayer())){
+        if (!plugin.getToolsManager().isOwningTool(toolItemStack.getItem(), e.getPlayer())) {
             e.setCancelled(true);
             Locale.NOT_OWNER.send(e.getPlayer());
             return;
@@ -80,42 +78,42 @@ public final class BlocksListener implements Listener {
                 if (owner.isEmpty())
                     toolItemStack.setOwner(e.getPlayer().getUniqueId().toString());
             }
-        }catch(Exception ex){
+        } catch (Exception ex) {
             ex.printStackTrace();
-        }finally {
+        } finally {
             WTool.toolBlockBreak.remove(e.getPlayer().getUniqueId());
         }
     }
 
     @EventHandler(priority = EventPriority.LOW)
-    public void onBlockInteract(PlayerInteractEvent e){
+    public void onBlockInteract(PlayerInteractEvent e) {
         //One of the blocks that were broken by a tool
-        if(WTool.toolBlockBreak.contains(e.getPlayer().getUniqueId()) || e.getItem() == null)
+        if (WTool.toolBlockBreak.contains(e.getPlayer().getUniqueId()) || e.getItem() == null)
             return;
 
-        if(!e.getPlayer().hasPermission("wildtools.use"))
+        if (!e.getPlayer().hasPermission("wildtools.use"))
             return;
 
         ToolItemStack toolItemStack = ToolItemStack.of(e.getItem());
         Tool tool = toolItemStack.getTool();
 
-        if(tool == null)
+        if (tool == null)
             return;
 
         String world = e.getPlayer().getWorld().getName();
 
-        if(!tool.isWhitelistedWorld(world) || tool.isBlacklistedWorld(world)){
+        if (!tool.isWhitelistedWorld(world) || tool.isBlacklistedWorld(world)) {
             e.setCancelled(true);
             return;
         }
 
-        if(!tool.canUse(e.getPlayer().getUniqueId())){
+        if (!tool.canUse(e.getPlayer().getUniqueId())) {
             e.setCancelled(true);
             Locale.COOLDOWN_TIME.send(e.getPlayer(), getTime(tool.getTimeLeft(e.getPlayer().getUniqueId())));
             return;
         }
 
-        if(!plugin.getToolsManager().isOwningTool(toolItemStack.getItem(), e.getPlayer())){
+        if (!plugin.getToolsManager().isOwningTool(toolItemStack.getItem(), e.getPlayer())) {
             e.setCancelled(true);
             Locale.NOT_OWNER.send(e.getPlayer());
             return;
@@ -150,57 +148,57 @@ public final class BlocksListener implements Listener {
                 if (owner.isEmpty())
                     toolItemStack.setOwner(e.getPlayer().getUniqueId().toString());
             }
-        }finally {
+        } finally {
             WTool.toolBlockBreak.remove(e.getPlayer().getUniqueId());
         }
     }
 
 
     @EventHandler(priority = EventPriority.LOW)
-    public void onItemDamage(PlayerItemDamageEvent e){
+    public void onItemDamage(PlayerItemDamageEvent e) {
         ToolItemStack toolItemStack = ToolItemStack.of(e.getItem());
         Tool tool = toolItemStack.getTool();
 
-        if(tool == null)
+        if (tool == null)
             return;
 
         e.setCancelled(true);
 
-        if(tool.isUnbreakable() || !tool.hasVanillaDamage())
+        if (tool.isUnbreakable() || !tool.hasVanillaDamage())
             return;
 
         tool.reduceDurablility(e.getPlayer(), tool.isUsingDurability() ? e.getDamage() : 1, e.getItem());
     }
 
     @EventHandler(priority = EventPriority.LOW)
-    public void onEntityInteract(PlayerInteractAtEntityEvent e){
+    public void onEntityInteract(PlayerInteractAtEntityEvent e) {
         //One of the blocks that were broken by a tool
-        if(WTool.toolBlockBreak.contains(e.getPlayer().getUniqueId()))
+        if (WTool.toolBlockBreak.contains(e.getPlayer().getUniqueId()))
             return;
 
-        if(!e.getPlayer().hasPermission("wildtools.use"))
+        if (!e.getPlayer().hasPermission("wildtools.use"))
             return;
 
         ToolItemStack toolItemStack = ToolItemStack.of(plugin.getNMSAdapter().getItemInHand(e.getPlayer(), e));
         Tool tool = toolItemStack.getTool();
 
-        if(tool == null)
+        if (tool == null)
             return;
 
         String world = e.getRightClicked().getWorld().getName();
 
-        if(!tool.isWhitelistedWorld(world) || tool.isBlacklistedWorld(world)){
+        if (!tool.isWhitelistedWorld(world) || tool.isBlacklistedWorld(world)) {
             e.setCancelled(true);
             return;
         }
 
-        if(!tool.canUse(e.getPlayer().getUniqueId())){
+        if (!tool.canUse(e.getPlayer().getUniqueId())) {
             e.setCancelled(true);
             Locale.COOLDOWN_TIME.send(e.getPlayer(), getTime(tool.getTimeLeft(e.getPlayer().getUniqueId())));
             return;
         }
 
-        if(!plugin.getToolsManager().isOwningTool(toolItemStack.getItem(), e.getPlayer())){
+        if (!plugin.getToolsManager().isOwningTool(toolItemStack.getItem(), e.getPlayer())) {
             e.setCancelled(true);
             Locale.NOT_OWNER.send(e.getPlayer());
             return;
@@ -219,76 +217,79 @@ public final class BlocksListener implements Listener {
                 if (owner.isEmpty())
                     toolItemStack.setOwner(e.getPlayer().getUniqueId().toString());
             }
-        }catch(Exception ex){
+        } catch (Exception ex) {
             ex.printStackTrace();
-        }finally {
+        } finally {
             WTool.toolBlockBreak.remove(e.getPlayer().getUniqueId());
         }
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
-    public void onOmniInteract(PlayerInteractEvent e){
-        if(e.getAction() != Action.LEFT_CLICK_BLOCK)
+    public void onOmniInteract(PlayerInteractEvent e) {
+        if (e.getAction() != Action.LEFT_CLICK_BLOCK)
             return;
 
         Material blockType = e.getClickedBlock().getType();
 
-        if(lastClickedType.containsKey(e.getPlayer().getUniqueId()) && lastClickedType.get(e.getPlayer().getUniqueId()) == blockType)
+        if (lastClickedType.containsKey(e.getPlayer().getUniqueId()) && lastClickedType.get(e.getPlayer().getUniqueId()) == blockType)
             return;
 
         ToolItemStack toolItemStack = ToolItemStack.of(plugin.getNMSAdapter().getItemInHand(e.getPlayer(), e));
         Tool tool = toolItemStack.getTool();
 
-        if(tool == null || !tool.isOmni())
+        if (tool == null || !tool.isOmni())
             return;
 
         String world = e.getClickedBlock().getWorld().getName();
 
-        if(!tool.isWhitelistedWorld(world) || tool.isBlacklistedWorld(world)){
+        if (!tool.isWhitelistedWorld(world) || tool.isBlacklistedWorld(world)) {
             e.setCancelled(true);
             return;
         }
 
         lastClickedType.put(e.getPlayer().getUniqueId(), blockType);
 
-        String replaceType = "PICKAXE";
+        String replaceTypeName;
 
-        if(plugin.getNMSAdapter().isShovelType(blockType)) {
-            replaceType = plugin.getNMSAdapter().isLegacy() ? "SPADE" : "SHOVEL";
+        switch (plugin.getNMSAdapter().getDestroySpeedCategory(blockType)) {
+            case AXE:
+                replaceTypeName = "AXE";
+                break;
+            case SHOVEL:
+                replaceTypeName = ServerVersion.isLegacy() ? "SPADE" : "SHOVEL";
+                break;
+            default:
+                replaceTypeName = "PICKAXE";
+                break;
         }
-        else if(plugin.getNMSAdapter().isAxeType(blockType)) {
-            replaceType = "AXE";
-        }
 
-        replaceType = toolItemStack.getType().name().split("_")[0] + "_" + replaceType;
+        Material replaceType = Material.valueOf(toolItemStack.getType().name().split("_")[0] + "_" + replaceTypeName);
 
-        if(toolItemStack.getType().name().equals(replaceType))
-            return;
-
-        toolItemStack.setType(Material.valueOf(replaceType));
+        if (toolItemStack.getType() != replaceType)
+            toolItemStack.setType(replaceType);
     }
 
-    private String getTime(long timeLeft){
+    private String getTime(long timeLeft) {
         String time = "";
 
         // Get rid of miliseconds
         timeLeft = timeLeft / 1000;
 
-        if(timeLeft >= 3600) {
+        if (timeLeft >= 3600) {
             if (timeLeft / 3600 == 1)
                 time += "1 hour, ";
             else time += (timeLeft / 3600) + " hours, ";
             timeLeft %= 3600;
         }
 
-        if(timeLeft >= 60){
+        if (timeLeft >= 60) {
             if (timeLeft / 60 == 1)
                 time += "1 minute, ";
             else time += (timeLeft / 60) + " minutes, ";
             timeLeft %= 60;
         }
 
-        if(timeLeft != 0) {
+        if (timeLeft != 0) {
             if (timeLeft == 1)
                 time += timeLeft + " second";
             else time += timeLeft + " seconds";

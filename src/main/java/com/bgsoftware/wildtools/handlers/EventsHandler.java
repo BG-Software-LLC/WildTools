@@ -21,7 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public final class EventsHandler {
+public class EventsHandler {
 
     private static final List<String> PRE_DEFINED_CLAIMING_PLUGINS = Arrays.asList("AcidIsland", "ASkyBlock",
             "BentoBox", "FabledSkyBlock", "Factions", "FactionsX", "GriefPrevention", "IslandWorld", "Lands",
@@ -128,7 +128,7 @@ public final class EventsHandler {
         }
     }
 
-    private static final class CachedListenerMethod implements Comparable<CachedListenerMethod> {
+    private static class CachedListenerMethod implements Comparable<CachedListenerMethod> {
 
         private final Listener listener;
         private final Method method;

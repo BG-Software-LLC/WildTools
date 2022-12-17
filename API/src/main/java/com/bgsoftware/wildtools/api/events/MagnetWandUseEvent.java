@@ -8,11 +8,10 @@ import org.bukkit.event.HandlerList;
 import java.util.Collections;
 import java.util.List;
 
-@SuppressWarnings("unused")
 /**
  * MagnetWandUseEvent is called when a magnet wand is used.
  */
-public final class MagnetWandUseEvent extends ToolUseEvent<MagnetTool> {
+public class MagnetWandUseEvent extends ToolUseEvent<MagnetTool> {
 
     private static final HandlerList HANDLERS = new HandlerList();
 

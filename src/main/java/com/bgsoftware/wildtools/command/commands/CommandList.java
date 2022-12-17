@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public final class CommandList implements ICommand {
+public class CommandList implements ICommand {
 
     @Override
     public String getLabel() {

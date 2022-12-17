@@ -8,7 +8,7 @@ import me.ryanhamshire.GriefPrevention.PlayerData;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
-public final class ClaimsProvider_GriefPrevention implements ClaimsProvider {
+public class ClaimsProvider_GriefPrevention implements ClaimsProvider {
 
     @Override
     public boolean isPlayerClaim(Player player, Location location) {

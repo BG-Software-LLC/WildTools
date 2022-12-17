@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public final class DropsProvider_ChunkHoppers implements DropsProvider {
+public class DropsProvider_ChunkHoppers implements DropsProvider {
 
     @Override
     public List<ItemStack> getBlockDrops(Player player, Block block) {

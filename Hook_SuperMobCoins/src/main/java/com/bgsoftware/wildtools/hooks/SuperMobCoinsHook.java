@@ -7,8 +7,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
-@SuppressWarnings("unused")
-public final class SuperMobCoinsHook {
+public class SuperMobCoinsHook {
 
     public static void register(WildToolsPlugin plugin) {
         plugin.getServer().getPluginManager().registerEvents(new Listener() {

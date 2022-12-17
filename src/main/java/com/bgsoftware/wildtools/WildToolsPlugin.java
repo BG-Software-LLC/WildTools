@@ -16,6 +16,7 @@ import com.bgsoftware.wildtools.listeners.EditorListener;
 import com.bgsoftware.wildtools.listeners.PlayerListener;
 import com.bgsoftware.wildtools.metrics.Metrics;
 import com.bgsoftware.wildtools.nms.NMSAdapter;
+import com.bgsoftware.wildtools.nms.NMSWorld;
 import com.bgsoftware.wildtools.utils.Pair;
 import com.bgsoftware.wildtools.utils.ServerVersion;
 import org.bukkit.Bukkit;
@@ -29,7 +30,7 @@ import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.List;
 
-public final class WildToolsPlugin extends JavaPlugin implements WildTools {
+public class WildToolsPlugin extends JavaPlugin implements WildTools {
 
     private static WildToolsPlugin plugin;
 
@@ -42,6 +43,7 @@ public final class WildToolsPlugin extends JavaPlugin implements WildTools {
     private Enchantment glowEnchant;
 
     private NMSAdapter nmsAdapter;
+    private NMSWorld nmsWorld;
 
     private boolean shouldEnable = true;
 
@@ -145,6 +147,7 @@ public final class WildToolsPlugin extends JavaPlugin implements WildTools {
         if (version != null) {
             try {
                 nmsAdapter = (NMSAdapter) Class.forName(String.format("com.bgsoftware.wildtools.nms.%s.NMSAdapter", version)).newInstance();
+                nmsWorld = (NMSWorld) Class.forName(String.format("com.bgsoftware.wildtools.nms.%s.NMSWorld", version)).newInstance();
                 return true;
             } catch (Exception error) {
                 error.printStackTrace();
@@ -214,6 +217,10 @@ public final class WildToolsPlugin extends JavaPlugin implements WildTools {
 
     public NMSAdapter getNMSAdapter() {
         return nmsAdapter;
+    }
+
+    public NMSWorld getNMSWorld() {
+        return nmsWorld;
     }
 
     public static void log(String message) {

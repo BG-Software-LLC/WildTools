@@ -20,8 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@SuppressWarnings("unused")
-public final class ContainerProvider_WildChests implements ExtendedContainerProvider {
+public class ContainerProvider_WildChests implements ExtendedContainerProvider {
 
     private final WildToolsPlugin plugin;
 
