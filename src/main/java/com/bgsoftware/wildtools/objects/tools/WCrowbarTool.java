@@ -5,6 +5,7 @@ import com.bgsoftware.wildtools.api.objects.ToolMode;
 import com.bgsoftware.wildtools.api.objects.tools.CrowbarTool;
 import com.bgsoftware.wildtools.utils.BukkitUtils;
 import com.bgsoftware.wildtools.utils.items.ItemUtils;
+import com.bgsoftware.wildtools.utils.world.WorldEditSession;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.CreatureSpawner;
@@ -53,8 +54,10 @@ public final class WCrowbarTool extends WTool implements CrowbarTool {
             e.getItem().addUnsafeEnchantment(Enchantment.SILK_TOUCH, 1);
         }
 
+        WorldEditSession editSession = new WorldEditSession(e.getClickedBlock().getWorld());
+
         try {
-            if (!BukkitUtils.breakBlock(e.getPlayer(), null, null, e.getClickedBlock(), e.getItem(), this, itemStack -> null))
+            if (!BukkitUtils.breakBlock(e.getPlayer(), e.getClickedBlock(), e.getItem(), this, editSession, itemStack -> null))
                 return true;
         } finally {
             if (addedSilktouch)
@@ -78,6 +81,8 @@ public final class WCrowbarTool extends WTool implements CrowbarTool {
 
         CrowbarWandUseEvent crowbarWandUseEvent = new CrowbarWandUseEvent(e.getPlayer(), this, e.getClickedBlock());
         Bukkit.getPluginManager().callEvent(crowbarWandUseEvent);
+
+        editSession.apply();
 
         reduceDurablility(e.getPlayer(), 1, e.getItem());
 

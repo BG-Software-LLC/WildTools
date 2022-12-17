@@ -4,16 +4,15 @@ import com.bgsoftware.wildtools.api.events.IceWandUseEvent;
 import com.bgsoftware.wildtools.api.objects.ToolMode;
 import com.bgsoftware.wildtools.api.objects.tools.IceTool;
 import com.bgsoftware.wildtools.utils.BukkitUtils;
+import com.bgsoftware.wildtools.utils.world.WorldEditSession;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public final class WIceTool extends WTool implements IceTool {
 
@@ -43,7 +42,9 @@ public final class WIceTool extends WTool implements IceTool {
         Location max = block.getLocation().clone().add(radius, radius, radius),
                 min = block.getLocation().clone().subtract(radius, radius, radius);
 
-        List<Location> affectedBlocks = new ArrayList<>();
+        World world = block.getWorld();
+
+        WorldEditSession editSession = new WorldEditSession(world);
         int toolDurability = getDurability(player, usedItem);
         boolean usingDurability = isUsingDurability();
         int toolUsages = 0;
@@ -55,22 +56,23 @@ public final class WIceTool extends WTool implements IceTool {
                     if (usingDurability && toolUsages >= toolDurability)
                         break outerLoop;
 
-                    Block targetBlock = block.getWorld().getBlockAt(x, y, z);
+                    Block targetBlock = world.getBlockAt(x, y, z);
 
                     if (targetBlock.getType() != Material.ICE || !BukkitUtils.canBreakBlock(player, targetBlock, this) ||
                             !BukkitUtils.hasBreakAccess(targetBlock, player))
                         continue;
 
-                    affectedBlocks.add(targetBlock.getLocation());
-                    targetBlock.setType(Material.WATER);
+                    editSession.setType(targetBlock.getLocation(), false, vec -> targetBlock.setType(Material.WATER));
 
                     toolUsages++;
                 }
             }
         }
 
-        IceWandUseEvent iceWandUseEvent = new IceWandUseEvent(player, this, affectedBlocks);
+        IceWandUseEvent iceWandUseEvent = new IceWandUseEvent(player, this, editSession.getAffectedBlocks());
         Bukkit.getPluginManager().callEvent(iceWandUseEvent);
+
+        editSession.apply();
 
         if (toolUsages > 0)
             reduceDurablility(player, usingDurability ? toolUsages : 1, usedItem);

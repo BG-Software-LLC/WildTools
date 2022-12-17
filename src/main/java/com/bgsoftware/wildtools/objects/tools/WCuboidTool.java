@@ -4,8 +4,7 @@ import com.bgsoftware.wildtools.api.events.CuboidWandUseEvent;
 import com.bgsoftware.wildtools.api.objects.ToolMode;
 import com.bgsoftware.wildtools.api.objects.tools.CuboidTool;
 import com.bgsoftware.wildtools.utils.BukkitUtils;
-import com.bgsoftware.wildtools.utils.blocks.BlocksController;
-import com.bgsoftware.wildtools.utils.items.ItemsDropper;
+import com.bgsoftware.wildtools.utils.world.WorldEditSession;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -37,8 +36,7 @@ public final class WCuboidTool extends WTool implements CuboidTool {
         Material firstType = e.getBlock().getType();
         short firstData = e.getBlock().getState().getData().toItemStack().getDurability();
 
-        BlocksController blocksController = new BlocksController();
-        ItemsDropper itemsDropper = new ItemsDropper();
+        WorldEditSession editSession = new WorldEditSession(e.getBlock().getWorld());
         int toolDurability = getDurability(e.getPlayer(), inHand);
         boolean usingDurability = isUsingDurability();
         int toolUsages = 0;
@@ -56,17 +54,16 @@ public final class WCuboidTool extends WTool implements CuboidTool {
                             !BukkitUtils.canBreakBlock(e.getPlayer(), targetBlock, firstType, firstData, this))
                         continue;
 
-                    if (BukkitUtils.breakBlock(e.getPlayer(), blocksController, itemsDropper, targetBlock, inHand, this, itemStack -> itemStack))
+                    if (BukkitUtils.breakBlock(e.getPlayer(), targetBlock, inHand, this, editSession, null))
                         toolUsages++;
                 }
             }
         }
 
-        CuboidWandUseEvent cuboidWandUseEvent = new CuboidWandUseEvent(e.getPlayer(), this, blocksController.getAffectedBlocks());
+        CuboidWandUseEvent cuboidWandUseEvent = new CuboidWandUseEvent(e.getPlayer(), this, editSession.getAffectedBlocks());
         Bukkit.getPluginManager().callEvent(cuboidWandUseEvent);
 
-        blocksController.updateSession();
-        itemsDropper.dropItems();
+        editSession.apply();
 
         if (toolUsages > 0)
             reduceDurablility(e.getPlayer(), usingDurability ? toolUsages : 1, inHand);

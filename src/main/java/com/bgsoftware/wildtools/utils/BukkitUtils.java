@@ -1,11 +1,12 @@
 package com.bgsoftware.wildtools.utils;
 
+import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.wildtools.WildToolsPlugin;
 import com.bgsoftware.wildtools.api.objects.tools.Tool;
-import com.bgsoftware.wildtools.utils.blocks.BlocksController;
 import com.bgsoftware.wildtools.utils.items.ItemUtils;
-import com.bgsoftware.wildtools.utils.items.ItemsDropper;
+import com.bgsoftware.wildtools.utils.world.WorldEditSession;
 import org.bukkit.CropState;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Statistic;
 import org.bukkit.block.Block;
@@ -20,6 +21,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumSet;
@@ -28,6 +30,9 @@ import java.util.List;
 import java.util.function.Function;
 
 public final class BukkitUtils {
+
+    private static final ReflectMethod<Boolean> BLOCK_BREAK_EVENT_IS_DROP_ITEMS = new ReflectMethod<>(
+            BlockBreakEvent.class, "isDropItems");
 
     private static final WildToolsPlugin plugin = WildToolsPlugin.getPlugin();
     private static final List<BlockFace> blockFaces = new LinkedList<>(Arrays.asList(
@@ -68,10 +73,11 @@ public final class BukkitUtils {
         return !playerInteractEvent.isCancelled();
     }
 
-    public static boolean breakBlock(Player player, BlocksController blocksController, ItemsDropper itemsDropper, Block block, ItemStack usedItem,
-                                     Tool tool, Function<ItemStack, ItemStack> dropItemFunction) {
+    public static boolean breakBlock(Player player, Block block, ItemStack usedItem,
+                                     @Nullable Tool tool,
+                                     @Nullable WorldEditSession editSession,
+                                     @Nullable Function<ItemStack, ItemStack> dropItemFunction) {
         BlockBreakEvent blockBreakEvent = new BlockBreakEvent(block, player);
-        List<ItemStack> drops = getBlockDrops(player, block, tool);
         block.setMetadata("drop-items", new FixedMetadataValue(plugin, tool == null));
 
         if ((tool == null || !tool.hasSilkTouch()) && usedItem.getEnchantmentLevel(Enchantment.SILK_TOUCH) == 0)
@@ -86,56 +92,41 @@ public final class BukkitUtils {
 
         plugin.getEvents().callBreakEvent(blockBreakEvent, false);
         Material originalType = block.getType();
+        Location blockLocation = block.getLocation();
 
-        if (blocksController == null || (tool != null && tool.isOmni()) || originalType.hasGravity() || shouldForceUpdate(block)) {
+        if (editSession == null) {
             block.setType(Material.AIR);
+            // Drop exp
+            ExperienceOrb orb = block.getWorld().spawn(block.getLocation(), ExperienceOrb.class);
+            orb.setExperience(blockBreakEvent.getExpToDrop());
         } else {
-            blocksController.setAir(block.getLocation());
+            if ((tool != null && tool.isOmni()) || originalType.hasGravity() || shouldForceUpdate(block)) {
+                editSession.setType(blockLocation, false, vec -> block.setType(Material.AIR));
+            } else {
+                editSession.setAir(blockLocation);
+            }
+            editSession.addExp(blockBreakEvent.getExpToDrop());
         }
 
         if (tool != null) {
-            boolean nullDropper = itemsDropper == null;
-            if (nullDropper)
-                itemsDropper = new ItemsDropper();
-
-            for (ItemStack itemStack : tool.filterDrops(drops)) {
-                itemStack = dropItemFunction.apply(itemStack);
-                if (itemStack != null) {
-                    if (tool.isAutoCollect()) {
-                        ItemUtils.addItem(itemStack, player.getInventory(), block.getLocation(), itemsDropper);
-                    } else {
-                        itemsDropper.addDrop(itemStack, block.getLocation());
-                    }
-                }
-            }
-
-            if (nullDropper)
-                itemsDropper.dropItems();
+            if (BLOCK_BREAK_EVENT_IS_DROP_ITEMS.isValid() && BLOCK_BREAK_EVENT_IS_DROP_ITEMS.invoke(blockBreakEvent))
+                collectDropsFromTool(player, block, tool, editSession, dropItemFunction);
 
             if (tool.hasStatistics()) {
                 try {
                     player.incrementStatistic(Statistic.MINE_BLOCK, originalType);
-                } catch (IllegalArgumentException e) {
+                } catch (IllegalArgumentException ignored) {
                 }
             }
-        }
-
-        if (blockBreakEvent.getExpToDrop() > 0) {
-            ExperienceOrb orb = block.getWorld().spawn(block.getLocation(), ExperienceOrb.class);
-            orb.setExperience(blockBreakEvent.getExpToDrop());
         }
 
         return true;
     }
 
-    @SuppressWarnings("UnusedReturnValue")
-    public static boolean breakBlockAsBoolean(Player player, BlocksController blocksController, ItemsDropper itemsDropper, Block block, ItemStack usedItem, Tool tool, Function<ItemStack, Boolean> dropItemFunction) {
-        return breakBlock(player, blocksController, itemsDropper, block, usedItem, tool, itemStack -> dropItemFunction.apply(itemStack) ? itemStack : null);
-    }
-
-    public static boolean seedBlock(Player player, Block block, Tool tool, Function<ItemStack, ItemStack> dropItemFunction,
-                                    ItemsDropper itemsDropper, BlocksController blocksController) {
-        List<ItemStack> drops = getBlockDrops(player, block, tool);
+    public static boolean seedBlock(Player player, Block block,
+                                    @Nullable Tool tool,
+                                    @Nullable WorldEditSession editSession,
+                                    @Nullable Function<ItemStack, ItemStack> dropItemFunction) {
         BlockBreakEvent blockBreakEvent = new BlockBreakEvent(block, player);
         block.setMetadata("drop-items", new FixedMetadataValue(plugin, tool == null));
 
@@ -148,46 +139,34 @@ public final class BukkitUtils {
 
         plugin.getEvents().callBreakEvent(blockBreakEvent, false);
 
-        plugin.getNMSAdapter().setCropState(block, CropState.SEEDED);
+        Location blockLocation = block.getLocation();
 
-        blocksController.setDirty(block.getLocation());
-
-        if (tool != null) {
-            boolean nullDropper = itemsDropper == null;
-            if (nullDropper)
-                itemsDropper = new ItemsDropper();
-
-            for (ItemStack itemStack : tool.filterDrops(drops)) {
-                itemStack = dropItemFunction.apply(itemStack);
-                if (itemStack != null) {
-                    if (tool.isAutoCollect()) {
-                        ItemUtils.addItem(itemStack, player.getInventory(), block.getLocation(), itemsDropper);
-                    } else {
-                        itemsDropper.addDrop(itemStack, block.getLocation());
-                    }
-                }
-            }
-
-            if (nullDropper)
-                itemsDropper.dropItems();
+        if (editSession == null) {
+            plugin.getNMSAdapter().setCropState(block, CropState.SEEDED);
+        } else {
+            editSession.setType(blockLocation, false, vec -> plugin.getNMSAdapter().setCropState(block, CropState.SEEDED));
         }
+
+        if (tool != null)
+            collectDropsFromTool(player, block, tool, editSession, dropItemFunction);
 
         return true;
     }
 
-    public static boolean seedBlockAsBoolean(Player player, Block block, Tool tool, Function<ItemStack, Boolean> dropItemFunction,
-                                             ItemsDropper itemsDropper, BlocksController blocksController) {
-        return seedBlock(player, block, tool, itemStack -> dropItemFunction.apply(itemStack) ? itemStack : null, itemsDropper, blocksController);
-    }
-
-    public static boolean placeBlock(Player player, BlocksController blocksController, Block block, Block materialBlock) {
+    public static boolean placeBlock(Player player, Block block, Block materialBlock,
+                                     @Nullable WorldEditSession editSession) {
         BlockPlaceEvent blockPlaceEvent = plugin.getNMSAdapter().getFakePlaceEvent(player, block, materialBlock);
         plugin.getEvents().callPlaceEvent(blockPlaceEvent);
 
         if (blockPlaceEvent.isCancelled())
             return false;
 
-        blocksController.setType(block.getLocation(), materialBlock);
+        if (editSession == null) {
+            block.setType(materialBlock.getType());
+            block.setData(materialBlock.getData());
+        } else {
+            editSession.setType(block.getLocation(), materialBlock);
+        }
 
         return true;
     }
@@ -204,6 +183,32 @@ public final class BukkitUtils {
         return ItemUtils.isCrops(block.getType()) ? plugin.getNMSAdapter().getCropDrops(player, block) :
                 plugin.getNMSAdapter().getBlockDrops(player, block, tool.hasSilkTouch());
     }
+
+    private static void collectDropsFromTool(Player player, Block block, Tool tool,
+                                             @Nullable WorldEditSession editSession,
+                                             @Nullable Function<ItemStack, ItemStack> dropItemFunction) {
+        List<ItemStack> naturalDrops = tool.filterDrops(getBlockDrops(player, block, tool));
+        List<ItemStack> dropsToEditSession = new LinkedList<>();
+
+        Location blockLocation = block.getLocation();
+
+        for (ItemStack itemStack : naturalDrops) {
+            if (dropItemFunction != null)
+                itemStack = dropItemFunction.apply(itemStack);
+
+            if (itemStack != null) {
+                if (tool.isAutoCollect()) {
+                    ItemUtils.addItem(itemStack, player.getInventory(), blockLocation, editSession);
+                } else {
+                    dropsToEditSession.add(itemStack);
+                }
+            }
+        }
+
+        if (editSession != null && !dropsToEditSession.isEmpty())
+            editSession.addDrops(dropsToEditSession);
+    }
+
 
     private static boolean shouldForceUpdate(Block frameBlock) {
         for (BlockFace blockFace : blockFaces) {

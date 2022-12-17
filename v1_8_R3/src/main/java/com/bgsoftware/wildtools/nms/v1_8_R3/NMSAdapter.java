@@ -3,6 +3,8 @@ package com.bgsoftware.wildtools.nms.v1_8_R3;
 import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.wildtools.nms.v1_8_R3.world.FakeCraftBlock;
 import com.bgsoftware.wildtools.utils.items.ToolItemStack;
+import com.bgsoftware.wildtools.utils.math.Vector3;
+import com.bgsoftware.wildtools.utils.world.WorldEditSession;
 import net.minecraft.server.v1_8_R3.Block;
 import net.minecraft.server.v1_8_R3.BlockCarrots;
 import net.minecraft.server.v1_8_R3.BlockCocoa;
@@ -61,13 +63,60 @@ import org.bukkit.material.NetherWarts;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 
 @SuppressWarnings({"unused", "deprecation"})
 public final class NMSAdapter implements com.bgsoftware.wildtools.nms.NMSAdapter {
 
     private static final ReflectField<ItemStack> ITEM_STACK_HANDLE = new ReflectField<>(CraftItemStack.class, ItemStack.class, "handle");
+
+    private static boolean canMerge(EntityItem entityItem) {
+        ItemStack itemStack = entityItem.getItemStack();
+        return itemStack.count < itemStack.getMaxStackSize();
+    }
+
+    private static boolean mergeEntityItems(EntityItem entityItem, EntityItem otherEntity) {
+        ItemStack itemOfEntity = entityItem.getItemStack();
+        ItemStack itemOfOtherEntity = otherEntity.getItemStack();
+        if (canMergeTogether(itemOfEntity, itemOfOtherEntity)) {
+            if (!CraftEventFactory.callItemMergeEvent(otherEntity, entityItem).isCancelled()) {
+                mergeItems(entityItem, itemOfEntity, otherEntity, itemOfOtherEntity);
+                entityItem.pickupDelay = Math.max(entityItem.pickupDelay, otherEntity.pickupDelay);
+                if (itemOfOtherEntity.count <= 0) {
+                    otherEntity.die();
+                }
+            }
+        }
+
+        return entityItem.dead;
+    }
+
+    private static boolean canMergeTogether(ItemStack itemStack, ItemStack otherItem) {
+        if (itemStack.getItem() != otherItem.getItem())
+            return false;
+
+        if (itemStack.count + otherItem.count > otherItem.getMaxStackSize())
+            return false;
+
+        if (itemStack.hasTag() ^ otherItem.hasTag())
+            return false;
+
+        return !otherItem.hasTag() || otherItem.getTag().equals(itemStack.getTag());
+    }
+
+    private static void mergeItems(EntityItem entityItem, ItemStack itemStack, EntityItem otherEntity, ItemStack otherItem) {
+        int amountLeftUntilFullStack = Math.min(itemStack.getMaxStackSize() - itemStack.count, otherItem.count);
+        ItemStack itemStackClone = itemStack.cloneItemStack();
+        itemStackClone.count += amountLeftUntilFullStack;
+        entityItem.setItemStack(itemStackClone);
+        otherItem.count -= amountLeftUntilFullStack;
+        if (otherItem.count <= 0) {
+            otherEntity.setItemStack(otherItem);
+        }
+    }
 
     @Override
     public String getVersion() {
@@ -192,10 +241,28 @@ public final class NMSAdapter implements com.bgsoftware.wildtools.nms.NMSAdapter
     }
 
     @Override
-    public int getTag(ToolItemStack toolItemStack, String key, int def) {
-        ItemStack nmsStack = (ItemStack) toolItemStack.getNMSItem();
-        NBTTagCompound tagCompound = nmsStack.getTag();
-        return tagCompound == null || !tagCompound.hasKey(key) ? def : tagCompound.getInt(key);
+    public org.bukkit.inventory.ItemStack getItemInHand(Player player) {
+        return player.getItemInHand();
+    }
+
+    @Override
+    public org.bukkit.inventory.ItemStack getItemInHand(Player player, Event e) {
+        return getItemInHand(player);
+    }
+
+    @Override
+    public Object[] createSyncedItem(org.bukkit.inventory.ItemStack other) {
+        CraftItemStack craftItemStack;
+        ItemStack handle;
+        if (other instanceof CraftItemStack) {
+            craftItemStack = (CraftItemStack) other;
+            handle = ITEM_STACK_HANDLE.get(other);
+        } else {
+            handle = CraftItemStack.asNMSCopy(other);
+            craftItemStack = CraftItemStack.asCraftMirror(handle);
+        }
+
+        return new Object[]{craftItemStack, handle};
     }
 
     @Override
@@ -210,13 +277,6 @@ public final class NMSAdapter implements com.bgsoftware.wildtools.nms.NMSAdapter
     }
 
     @Override
-    public String getTag(ToolItemStack toolItemStack, String key, String def) {
-        ItemStack nmsStack = (ItemStack) toolItemStack.getNMSItem();
-        NBTTagCompound tagCompound = nmsStack.getTag();
-        return tagCompound == null || !tagCompound.hasKey(key) ? def : tagCompound.getString(key);
-    }
-
-    @Override
     public void setTag(ToolItemStack toolItemStack, String key, String value) {
         ItemStack nmsStack = (ItemStack) toolItemStack.getNMSItem();
         NBTTagCompound tagCompound = nmsStack.getTag();
@@ -225,6 +285,20 @@ public final class NMSAdapter implements com.bgsoftware.wildtools.nms.NMSAdapter
             tagCompound = nmsStack.getTag();
         }
         tagCompound.setString(key, value);
+    }
+
+    @Override
+    public int getTag(ToolItemStack toolItemStack, String key, int def) {
+        ItemStack nmsStack = (ItemStack) toolItemStack.getNMSItem();
+        NBTTagCompound tagCompound = nmsStack.getTag();
+        return tagCompound == null || !tagCompound.hasKey(key) ? def : tagCompound.getInt(key);
+    }
+
+    @Override
+    public String getTag(ToolItemStack toolItemStack, String key, String def) {
+        ItemStack nmsStack = (ItemStack) toolItemStack.getNMSItem();
+        NBTTagCompound tagCompound = nmsStack.getTag();
+        return tagCompound == null || !tagCompound.hasKey(key) ? def : tagCompound.getString(key);
     }
 
     @Override
@@ -255,31 +329,6 @@ public final class NMSAdapter implements com.bgsoftware.wildtools.nms.NMSAdapter
             CraftEventFactory.callPlayerItemBreakEvent(entityPlayer, nmsStack);
 
         nmsStack.setData(0);
-    }
-
-    @Override
-    public Object[] createSyncedItem(org.bukkit.inventory.ItemStack other) {
-        CraftItemStack craftItemStack;
-        ItemStack handle;
-        if (other instanceof CraftItemStack) {
-            craftItemStack = (CraftItemStack) other;
-            handle = ITEM_STACK_HANDLE.get(other);
-        } else {
-            handle = CraftItemStack.asNMSCopy(other);
-            craftItemStack = CraftItemStack.asCraftMirror(handle);
-        }
-
-        return new Object[]{craftItemStack, handle};
-    }
-
-    @Override
-    public org.bukkit.inventory.ItemStack getItemInHand(Player player) {
-        return player.getItemInHand();
-    }
-
-    @Override
-    public org.bukkit.inventory.ItemStack getItemInHand(Player player, Event e) {
-        return getItemInHand(player);
     }
 
     @Override
@@ -330,10 +379,16 @@ public final class NMSAdapter implements com.bgsoftware.wildtools.nms.NMSAdapter
     }
 
     @Override
-    public void setBlockFast(Location location, int combinedId) {
-        World world = ((CraftWorld) location.getWorld()).getHandle();
-        Chunk chunk = world.getChunkAt(location.getChunk().getX(), location.getChunk().getZ());
-        BlockPosition blockPosition = new BlockPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ());
+    public void setBlockFast(org.bukkit.World bukkitWorld, Vector3 location, int combinedId, boolean sendUpdate) {
+        World world = ((CraftWorld) bukkitWorld).getHandle();
+        BlockPosition blockPosition = new BlockPosition(location.getX(), location.getY(), location.getZ());
+
+        if (sendUpdate) {
+            world.setTypeAndData(blockPosition, Block.getByCombinedId(combinedId), 18);
+            return;
+        }
+
+        Chunk chunk = world.getChunkAt(location.getX() >> 4, location.getZ() >> 4);
 
         if (combinedId == 0)
             world.a(null, 2001, blockPosition, Block.getCombinedId(world.getType(blockPosition)));
@@ -342,19 +397,19 @@ public final class NMSAdapter implements com.bgsoftware.wildtools.nms.NMSAdapter
     }
 
     @Override
-    public void refreshChunk(org.bukkit.Chunk bukkitChunk, Set<Location> blocksList) {
+    public void refreshChunk(org.bukkit.Chunk bukkitChunk, List<WorldEditSession.BlockData> blocksList) {
         Chunk chunk = ((CraftChunk) bukkitChunk).getHandle();
         int blocksAmount = blocksList.size();
         short[] values = new short[blocksAmount];
 
-        Location firstLocation = null;
+        Vector3 firstLocation = null;
 
         int counter = 0;
-        for (Location location : blocksList) {
+        for (WorldEditSession.BlockData blockData : blocksList) {
             if (firstLocation == null)
-                firstLocation = location;
+                firstLocation = blockData.location;
 
-            values[counter++] = (short) ((location.getBlockX() & 15) << 12 | (location.getBlockZ() & 15) << 8 | location.getBlockY());
+            values[counter++] = (short) ((blockData.location.getX() & 15) << 12 | (blockData.location.getZ() & 15) << 8 | blockData.location.getY());
         }
 
         sendPacketToRelevantPlayers((WorldServer) chunk.world, chunk.locX, chunk.locZ,
@@ -371,21 +426,6 @@ public final class NMSAdapter implements com.bgsoftware.wildtools.nms.NMSAdapter
     @Override
     public int getFarmlandId() {
         return Block.getCombinedId(Blocks.FARMLAND.getBlockData());
-    }
-
-    @Override
-    public void setCombinedId(Location location, int combinedId) {
-        World world = ((CraftWorld) location.getWorld()).getHandle();
-        BlockPosition blockPosition = new BlockPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ());
-        world.setTypeAndData(blockPosition, Block.getByCombinedId(combinedId), 18);
-    }
-
-    private void sendPacketToRelevantPlayers(WorldServer worldServer, int chunkX, int chunkZ, Packet<?> packet) {
-        PlayerChunkMap playerChunkMap = worldServer.getPlayerChunkMap();
-        for (EntityHuman entityHuman : worldServer.players) {
-            if (entityHuman instanceof EntityPlayer && playerChunkMap.a((EntityPlayer) entityHuman, chunkX, chunkZ))
-                ((EntityPlayer) entityHuman).playerConnection.sendPacket(packet);
-        }
     }
 
     @Override
@@ -462,78 +502,50 @@ public final class NMSAdapter implements com.bgsoftware.wildtools.nms.NMSAdapter
     }
 
     @Override
-    public Object getDroppedItem(org.bukkit.inventory.ItemStack itemStack, Location location) {
-        WorldServer world = ((CraftWorld) location.getWorld()).getHandle();
-        EntityItem entityitem = new EntityItem(world, location.getX(), location.getY(), location.getZ(), CraftItemStack.asNMSCopy(itemStack));
-        entityitem.pickupDelay = 10;
-        return entityitem;
-    }
+    public void dropItems(org.bukkit.World bukkitWorld, Vector3 dropLocation, List<org.bukkit.inventory.ItemStack> droppedItems) {
+        Map<Item, List<EntityItem>> entityItems = new LinkedHashMap<>();
 
-    @Override
-    public void dropItems(List<Object> droppedItemsRaw) {
-        droppedItemsRaw.removeIf(droppedItem -> !(droppedItem instanceof EntityItem));
+        WorldServer worldServer = ((CraftWorld) bukkitWorld).getHandle();
 
-        for (Object entityItem : droppedItemsRaw) {
-            if (canMerge((EntityItem) entityItem)) {
-                for (Object otherEntityItem : droppedItemsRaw) {
-                    if (entityItem != otherEntityItem && canMerge((EntityItem) otherEntityItem)) {
-                        if (mergeEntityItems((EntityItem) entityItem, (EntityItem) otherEntityItem))
-                            break;
+        // We first create item entity objects for all of our drops.
+        droppedItems.forEach(bukkitItemDrop -> {
+            ItemStack itemDrop = CraftItemStack.asNMSCopy(bukkitItemDrop);
+            EntityItem entityItem = new EntityItem(worldServer, dropLocation.getX(),
+                    dropLocation.getY(), dropLocation.getZ(), itemDrop);
+            entityItem.pickupDelay = 10;
+            entityItems.computeIfAbsent(itemDrop.getItem(), i -> new LinkedList<>()).add(entityItem);
+        });
+
+        // Now we want to try and merge them together.
+        entityItems.forEach((item, entityItemsPerItem) -> {
+            if (entityItemsPerItem.size() > 1) {
+                for (EntityItem entityItem : entityItemsPerItem) {
+                    if (canMerge(entityItem)) {
+                        for (EntityItem otherEntityItem : entityItemsPerItem) {
+                            if (otherEntityItem != entityItem && canMerge(otherEntityItem)) {
+                                if (mergeEntityItems(entityItem, otherEntityItem))
+                                    break;
+                            }
+                        }
                     }
                 }
             }
-        }
+        });
 
-        droppedItemsRaw.forEach(droppedItemObject -> {
-            EntityItem entityItem = (EntityItem) droppedItemObject;
+        // Finally, we'll go through all of them and try to drop the alive ones
+        // Items that were stacked to others are not alive anymore.
+        entityItems.forEach((item, entityItemsPerItem) -> entityItemsPerItem.forEach(entityItem -> {
             if (entityItem.isAlive()) {
                 entityItem.world.addEntity(entityItem);
             }
-        });
+        }));
     }
 
-    private static boolean canMerge(EntityItem entityItem) {
-        ItemStack itemStack = entityItem.getItemStack();
-        return itemStack.count < itemStack.getMaxStackSize();
-    }
-
-    private static boolean mergeEntityItems(EntityItem entityItem, EntityItem otherEntity) {
-        ItemStack itemOfEntity = entityItem.getItemStack();
-        ItemStack itemOfOtherEntity = otherEntity.getItemStack();
-        if (canMergeTogether(itemOfEntity, itemOfOtherEntity)) {
-            if (!CraftEventFactory.callItemMergeEvent(otherEntity, entityItem).isCancelled()) {
-                mergeItems(entityItem, itemOfEntity, otherEntity, itemOfOtherEntity);
-                entityItem.pickupDelay = Math.max(entityItem.pickupDelay, otherEntity.pickupDelay);
-                if (itemOfOtherEntity.count <= 0) {
-                    otherEntity.die();
-                }
-            }
-        }
-
-        return entityItem.dead;
-    }
-
-    private static boolean canMergeTogether(ItemStack itemStack, ItemStack otherItem) {
-        if (itemStack.getItem() != otherItem.getItem())
-            return false;
-
-        if (itemStack.count + otherItem.count > otherItem.getMaxStackSize())
-            return false;
-
-        if (itemStack.hasTag() ^ otherItem.hasTag())
-            return false;
-
-        return !otherItem.hasTag() || otherItem.getTag().equals(itemStack.getTag());
-    }
-
-    private static void mergeItems(EntityItem entityItem, ItemStack itemStack, EntityItem otherEntity, ItemStack otherItem) {
-        int amountLeftUntilFullStack = Math.min(itemStack.getMaxStackSize() - itemStack.count, otherItem.count);
-        ItemStack itemStackClone = itemStack.cloneItemStack();
-        itemStackClone.count += amountLeftUntilFullStack;
-        entityItem.setItemStack(itemStackClone);
-        otherItem.count -= amountLeftUntilFullStack;
-        if (otherItem.count <= 0) {
-            otherEntity.setItemStack(otherItem);
+    private void sendPacketToRelevantPlayers(WorldServer worldServer, int chunkX, int chunkZ, Packet<?> packet) {
+        PlayerChunkMap playerChunkMap = worldServer.getPlayerChunkMap();
+        for (EntityHuman entityHuman : worldServer.players) {
+            if (entityHuman instanceof EntityPlayer && playerChunkMap.a((EntityPlayer) entityHuman, chunkX, chunkZ))
+                ((EntityPlayer) entityHuman).playerConnection.sendPacket(packet);
         }
     }
 

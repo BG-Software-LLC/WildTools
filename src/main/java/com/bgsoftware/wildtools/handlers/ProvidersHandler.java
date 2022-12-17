@@ -19,9 +19,11 @@ import com.bgsoftware.wildtools.hooks.StackedItemProvider;
 import com.bgsoftware.wildtools.hooks.StackedItemProvider_Default;
 import com.bgsoftware.wildtools.hooks.listener.IToolBlockListener;
 import com.bgsoftware.wildtools.utils.Executor;
+import com.bgsoftware.wildtools.utils.math.Vector3;
 import com.google.common.collect.Lists;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.entity.Player;
@@ -196,8 +198,8 @@ public final class ProvidersHandler implements ProvidersManager {
         this.toolBlockListeners.add(toolBlockListener);
     }
 
-    public void notifyToolBlockListeners(Location location, IToolBlockListener.Action action) {
-        this.toolBlockListeners.forEach(toolBlockListener -> toolBlockListener.recordBlockChange(location, action));
+    public void notifyToolBlockListeners(World world, Vector3 location, IToolBlockListener.Action action) {
+        this.toolBlockListeners.forEach(toolBlockListener -> toolBlockListener.recordBlockChange(world, location, action));
     }
 
     public boolean hasEconomyProvider() {

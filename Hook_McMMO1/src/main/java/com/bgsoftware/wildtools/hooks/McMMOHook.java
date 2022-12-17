@@ -4,9 +4,10 @@ import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.wildtools.Locale;
 import com.bgsoftware.wildtools.WildToolsPlugin;
 import com.bgsoftware.wildtools.hooks.listener.IToolBlockListener;
+import com.bgsoftware.wildtools.utils.math.Vector3;
 import com.gmail.nossr50.events.skills.abilities.McMMOPlayerAbilityActivateEvent;
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -40,11 +41,11 @@ public final class McMMOHook {
         plugin.getProviders().registerToolBlockListener(McMMOHook::recordBlockChange);
     }
 
-    private static void recordBlockChange(Location location, IToolBlockListener.Action action) {
+    private static void recordBlockChange(World world, Vector3 location, IToolBlockListener.Action action) {
         if (action != IToolBlockListener.Action.BLOCK_PLACE)
             return;
 
-        Block block = location.getBlock();
+        Block block = location.toLocation(world).getBlock();
 
         try {
             com.gmail.nossr50.mcMMO.getPlaceStore().setTrue(block);

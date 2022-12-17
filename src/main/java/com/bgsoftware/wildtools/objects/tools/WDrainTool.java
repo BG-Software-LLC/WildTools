@@ -4,10 +4,11 @@ import com.bgsoftware.wildtools.api.events.DrainWandUseEvent;
 import com.bgsoftware.wildtools.api.objects.ToolMode;
 import com.bgsoftware.wildtools.api.objects.tools.DrainTool;
 import com.bgsoftware.wildtools.utils.BukkitUtils;
-import com.bgsoftware.wildtools.utils.blocks.BlocksController;
+import com.bgsoftware.wildtools.utils.world.WorldEditSession;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -41,7 +42,9 @@ public final class WDrainTool extends WTool implements DrainTool {
         Location max = block.getLocation().clone().add(radius, radius, radius),
                 min = block.getLocation().clone().subtract(radius, radius, radius);
 
-        BlocksController blocksController = new BlocksController();
+        World world = block.getWorld();
+
+        WorldEditSession editSession = new WorldEditSession(world);
         int toolDurability = getDurability(player, usedItem);
         boolean usingDurability = isUsingDurability();
         int toolUsages = 0;
@@ -53,23 +56,23 @@ public final class WDrainTool extends WTool implements DrainTool {
                     if (usingDurability && toolUsages >= toolDurability)
                         break outerLoop;
 
-                    Block targetBlock = block.getWorld().getBlockAt(x, y, z);
+                    Block targetBlock = world.getBlockAt(x, y, z);
 
                     if (targetBlock.getType() != Material.ICE || !BukkitUtils.canBreakBlock(player, targetBlock, this) ||
                             !BukkitUtils.hasBreakAccess(targetBlock, player))
                         continue;
 
-                    blocksController.setAir(targetBlock.getLocation());
+                    editSession.setAir(targetBlock.getLocation());
 
                     toolUsages++;
                 }
             }
         }
 
-        DrainWandUseEvent drainWandUseEvent = new DrainWandUseEvent(player, this, blocksController.getAffectedBlocks());
+        DrainWandUseEvent drainWandUseEvent = new DrainWandUseEvent(player, this, editSession.getAffectedBlocks());
         Bukkit.getPluginManager().callEvent(drainWandUseEvent);
 
-        blocksController.updateSession();
+        editSession.apply();
 
         if (toolUsages > 0)
             reduceDurablility(player, usingDurability ? toolUsages : 1, usedItem);

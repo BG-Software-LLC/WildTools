@@ -4,7 +4,6 @@ import com.bgsoftware.wildtools.WildToolsPlugin;
 import com.bgsoftware.wildtools.api.hooks.SellInfo;
 import com.bgsoftware.wildtools.api.hooks.SoldItem;
 import com.bgsoftware.wildtools.utils.items.ItemUtils;
-import com.bgsoftware.wildtools.utils.items.ItemsDropper;
 import org.bukkit.Material;
 import org.bukkit.block.BlockState;
 import org.bukkit.entity.Player;
@@ -60,9 +59,7 @@ public final class ContainerProvider_Default implements ExtendedContainerProvide
 
     @Override
     public void addItems(BlockState blockState, Inventory chestInventory, List<ItemStack> itemStackList) {
-        ItemsDropper itemsDropper = new ItemsDropper();
-        itemStackList.forEach(itemStack -> ItemUtils.addItem(itemStack, chestInventory, blockState.getLocation(), itemsDropper));
-        itemsDropper.dropItems();
+        itemStackList.forEach(itemStack -> ItemUtils.addItem(itemStack, chestInventory, blockState.getLocation(), null));
     }
 
 }

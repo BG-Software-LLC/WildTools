@@ -3,6 +3,8 @@ package com.bgsoftware.wildtools.nms;
 import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.wildtools.recipes.AdvancedShapedRecipe;
 import com.bgsoftware.wildtools.utils.items.ToolItemStack;
+import com.bgsoftware.wildtools.utils.math.Vector3;
+import com.bgsoftware.wildtools.utils.world.WorldEditSession;
 import org.apache.commons.lang.Validate;
 import org.bukkit.Chunk;
 import org.bukkit.CropState;
@@ -24,7 +26,6 @@ import org.bukkit.inventory.ShapedRecipe;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 public interface NMSAdapter {
 
@@ -64,15 +65,13 @@ public interface NMSAdapter {
 
     Collection<Player> getOnlinePlayers();
 
-    void setBlockFast(Location location, int combinedId);
+    void setBlockFast(World world, Vector3 location, int combinedId, boolean sendUpdate);
 
-    void refreshChunk(Chunk chunk, Set<Location> blocksList);
+    void refreshChunk(Chunk chunk, List<WorldEditSession.BlockData> blocksList);
 
     int getCombinedId(Block block);
 
     int getFarmlandId();
-
-    void setCombinedId(Location location, int combinedId);
 
     Enchantment getGlowEnchant();
 
@@ -85,6 +84,8 @@ public interface NMSAdapter {
     boolean isAxeType(Material material);
 
     boolean isShovelType(Material material);
+
+    void dropItems(World world, Vector3 dropLocation, List<ItemStack> droppedItems);
 
     default ItemStack[] parseChoice(Recipe recipe, ItemStack itemStack) {
         return new ItemStack[]{itemStack};
@@ -105,10 +106,6 @@ public interface NMSAdapter {
     default AdvancedShapedRecipe createRecipe(String toolName, ItemStack result) {
         return new AdvancedRecipeClassImpl(result);
     }
-
-    Object getDroppedItem(ItemStack itemStack, Location location);
-
-    void dropItems(List<Object> droppedItems);
 
     default int getMinHeight(World world) {
         return 0;
