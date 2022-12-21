@@ -210,7 +210,8 @@ public class BukkitUtils {
 
     private static boolean shouldForceUpdate(Block frameBlock) {
         for (BlockFace blockFace : blockFaces) {
-            if (FORCE_UPDATE_MATERIALS.contains(frameBlock.getRelative(blockFace).getType()))
+            Material blockType = frameBlock.getRelative(blockFace).getType();
+            if ((blockFace == BlockFace.UP && !blockType.isSolid()) || FORCE_UPDATE_MATERIALS.contains(blockType))
                 return true;
         }
 
