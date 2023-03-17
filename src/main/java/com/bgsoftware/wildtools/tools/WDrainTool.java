@@ -62,9 +62,9 @@ public class WDrainTool extends WTool implements DrainTool {
                             !BukkitUtils.hasBreakAccess(targetBlock, player))
                         continue;
 
-                    editSession.setAir(targetBlock.getLocation());
-
-                    toolUsages++;
+                    boolean result = editSession.setAir(targetBlock.getLocation());
+                    if (result)
+                        toolUsages++;
                 }
             }
         }

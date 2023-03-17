@@ -38,21 +38,21 @@ public class WorldEditSession {
         this.world = world;
     }
 
-    public void setType(Location location, Block block) {
+    public boolean setType(Location location, Block block) {
         ensureNotApplied();
-        setType(location, plugin.getNMSWorld().getCombinedId(block));
+        return setType(location, plugin.getNMSWorld().getCombinedId(block));
     }
 
-    public void setAir(Location location) {
+    public boolean setAir(Location location) {
         ensureNotApplied();
-        this.setType(location, 0);
+        return this.setType(location, 0);
     }
 
-    public void setType(Location bukkitLocation, int blockId) {
+    public boolean setType(Location bukkitLocation, int blockId) {
         ensureNotApplied();
         boolean isPlace = blockId != 0;
         boolean updateBlock = dropLocation == null;
-        this.setType(bukkitLocation, isPlace, vec -> plugin.getNMSWorld().setBlockFast(this.world, vec, blockId, updateBlock));
+        return this.setType(bukkitLocation, isPlace, vec -> plugin.getNMSWorld().setBlockFast(this.world, vec, blockId, updateBlock));
     }
 
     public boolean setType(Location bukkitLocation, boolean isPlace, SetBlockFunction setBlockFunction) {

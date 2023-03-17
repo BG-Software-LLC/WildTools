@@ -99,11 +99,17 @@ public class BukkitUtils {
             ExperienceOrb orb = block.getWorld().spawn(block.getLocation(), ExperienceOrb.class);
             orb.setExperience(blockBreakEvent.getExpToDrop());
         } else {
+            boolean result;
+
             if ((tool != null && tool.isOmni()) || originalType.hasGravity() || shouldForceUpdate(block)) {
-                editSession.setType(blockLocation, false, vec -> block.setType(Material.AIR));
+                result = editSession.setType(blockLocation, false, vec -> block.setType(Material.AIR));
             } else {
-                editSession.setAir(blockLocation);
+                result = editSession.setAir(blockLocation);
             }
+
+            if (!result)
+                return false;
+
             editSession.addExp(blockBreakEvent.getExpToDrop());
         }
 
@@ -143,7 +149,9 @@ public class BukkitUtils {
         if (editSession == null) {
             plugin.getNMSWorld().setCropState(block, CropState.SEEDED);
         } else {
-            editSession.setType(blockLocation, false, vec -> plugin.getNMSWorld().setCropState(block, CropState.SEEDED));
+            boolean result = editSession.setType(blockLocation, false, vec -> plugin.getNMSWorld().setCropState(block, CropState.SEEDED));
+            if (!result)
+                return false;
         }
 
         if (tool != null)
@@ -164,7 +172,9 @@ public class BukkitUtils {
             block.setType(materialBlock.getType());
             block.setData(materialBlock.getData());
         } else {
-            editSession.setType(block.getLocation(), materialBlock);
+            boolean result = editSession.setType(block.getLocation(), materialBlock);
+            if (!result)
+                return false;
         }
 
         return true;
