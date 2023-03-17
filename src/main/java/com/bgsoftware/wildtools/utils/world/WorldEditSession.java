@@ -145,7 +145,7 @@ public class WorldEditSession {
     }
 
     private boolean isLocationValid(Vector3 location) {
-        return NumberUtils.range(location.getY(), plugin.getNMSWorld().getMinHeight(this.world), this.world.getMaxHeight()) &&
+        return NumberUtils.range(location.getY(), plugin.getNMSWorld().getMinHeight(this.world), this.world.getMaxHeight() - 1) &&
                 NumberUtils.range(location.getX(), -MAX_BLOCK_LOCATION, MAX_BLOCK_LOCATION) &&
                 NumberUtils.range(location.getZ(), -MAX_BLOCK_LOCATION, MAX_BLOCK_LOCATION);
     }
