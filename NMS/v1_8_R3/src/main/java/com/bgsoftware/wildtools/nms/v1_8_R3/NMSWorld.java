@@ -276,6 +276,8 @@ public class NMSWorld implements com.bgsoftware.wildtools.nms.NMSWorld {
             EntityItem entityItem = new EntityItem(worldServer, dropLocation.getX(),
                     dropLocation.getY(), dropLocation.getZ(), itemDrop);
             entityItem.pickupDelay = 10;
+            entityItem.dead = false;
+            entityItem.valid = true;
             entityItems.computeIfAbsent(itemDrop.getItem(), i -> new LinkedList<>()).add(entityItem);
         });
 
