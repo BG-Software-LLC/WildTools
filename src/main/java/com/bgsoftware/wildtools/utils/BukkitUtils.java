@@ -114,7 +114,7 @@ public class BukkitUtils {
         }
 
         if (tool != null) {
-            if (BLOCK_BREAK_EVENT_IS_DROP_ITEMS.isValid() && BLOCK_BREAK_EVENT_IS_DROP_ITEMS.invoke(blockBreakEvent))
+            if (!BLOCK_BREAK_EVENT_IS_DROP_ITEMS.isValid() || BLOCK_BREAK_EVENT_IS_DROP_ITEMS.invoke(blockBreakEvent))
                 collectDropsFromTool(player, block, tool, editSession, dropItemFunction);
 
             if (tool.hasStatistics()) {
