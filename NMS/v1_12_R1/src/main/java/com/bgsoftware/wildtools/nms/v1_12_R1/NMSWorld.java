@@ -13,7 +13,6 @@ import net.minecraft.server.v1_12_R1.BlockPotatoes;
 import net.minecraft.server.v1_12_R1.Chunk;
 import net.minecraft.server.v1_12_R1.EnchantmentManager;
 import net.minecraft.server.v1_12_R1.Enchantments;
-import net.minecraft.server.v1_12_R1.EntityItem;
 import net.minecraft.server.v1_12_R1.EntityPlayer;
 import net.minecraft.server.v1_12_R1.EnumColor;
 import net.minecraft.server.v1_12_R1.GameProfileSerializer;
@@ -43,10 +42,8 @@ import org.bukkit.material.CocoaPlant;
 import org.bukkit.material.Crops;
 import org.bukkit.material.NetherWarts;
 
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 public class NMSWorld implements com.bgsoftware.wildtools.nms.NMSWorld {
@@ -296,46 +293,6 @@ public class NMSWorld implements com.bgsoftware.wildtools.nms.NMSWorld {
                 location.getBlockX() < (worldBorder.getCenter().getBlockX() - radius) ||
                 location.getBlockZ() > (worldBorder.getCenter().getBlockZ() + radius) ||
                 location.getBlockZ() < (worldBorder.getCenter().getBlockZ() - radius);
-    }
-
-    @Override
-    public void dropItems(org.bukkit.World bukkitWorld, Vector3 dropLocation, List<org.bukkit.inventory.ItemStack> droppedItems) {
-        Map<Item, List<EntityItem>> entityItems = new LinkedHashMap<>();
-
-        WorldServer worldServer = ((CraftWorld) bukkitWorld).getHandle();
-
-        // We first create item entity objects for all of our drops.
-        droppedItems.forEach(bukkitItemDrop -> {
-            ItemStack itemDrop = CraftItemStack.asNMSCopy(bukkitItemDrop);
-            EntityItem entityItem = new EntityItem(worldServer, dropLocation.getX(),
-                    dropLocation.getY(), dropLocation.getZ(), itemDrop);
-            entityItem.pickupDelay = 10;
-            entityItems.computeIfAbsent(itemDrop.getItem(), i -> new LinkedList<>()).add(entityItem);
-        });
-
-        // Now we want to try and merge them together.
-        entityItems.forEach((item, entityItemsPerItem) -> {
-            if (entityItemsPerItem.size() > 1) {
-                for (EntityItem entityItem : entityItemsPerItem) {
-                    if (NMSUtils.canMerge(entityItem)) {
-                        for (EntityItem otherEntityItem : entityItemsPerItem) {
-                            if (otherEntityItem != entityItem && NMSUtils.canMerge(otherEntityItem)) {
-                                if (NMSUtils.mergeEntityItems(entityItem, otherEntityItem))
-                                    break;
-                            }
-                        }
-                    }
-                }
-            }
-        });
-
-        // Finally, we'll go through all of them and try to drop the alive ones
-        // Items that were stacked to others are not alive anymore.
-        entityItems.forEach((item, entityItemsPerItem) -> entityItemsPerItem.forEach(entityItem -> {
-            if (entityItem.isAlive()) {
-                entityItem.world.addEntity(entityItem);
-            }
-        }));
     }
 
     @Override

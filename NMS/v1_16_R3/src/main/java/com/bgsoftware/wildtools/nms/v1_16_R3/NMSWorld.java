@@ -3,7 +3,6 @@ package com.bgsoftware.wildtools.nms.v1_16_R3;
 import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.wildtools.utils.Executor;
-import com.bgsoftware.wildtools.utils.Materials;
 import com.bgsoftware.wildtools.utils.math.Vector3;
 import com.bgsoftware.wildtools.utils.world.WorldEditSession;
 import com.destroystokyo.paper.antixray.ChunkPacketBlockControllerAntiXray;
@@ -12,10 +11,8 @@ import net.minecraft.server.v1_16_R3.Block;
 import net.minecraft.server.v1_16_R3.BlockPosition;
 import net.minecraft.server.v1_16_R3.Chunk;
 import net.minecraft.server.v1_16_R3.ChunkProviderServer;
-import net.minecraft.server.v1_16_R3.EntityItem;
 import net.minecraft.server.v1_16_R3.EntityPlayer;
 import net.minecraft.server.v1_16_R3.IBlockData;
-import net.minecraft.server.v1_16_R3.Item;
 import net.minecraft.server.v1_16_R3.ItemStack;
 import net.minecraft.server.v1_16_R3.LightEngineThreaded;
 import net.minecraft.server.v1_16_R3.PacketPlayOutLightUpdate;
@@ -38,7 +35,6 @@ import org.bukkit.entity.Player;
 
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -179,46 +175,6 @@ public class NMSWorld implements com.bgsoftware.wildtools.nms.NMSWorld {
         int radius = (int) worldBorder.getSize() / 2;
         return location.getBlockX() > (worldBorder.getCenter().getBlockX() + radius) || location.getBlockX() < (worldBorder.getCenter().getBlockX() - radius) ||
                 location.getBlockZ() > (worldBorder.getCenter().getBlockZ() + radius) || location.getBlockZ() < (worldBorder.getCenter().getBlockZ() - radius);
-    }
-
-    @Override
-    public void dropItems(org.bukkit.World bukkitWorld, Vector3 dropLocation, List<org.bukkit.inventory.ItemStack> droppedItems) {
-        Map<Item, List<EntityItem>> entityItems = new LinkedHashMap<>();
-
-        WorldServer worldServer = ((CraftWorld) bukkitWorld).getHandle();
-
-        // We first create item entity objects for all of our drops.
-        droppedItems.forEach(bukkitItemDrop -> {
-            ItemStack itemDrop = CraftItemStack.asNMSCopy(bukkitItemDrop);
-            EntityItem entityItem = new EntityItem(worldServer, dropLocation.getX(),
-                    dropLocation.getY(), dropLocation.getZ(), itemDrop);
-            entityItem.pickupDelay = 10;
-            entityItems.computeIfAbsent(itemDrop.getItem(), i -> new LinkedList<>()).add(entityItem);
-        });
-
-        // Now we want to try and merge them together.
-        entityItems.forEach((item, entityItemsPerItem) -> {
-            if (entityItemsPerItem.size() > 1) {
-                for (EntityItem entityItem : entityItemsPerItem) {
-                    if (NMSUtils.canMerge(entityItem)) {
-                        for (EntityItem otherEntityItem : entityItemsPerItem) {
-                            if (otherEntityItem != entityItem && NMSUtils.canMerge(otherEntityItem)) {
-                                if (NMSUtils.mergeEntityItems(entityItem, otherEntityItem))
-                                    break;
-                            }
-                        }
-                    }
-                }
-            }
-        });
-
-        // Finally, we'll go through all of them and try to drop the alive ones
-        // Items that were stacked to others are not alive anymore.
-        entityItems.forEach((item, entityItemsPerItem) -> entityItemsPerItem.forEach(entityItem -> {
-            if (entityItem.isAlive()) {
-                entityItem.world.addEntity(entityItem);
-            }
-        }));
     }
 
     @Override

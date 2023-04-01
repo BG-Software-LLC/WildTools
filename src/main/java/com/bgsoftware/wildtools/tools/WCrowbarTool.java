@@ -67,10 +67,11 @@ public class WCrowbarTool extends WTool implements CrowbarTool {
         if (commandsOnUse.isEmpty()) {
             if (!itemsToDrop.isEmpty()) {
                 ItemStack dropItem = itemsToDrop.get(0);
-                if (isAutoCollect())
+                if (isAutoCollect()) {
                     ItemUtils.addItem(dropItem, e.getPlayer().getInventory(), e.getClickedBlock().getLocation(), null);
-                else
-                    e.getClickedBlock().getWorld().dropItemNaturally(e.getClickedBlock().getLocation(), dropItem);
+                } else {
+                    plugin.getProviders().getStackedItemProvider().dropItem(e.getClickedBlock().getLocation(), dropItem);
+                }
             }
         } else {
             commandsOnUse.forEach(commandOnUse -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), commandOnUse

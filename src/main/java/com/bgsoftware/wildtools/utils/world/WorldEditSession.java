@@ -2,6 +2,7 @@ package com.bgsoftware.wildtools.utils.world;
 
 import com.bgsoftware.wildtools.WildToolsPlugin;
 import com.bgsoftware.wildtools.hooks.listener.IToolBlockListener;
+import com.bgsoftware.wildtools.utils.items.ItemStackMap;
 import com.bgsoftware.wildtools.utils.math.NumberUtils;
 import com.bgsoftware.wildtools.utils.math.Vector2;
 import com.bgsoftware.wildtools.utils.math.Vector3;
@@ -27,7 +28,7 @@ public class WorldEditSession {
     private final Map<Vector3, BlockData> affectedBlocks = new LinkedHashMap<>();
     private final World world;
 
-    private List<ItemStack> itemsToDrop;
+    private ItemStackMap itemsToDrop;
     private int expToDrop = 0;
 
     private Vector3 dropLocation;
@@ -80,8 +81,11 @@ public class WorldEditSession {
 
     public void addDrops(List<ItemStack> drops) {
         ensureNotApplied();
-        if (this.itemsToDrop == null) this.itemsToDrop = new LinkedList<>();
-        this.itemsToDrop.addAll(drops);
+
+        if (this.itemsToDrop == null)
+            this.itemsToDrop = new ItemStackMap();
+
+        this.itemsToDrop.addItems(drops);
     }
 
     public void addExp(int exp) {
@@ -114,13 +118,16 @@ public class WorldEditSession {
             plugin.getNMSWorld().refreshChunk(chunkVector.toChunk(this.world), affectedBlocks);
         });
 
+        Location bukkitDropLocation = this.dropLocation.toLocation(this.world);
+
         // Drop all the items
-        if (this.itemsToDrop != null && !this.itemsToDrop.isEmpty())
-            plugin.getNMSWorld().dropItems(this.world, this.dropLocation, this.itemsToDrop);
+        if (this.itemsToDrop != null && !this.itemsToDrop.isEmpty()) {
+            this.itemsToDrop.forEach((itemToDrop, count) -> plugin.getProviders()
+                    .getStackedItemProvider().dropItem(bukkitDropLocation, itemToDrop, count.get()));
+        }
 
         if (this.expToDrop > 0) {
-            Location bukkitLocation = this.dropLocation.toLocation(this.world);
-            ExperienceOrb orb = this.world.spawn(bukkitLocation, ExperienceOrb.class);
+            ExperienceOrb orb = this.world.spawn(bukkitDropLocation, ExperienceOrb.class);
             orb.setExperience(this.expToDrop);
         }
 

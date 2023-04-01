@@ -6,7 +6,6 @@ import com.bgsoftware.wildtools.api.objects.tools.Tool;
 import com.bgsoftware.wildtools.tools.WHarvesterTool;
 import com.bgsoftware.wildtools.utils.Executor;
 import com.bgsoftware.wildtools.utils.Materials;
-import com.bgsoftware.wildtools.utils.math.Vector3;
 import com.bgsoftware.wildtools.utils.world.WorldEditSession;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -40,8 +39,10 @@ public class ItemUtils {
                 additionalItems.forEach((i, drop) -> drops.add(drop));
                 editSession.addDrops(drops);
             } else {
-                Executor.sync(() -> plugin.getNMSWorld().dropItems(location.getWorld(),
-                        Vector3.of(location), new LinkedList<>(additionalItems.values())));
+                ItemStackMap itemsToDrop = new ItemStackMap();
+                itemsToDrop.addItems(additionalItems.values());
+                Executor.sync(() -> itemsToDrop.forEach((itemToDrop, count) -> plugin.getProviders()
+                        .getStackedItemProvider().dropItem(location, itemToDrop, count.get())));
             }
         }
     }

@@ -30,8 +30,6 @@ public interface NMSWorld {
 
     boolean isOutsideWorldBorder(Location location);
 
-    void dropItems(World world, Vector3 dropLocation, List<ItemStack> droppedItems);
-
     int getMinHeight(World world);
 
 }

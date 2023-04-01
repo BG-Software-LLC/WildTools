@@ -11,8 +11,6 @@ import net.minecraft.server.level.ServerChunkCache;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.level.ThreadedLevelLightEngine;
-import net.minecraft.world.entity.item.ItemEntity;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
@@ -34,10 +32,8 @@ import org.bukkit.craftbukkit.v1_19_R3.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_19_R3.inventory.CraftItemStack;
 import org.bukkit.entity.Player;
 
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 public class NMSWorld implements com.bgsoftware.wildtools.nms.NMSWorld {
 
@@ -161,46 +157,6 @@ public class NMSWorld implements com.bgsoftware.wildtools.nms.NMSWorld {
                 location.getBlockX() < (worldBorder.getCenter().getBlockX() - radius) ||
                 location.getBlockZ() > (worldBorder.getCenter().getBlockZ() + radius) ||
                 location.getBlockZ() < (worldBorder.getCenter().getBlockZ() - radius);
-    }
-
-    @Override
-    public void dropItems(World bukkitWorld, Vector3 dropLocation, List<org.bukkit.inventory.ItemStack> droppedItems) {
-        Map<Item, List<ItemEntity>> itemEntities = new LinkedHashMap<>();
-
-        ServerLevel serverLevel = ((CraftWorld) bukkitWorld).getHandle();
-
-        // We first create item entity objects for all of our drops.
-        droppedItems.forEach(bukkitItemDrop -> {
-            ItemStack itemDrop = CraftItemStack.asNMSCopy(bukkitItemDrop);
-            ItemEntity itemEntity = new ItemEntity(serverLevel, dropLocation.getX(),
-                    dropLocation.getY(), dropLocation.getZ(), itemDrop);
-            itemEntity.pickupDelay = 10;
-            itemEntities.computeIfAbsent(itemDrop.getItem(), i -> new LinkedList<>()).add(itemEntity);
-        });
-
-        // Now we want to try and merge them together.
-        itemEntities.forEach((item, itemEntitiesPerItem) -> {
-            if (itemEntitiesPerItem.size() > 1) {
-                for (ItemEntity itemEntity : itemEntitiesPerItem) {
-                    if (NMSUtils.canMerge(itemEntity)) {
-                        for (ItemEntity otherItemEntity : itemEntitiesPerItem) {
-                            if (otherItemEntity != itemEntity && NMSUtils.canMerge(otherItemEntity)) {
-                                if (NMSUtils.mergeEntityItems(itemEntity, otherItemEntity))
-                                    break;
-                            }
-                        }
-                    }
-                }
-            }
-        });
-
-        // Finally, we'll go through all of them and try to drop the alive ones
-        // Items that were stacked to others are not alive anymore.
-        itemEntities.forEach((item, itemEntitiesPerItem) -> itemEntitiesPerItem.forEach(itemEntity -> {
-            if (itemEntity.isAlive()) {
-                itemEntity.level.addFreshEntity(itemEntity);
-            }
-        }));
     }
 
     @Override
