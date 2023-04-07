@@ -125,7 +125,8 @@ public class NMSWorld implements com.bgsoftware.wildtools.nms.NMSWorld {
 
     @Override
     public void refreshChunk(org.bukkit.Chunk bukkitChunk, List<WorldEditSession.BlockData> blocksList) {
-        LevelChunk levelChunk = ((CraftChunk) bukkitChunk).getHandle();
+        ServerLevel serverLevel = ((CraftChunk) bukkitChunk).getCraftWorld().getHandle();
+        LevelChunk levelChunk = serverLevel.getChunk(bukkitChunk.getX(), bukkitChunk.getZ());
         ServerChunkCache serverChunkCache = levelChunk.level.getChunkSource();
         ThreadedLevelLightEngine lightEngine = (ThreadedLevelLightEngine) levelChunk.level.getLightEngine();
 
