@@ -92,9 +92,10 @@ public class WBuilderTool extends WTool implements BuilderTool {
             Material nextBlockType = nextBlock.getType();
 
             if (nextBlockType.isSolid() || nextBlockType == Materials.COBWEB.parseMaterial() ||
-                    !BukkitUtils.canBreakBlock(e.getPlayer(), nextBlock, firstType, firstData, this) ||
-                    !BukkitUtils.placeBlock(e.getPlayer(), nextBlock, originalBlock, editSession))
+                    !BukkitUtils.canBreakBlock(e.getPlayer(), nextBlock, firstType, firstData, this, false) ||
+                    !BukkitUtils.placeBlock(e.getPlayer(), nextBlock, originalBlock, editSession)) {
                 break;
+            }
         }
 
         BuilderWandUseEvent builderWandUseEvent = new BuilderWandUseEvent(e.getPlayer(), this, editSession.getAffectedBlocks());

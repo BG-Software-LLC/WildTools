@@ -54,7 +54,12 @@ public class BukkitUtils {
     }
 
     public static boolean canBreakBlock(Player player, Block block, Material firstType, short firstData, Tool tool) {
-        return !DISALLOWED_BLOCKS.contains(block.getType()) && tool.canBreakBlock(block, firstType, firstData) &&
+        return canBreakBlock(player, block, firstType, firstData, tool, true);
+    }
+
+    public static boolean canBreakBlock(Player player, Block block, Material firstType, short firstData, Tool tool,
+                                        boolean checkDisallowedBlocks) {
+        return (!checkDisallowedBlocks || !DISALLOWED_BLOCKS.contains(block.getType())) && tool.canBreakBlock(block, firstType, firstData) &&
                 (!tool.isOnlyInsideClaim() || plugin.getProviders().isInsideClaim(player, block.getLocation())) &&
                 !plugin.getNMSWorld().isOutsideWorldBorder(block.getLocation());
     }
