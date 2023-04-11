@@ -114,7 +114,7 @@ public class NMSWorld implements com.bgsoftware.wildtools.nms.NMSWorld {
                 if (fortuneLevel > 0) {
                     amount += world.random.nextInt(fortuneLevel + 1);
                 }
-                drops.add(new org.bukkit.inventory.ItemStack(Material.NETHER_WARTS, amount));
+                drops.add(new org.bukkit.inventory.ItemStack(Material.NETHER_STALK, amount));
             }
 
             return drops;
