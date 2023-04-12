@@ -1,5 +1,6 @@
 package com.bgsoftware.wildtools.handlers;
 
+import com.bgsoftware.common.shopsbridge.ShopsProvider;
 import com.bgsoftware.wildtools.WildToolsPlugin;
 import com.bgsoftware.wildtools.api.handlers.ProvidersManager;
 import com.bgsoftware.wildtools.api.hooks.ClaimsProvider;
@@ -15,6 +16,7 @@ import com.bgsoftware.wildtools.hooks.ExtendedContainerProvider;
 import com.bgsoftware.wildtools.hooks.FactionsProvider;
 import com.bgsoftware.wildtools.hooks.FactionsProvider_Default;
 import com.bgsoftware.wildtools.hooks.PricesProvider_Default;
+import com.bgsoftware.wildtools.hooks.PricesProvider_ShopsBridgeWrapper;
 import com.bgsoftware.wildtools.hooks.StackedItemProvider;
 import com.bgsoftware.wildtools.hooks.StackedItemProvider_Default;
 import com.bgsoftware.wildtools.hooks.listener.IToolBlockListener;
@@ -249,35 +251,11 @@ public class ProvidersHandler implements ProvidersManager {
         if (pricesProvider != null && !(pricesProvider instanceof PricesProvider_Default))
             return;
 
-        Optional<PricesProvider> pricesProvider = Optional.empty();
-
-        if (pricesPlugin.equalsIgnoreCase("ShopGUIPlus") && Bukkit.getPluginManager().isPluginEnabled("ShopGUIPlus")) {
-            if (containsClass("net.brcdev.shopgui.shop.item.ShopItem")) {
-                pricesProvider = createInstance("PricesProvider_ShopGUIPlus78");
-            } else {
-                pricesProvider = createInstance("PricesProvider_ShopGUIPlus");
-            }
-        } else if (pricesPlugin.equalsIgnoreCase("GUIShop") && Bukkit.getPluginManager().isPluginEnabled("GUIShop")) {
-            pricesProvider = createInstance("PricesProvider_GUIShop");
-        } else if (pricesPlugin.equalsIgnoreCase("Essentials") && Bukkit.getPluginManager().isPluginEnabled("Essentials")) {
-            Plugin essentials = Bukkit.getPluginManager().getPlugin("Essentials");
-            if (essentials.getDescription().getVersion().startsWith("2.15")) {
-                pricesProvider = createInstance("PricesProvider_Essentials215");
-            } else {
-                pricesProvider = createInstance("PricesProvider_Essentials216");
-            }
-        } else if (pricesPlugin.equals("CMI") && Bukkit.getPluginManager().isPluginEnabled("CMI")) {
-            pricesProvider = createInstance("PricesProvider_CMI");
-        } else if (pricesPlugin.equalsIgnoreCase("newtShop") && Bukkit.getPluginManager().isPluginEnabled("newtShop")) {
-            pricesProvider = createInstance("PricesProvider_NewtShop");
-        } else if (pricesPlugin.equalsIgnoreCase("QuantumShop") && Bukkit.getPluginManager().isPluginEnabled("QuantumShop")) {
-            pricesProvider = createInstance("PricesProvider_QuantumShop");
-        } else if (pricesPlugin.equalsIgnoreCase("EconomyShopGUI") && (Bukkit.getPluginManager().isPluginEnabled("EconomyShopGUI") ||
-                Bukkit.getPluginManager().isPluginEnabled("EconomyShopGUI-Premium"))) {
-            pricesProvider = createInstance("PricesProvider_EconomyShopGUI");
-        }
-
-        setPricesProvider(pricesProvider.orElse(new PricesProvider_Default()));
+        setPricesProvider((pricesPlugin.equalsIgnoreCase("AUTO") ?
+                ShopsProvider.findAvailableProvider() : ShopsProvider.getShopsProvider(pricesPlugin))
+                .flatMap(shopsProvider -> shopsProvider.createInstance(plugin).map(shopsBridge ->
+                        (PricesProvider) new PricesProvider_ShopsBridgeWrapper(shopsProvider, shopsBridge)))
+                .orElseGet(PricesProvider_Default::new));
     }
 
     private void loadFactionsProvider() {
