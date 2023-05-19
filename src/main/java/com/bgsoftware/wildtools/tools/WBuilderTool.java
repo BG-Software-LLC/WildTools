@@ -8,7 +8,10 @@ import com.bgsoftware.wildtools.api.objects.tools.BuilderTool;
 import com.bgsoftware.wildtools.utils.BukkitUtils;
 import com.bgsoftware.wildtools.utils.Materials;
 import com.bgsoftware.wildtools.utils.inventory.InventoryUtils;
+import com.bgsoftware.wildtools.utils.items.ItemUtils;
 import com.bgsoftware.wildtools.utils.world.WorldEditSession;
+import com.destroystokyo.paper.util.set.OptimizedSmallEnumSet;
+import com.google.common.collect.ImmutableSet;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -16,6 +19,9 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
+
+import java.util.EnumSet;
+import java.util.Set;
 
 public class WBuilderTool extends WTool implements BuilderTool {
 
@@ -91,7 +97,7 @@ public class WBuilderTool extends WTool implements BuilderTool {
 
             Material nextBlockType = nextBlock.getType();
 
-            if (nextBlockType.isSolid() || nextBlockType == Materials.COBWEB.parseMaterial() ||
+            if (!canPlaceThroughBlock(nextBlockType) ||
                     !BukkitUtils.canBreakBlock(e.getPlayer(), nextBlock, firstType, firstData, this, false) ||
                     !BukkitUtils.placeBlock(e.getPlayer(), nextBlock, originalBlock, editSession)) {
                 break;
@@ -116,6 +122,10 @@ public class WBuilderTool extends WTool implements BuilderTool {
             reduceDurablility(e.getPlayer(), usingDurability ? iter : 1, e.getItem());
 
         return true;
+    }
+
+    private static boolean canPlaceThroughBlock(Material type) {
+        return !type.isSolid() && type != Materials.COBWEB.parseMaterial() && !ItemUtils.isCrops(type);
     }
 
 }
