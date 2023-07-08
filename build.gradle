@@ -56,7 +56,7 @@ dependencies {
 
     implementation 'com.bgsoftware.common.reflection:ReflectionUtils:1.0.2'
     implementation 'com.bgsoftware.common.config:CommentedConfiguration:1.0.3'
-    implementation 'com.bgsoftware.common.shopsbridge:ShopsBridge:b1:all@jar'
+    implementation 'com.bgsoftware.common.shopsbridge:ShopsBridge:b4:all@jar'
 
     // Spigot jars
     compileOnly "org.spigotmc:v1_7_R3:latest"
