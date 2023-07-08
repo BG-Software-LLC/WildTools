@@ -6,10 +6,7 @@ import net.minecraft.network.protocol.Packet;
 import net.minecraft.server.level.ChunkHolder;
 import net.minecraft.server.level.ChunkMap;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.entity.item.ItemEntity;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ChunkPos;
-import org.bukkit.craftbukkit.v1_19_R2.event.CraftEventFactory;
 
 import java.lang.reflect.Modifier;
 import java.util.Map;
@@ -38,35 +35,6 @@ public class NMSUtils {
 
         if (chunkHolder != null) {
             SEND_PACKETS_TO_RELEVANT_PLAYERS.invoke(chunkHolder, packet, false);
-        }
-    }
-
-    public static boolean canMerge(ItemEntity itemEntity) {
-        ItemStack itemStack = itemEntity.getItem();
-        return !itemStack.isEmpty() && itemStack.getCount() < itemStack.getMaxStackSize();
-    }
-
-    public static boolean mergeEntityItems(ItemEntity itemEntity, ItemEntity otherItemEntity) {
-        ItemStack itemOfEntity = itemEntity.getItem();
-        ItemStack itemOfOtherEntity = otherItemEntity.getItem();
-        if (ItemEntity.areMergable(itemOfEntity, itemOfOtherEntity)) {
-            if (!CraftEventFactory.callItemMergeEvent(otherItemEntity, itemEntity).isCancelled()) {
-                mergeItemsInternal(itemEntity, itemOfEntity, itemOfOtherEntity);
-                itemEntity.age = Math.max(itemEntity.age, otherItemEntity.age);
-                itemEntity.pickupDelay = Math.max(itemEntity.pickupDelay, otherItemEntity.pickupDelay);
-                if (itemOfOtherEntity.isEmpty()) {
-                    otherItemEntity.discard();
-                }
-            }
-        }
-
-        return !itemEntity.isAlive();
-    }
-
-    private static void mergeItemsInternal(ItemEntity itemEntity, ItemStack itemStack, ItemStack otherItem) {
-        ItemStack leftOver = ItemEntity.merge(itemStack, otherItem, itemStack.getMaxStackSize());
-        if (!leftOver.isEmpty()) {
-            itemEntity.setItem(leftOver);
         }
     }
 
