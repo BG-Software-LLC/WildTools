@@ -38,13 +38,22 @@ public class ContainerProvider_Default implements ExtendedContainerProvider {
         Map<Integer, SoldItem> toSell = new HashMap<>();
         double totalEarnings = 0;
 
-        for (int slot = 0; slot < inventory.getSize(); slot++) {
-            ItemStack itemStack = inventory.getItem(slot);
-            if (itemStack != null && plugin.getProviders().canSellItem(player, itemStack)) {
-                SoldItem soldItem = new SoldItem(itemStack, plugin.getProviders().getPrice(player, itemStack));
-                toSell.put(slot, soldItem);
-                totalEarnings += soldItem.getPrice();
+        try {
+            this.plugin.getProviders().startBulkSell();
+
+            for (int slot = 0; slot < inventory.getSize(); slot++) {
+                ItemStack itemStack = inventory.getItem(slot);
+                if (itemStack != null) {
+                    SoldItem soldItem = new SoldItem(itemStack, plugin.getProviders().getPrice(player, itemStack));
+                    if (soldItem.isSellable()) {
+                        toSell.put(slot, soldItem);
+                        totalEarnings += soldItem.getPrice();
+                    }
+                }
+
             }
+        } finally {
+            this.plugin.getProviders().stopBulkSell();
         }
 
         return new SellInfo(toSell, totalEarnings);

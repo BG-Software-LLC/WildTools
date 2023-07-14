@@ -40,44 +40,52 @@ public class ContainerProvider_WildChests implements ExtendedContainerProvider {
         Map<Integer, SoldItem> toSell = new HashMap<>();
         double totalEarnings = 0;
 
-        if (chest instanceof StorageChest) {
-            ItemStack itemStack = ((StorageChest) chest).getItemStack();
-            BigInteger amount = ((StorageChest) chest).getAmount();
-            int slots = amount.divide(BigInteger.valueOf(Integer.MAX_VALUE)).intValue();
+        try {
+            this.plugin.getProviders().startBulkSell();
 
-            for (int i = 0; i < slots; i++) {
-                itemStack.setAmount(Integer.MAX_VALUE);
-                if (plugin.getProviders().canSellItem(player, itemStack)) {
+            if (chest instanceof StorageChest) {
+                ItemStack itemStack = ((StorageChest) chest).getItemStack();
+                BigInteger amount = ((StorageChest) chest).getAmount();
+                int slots = amount.divide(BigInteger.valueOf(Integer.MAX_VALUE)).intValue();
+
+                for (int i = 0; i < slots; i++) {
+                    itemStack.setAmount(Integer.MAX_VALUE);
                     SoldItem soldItem = new SoldItem(itemStack.clone(), plugin.getProviders().getPrice(player, itemStack));
-                    toSell.put(0, soldItem);
-                    totalEarnings += soldItem.getPrice();
-                }
-            }
-
-            itemStack.setAmount(amount.remainder(BigInteger.valueOf(Integer.MAX_VALUE)).intValue());
-            if (plugin.getProviders().canSellItem(player, itemStack)) {
-                SoldItem soldItem = new SoldItem(itemStack.clone(), plugin.getProviders().getPrice(player, itemStack));
-                toSell.put(0, soldItem);
-                totalEarnings += soldItem.getPrice();
-            }
-
-            return new SellInfo(toSell, totalEarnings);
-        } else {
-            Inventory[] pages = chest.getPages();
-
-            for (int i = 0; i < pages.length; i++) {
-                inventory = pages[i];
-                for (int slot = 0; slot < inventory.getSize(); slot++) {
-                    ItemStack itemStack = inventory.getItem(slot);
-                    if (itemStack != null && plugin.getProviders().canSellItem(player, itemStack)) {
-                        SoldItem soldItem = new SoldItem(itemStack.clone(), plugin.getProviders().getPrice(player, itemStack));
-                        toSell.put(i * 54 + slot, soldItem);
+                    if (soldItem.isSellable()) {
+                        toSell.put(0, soldItem);
                         totalEarnings += soldItem.getPrice();
                     }
                 }
-            }
 
-            return new SellInfo(toSell, totalEarnings);
+                itemStack.setAmount(amount.remainder(BigInteger.valueOf(Integer.MAX_VALUE)).intValue());
+                SoldItem soldItem = new SoldItem(itemStack.clone(), plugin.getProviders().getPrice(player, itemStack));
+                if (soldItem.isSellable()) {
+                    toSell.put(0, soldItem);
+                    totalEarnings += soldItem.getPrice();
+                }
+
+                return new SellInfo(toSell, totalEarnings);
+            } else {
+                Inventory[] pages = chest.getPages();
+
+                for (int i = 0; i < pages.length; i++) {
+                    inventory = pages[i];
+                    for (int slot = 0; slot < inventory.getSize(); slot++) {
+                        ItemStack itemStack = inventory.getItem(slot);
+                        if (itemStack != null) {
+                            SoldItem soldItem = new SoldItem(itemStack.clone(), plugin.getProviders().getPrice(player, itemStack));
+                            if (soldItem.isSellable()) {
+                                toSell.put(i * 54 + slot, soldItem);
+                                totalEarnings += soldItem.getPrice();
+                            }
+                        }
+                    }
+                }
+
+                return new SellInfo(toSell, totalEarnings);
+            }
+        } finally {
+            this.plugin.getProviders().stopBulkSell();
         }
     }
 

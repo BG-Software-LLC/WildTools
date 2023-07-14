@@ -1,5 +1,6 @@
 package com.bgsoftware.wildtools.hooks;
 
+import com.bgsoftware.common.shopsbridge.BulkTransaction;
 import com.bgsoftware.common.shopsbridge.IShopsBridge;
 import com.bgsoftware.common.shopsbridge.ShopsProvider;
 import com.bgsoftware.wildtools.WildToolsPlugin;
@@ -10,6 +11,7 @@ import org.bukkit.inventory.ItemStack;
 public class PricesProvider_ShopsBridgeWrapper implements PricesProvider {
 
     private final IShopsBridge shopsBridge;
+    private BulkTransaction bulkTransaction;
 
     public PricesProvider_ShopsBridgeWrapper(ShopsProvider shopsProvider, IShopsBridge shopsBridge) {
         WildToolsPlugin.log(" - Using " + shopsProvider.getPluginName() + " as PricesProvider.");
@@ -18,7 +20,15 @@ public class PricesProvider_ShopsBridgeWrapper implements PricesProvider {
 
     @Override
     public double getPrice(Player player, ItemStack itemStack) {
-        return this.shopsBridge.getSellPrice(player, itemStack).doubleValue();
+        return (this.bulkTransaction == null ? this.shopsBridge : this.bulkTransaction).getSellPrice(player, itemStack).doubleValue();
+    }
+
+    public void startBulkTransaction() {
+        this.bulkTransaction = this.shopsBridge.startBulkTransaction();
+    }
+
+    public void stopBulkTransaction() {
+        this.bulkTransaction = null;
     }
 
 }

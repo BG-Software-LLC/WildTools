@@ -71,6 +71,18 @@ public class ProvidersHandler implements ProvidersManager {
      * Hooks' methods
      */
 
+    public void startBulkSell() {
+        if (this.pricesProvider instanceof PricesProvider_ShopsBridgeWrapper) {
+            ((PricesProvider_ShopsBridgeWrapper) this.pricesProvider).startBulkTransaction();
+        }
+    }
+
+    public void stopBulkSell() {
+        if (this.pricesProvider instanceof PricesProvider_ShopsBridgeWrapper) {
+            ((PricesProvider_ShopsBridgeWrapper) this.pricesProvider).stopBulkTransaction();
+        }
+    }
+
     public double getPrice(Player player, ItemStack itemStack) {
         if (plugin.getToolsManager().getTool(itemStack) != null)
             return -1;
@@ -171,10 +183,6 @@ public class ProvidersHandler implements ProvidersManager {
     /*
      * Handler' methods
      */
-
-    public boolean canSellItem(Player player, ItemStack itemStack) {
-        return getPrice(player, itemStack) > 0;
-    }
 
     @Override
     public void addContainerProvider(ContainerProvider containerProvider) {
