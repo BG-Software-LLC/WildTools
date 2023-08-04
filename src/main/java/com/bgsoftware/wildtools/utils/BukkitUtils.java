@@ -107,7 +107,7 @@ public class BukkitUtils {
             boolean result;
 
             if ((tool != null && tool.isOmni()) || originalType.hasGravity() || shouldForceUpdate(block)) {
-                result = editSession.setType(blockLocation, false, vec -> block.setType(Material.AIR));
+                result = editSession.setType(blockLocation, false, vec -> block.setType(Material.AIR), WorldEditSession.SetBlockPriority.UPDATES);
             } else {
                 result = editSession.setAir(blockLocation);
             }
@@ -154,7 +154,10 @@ public class BukkitUtils {
         if (editSession == null) {
             plugin.getNMSWorld().setCropState(block, CropState.SEEDED);
         } else {
-            boolean result = editSession.setType(blockLocation, false, vec -> plugin.getNMSWorld().setCropState(block, CropState.SEEDED));
+            boolean result = editSession.setType(blockLocation, false,
+                    vec -> plugin.getNMSWorld().setCropState(block, CropState.SEEDED),
+                    WorldEditSession.SetBlockPriority.CROPS);
+
             if (!result)
                 return false;
         }

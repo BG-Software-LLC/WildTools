@@ -62,7 +62,8 @@ public class WIceTool extends WTool implements IceTool {
                             !BukkitUtils.hasBreakAccess(targetBlock, player))
                         continue;
 
-                    boolean result = editSession.setType(targetBlock.getLocation(), false, vec -> targetBlock.setType(Material.WATER));
+                    boolean result = editSession.setType(targetBlock.getLocation(), false,
+                            vec -> targetBlock.setType(Material.WATER), WorldEditSession.SetBlockPriority.UPDATES);
                     if (result)
                         toolUsages++;
                 }

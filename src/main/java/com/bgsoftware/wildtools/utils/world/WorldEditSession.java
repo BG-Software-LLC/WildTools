@@ -33,6 +33,7 @@ public class WorldEditSession {
 
     private Vector3 dropLocation;
     private boolean applied = false;
+    private int minPriority = SetBlockPriority.values().length;
 
 
     public WorldEditSession(World world) {
@@ -53,14 +54,14 @@ public class WorldEditSession {
         ensureNotApplied();
         boolean isPlace = blockId != 0;
         boolean updateBlock = dropLocation == null;
-        return this.setType(bukkitLocation, isPlace, vec -> plugin.getNMSWorld().setBlockFast(this.world, vec, blockId, updateBlock));
+        return this.setType(bukkitLocation, isPlace, vec -> plugin.getNMSWorld().setBlockFast(this.world, vec, blockId, updateBlock), SetBlockPriority.NORMAL);
     }
 
-    public boolean setType(Location bukkitLocation, boolean isPlace, SetBlockFunction setBlockFunction) {
+    public boolean setType(Location bukkitLocation, boolean isPlace, SetBlockFunction setBlockFunction, SetBlockPriority priority) {
         ensureNotApplied();
 
         Vector3 location = Vector3.of(bukkitLocation);
-        boolean setTypeResult = this.setTypeInternal(location, isPlace, setBlockFunction);
+        boolean setTypeResult = this.setTypeInternal(location, isPlace, setBlockFunction, priority.ordinal());
 
         if (setTypeResult && dropLocation == null)
             dropLocation = location;
@@ -68,11 +69,13 @@ public class WorldEditSession {
         return setTypeResult;
     }
 
-    private boolean setTypeInternal(Vector3 location, boolean isPlace, SetBlockFunction setBlockFunction) {
+    private boolean setTypeInternal(Vector3 location, boolean isPlace, SetBlockFunction setBlockFunction, int priority) {
         ensureNotApplied();
 
         if (isLocationValid(location)) {
-            BlockData blockData = new BlockData(location, isPlace, setBlockFunction);
+            BlockData blockData = new BlockData(location, isPlace, setBlockFunction, priority);
+            if (this.minPriority > priority)
+                this.minPriority = priority;
             return setDirty(blockData);
         }
 
@@ -108,15 +111,11 @@ public class WorldEditSession {
         }
 
         //Refreshing chunks
-        affectedBlocksByChunks.forEach((chunkVector, affectedBlocks) -> {
-            affectedBlocks.forEach(blockData -> {
-                blockData.setBlockFunction.run(blockData.location);
-                plugin.getProviders().notifyToolBlockListeners(this.world, blockData.location, blockData.isPlace ?
-                        IToolBlockListener.Action.BLOCK_PLACE : IToolBlockListener.Action.BLOCK_BREAK);
-            });
-
-            plugin.getNMSWorld().refreshChunk(chunkVector.toChunk(this.world), affectedBlocks);
-        });
+        int priority = this.minPriority;
+        Map<Vector2, List<BlockData>> affectedBlocksByChunks = this.affectedBlocksByChunks;
+        while (!affectedBlocksByChunks.isEmpty()) {
+            affectedBlocksByChunks = applyBlocksByPriority(this.world, affectedBlocksByChunks, priority++);
+        }
 
         Location bukkitDropLocation = this.dropLocation.toLocation(this.world);
 
@@ -157,16 +156,43 @@ public class WorldEditSession {
                 NumberUtils.range(location.getZ(), -MAX_BLOCK_LOCATION, MAX_BLOCK_LOCATION);
     }
 
+    private static Map<Vector2, List<BlockData>> applyBlocksByPriority(World world, Map<Vector2, List<BlockData>> affectedBlocksByChunks, int priority) {
+        Map<Vector2, List<BlockData>> leftOvers = new LinkedHashMap<>();
+
+        affectedBlocksByChunks.forEach((chunkVector, affectedBlocks) -> {
+            List<BlockData> chunkLeftOvers = null;
+
+            for (BlockData blockData : affectedBlocks) {
+                if (blockData.priority > priority) {
+                    if (chunkLeftOvers == null)
+                        chunkLeftOvers = leftOvers.computeIfAbsent(chunkVector, v -> new LinkedList<>());
+                    chunkLeftOvers.add(blockData);
+                } else {
+                    blockData.setBlockFunction.run(blockData.location);
+                    plugin.getProviders().notifyToolBlockListeners(world, blockData.location, blockData.isPlace ?
+                            IToolBlockListener.Action.BLOCK_PLACE : IToolBlockListener.Action.BLOCK_BREAK);
+                }
+            }
+
+            if (chunkLeftOvers == null || chunkLeftOvers.isEmpty())
+                plugin.getNMSWorld().refreshChunk(chunkVector.toChunk(world), affectedBlocks);
+        });
+
+        return leftOvers;
+    }
+
     public static class BlockData {
 
         public final Vector3 location;
         public final boolean isPlace;
         public final SetBlockFunction setBlockFunction;
+        public final int priority;
 
-        public BlockData(Vector3 location, boolean isPlace, SetBlockFunction setBlockFunction) {
+        public BlockData(Vector3 location, boolean isPlace, SetBlockFunction setBlockFunction, int priority) {
             this.location = location;
             this.isPlace = isPlace;
             this.setBlockFunction = setBlockFunction;
+            this.priority = priority;
         }
 
     }
@@ -174,6 +200,14 @@ public class WorldEditSession {
     public interface SetBlockFunction {
 
         void run(Vector3 location);
+
+    }
+
+    public enum SetBlockPriority {
+
+        NORMAL,
+        CROPS,
+        UPDATES
 
     }
 
