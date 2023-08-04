@@ -281,7 +281,7 @@ public class ProvidersHandler implements ProvidersManager {
     }
 
     private void loadDropsProviders() {
-        if (Bukkit.getPluginManager().isPluginEnabled("ChunkHoppers")) {
+        if (Bukkit.getPluginManager().isPluginEnabled("ChunkHoppers") && containsClass("dev.warse.chunkhoppers.ChunkHoppers")) {
             Optional<DropsProvider> dropsProvider = createInstance("DropsProvider_ChunkHoppers");
             dropsProvider.ifPresent(this::addDropsProvider);
         }
