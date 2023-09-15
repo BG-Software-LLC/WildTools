@@ -117,6 +117,9 @@ public class WorldEditSession {
             affectedBlocksByChunks = applyBlocksByPriority(this.world, affectedBlocksByChunks, priority++);
         }
 
+        this.affectedBlocksByChunks.forEach((chunkVector, affectedBlocks) ->
+                plugin.getNMSWorld().refreshChunk(chunkVector.toChunk(world), affectedBlocks));
+
         Location bukkitDropLocation = this.dropLocation.toLocation(this.world);
 
         // Drop all the items
@@ -173,9 +176,6 @@ public class WorldEditSession {
                             IToolBlockListener.Action.BLOCK_PLACE : IToolBlockListener.Action.BLOCK_BREAK);
                 }
             }
-
-            if (chunkLeftOvers == null || chunkLeftOvers.isEmpty())
-                plugin.getNMSWorld().refreshChunk(chunkVector.toChunk(world), affectedBlocks);
         });
 
         return leftOvers;
