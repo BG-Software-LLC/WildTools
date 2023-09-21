@@ -37,7 +37,7 @@ public abstract class WTool implements Tool {
 
     protected static WildToolsPlugin plugin = WildToolsPlugin.getPlugin();
 
-    public static Set<UUID> toolBlockBreak;
+    public static final Set<UUID> toolBlockBreak = new HashSet<>();
 
     protected Map<UUID, Integer> heldItemsTracker = new HashMap<>();
 
@@ -80,7 +80,6 @@ public abstract class WTool implements Tool {
         this.lastUses = new HashMap<>();
         this.multiplier = 1;
         this.anvilCombineExp = -1;
-        this.toolBlockBreak = new HashSet<>();
         this.statistics = true;
     }
 
