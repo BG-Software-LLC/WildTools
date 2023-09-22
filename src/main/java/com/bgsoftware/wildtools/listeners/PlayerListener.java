@@ -3,11 +3,13 @@ package com.bgsoftware.wildtools.listeners;
 import com.bgsoftware.wildtools.Updater;
 import com.bgsoftware.wildtools.WildToolsPlugin;
 import com.bgsoftware.wildtools.api.objects.tools.Tool;
-import com.bgsoftware.wildtools.utils.WSelection;
+import com.bgsoftware.wildtools.tools.ToolBreaksTracker;
 import com.bgsoftware.wildtools.tools.WCannonTool;
+import com.bgsoftware.wildtools.utils.WSelection;
 import com.bgsoftware.wildtools.utils.items.ItemUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -19,24 +21,26 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.UUID;
 
 public class PlayerListener implements Listener {
 
-    /*
-    Just notifies me if the server is using WildBuster
-     */
+    private final Map<UUID, LinkedList<ItemStack>> keepInventoryTools = new HashMap<>();
 
     private final WildToolsPlugin plugin;
 
     public PlayerListener(WildToolsPlugin plugin) {
         this.plugin = plugin;
     }
+
+    /**
+     * Just notifies me if the server is using WildBuster
+     */
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent e) {
@@ -52,20 +56,21 @@ public class PlayerListener implements Listener {
 
     }
 
-    //Remove the players selection and cancel task
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent e) {
-        WSelection selection = WCannonTool.getSelection(e.getPlayer());
+        ToolBreaksTracker.removePlayer(e.getPlayer());
 
+        WSelection selection = WCannonTool.getSelection(e.getPlayer());
         if (selection != null)
             selection.remove();
     }
 
-    private final Map<UUID, List<ItemStack>> keepInventoryTools = new HashMap<>();
-
     @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerDeath(PlayerDeathEvent e) {
         Inventory inventory = e.getEntity().getInventory();
+
+        LinkedList<ItemStack> keepInventoryItems = null;
+
         for (int slot = 0; slot < inventory.getSize(); slot++) {
             ItemStack itemStack = inventory.getItem(slot);
 
@@ -80,21 +85,26 @@ public class PlayerListener implements Listener {
             e.getDrops().remove(itemStack);
             inventory.setItem(slot, new ItemStack(Material.AIR));
 
-            if (!keepInventoryTools.containsKey(e.getEntity().getUniqueId()))
-                keepInventoryTools.put(e.getEntity().getUniqueId(), new ArrayList<>());
+            if (keepInventoryItems == null) {
+                keepInventoryItems = keepInventoryTools.computeIfAbsent(e.getEntity().getUniqueId(), x -> new LinkedList<>());
+            }
 
-            keepInventoryTools.get(e.getEntity().getUniqueId()).add(itemStack);
+            keepInventoryItems.add(itemStack);
         }
+
     }
 
     @EventHandler
     public void onPlayerRespawn(PlayerRespawnEvent e) {
-        if (keepInventoryTools.containsKey(e.getPlayer().getUniqueId())) {
-            List<ItemStack> toAdd = keepInventoryTools.get(e.getPlayer().getUniqueId());
-            keepInventoryTools.remove(e.getPlayer().getUniqueId());
-            toAdd.forEach(itemStack -> ItemUtils.addItem(itemStack, e.getPlayer().getInventory(),
-                    e.getPlayer().getLocation(), null));
-        }
+        LinkedList<ItemStack> keepInventoryItems = keepInventoryTools.remove(e.getPlayer().getUniqueId());
+
+        if (keepInventoryItems == null)
+            return;
+
+        PlayerInventory inventory = e.getPlayer().getInventory();
+        Location location = e.getPlayer().getLocation();
+
+        keepInventoryItems.forEach(itemStack -> ItemUtils.addItem(itemStack, inventory, location, null));
     }
 
     private void sendMessage(Player player, String message) {

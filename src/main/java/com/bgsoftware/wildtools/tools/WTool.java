@@ -18,8 +18,10 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -37,50 +39,41 @@ public abstract class WTool implements Tool {
 
     protected static WildToolsPlugin plugin = WildToolsPlugin.getPlugin();
 
-    public static final Set<UUID> toolBlockBreak = new HashSet<>();
+    private final Map<UUID, Long> lastUses = new HashMap<>();
+    private final Set<String> blacklistedMaterials = new LinkedHashSet<>();
+    private final Set<String> whitelistedMaterials = new LinkedHashSet<>();
+    private final Set<String> blacklistedDrops = new LinkedHashSet<>();
+    private final Set<String> whitelistedDrops = new LinkedHashSet<>();
+    private final Set<String> blacklistedWorlds = new HashSet<>();
+    private final Set<String> whitelistedWorlds = new HashSet<>();
+    private final Set<String> notifiedPlugins = new LinkedHashSet<>();
 
-    protected Map<UUID, Integer> heldItemsTracker = new HashMap<>();
+    private final ToolItemStack toolItemStack;
+    private final String name;
+    private final ToolMode toolMode;
 
-    private Map<UUID, Long> lastUses;
-
-    private ToolItemStack toolItemStack;
-    private int usesLeft;
-    private String name, toolMode;
-    private boolean onlySameType, onlyInsideClaim, unbreakable, vanillaDamage, autoCollect, instantBreak, silkTouch,
-            keepInventory, omni, privateTool, usesProgress, statistics;
-    private long cooldown;
-    private double multiplier;
-    private int anvilCombineExp, anvilCombineLimit;
-
-    private Set<String> blacklistedMaterials, whitelistedMaterials, blacklistedDrops, whitelistedDrops,
-            blacklistedWorlds, whitelistedWorlds, notifiedPlugins;
-
-    /***********************************************************************************/
+    private boolean isOnlySameType = false;
+    private boolean isOnlyInsideClaim = false;
+    private boolean isUnbreakable = false;
+    private boolean isVanillaDamage = false;
+    private boolean isAutoCollect = false;
+    private boolean isInstantBreak = false;
+    private boolean isSilkTouch = false;
+    private boolean isKeepInventory = false;
+    private boolean isOmni = false;
+    private boolean isPrivateTool = false;
+    private boolean isUsingProgress = false;
+    private boolean isStatistics = true;
+    private long cooldown = 0;
+    private double multiplier = 1D;
+    private int usesLeft = -1;
+    private int anvilCombineExp = -1;
+    private int anvilCombineLimit = 0;
 
     public WTool(Material type, String name, ToolMode toolMode) {
         this.toolItemStack = ToolItemStack.of(type);
-        this.toolMode = toolMode.name();
+        this.toolMode = toolMode;
         this.name = name;
-        this.usesLeft = -1;
-        this.cooldown = 0;
-        this.onlySameType = false;
-        this.onlyInsideClaim = false;
-        this.autoCollect = false;
-        this.instantBreak = false;
-        this.silkTouch = false;
-        this.unbreakable = false;
-        this.omni = false;
-        this.blacklistedMaterials = new HashSet<>();
-        this.whitelistedMaterials = new HashSet<>();
-        this.blacklistedDrops = new HashSet<>();
-        this.whitelistedDrops = new HashSet<>();
-        this.blacklistedWorlds = new HashSet<>();
-        this.whitelistedWorlds = new HashSet<>();
-        this.notifiedPlugins = new HashSet<>();
-        this.lastUses = new HashMap<>();
-        this.multiplier = 1;
-        this.anvilCombineExp = -1;
-        this.statistics = true;
     }
 
     @Override
@@ -122,37 +115,37 @@ public abstract class WTool implements Tool {
 
     @Override
     public void setOnlySameType(boolean onlySameType) {
-        this.onlySameType = onlySameType;
+        this.isOnlySameType = onlySameType;
     }
 
     @Override
     public void setOnlyInsideClaim(boolean onlyInsideClaim) {
-        this.onlyInsideClaim = onlyInsideClaim;
+        this.isOnlyInsideClaim = onlyInsideClaim;
     }
 
     @Override
     public void setAutoCollect(boolean autoCollect) {
-        this.autoCollect = autoCollect;
+        this.isAutoCollect = autoCollect;
     }
 
     @Override
     public void setInstantBreak(boolean instantBreak) {
-        this.instantBreak = instantBreak;
+        this.isInstantBreak = instantBreak;
     }
 
     @Override
     public void setSilkTouch(boolean silkTouch) {
-        this.silkTouch = silkTouch;
+        this.isSilkTouch = silkTouch;
     }
 
     @Override
     public void setUnbreakable(boolean unbreakable) {
-        this.unbreakable = unbreakable;
+        this.isUnbreakable = unbreakable;
     }
 
     @Override
     public void setVanillaDamage(boolean vanillaDamage) {
-        this.vanillaDamage = vanillaDamage;
+        this.isVanillaDamage = vanillaDamage;
     }
 
     @Override
@@ -167,22 +160,22 @@ public abstract class WTool implements Tool {
 
     @Override
     public void setKeepInventory(boolean keepInventory) {
-        this.keepInventory = keepInventory;
+        this.isKeepInventory = keepInventory;
     }
 
     @Override
     public void setOmni(boolean omni) {
-        this.omni = omni;
+        this.isOmni = omni;
     }
 
     @Override
     public void setPrivate(boolean privateTool) {
-        this.privateTool = privateTool;
+        this.isPrivateTool = privateTool;
     }
 
     @Override
     public void setUsesProgress(boolean usesProgress) {
-        this.usesProgress = usesProgress;
+        this.isUsingProgress = usesProgress;
     }
 
     @Override
@@ -239,7 +232,7 @@ public abstract class WTool implements Tool {
 
     @Override
     public void setStatistics(boolean statistics) {
-        this.statistics = statistics;
+        this.isStatistics = statistics;
     }
 
     @Override
@@ -270,7 +263,7 @@ public abstract class WTool implements Tool {
 
     @Override
     public ToolMode getToolMode() {
-        return ToolMode.valueOf(toolMode);
+        return this.toolMode;
     }
 
     @Override
@@ -280,27 +273,27 @@ public abstract class WTool implements Tool {
 
     @Override
     public boolean isUnbreakable() {
-        return unbreakable;
+        return isUnbreakable;
     }
 
     @Override
     public boolean hasVanillaDamage() {
-        return vanillaDamage;
+        return isVanillaDamage;
     }
 
     @Override
     public boolean isAutoCollect() {
-        return autoCollect;
+        return isAutoCollect;
     }
 
     @Override
     public boolean isInstantBreak() {
-        return instantBreak;
+        return isInstantBreak;
     }
 
     @Override
     public boolean hasSilkTouch() {
-        return silkTouch;
+        return isSilkTouch;
     }
 
     @Override
@@ -315,12 +308,12 @@ public abstract class WTool implements Tool {
 
     @Override
     public boolean isOnlySameType() {
-        return onlySameType;
+        return isOnlySameType;
     }
 
     @Override
     public boolean isOnlyInsideClaim() {
-        return onlyInsideClaim;
+        return isOnlyInsideClaim;
     }
 
     @Override
@@ -330,22 +323,22 @@ public abstract class WTool implements Tool {
 
     @Override
     public boolean hasKeepInventory() {
-        return keepInventory;
+        return isKeepInventory;
     }
 
     @Override
     public boolean isOmni() {
-        return omni;
+        return isOmni;
     }
 
     @Override
     public boolean isPrivate() {
-        return privateTool;
+        return isPrivateTool;
     }
 
     @Override
     public boolean isUsesProgress() {
-        return usesProgress;
+        return isUsingProgress;
     }
 
     @Override
@@ -360,27 +353,27 @@ public abstract class WTool implements Tool {
 
     @Override
     public Set<String> getBlacklistedMaterials() {
-        return new HashSet<>(blacklistedMaterials);
+        return blacklistedMaterials.isEmpty() ? Collections.emptySet() : Collections.unmodifiableSet(blacklistedMaterials);
     }
 
     @Override
     public Set<String> getWhitelistedMaterials() {
-        return new HashSet<>(whitelistedMaterials);
+        return whitelistedMaterials.isEmpty() ? Collections.emptySet() : Collections.unmodifiableSet(whitelistedMaterials);
     }
 
     @Override
     public Set<String> getBlacklistedDrops() {
-        return new HashSet<>(blacklistedDrops);
+        return blacklistedDrops.isEmpty() ? Collections.emptySet() : Collections.unmodifiableSet(blacklistedDrops);
     }
 
     @Override
     public Set<String> getWhitelistedDrops() {
-        return new HashSet<>(whitelistedDrops);
+        return whitelistedDrops.isEmpty() ? Collections.emptySet() : Collections.unmodifiableSet(whitelistedDrops);
     }
 
     @Override
     public Set<String> getNotifiedPlugins() {
-        return notifiedPlugins;
+        return notifiedPlugins.isEmpty() ? Collections.emptySet() : Collections.unmodifiableSet(notifiedPlugins);
     }
 
     @Override
@@ -450,7 +443,7 @@ public abstract class WTool implements Tool {
 
     @Override
     public boolean hasStatistics() {
-        return statistics;
+        return isStatistics;
     }
 
     /***********************************************************************************/
@@ -469,7 +462,7 @@ public abstract class WTool implements Tool {
     public boolean canBreakBlock(Block block, Material firstType, short firstData) {
         if (block.getType() == null || block.getType() == Material.AIR)
             return false;
-        if (onlySameType && (firstType != block.getType() || firstData != block.getData()))
+        if (isOnlySameType && (firstType != block.getType() || firstData != block.getData()))
             return false;
         if (hasBlacklistedMaterials() && isBlacklistedMaterial(block.getType(), block.getData()))
             return false;
@@ -528,28 +521,30 @@ public abstract class WTool implements Tool {
     public void setLastUse(UUID uuid) {
         if (cooldown <= 0)
             return;
-        lastUses.remove(uuid);
+
         lastUses.put(uuid, System.currentTimeMillis());
     }
 
     @Override
     public boolean canUse(UUID uuid) {
-        if (!lastUses.containsKey(uuid))
-            return true;
-
-        if (getTimeLeft(uuid) / 1000 > 0)
-            return false;
-
-        lastUses.remove(uuid);
-        return true;
+        return getTimeLeft(uuid) <= 0;
     }
 
     @Override
     public long getTimeLeft(UUID uuid) {
-        if (!lastUses.containsKey(uuid))
+        long lastUseTime = lastUses.getOrDefault(uuid, -1L);
+
+        if (lastUseTime < 0)
             return 0;
 
-        return (lastUses.get(uuid) + cooldown) - System.currentTimeMillis();
+        long timeLeft = lastUseTime + cooldown - System.currentTimeMillis();
+
+        if (timeLeft <= 0) {
+            lastUses.remove(uuid);
+            return 0;
+        }
+
+        return timeLeft;
     }
 
     @Override

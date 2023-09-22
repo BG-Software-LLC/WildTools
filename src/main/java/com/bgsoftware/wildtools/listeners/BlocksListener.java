@@ -3,7 +3,7 @@ package com.bgsoftware.wildtools.listeners;
 import com.bgsoftware.wildtools.Locale;
 import com.bgsoftware.wildtools.WildToolsPlugin;
 import com.bgsoftware.wildtools.api.objects.tools.Tool;
-import com.bgsoftware.wildtools.tools.WTool;
+import com.bgsoftware.wildtools.tools.ToolBreaksTracker;
 import com.bgsoftware.wildtools.utils.ServerVersion;
 import com.bgsoftware.wildtools.utils.items.ToolItemStack;
 import org.bukkit.Material;
@@ -34,7 +34,7 @@ public class BlocksListener implements Listener {
     @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
     public void onBlockBreak(BlockBreakEvent e) {
         //One of the blocks that were broken by a tool
-        if (WTool.toolBlockBreak.contains(e.getPlayer().getUniqueId()))
+        if (ToolBreaksTracker.containsPlayer(e.getPlayer()))
             return;
 
         if (!e.getPlayer().hasPermission("wildtools.use"))
@@ -66,7 +66,7 @@ public class BlocksListener implements Listener {
         }
 
         try {
-            WTool.toolBlockBreak.add(e.getPlayer().getUniqueId());
+            ToolBreaksTracker.trackPlayer(e.getPlayer());
 
             if (tool.onBlockBreak(e)) {
                 e.setCancelled(true);
@@ -78,17 +78,15 @@ public class BlocksListener implements Listener {
                 if (owner.isEmpty())
                     toolItemStack.setOwner(e.getPlayer().getUniqueId().toString());
             }
-        } catch (Exception ex) {
-            ex.printStackTrace();
         } finally {
-            WTool.toolBlockBreak.remove(e.getPlayer().getUniqueId());
+            ToolBreaksTracker.removePlayer(e.getPlayer());
         }
     }
 
     @EventHandler(priority = EventPriority.LOW)
     public void onBlockInteract(PlayerInteractEvent e) {
         //One of the blocks that were broken by a tool
-        if (WTool.toolBlockBreak.contains(e.getPlayer().getUniqueId()) || e.getItem() == null)
+        if (e.getItem() == null || ToolBreaksTracker.containsPlayer(e.getPlayer()))
             return;
 
         if (!e.getPlayer().hasPermission("wildtools.use"))
@@ -120,7 +118,7 @@ public class BlocksListener implements Listener {
         }
 
         try {
-            WTool.toolBlockBreak.add(e.getPlayer().getUniqueId());
+            ToolBreaksTracker.trackPlayer(e.getPlayer());
 
             boolean toolInteract = false;
 
@@ -149,7 +147,7 @@ public class BlocksListener implements Listener {
                     toolItemStack.setOwner(e.getPlayer().getUniqueId().toString());
             }
         } finally {
-            WTool.toolBlockBreak.remove(e.getPlayer().getUniqueId());
+            ToolBreaksTracker.removePlayer(e.getPlayer());
         }
     }
 
@@ -173,7 +171,7 @@ public class BlocksListener implements Listener {
     @EventHandler(priority = EventPriority.LOW)
     public void onEntityInteract(PlayerInteractAtEntityEvent e) {
         //One of the blocks that were broken by a tool
-        if (WTool.toolBlockBreak.contains(e.getPlayer().getUniqueId()))
+        if (ToolBreaksTracker.containsPlayer(e.getPlayer()))
             return;
 
         if (!e.getPlayer().hasPermission("wildtools.use"))
@@ -205,7 +203,7 @@ public class BlocksListener implements Listener {
         }
 
         try {
-            WTool.toolBlockBreak.add(e.getPlayer().getUniqueId());
+            ToolBreaksTracker.trackPlayer(e.getPlayer());
 
             if (tool.onAirInteract(new PlayerInteractEvent(e.getPlayer(), Action.RIGHT_CLICK_AIR, toolItemStack.getItem(), null, BlockFace.UP))) {
                 e.setCancelled(true);
@@ -217,10 +215,8 @@ public class BlocksListener implements Listener {
                 if (owner.isEmpty())
                     toolItemStack.setOwner(e.getPlayer().getUniqueId().toString());
             }
-        } catch (Exception ex) {
-            ex.printStackTrace();
         } finally {
-            WTool.toolBlockBreak.remove(e.getPlayer().getUniqueId());
+            ToolBreaksTracker.removePlayer(e.getPlayer());
         }
     }
 
@@ -231,7 +227,7 @@ public class BlocksListener implements Listener {
 
         Material blockType = e.getClickedBlock().getType();
 
-        if (lastClickedType.containsKey(e.getPlayer().getUniqueId()) && lastClickedType.get(e.getPlayer().getUniqueId()) == blockType)
+        if (lastClickedType.get(e.getPlayer().getUniqueId()) == blockType)
             return;
 
         ToolItemStack toolItemStack = ToolItemStack.of(plugin.getNMSAdapter().getItemInHand(e.getPlayer(), e));
