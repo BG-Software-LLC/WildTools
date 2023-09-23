@@ -128,7 +128,8 @@ public class WildToolsPlugin extends JavaPlugin implements WildTools {
                     new Pair<>(2975, "v1_18"),
                     new Pair<>(3336, null),
                     new Pair<>(3337, "v1_19"),
-                    new Pair<>(3465, "v1_20_1")
+                    new Pair<>(3465, "v1_20_1"),
+                    new Pair<>(3578, "v1_20_2")
             );
 
             for (Pair<Integer, String> versionData : versions) {
