@@ -64,6 +64,12 @@ public class WCrowbarTool extends WTool implements CrowbarTool {
                 e.getItem().removeEnchantment(Enchantment.SILK_TOUCH);
         }
 
+        CrowbarWandUseEvent crowbarWandUseEvent = new CrowbarWandUseEvent(e.getPlayer(), this, e.getClickedBlock());
+        Bukkit.getPluginManager().callEvent(crowbarWandUseEvent);
+
+        if (crowbarWandUseEvent.isCancelled())
+            return true;
+
         if (commandsOnUse.isEmpty()) {
             if (!itemsToDrop.isEmpty()) {
                 ItemStack dropItem = itemsToDrop.get(0);
@@ -79,12 +85,6 @@ public class WCrowbarTool extends WTool implements CrowbarTool {
                     .replace("%entity%", creatureSpawner.getSpawnedType().name())
             ));
         }
-
-        CrowbarWandUseEvent crowbarWandUseEvent = new CrowbarWandUseEvent(e.getPlayer(), this, e.getClickedBlock());
-        Bukkit.getPluginManager().callEvent(crowbarWandUseEvent);
-
-        if (crowbarWandUseEvent.isCancelled())
-            return true;
 
         editSession.apply();
 
