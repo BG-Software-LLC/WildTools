@@ -35,12 +35,12 @@ public class EventsHandler {
 
     private static final WildToolsPlugin plugin = WildToolsPlugin.getPlugin();
 
-    public EventsHandler(){
+    public EventsHandler() {
 
     }
 
-    public void callBreakEvent(BlockBreakEvent blockBreakEvent, boolean claimingCheck){
-        if(claimingCheck) {
+    public void callBreakEvent(BlockBreakEvent blockBreakEvent, boolean claimingCheck) {
+        if (claimingCheck) {
             callMethods(claimingPluginsBreakMethods, blockBreakEvent);
             return;
         }
@@ -50,39 +50,39 @@ public class EventsHandler {
         ToolItemStack toolItemStack = ToolItemStack.of(plugin.getNMSAdapter().getItemInHand(blockBreakEvent.getPlayer()));
         Tool tool = toolItemStack.getTool();
         List<CachedListenerMethod> getOtherPluginsMethods = notifiedPluginsBreakMethodsTools.get(tool);
-        if(getOtherPluginsMethods != null)
+        if (getOtherPluginsMethods != null)
             callMethods(getOtherPluginsMethods, blockBreakEvent);
     }
 
-    public void callPlaceEvent(BlockPlaceEvent blockPlaceEvent){
+    public void callPlaceEvent(BlockPlaceEvent blockPlaceEvent) {
         callMethods(claimingPluginsPlaceMethods, blockPlaceEvent);
     }
 
-    public void callInteractEvent(PlayerInteractEvent playerInteractEvent){
+    public void callInteractEvent(PlayerInteractEvent playerInteractEvent) {
         callMethods(claimingPluginsInteractMethods, playerInteractEvent);
     }
 
-    public void loadClaimingPlugins(List<String> claimingPlugins){
+    public void loadClaimingPlugins(List<String> claimingPlugins) {
         // We want to initialize some well-known plugins for claims.
         claimingPlugins.addAll(PRE_DEFINED_CLAIMING_PLUGINS);
 
         claimingPluginsBreakMethods.clear();
-        for(RegisteredListener registeredListener : BlockBreakEvent.getHandlerList().getRegisteredListeners()){
-            if(claimingPlugins.contains(registeredListener.getPlugin().getName()))
+        for (RegisteredListener registeredListener : BlockBreakEvent.getHandlerList().getRegisteredListeners()) {
+            if (claimingPlugins.contains(registeredListener.getPlugin().getName()))
                 addAllMethods(claimingPluginsBreakMethods, registeredListener.getListener(), BlockBreakEvent.class);
         }
         claimingPluginsBreakMethods.sort(CachedListenerMethod::compareTo);
 
         claimingPluginsPlaceMethods.clear();
-        for(RegisteredListener registeredListener : BlockPlaceEvent.getHandlerList().getRegisteredListeners()){
-            if(claimingPlugins.contains(registeredListener.getPlugin().getName()))
+        for (RegisteredListener registeredListener : BlockPlaceEvent.getHandlerList().getRegisteredListeners()) {
+            if (claimingPlugins.contains(registeredListener.getPlugin().getName()))
                 addAllMethods(claimingPluginsPlaceMethods, registeredListener.getListener(), BlockPlaceEvent.class);
         }
         claimingPluginsPlaceMethods.sort(CachedListenerMethod::compareTo);
 
         claimingPluginsInteractMethods.clear();
-        for(RegisteredListener registeredListener : PlayerInteractEvent.getHandlerList().getRegisteredListeners()){
-            if(claimingPlugins.contains(registeredListener.getPlugin().getName()))
+        for (RegisteredListener registeredListener : PlayerInteractEvent.getHandlerList().getRegisteredListeners()) {
+            if (claimingPlugins.contains(registeredListener.getPlugin().getName()))
                 addAllMethods(claimingPluginsInteractMethods, registeredListener.getListener(), PlayerInteractEvent.class);
         }
         claimingPluginsInteractMethods.sort(CachedListenerMethod::compareTo);
@@ -100,30 +100,43 @@ public class EventsHandler {
                     List<CachedListenerMethod> notifiedPlugins = notifiedPluginsBreakMethodsTools
                             .computeIfAbsent(tool, t -> new ArrayList<>());
                     loadNotifiedPluginListeners0(tool.getNotifiedPlugins(), notifiedPlugins);
-                    if(notifiedPlugins.isEmpty())
+                    if (notifiedPlugins.isEmpty())
                         notifiedPluginsBreakMethodsTools.remove(tool);
                 });
     }
 
     private void loadNotifiedPluginListeners0(Collection<String> notifiedPlugins, List<CachedListenerMethod> cachedListenerMethods) {
         cachedListenerMethods.clear();
-        for(RegisteredListener registeredListener : BlockBreakEvent.getHandlerList().getRegisteredListeners()){
-            if(notifiedPlugins.contains(registeredListener.getPlugin().getName()))
+        for (RegisteredListener registeredListener : BlockBreakEvent.getHandlerList().getRegisteredListeners()) {
+            if (notifiedPlugins.contains(registeredListener.getPlugin().getName()))
                 addAllMethods(cachedListenerMethods, registeredListener.getListener(), BlockBreakEvent.class);
         }
         cachedListenerMethods.sort(CachedListenerMethod::compareTo);
     }
 
-    private static void callMethods(List<CachedListenerMethod> methodList, Event event){
+    private static void callMethods(List<CachedListenerMethod> methodList, Event event) {
         methodList.forEach(method -> method.invoke(event));
     }
 
-    private static void addAllMethods(List<CachedListenerMethod> methodsList, Listener listener, Class<?> eventClass){
-        for(Method method : listener.getClass().getDeclaredMethods()){
+    private static void addAllMethods(List<CachedListenerMethod> methodsList, Listener listener, Class<?> eventClass) {
+        for (Method method : listener.getClass().getDeclaredMethods()) {
             EventHandler eventHandler = method.getAnnotation(EventHandler.class);
-            if(eventHandler != null && method.getParameterCount() == 1 && method.getParameterTypes()[0].equals(eventClass)){
+            if (eventHandler != null && method.getParameterCount() == 1 && method.getParameterTypes()[0].equals(eventClass)) {
                 method.setAccessible(true);
                 methodsList.add(new CachedListenerMethod(listener, method, eventHandler));
+            }
+        }
+
+        // Checking the super class
+        Class<?> superClass = listener.getClass().getSuperclass();
+
+        if (Listener.class.isAssignableFrom(superClass)) {
+            for (Method method : superClass.getDeclaredMethods()) {
+                EventHandler eventHandler = method.getAnnotation(EventHandler.class);
+                if (eventHandler != null && method.getParameterCount() == 1 && method.getParameterTypes()[0].equals(eventClass)) {
+                    method.setAccessible(true);
+                    methodsList.add(new CachedListenerMethod(listener, method, eventHandler));
+                }
             }
         }
     }
@@ -134,17 +147,17 @@ public class EventsHandler {
         private final Method method;
         private final EventHandler eventHandler;
 
-        CachedListenerMethod(Listener listener, Method method, EventHandler eventHandler){
+        CachedListenerMethod(Listener listener, Method method, EventHandler eventHandler) {
             this.listener = listener;
             this.method = method;
             this.eventHandler = eventHandler;
         }
 
-        void invoke(Event event){
-            try{
-                if(!eventHandler.ignoreCancelled() || !(event instanceof Cancellable) || !((Cancellable) event).isCancelled())
+        void invoke(Event event) {
+            try {
+                if (!eventHandler.ignoreCancelled() || !(event instanceof Cancellable) || !((Cancellable) event).isCancelled())
                     method.invoke(listener, event);
-            }catch (Exception ex){
+            } catch (Exception ex) {
                 ex.printStackTrace();
             }
         }
