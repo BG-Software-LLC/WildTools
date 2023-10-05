@@ -1,14 +1,36 @@
 name: WildTools
 version: ${project.version}
-api-version: 1.13
 main: com.bgsoftware.wildtools.WildToolsPlugin
+
 description: Configurable trench picks, tray picks, sell-wands, harvester-hoes and more!
 website: https://bg-software.com/
-authors: [Ome_R]
-softdepend: [AcidIsland, ASkyBlock, ChunkCollectors, BentoBox, CMI, Essentials, FabledSkyBlock, Factions, FactionsX, GriefPrevention, IslandWorld, Jobs, Lands, LockettePro, MassiveCore, mcMMO, PlotSquared, QuickShop, Residence, RoseStacker, ShopGUIPlus, SilkSpawners, SuperiorSkyblock2, SuperMobCoins, Towny, Villages, VoidChest, WildChests, WildStacker, WorldGuard]
+api-version: 1.13
+author: Ome_R
+
+# Custom section used by DependenciesManager, which replaces softdepend.
+class-depends:
+  - ChunkCollectors
+  - ChunkHoppers
+  - Factions
+  - FactionsX
+  - GriefPrevention
+  - Lands
+  - MassiveCore
+  - mcMMO
+  - Residence
+  - RoseStacker
+  - SilkSpawners
+  - SuperMobCoins
+  - Towny
+  - Vault
+  - Villages
+  - WildChests
+  - WildStacker
+
 commands:
   tools:
     description: List of all wildtools command
+
 permissions:
   wildtools.*:
     description: Gives access to all the command.

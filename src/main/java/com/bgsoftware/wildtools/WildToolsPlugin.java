@@ -1,5 +1,6 @@
 package com.bgsoftware.wildtools;
 
+import com.bgsoftware.common.dependencies.DependenciesManager;
 import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.wildtools.api.WildTools;
 import com.bgsoftware.wildtools.api.WildToolsAPI;
@@ -50,6 +51,9 @@ public class WildToolsPlugin extends JavaPlugin implements WildTools {
     @Override
     public void onLoad() {
         plugin = this;
+
+        DependenciesManager.inject(this);
+
         shouldEnable = loadNMSAdapter();
     }
 
