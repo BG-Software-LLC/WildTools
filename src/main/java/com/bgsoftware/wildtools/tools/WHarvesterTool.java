@@ -187,6 +187,7 @@ public class WHarvesterTool extends WTool implements HarvesterTool {
                     if (farmlandRadius >= 0 && (blockType == Material.DIRT || blockType == Materials.GRASS_BLOCK.parseMaterial()) &&
                             isBetweenBlocks(farmlandMax, farmlandMin, blockLocation) && BukkitUtils.hasBreakAccess(block, player)) {
                         editSession.setType(blockLocation, Materials.getFarmlandId());
+                        toolUsages++;
                         continue;
                     }
 
