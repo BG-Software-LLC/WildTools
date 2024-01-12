@@ -1,4 +1,4 @@
-group 'Hooks:FactionsUUID05'
+group 'Hooks:FactionsUUID'
 
 dependencies {
     compileOnly "com.drtshock:Factions:1.6.9.5-U0.5.9"
@@ -7,7 +7,7 @@ dependencies {
     compileOnly rootProject
 }
 
-if (project.hasProperty('hook.compile_factionsuuid05') &&
-        !Boolean.valueOf(project.findProperty("hook.compile_factionsuuid05").toString())) {
+if (project.hasProperty('hook.compile_factionsuuid') &&
+        !Boolean.valueOf(project.findProperty("hook.compile_factionsuuid").toString())) {
     project.tasks.all { task -> task.enabled = false }
 }
