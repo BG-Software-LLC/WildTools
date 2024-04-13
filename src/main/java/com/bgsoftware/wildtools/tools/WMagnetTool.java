@@ -3,13 +3,13 @@ package com.bgsoftware.wildtools.tools;
 import com.bgsoftware.wildtools.api.events.MagnetWandUseEvent;
 import com.bgsoftware.wildtools.api.objects.ToolMode;
 import com.bgsoftware.wildtools.api.objects.tools.MagnetTool;
+import com.bgsoftware.wildtools.events.EventsSimulation;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
@@ -57,13 +57,8 @@ public class WMagnetTool extends WTool implements MagnetTool {
             if (!item.isValid() || item.isDead())
                 continue;
 
-            if (!plugin.getProviders().getStackedItemProvider().skipPickupItemEventCall()) {
-                PlayerPickupItemEvent playerPickupItemEvent = new PlayerPickupItemEvent(player, item, item.getItemStack().getAmount());
-                Bukkit.getPluginManager().callEvent(playerPickupItemEvent);
-
-                if (playerPickupItemEvent.isCancelled())
-                    continue;
-            }
+            if (EventsSimulation.simulateItemPickupEvent(player, item, true))
+                continue;
 
             ItemStack itemStack = plugin.getProviders().getStackedItemProvider().getItemStack(item);
 

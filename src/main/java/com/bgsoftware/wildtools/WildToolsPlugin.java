@@ -5,6 +5,7 @@ import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.wildtools.api.WildTools;
 import com.bgsoftware.wildtools.api.WildToolsAPI;
 import com.bgsoftware.wildtools.command.CommandsHandler;
+import com.bgsoftware.wildtools.events.EventsSimulation;
 import com.bgsoftware.wildtools.handlers.DataHandler;
 import com.bgsoftware.wildtools.handlers.EditorHandler;
 import com.bgsoftware.wildtools.handlers.EventsHandler;
@@ -55,6 +56,8 @@ public class WildToolsPlugin extends JavaPlugin implements WildTools {
         DependenciesManager.inject(this);
 
         shouldEnable = loadNMSAdapter();
+
+        EventsSimulation.init();
     }
 
     @Override
