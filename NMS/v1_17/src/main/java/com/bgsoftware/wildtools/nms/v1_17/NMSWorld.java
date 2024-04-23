@@ -1,5 +1,6 @@
 package com.bgsoftware.wildtools.nms.v1_17;
 
+import com.bgsoftware.common.reflection.ClassInfo;
 import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.wildtools.utils.Executor;
 import com.bgsoftware.wildtools.utils.math.Vector3;
@@ -38,7 +39,7 @@ import java.util.List;
 public class NMSWorld implements com.bgsoftware.wildtools.nms.NMSWorld {
 
     private static final ReflectMethod<Void> UPDATE_NEARBY_BLOCKS = new ReflectMethod<>(
-            "com.destroystokyo.paper.antixray.ChunkPacketBlockControllerAntiXray",
+            new ClassInfo("com.destroystokyo.paper.antixray.ChunkPacketBlockControllerAntiXray", ClassInfo.PackageType.UNKNOWN),
             "updateNearbyBlocks", Level.class, BlockPos.class);
 
     @Override

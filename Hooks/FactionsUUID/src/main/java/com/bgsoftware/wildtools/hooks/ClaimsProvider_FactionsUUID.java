@@ -1,5 +1,6 @@
 package com.bgsoftware.wildtools.hooks;
 
+import com.bgsoftware.common.reflection.ClassInfo;
 import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.wildtools.api.hooks.ClaimsProvider;
@@ -18,7 +19,8 @@ public class ClaimsProvider_FactionsUUID implements ClaimsProvider {
             Player.class, Location.class, String.class, boolean.class);
 
     private static final ReflectField<PermissibleAction> PERMISSIBLE_ACTIONS_DESTROY = new ReflectField<>(
-            "com.massivecraft.factions.perms.PermissibleActions", PermissibleAction.class, "DESTROY");
+            new ClassInfo("com.massivecraft.factions.perms.PermissibleActions", ClassInfo.PackageType.UNKNOWN),
+            PermissibleAction.class, "DESTROY");
 
     @Override
     public boolean isPlayerClaim(Player player, Location location) {

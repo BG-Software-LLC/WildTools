@@ -1,5 +1,6 @@
 package com.bgsoftware.wildtools.nms.v1_16_R3;
 
+import com.bgsoftware.common.reflection.ClassInfo;
 import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.wildtools.utils.Executor;
@@ -47,7 +48,7 @@ public class NMSWorld implements com.bgsoftware.wildtools.nms.NMSWorld {
     private static final ReflectField<ThreadedMailbox<Runnable>> LIGHT_ENGINE_EXECUTOR = new ReflectField<>(
             LightEngineThreaded.class, ThreadedMailbox.class, "b");
     private static final ReflectMethod<Void> UPDATE_NEARBY_BLOCKS = new ReflectMethod<>(
-            "com.destroystokyo.paper.antixray.ChunkPacketBlockControllerAntiXray",
+            new ClassInfo("com.destroystokyo.paper.antixray.ChunkPacketBlockControllerAntiXray", ClassInfo.PackageType.UNKNOWN),
             "updateNearbyBlocks", World.class, BlockPosition.class);
 
     @Override
