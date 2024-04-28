@@ -36,16 +36,15 @@ public class EventsSimulation {
     }
 
     private static void registerPickupItemEventCalls() {
-        // TODO: Fix PlayerAttemptPickupItemEvent
-//        try {
-//            Class.forName("org.bukkit.event.player.PlayerAttemptPickupItemEvent");
-//            pickupItemEventCalls.add(params -> new org.bukkit.event.player.PlayerAttemptPickupItemEvent(
-//                    params.player,
-//                    params.item,
-//                    params.remaining
-//            ));
-//        } catch (ClassNotFoundException ignored) {
-//        }
+        try {
+            Class.forName("org.bukkit.event.player.PlayerAttemptPickupItemEvent");
+            pickupItemEventCalls.add(params -> new org.bukkit.event.player.PlayerAttemptPickupItemEvent(
+                    params.player,
+                    params.item,
+                    params.remaining
+            ));
+        } catch (ClassNotFoundException ignored) {
+        }
 
         pickupItemEventCalls.add(params -> new PlayerPickupItemEvent(
                 params.player,
