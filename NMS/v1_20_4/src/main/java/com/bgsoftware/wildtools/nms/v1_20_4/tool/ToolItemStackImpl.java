@@ -52,7 +52,7 @@ public class ToolItemStackImpl extends ToolItemStack {
     public int getTag(String key, int def) {
         CustomData customData = this.nmsItem.get(DataComponents.CUSTOM_DATA);
         if(customData != null) {
-            CompoundTag compoundTag = customData.copyTag();
+            CompoundTag compoundTag = customData.getUnsafe();
             if(compoundTag.contains(key, 3))
                 return compoundTag.getInt(key);
         }
@@ -63,7 +63,7 @@ public class ToolItemStackImpl extends ToolItemStack {
     public String getTag(String key, String def) {
         CustomData customData = this.nmsItem.get(DataComponents.CUSTOM_DATA);
         if(customData != null) {
-            CompoundTag compoundTag = customData.copyTag();
+            CompoundTag compoundTag = customData.getUnsafe();
             if(compoundTag.contains(key, 8))
                 return compoundTag.getString(key);
         }
