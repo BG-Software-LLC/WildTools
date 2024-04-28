@@ -70,6 +70,8 @@ public class WildToolsPlugin extends JavaPlugin implements WildTools {
             return;
         }
 
+        this.nmsAdapter.loadLegacy();
+
         new Metrics(this);
 
         log("******** ENABLE START ********");

@@ -24,6 +24,10 @@ import java.util.Map;
 
 public interface NMSAdapter {
 
+    default void loadLegacy() {
+
+    }
+
     ToolItemStack createToolItemStack(ItemStack other);
 
     ItemStack getItemInHand(Player player);
