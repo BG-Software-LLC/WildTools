@@ -18,6 +18,12 @@ allprojects {
     apply plugin: 'java'
     apply plugin: 'com.github.johnrengelman.shadow'
 
+    java {
+        toolchain {
+            languageVersion.set(JavaLanguageVersion.of(8))
+        }
+    }
+
     repositories {
         maven { url 'https://repo.bg-software.com/repository/nms/' }
         maven { url 'https://repo.bg-software.com/repository/api/' }
@@ -87,7 +93,8 @@ processResources {
 shadowJar {
     dependsOn(jar)
 
-    relocate 'com.bgsoftware.common', 'com.bgsoftware.wildtools.common'
+    // TODO: Fix relocate
+//    relocate 'com.bgsoftware.common', 'com.bgsoftware.wildtools.libs.com.bgsoftware.common'
 
     archiveFileName = rootProject.name + "-" + rootProject.buildVersion + ".jar"
 
