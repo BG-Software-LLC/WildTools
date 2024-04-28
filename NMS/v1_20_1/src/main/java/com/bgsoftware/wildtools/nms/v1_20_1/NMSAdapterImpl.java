@@ -1,6 +1,7 @@
 package com.bgsoftware.wildtools.nms.v1_20_1;
 
 import com.bgsoftware.common.reflection.ReflectField;
+import com.bgsoftware.wildtools.nms.NMSAdapter;
 import com.bgsoftware.wildtools.nms.alogrithms.PaperGlowEnchantment;
 import com.bgsoftware.wildtools.nms.alogrithms.SpigotGlowEnchantment;
 import com.bgsoftware.wildtools.nms.v1_20_1.tool.ToolItemStackImpl;
@@ -42,7 +43,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-public class NMSAdapter implements com.bgsoftware.wildtools.nms.NMSAdapter {
+public class NMSAdapterImpl implements NMSAdapter {
 
     private static final ReflectField<ItemStack> ITEM_STACK_HANDLE = new ReflectField<>(
             CraftItemStack.class, ItemStack.class, "handle");

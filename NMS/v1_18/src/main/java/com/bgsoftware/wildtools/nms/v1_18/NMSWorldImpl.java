@@ -1,7 +1,8 @@
-package com.bgsoftware.wildtools.nms.v1_19;
+package com.bgsoftware.wildtools.nms.v1_18;
 
 import com.bgsoftware.common.reflection.ClassInfo;
 import com.bgsoftware.common.reflection.ReflectMethod;
+import com.bgsoftware.wildtools.nms.NMSWorld;
 import com.bgsoftware.wildtools.utils.Executor;
 import com.bgsoftware.wildtools.utils.math.Vector3;
 import com.bgsoftware.wildtools.utils.world.WorldEditSession;
@@ -26,17 +27,17 @@ import org.bukkit.World;
 import org.bukkit.WorldBorder;
 import org.bukkit.block.data.Ageable;
 import org.bukkit.block.data.BlockData;
-import org.bukkit.craftbukkit.v1_19_R3.CraftChunk;
-import org.bukkit.craftbukkit.v1_19_R3.CraftWorld;
-import org.bukkit.craftbukkit.v1_19_R3.block.CraftBlock;
-import org.bukkit.craftbukkit.v1_19_R3.entity.CraftPlayer;
-import org.bukkit.craftbukkit.v1_19_R3.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_18_R2.CraftChunk;
+import org.bukkit.craftbukkit.v1_18_R2.CraftWorld;
+import org.bukkit.craftbukkit.v1_18_R2.block.CraftBlock;
+import org.bukkit.craftbukkit.v1_18_R2.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_18_R2.inventory.CraftItemStack;
 import org.bukkit.entity.Player;
 
 import java.util.LinkedList;
 import java.util.List;
 
-public class NMSWorld implements com.bgsoftware.wildtools.nms.NMSWorld {
+public class NMSWorldImpl implements NMSWorld {
 
     private static final ReflectMethod<Void> UPDATE_NEARBY_BLOCKS = new ReflectMethod<>(
             new ClassInfo("com.destroystokyo.paper.antixray.ChunkPacketBlockControllerAntiXray", ClassInfo.PackageType.UNKNOWN),
@@ -66,8 +67,7 @@ public class NMSWorld implements com.bgsoftware.wildtools.nms.NMSWorld {
         return blockState.getBlock().getExpDrop(blockState,
                 serverPlayer.getLevel(),
                 ((CraftBlock) bukkitBlock).getPosition(),
-                serverPlayer.getMainHandItem(),
-                true);
+                serverPlayer.getMainHandItem());
     }
 
     @Override
@@ -126,8 +126,7 @@ public class NMSWorld implements com.bgsoftware.wildtools.nms.NMSWorld {
 
     @Override
     public void refreshChunk(org.bukkit.Chunk bukkitChunk, List<WorldEditSession.BlockData> blocksList) {
-        ServerLevel serverLevel = ((CraftChunk) bukkitChunk).getCraftWorld().getHandle();
-        LevelChunk levelChunk = serverLevel.getChunk(bukkitChunk.getX(), bukkitChunk.getZ());
+        LevelChunk levelChunk = ((CraftChunk) bukkitChunk).getHandle();
         ServerChunkCache serverChunkCache = levelChunk.level.getChunkSource();
         ThreadedLevelLightEngine lightEngine = (ThreadedLevelLightEngine) levelChunk.level.getLightEngine();
 

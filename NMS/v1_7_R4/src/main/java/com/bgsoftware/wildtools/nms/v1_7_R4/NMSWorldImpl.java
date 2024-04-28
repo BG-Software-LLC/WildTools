@@ -1,5 +1,6 @@
 package com.bgsoftware.wildtools.nms.v1_7_R4;
 
+import com.bgsoftware.wildtools.nms.NMSWorld;
 import com.bgsoftware.wildtools.utils.math.Vector3;
 import com.bgsoftware.wildtools.utils.world.WorldEditSession;
 import net.minecraft.server.v1_7_R4.Block;
@@ -38,7 +39,7 @@ import org.bukkit.material.NetherWarts;
 import java.util.LinkedList;
 import java.util.List;
 
-public class NMSWorld implements com.bgsoftware.wildtools.nms.NMSWorld {
+public class NMSWorldImpl implements NMSWorld {
 
     @Override
     public List<org.bukkit.inventory.ItemStack> getBlockDrops(Player bukkitPlayer, org.bukkit.block.Block bukkitBlock, boolean silkTouch) {

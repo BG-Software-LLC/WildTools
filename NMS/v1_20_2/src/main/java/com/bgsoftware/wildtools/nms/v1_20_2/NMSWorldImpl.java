@@ -1,5 +1,6 @@
-package com.bgsoftware.wildtools.nms.v1_20_4;
+package com.bgsoftware.wildtools.nms.v1_20_2;
 
+import com.bgsoftware.wildtools.nms.NMSWorld;
 import com.bgsoftware.wildtools.utils.Executor;
 import com.bgsoftware.wildtools.utils.math.Vector3;
 import com.bgsoftware.wildtools.utils.world.WorldEditSession;
@@ -22,17 +23,17 @@ import org.bukkit.World;
 import org.bukkit.WorldBorder;
 import org.bukkit.block.data.Ageable;
 import org.bukkit.block.data.BlockData;
-import org.bukkit.craftbukkit.CraftChunk;
-import org.bukkit.craftbukkit.CraftWorld;
-import org.bukkit.craftbukkit.block.CraftBlock;
-import org.bukkit.craftbukkit.entity.CraftPlayer;
-import org.bukkit.craftbukkit.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_20_R2.CraftChunk;
+import org.bukkit.craftbukkit.v1_20_R2.CraftWorld;
+import org.bukkit.craftbukkit.v1_20_R2.block.CraftBlock;
+import org.bukkit.craftbukkit.v1_20_R2.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_20_R2.inventory.CraftItemStack;
 import org.bukkit.entity.Player;
 
 import java.util.LinkedList;
 import java.util.List;
 
-public class NMSWorld implements com.bgsoftware.wildtools.nms.NMSWorld {
+public class NMSWorldImpl implements NMSWorld {
 
     @Override
     public List<org.bukkit.inventory.ItemStack> getBlockDrops(Player bukkitPlayer, org.bukkit.block.Block bukkitBlock, boolean silkTouch) {

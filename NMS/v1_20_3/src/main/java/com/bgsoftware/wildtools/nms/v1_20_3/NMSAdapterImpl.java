@@ -1,40 +1,41 @@
-package com.bgsoftware.wildtools.nms.v1_16_R3;
+package com.bgsoftware.wildtools.nms.v1_20_3;
 
 import com.bgsoftware.common.reflection.ReflectField;
-import com.bgsoftware.wildtools.nms.alogrithms.PaperGlowEnchantment;
-import com.bgsoftware.wildtools.nms.alogrithms.SpigotGlowEnchantment;
-import com.bgsoftware.wildtools.nms.v1_16_R3.tool.ToolItemStackImpl;
-import com.bgsoftware.wildtools.nms.v1_16_R3.world.FakeCraftBlock;
+import com.bgsoftware.wildtools.nms.NMSAdapter;
+import com.bgsoftware.wildtools.nms.v1_20_3.alogrithms.PaperGlowEnchantment;
+import com.bgsoftware.wildtools.nms.v1_20_3.tool.ToolItemStackImpl;
+import com.bgsoftware.wildtools.nms.v1_20_3.world.FakeCraftBlock;
+import com.bgsoftware.wildtools.nms.v1_20_R3.alogrithms.SpigotGlowEnchantment;
 import com.bgsoftware.wildtools.recipes.AdvancedShapedRecipe;
 import com.bgsoftware.wildtools.utils.items.DestroySpeedCategory;
 import com.bgsoftware.wildtools.utils.items.ToolItemStack;
-import net.minecraft.server.v1_16_R3.Block;
-import net.minecraft.server.v1_16_R3.Blocks;
-import net.minecraft.server.v1_16_R3.ContainerAnvil;
-import net.minecraft.server.v1_16_R3.EntityItem;
-import net.minecraft.server.v1_16_R3.EntityLiving;
-import net.minecraft.server.v1_16_R3.IBlockData;
-import net.minecraft.server.v1_16_R3.ItemStack;
-import net.minecraft.server.v1_16_R3.Items;
-import net.minecraft.server.v1_16_R3.PacketPlayOutCollect;
-import net.minecraft.server.v1_16_R3.WorldServer;
+import net.minecraft.network.protocol.game.ClientboundTakeItemEntityPacket;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.inventory.AnvilMenu;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
+import org.bukkit.Registry;
 import org.bukkit.block.BlockFace;
-import org.bukkit.block.BlockState;
-import org.bukkit.craftbukkit.v1_16_R3.entity.CraftItem;
-import org.bukkit.craftbukkit.v1_16_R3.entity.CraftLivingEntity;
-import org.bukkit.craftbukkit.v1_16_R3.inventory.CraftInventoryView;
-import org.bukkit.craftbukkit.v1_16_R3.inventory.CraftItemStack;
-import org.bukkit.craftbukkit.v1_16_R3.util.CraftMagicNumbers;
+import org.bukkit.craftbukkit.v1_20_R3.CraftRegistry;
+import org.bukkit.craftbukkit.v1_20_R3.block.data.CraftBlockData;
+import org.bukkit.craftbukkit.v1_20_R3.entity.CraftItem;
+import org.bukkit.craftbukkit.v1_20_R3.entity.CraftLivingEntity;
+import org.bukkit.craftbukkit.v1_20_R3.inventory.CraftInventoryView;
+import org.bukkit.craftbukkit.v1_20_R3.inventory.CraftItemStack;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.Recipe;
 import org.bukkit.inventory.RecipeChoice;
@@ -44,10 +45,15 @@ import org.bukkit.inventory.ShapelessRecipe;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
-public class NMSAdapter implements com.bgsoftware.wildtools.nms.NMSAdapter {
+public class NMSAdapterImpl implements NMSAdapter {
 
-    private static final ReflectField<ItemStack> ITEM_STACK_HANDLE = new ReflectField<>(CraftItemStack.class, ItemStack.class, "handle");
+    private static final ReflectField<Map<NamespacedKey, Enchantment>> REGISTRY_CACHE =
+            new ReflectField<>(CraftRegistry.class, Map.class, "cache");
+
+    private static final ReflectField<ItemStack> ITEM_STACK_HANDLE = new ReflectField<>(
+            CraftItemStack.class, ItemStack.class, "handle");
 
     @Override
     public ToolItemStack createToolItemStack(org.bukkit.inventory.ItemStack bukkitItem) {
@@ -68,13 +74,13 @@ public class NMSAdapter implements com.bgsoftware.wildtools.nms.NMSAdapter {
     }
 
     @Override
-    public org.bukkit.inventory.ItemStack getItemInHand(Player player, Event e) {
+    public org.bukkit.inventory.ItemStack getItemInHand(Player player, Event event) {
         boolean offHand = false;
 
-        if (e instanceof PlayerInteractEvent) {
-            offHand = ((PlayerInteractEvent) e).getHand() == EquipmentSlot.OFF_HAND;
-        } else if (e instanceof PlayerInteractEntityEvent) {
-            offHand = ((PlayerInteractEntityEvent) e).getHand() == EquipmentSlot.OFF_HAND;
+        if (event instanceof PlayerInteractEvent playerInteractEvent) {
+            offHand = playerInteractEvent.getHand() == org.bukkit.inventory.EquipmentSlot.OFF_HAND;
+        } else if (event instanceof PlayerInteractEntityEvent playerInteractEntityEvent) {
+            offHand = playerInteractEntityEvent.getHand() == org.bukkit.inventory.EquipmentSlot.OFF_HAND;
         }
 
         return offHand ? player.getInventory().getItemInOffHand() : getItemInHand(player);
@@ -95,13 +101,24 @@ public class NMSAdapter implements com.bgsoftware.wildtools.nms.NMSAdapter {
     }
 
     @Override
+    public Enchantment createGlowEnchantment() {
+        Enchantment enchantment = getGlowEnchant();
+
+        Map<NamespacedKey, Enchantment> registryCache = REGISTRY_CACHE.get(Registry.ENCHANTMENT);
+
+        registryCache.put(enchantment.getKey(), enchantment);
+
+        return enchantment;
+    }
+
+    @Override
     public int getFarmlandId() {
-        return Block.getCombinedId(Blocks.FARMLAND.getBlockData());
+        return Block.getId(Blocks.FARMLAND.defaultBlockState());
     }
 
     @Override
     public BlockPlaceEvent getFakePlaceEvent(Player player, org.bukkit.block.Block block, org.bukkit.block.Block copyBlock) {
-        BlockState originalState = block.getState();
+        org.bukkit.block.BlockState originalState = block.getState();
         FakeCraftBlock fakeBlock = new FakeCraftBlock(block, copyBlock.getType(), originalState);
         return new BlockPlaceEvent(
                 fakeBlock,
@@ -110,25 +127,30 @@ public class NMSAdapter implements com.bgsoftware.wildtools.nms.NMSAdapter {
                 new org.bukkit.inventory.ItemStack(copyBlock.getType()),
                 player,
                 true,
-                EquipmentSlot.HAND
+                org.bukkit.inventory.EquipmentSlot.HAND
         );
     }
 
     @Override
-    public void playPickupAnimation(LivingEntity livingEntity, org.bukkit.entity.Item item) {
-        EntityLiving entityLiving = ((CraftLivingEntity) livingEntity).getHandle();
-        EntityItem entityItem = (EntityItem) ((CraftItem) item).getHandle();
-        ((WorldServer) entityLiving.world).getChunkProvider().broadcast(entityItem, new PacketPlayOutCollect(entityItem.getId(), entityLiving.getId(), item.getItemStack().getAmount()));
+    public void playPickupAnimation(org.bukkit.entity.LivingEntity bukkitLivingEntity, org.bukkit.entity.Item item) {
+        LivingEntity livingEntity = ((CraftLivingEntity) bukkitLivingEntity).getHandle();
+        ItemEntity itemEntity = (ItemEntity) ((CraftItem) item).getHandle();
+        ServerLevel serverLevel = (ServerLevel) livingEntity.level();
+
+        ClientboundTakeItemEntityPacket takeItemEntityPacket = new ClientboundTakeItemEntityPacket(itemEntity.getId(),
+                livingEntity.getId(), itemEntity.getItem().getCount());
+
+        serverLevel.getChunkSource().broadcast(itemEntity, takeItemEntityPacket);
     }
 
     @Override
     public DestroySpeedCategory getDestroySpeedCategory(Material material) {
-        IBlockData blockData = CraftMagicNumbers.getBlock(material).getBlockData();
+        BlockState blockState = ((CraftBlockData) material.createBlockData()).getState();
 
-        if (Items.DIAMOND_AXE.getDestroySpeed(new ItemStack(Items.DIAMOND_AXE), blockData) == 8f)
+        if (Items.DIAMOND_AXE.getDestroySpeed(new ItemStack(Items.DIAMOND_AXE), blockState) == 8f)
             return DestroySpeedCategory.AXE;
 
-        if (Items.DIAMOND_SHOVEL.getDestroySpeed(new ItemStack(Items.DIAMOND_SHOVEL), blockData) == 8f)
+        if (Items.DIAMOND_SHOVEL.getDestroySpeed(new ItemStack(Items.DIAMOND_SHOVEL), blockState) == 8f)
             return DestroySpeedCategory.SHOVEL;
 
         return DestroySpeedCategory.PICKAXE;
@@ -163,23 +185,24 @@ public class NMSAdapter implements com.bgsoftware.wildtools.nms.NMSAdapter {
 
     @Override
     public void setExpCost(InventoryView inventoryView, int expCost) {
-        ContainerAnvil container = (ContainerAnvil) ((CraftInventoryView) inventoryView).getHandle();
-        container.levelCost.set(expCost);
+        AnvilMenu anvilMenu = (AnvilMenu) ((CraftInventoryView) inventoryView).getHandle();
+        anvilMenu.cost.set(expCost);
     }
 
     @Override
     public int getExpCost(InventoryView inventoryView) {
-        return ((ContainerAnvil) ((CraftInventoryView) inventoryView).getHandle()).levelCost.get();
+        AnvilMenu anvilMenu = (AnvilMenu) ((CraftInventoryView) inventoryView).getHandle();
+        return anvilMenu.getCost();
     }
 
     @Override
     public String getRenameText(InventoryView inventoryView) {
-        return ((ContainerAnvil) ((CraftInventoryView) inventoryView).getHandle()).renameText;
+        return ((AnvilMenu) ((CraftInventoryView) inventoryView).getHandle()).itemName;
     }
 
     @Override
     public AdvancedShapedRecipe createRecipe(String toolName, org.bukkit.inventory.ItemStack result) {
-        return new com.bgsoftware.wildtools.nms.recipe.AdvancedRecipeClassImpl(toolName, result);
+        return new com.bgsoftware.wildtools.nms.v1_20_R3.recipe.AdvancedRecipeClassImpl(toolName, result);
     }
 
 }

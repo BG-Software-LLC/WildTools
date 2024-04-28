@@ -1,10 +1,11 @@
-package com.bgsoftware.wildtools.nms.v1_20_2;
+package com.bgsoftware.wildtools.nms.v1_19;
 
 import com.bgsoftware.common.reflection.ReflectField;
+import com.bgsoftware.wildtools.nms.NMSAdapter;
 import com.bgsoftware.wildtools.nms.alogrithms.PaperGlowEnchantment;
 import com.bgsoftware.wildtools.nms.alogrithms.SpigotGlowEnchantment;
-import com.bgsoftware.wildtools.nms.v1_20_2.tool.ToolItemStackImpl;
-import com.bgsoftware.wildtools.nms.v1_20_2.world.FakeCraftBlock;
+import com.bgsoftware.wildtools.nms.v1_19.tool.ToolItemStackImpl;
+import com.bgsoftware.wildtools.nms.v1_19.world.FakeCraftBlock;
 import com.bgsoftware.wildtools.recipes.AdvancedShapedRecipe;
 import com.bgsoftware.wildtools.utils.items.DestroySpeedCategory;
 import com.bgsoftware.wildtools.utils.items.ToolItemStack;
@@ -21,11 +22,11 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
-import org.bukkit.craftbukkit.v1_20_R2.block.data.CraftBlockData;
-import org.bukkit.craftbukkit.v1_20_R2.entity.CraftItem;
-import org.bukkit.craftbukkit.v1_20_R2.entity.CraftLivingEntity;
-import org.bukkit.craftbukkit.v1_20_R2.inventory.CraftInventoryView;
-import org.bukkit.craftbukkit.v1_20_R2.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_19_R3.block.data.CraftBlockData;
+import org.bukkit.craftbukkit.v1_19_R3.entity.CraftItem;
+import org.bukkit.craftbukkit.v1_19_R3.entity.CraftLivingEntity;
+import org.bukkit.craftbukkit.v1_19_R3.inventory.CraftInventoryView;
+import org.bukkit.craftbukkit.v1_19_R3.inventory.CraftItemStack;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
@@ -42,7 +43,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-public class NMSAdapter implements com.bgsoftware.wildtools.nms.NMSAdapter {
+public class NMSAdapterImpl implements NMSAdapter {
 
     private static final ReflectField<ItemStack> ITEM_STACK_HANDLE = new ReflectField<>(
             CraftItemStack.class, ItemStack.class, "handle");
@@ -116,7 +117,7 @@ public class NMSAdapter implements com.bgsoftware.wildtools.nms.NMSAdapter {
     public void playPickupAnimation(org.bukkit.entity.LivingEntity bukkitLivingEntity, org.bukkit.entity.Item item) {
         LivingEntity livingEntity = ((CraftLivingEntity) bukkitLivingEntity).getHandle();
         ItemEntity itemEntity = (ItemEntity) ((CraftItem) item).getHandle();
-        ServerLevel serverLevel = (ServerLevel) livingEntity.level();
+        ServerLevel serverLevel = (ServerLevel) livingEntity.level;
 
         ClientboundTakeItemEntityPacket takeItemEntityPacket = new ClientboundTakeItemEntityPacket(itemEntity.getId(),
                 livingEntity.getId(), itemEntity.getItem().getCount());

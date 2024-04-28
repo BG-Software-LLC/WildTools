@@ -1,6 +1,9 @@
 package com.bgsoftware.wildtools;
 
 import com.bgsoftware.common.dependencies.DependenciesManager;
+import com.bgsoftware.common.nmsloader.INMSLoader;
+import com.bgsoftware.common.nmsloader.NMSHandlersFactory;
+import com.bgsoftware.common.nmsloader.NMSLoadException;
 import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.wildtools.api.WildTools;
 import com.bgsoftware.wildtools.api.WildToolsAPI;
@@ -120,53 +123,19 @@ public class WildToolsPlugin extends JavaPlugin implements WildTools {
     }
 
     private boolean loadNMSAdapter() {
-        String version = null;
+        try {
+            INMSLoader nmsLoader = NMSHandlersFactory.createNMSLoader(this);
+            this.nmsAdapter = nmsLoader.loadNMSHandler(NMSAdapter.class);
+            this.nmsWorld = nmsLoader.loadNMSHandler(NMSWorld.class);
 
-        if (ServerVersion.isLessThan(ServerVersion.v1_17)) {
-            version = getServer().getClass().getPackage().getName().split("\\.")[3];
-        } else {
-            ReflectMethod<Integer> getDataVersion = new ReflectMethod<>(UnsafeValues.class, "getDataVersion");
-            int dataVersion = getDataVersion.invoke(Bukkit.getUnsafe());
+            return true;
+        } catch (NMSLoadException error) {
+            log("The plugin doesn't support your minecraft version.");
+            log("Please try a different version.");
+            error.printStackTrace();
 
-            List<Pair<Integer, String>> versions = Arrays.asList(
-                    new Pair<>(2729, null),
-                    new Pair<>(2730, "v1_17"),
-                    new Pair<>(2974, null),
-                    new Pair<>(2975, "v1_18"),
-                    new Pair<>(3336, null),
-                    new Pair<>(3337, "v1_19"),
-                    new Pair<>(3465, "v1_20_1"),
-                    new Pair<>(3578, "v1_20_2"),
-                    new Pair<>(3700, "v1_20_3"),
-                    new Pair<>(3837, "v1_20_4")
-            );
-
-            for (Pair<Integer, String> versionData : versions) {
-                if (dataVersion <= versionData.getX()) {
-                    version = versionData.getY();
-                    break;
-                }
-            }
-
-            if (version == null) {
-                log("Data version: " + dataVersion);
-            }
+            return false;
         }
-
-        if (version != null) {
-            try {
-                nmsAdapter = (NMSAdapter) Class.forName(String.format("com.bgsoftware.wildtools.nms.%s.NMSAdapter", version)).newInstance();
-                nmsWorld = (NMSWorld) Class.forName(String.format("com.bgsoftware.wildtools.nms.%s.NMSWorld", version)).newInstance();
-                return true;
-            } catch (Exception error) {
-                error.printStackTrace();
-            }
-        }
-
-        log("&cThe plugin doesn't support your minecraft version.");
-        log("&cPlease try a different version.");
-
-        return false;
     }
 
     private void loadAPI() {
