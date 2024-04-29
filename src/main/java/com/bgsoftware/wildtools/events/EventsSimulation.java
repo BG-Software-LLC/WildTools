@@ -10,6 +10,7 @@ import org.bukkit.event.player.PlayerPickupItemEvent;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 public class EventsSimulation {
 
@@ -38,11 +39,18 @@ public class EventsSimulation {
     private static void registerPickupItemEventCalls() {
         try {
             Class.forName("org.bukkit.event.player.PlayerAttemptPickupItemEvent");
-            pickupItemEventCalls.add(params -> new org.bukkit.event.player.PlayerAttemptPickupItemEvent(
-                    params.player,
-                    params.item,
-                    params.remaining
-            ));
+            pickupItemEventCalls.add(params -> {
+                return new Supplier<Event>() {
+                    @Override
+                    public Event get() {
+                        return new org.bukkit.event.player.PlayerAttemptPickupItemEvent(
+                                params.player,
+                                params.item,
+                                params.remaining
+                        );
+                    }
+                }.get();
+            });
         } catch (ClassNotFoundException ignored) {
         }
 
@@ -54,11 +62,18 @@ public class EventsSimulation {
 
         try {
             Class.forName("org.bukkit.event.entity.EntityPickupItemEvent");
-            pickupItemEventCalls.add(params -> new org.bukkit.event.entity.EntityPickupItemEvent(
-                    params.player,
-                    params.item,
-                    params.remaining
-            ));
+            pickupItemEventCalls.add(params -> {
+               return new Supplier<Event>() {
+                   @Override
+                   public Event get() {
+                       return new org.bukkit.event.entity.EntityPickupItemEvent(
+                               params.player,
+                               params.item,
+                               params.remaining
+                       );
+                   }
+               }.get();
+            });
         } catch (ClassNotFoundException ignored) {
         }
     }
