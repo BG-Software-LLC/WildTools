@@ -94,8 +94,7 @@ processResources {
 shadowJar {
     dependsOn(jar)
 
-    // TODO: Fix relocate
-//    relocate 'com.bgsoftware.common', 'com.bgsoftware.wildtools.libs.com.bgsoftware.common'
+    relocate 'com.bgsoftware.common', 'com.bgsoftware.wildtools.libs.com.bgsoftware.common'
 
     archiveFileName = rootProject.name + "-" + rootProject.buildVersion + ".jar"
 
