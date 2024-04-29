@@ -1,10 +1,9 @@
-package com.bgsoftware.wildtools.nms.v1_20_1;
+package com.bgsoftware.wildtools.nms.v1_20_3;
 
-import com.bgsoftware.common.reflection.ReflectMethod;
+import com.bgsoftware.wildtools.nms.NMSWorld;
 import com.bgsoftware.wildtools.utils.Executor;
 import com.bgsoftware.wildtools.utils.math.Vector3;
 import com.bgsoftware.wildtools.utils.world.WorldEditSession;
-import com.destroystokyo.paper.antixray.ChunkPacketBlockControllerAntiXray;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.protocol.game.ClientboundLightUpdatePacket;
 import net.minecraft.server.level.ServerChunkCache;
@@ -13,7 +12,6 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.level.ThreadedLevelLightEngine;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ChunkPos;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -25,21 +23,17 @@ import org.bukkit.World;
 import org.bukkit.WorldBorder;
 import org.bukkit.block.data.Ageable;
 import org.bukkit.block.data.BlockData;
-import org.bukkit.craftbukkit.v1_20_R1.CraftChunk;
-import org.bukkit.craftbukkit.v1_20_R1.CraftWorld;
-import org.bukkit.craftbukkit.v1_20_R1.block.CraftBlock;
-import org.bukkit.craftbukkit.v1_20_R1.entity.CraftPlayer;
-import org.bukkit.craftbukkit.v1_20_R1.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_20_R3.CraftChunk;
+import org.bukkit.craftbukkit.v1_20_R3.CraftWorld;
+import org.bukkit.craftbukkit.v1_20_R3.block.CraftBlock;
+import org.bukkit.craftbukkit.v1_20_R3.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_20_R3.inventory.CraftItemStack;
 import org.bukkit.entity.Player;
 
 import java.util.LinkedList;
 import java.util.List;
 
-public class NMSWorld implements com.bgsoftware.wildtools.nms.NMSWorld {
-
-    private static final ReflectMethod<Void> UPDATE_NEARBY_BLOCKS = new ReflectMethod<>(
-            "com.destroystokyo.paper.antixray.ChunkPacketBlockControllerAntiXray",
-            "updateNearbyBlocks", Level.class, BlockPos.class);
+public class NMSWorldImpl implements NMSWorld {
 
     @Override
     public List<org.bukkit.inventory.ItemStack> getBlockDrops(Player bukkitPlayer, org.bukkit.block.Block bukkitBlock, boolean silkTouch) {
@@ -117,10 +111,6 @@ public class NMSWorld implements com.bgsoftware.wildtools.nms.NMSWorld {
             serverLevel.levelEvent(null, 2001, blockPos, Block.getId(serverLevel.getBlockState(blockPos)));
 
         levelChunk.setBlockState(blockPos, Block.stateById(combinedId), true);
-
-        if (UPDATE_NEARBY_BLOCKS.isValid() && serverLevel.chunkPacketBlockController instanceof ChunkPacketBlockControllerAntiXray) {
-            UPDATE_NEARBY_BLOCKS.invoke(serverLevel.chunkPacketBlockController, serverLevel, blockPos);
-        }
     }
 
     @Override

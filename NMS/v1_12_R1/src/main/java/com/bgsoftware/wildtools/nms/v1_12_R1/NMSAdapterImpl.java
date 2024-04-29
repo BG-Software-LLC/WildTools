@@ -1,36 +1,44 @@
-package com.bgsoftware.wildtools.nms.v1_8_R3;
+package com.bgsoftware.wildtools.nms.v1_12_R1;
 
 import com.bgsoftware.common.reflection.ReflectField;
-import com.bgsoftware.wildtools.nms.v1_8_R3.tool.ToolItemStackImpl;
-import com.bgsoftware.wildtools.nms.v1_8_R3.world.FakeCraftBlock;
+import com.bgsoftware.wildtools.nms.NMSAdapter;
+import com.bgsoftware.wildtools.nms.v1_12_R1.tool.ToolItemStackImpl;
+import com.bgsoftware.wildtools.nms.v1_12_R1.world.FakeCraftBlock;
 import com.bgsoftware.wildtools.utils.items.DestroySpeedCategory;
 import com.bgsoftware.wildtools.utils.items.ToolItemStack;
-import net.minecraft.server.v1_8_R3.Block;
-import net.minecraft.server.v1_8_R3.Blocks;
-import net.minecraft.server.v1_8_R3.EntityItem;
-import net.minecraft.server.v1_8_R3.EntityLiving;
-import net.minecraft.server.v1_8_R3.ItemStack;
-import net.minecraft.server.v1_8_R3.Items;
-import net.minecraft.server.v1_8_R3.PacketPlayOutCollect;
-import net.minecraft.server.v1_8_R3.WorldServer;
+import net.minecraft.server.v1_12_R1.Block;
+import net.minecraft.server.v1_12_R1.Blocks;
+import net.minecraft.server.v1_12_R1.ContainerAnvil;
+import net.minecraft.server.v1_12_R1.EntityItem;
+import net.minecraft.server.v1_12_R1.EntityLiving;
+import net.minecraft.server.v1_12_R1.IBlockData;
+import net.minecraft.server.v1_12_R1.ItemStack;
+import net.minecraft.server.v1_12_R1.Items;
+import net.minecraft.server.v1_12_R1.PacketPlayOutCollect;
+import net.minecraft.server.v1_12_R1.WorldServer;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
-import org.bukkit.craftbukkit.v1_8_R3.entity.CraftItem;
-import org.bukkit.craftbukkit.v1_8_R3.entity.CraftLivingEntity;
-import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftItemStack;
-import org.bukkit.craftbukkit.v1_8_R3.util.CraftMagicNumbers;
+import org.bukkit.craftbukkit.v1_12_R1.entity.CraftItem;
+import org.bukkit.craftbukkit.v1_12_R1.entity.CraftLivingEntity;
+import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftInventoryView;
+import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_12_R1.util.CraftMagicNumbers;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.player.PlayerInteractEntityEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.InventoryView;
 
 import java.util.ArrayList;
 import java.util.Collection;
 
-public class NMSAdapter implements com.bgsoftware.wildtools.nms.NMSAdapter {
+public class NMSAdapterImpl implements NMSAdapter {
 
     private static final ReflectField<ItemStack> ITEM_STACK_HANDLE = new ReflectField<>(CraftItemStack.class, ItemStack.class, "handle");
 
@@ -49,12 +57,20 @@ public class NMSAdapter implements com.bgsoftware.wildtools.nms.NMSAdapter {
 
     @Override
     public org.bukkit.inventory.ItemStack getItemInHand(Player player) {
-        return player.getItemInHand();
+        return player.getInventory().getItemInMainHand();
     }
 
     @Override
     public org.bukkit.inventory.ItemStack getItemInHand(Player player, Event e) {
-        return getItemInHand(player);
+        boolean offHand = false;
+
+        if (e instanceof PlayerInteractEvent) {
+            offHand = ((PlayerInteractEvent) e).getHand() == EquipmentSlot.OFF_HAND;
+        } else if (e instanceof PlayerInteractEntityEvent) {
+            offHand = ((PlayerInteractEntityEvent) e).getHand() == EquipmentSlot.OFF_HAND;
+        }
+
+        return offHand ? player.getInventory().getItemInOffHand() : getItemInHand(player);
     }
 
     @Override
@@ -86,6 +102,16 @@ public class NMSAdapter implements com.bgsoftware.wildtools.nms.NMSAdapter {
             }
 
             @Override
+            public boolean isTreasure() {
+                return false;
+            }
+
+            @Override
+            public boolean isCursed() {
+                return false;
+            }
+
+            @Override
             public boolean conflictsWith(Enchantment enchantment) {
                 return false;
             }
@@ -111,7 +137,8 @@ public class NMSAdapter implements com.bgsoftware.wildtools.nms.NMSAdapter {
                 fakeBlock.getRelative(BlockFace.DOWN),
                 new org.bukkit.inventory.ItemStack(copyBlock.getType()),
                 player,
-                true
+                true,
+                EquipmentSlot.HAND
         );
     }
 
@@ -119,20 +146,37 @@ public class NMSAdapter implements com.bgsoftware.wildtools.nms.NMSAdapter {
     public void playPickupAnimation(LivingEntity livingEntity, org.bukkit.entity.Item item) {
         EntityLiving entityLiving = ((CraftLivingEntity) livingEntity).getHandle();
         EntityItem entityItem = (EntityItem) ((CraftItem) item).getHandle();
-        ((WorldServer) entityLiving.world).getTracker().a(entityItem, new PacketPlayOutCollect(entityItem.getId(), entityLiving.getId()));
+        ((WorldServer) entityLiving.world).getTracker().a(entityItem, new PacketPlayOutCollect(
+                entityItem.getId(), entityLiving.getId(), item.getItemStack().getAmount()));
     }
 
     @Override
     public DestroySpeedCategory getDestroySpeedCategory(Material material) {
-        Block block = CraftMagicNumbers.getBlock(material);
+        IBlockData blockData = CraftMagicNumbers.getBlock(material).getBlockData();
 
-        if (Items.DIAMOND_AXE.getDestroySpeed(new ItemStack(Items.DIAMOND_AXE), block) == 8f)
+        if (Items.DIAMOND_AXE.getDestroySpeed(new ItemStack(Items.DIAMOND_AXE), blockData) == 8f)
             return DestroySpeedCategory.AXE;
 
-        if (Items.DIAMOND_SHOVEL.getDestroySpeed(new ItemStack(Items.DIAMOND_SHOVEL), block) == 8f)
+        if (Items.DIAMOND_SHOVEL.getDestroySpeed(new ItemStack(Items.DIAMOND_SHOVEL), blockData) == 8f)
             return DestroySpeedCategory.SHOVEL;
 
         return DestroySpeedCategory.PICKAXE;
+    }
+
+    @Override
+    public void setExpCost(InventoryView inventoryView, int expCost) {
+        ContainerAnvil container = (ContainerAnvil) ((CraftInventoryView) inventoryView).getHandle();
+        container.levelCost = expCost;
+    }
+
+    @Override
+    public int getExpCost(InventoryView inventoryView) {
+        return ((ContainerAnvil) ((CraftInventoryView) inventoryView).getHandle()).levelCost;
+    }
+
+    @Override
+    public String getRenameText(InventoryView inventoryView) {
+        return ((ContainerAnvil) ((CraftInventoryView) inventoryView).getHandle()).renameText;
     }
 
 }

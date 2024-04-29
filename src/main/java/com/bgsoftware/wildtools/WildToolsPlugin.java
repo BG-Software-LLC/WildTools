@@ -1,7 +1,10 @@
 package com.bgsoftware.wildtools;
 
 import com.bgsoftware.common.dependencies.DependenciesManager;
-import com.bgsoftware.common.reflection.ReflectMethod;
+import com.bgsoftware.common.nmsloader.INMSLoader;
+import com.bgsoftware.common.nmsloader.NMSHandlersFactory;
+import com.bgsoftware.common.nmsloader.NMSLoadException;
+import com.bgsoftware.common.updater.Updater;
 import com.bgsoftware.wildtools.api.WildTools;
 import com.bgsoftware.wildtools.api.WildToolsAPI;
 import com.bgsoftware.wildtools.command.CommandsHandler;
@@ -16,23 +19,19 @@ import com.bgsoftware.wildtools.listeners.AnvilListener;
 import com.bgsoftware.wildtools.listeners.BlocksListener;
 import com.bgsoftware.wildtools.listeners.EditorListener;
 import com.bgsoftware.wildtools.listeners.PlayerListener;
-import com.bgsoftware.wildtools.metrics.Metrics;
 import com.bgsoftware.wildtools.nms.NMSAdapter;
 import com.bgsoftware.wildtools.nms.NMSWorld;
-import com.bgsoftware.wildtools.utils.Pair;
-import com.bgsoftware.wildtools.utils.ServerVersion;
-import org.bukkit.Bukkit;
-import org.bukkit.UnsafeValues;
+import org.bstats.bukkit.Metrics;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.lang.reflect.Field;
-import java.util.Arrays;
-import java.util.List;
 
 public class WildToolsPlugin extends JavaPlugin implements WildTools {
+
+    private final Updater updater = new Updater(this, "wildtools");
 
     private static WildToolsPlugin plugin;
 
@@ -67,7 +66,9 @@ public class WildToolsPlugin extends JavaPlugin implements WildTools {
             return;
         }
 
-        new Metrics(this);
+        this.nmsAdapter.loadLegacy();
+
+        new Metrics(this, 4107);
 
         log("******** ENABLE START ********");
 
@@ -97,10 +98,10 @@ public class WildToolsPlugin extends JavaPlugin implements WildTools {
         editorHandler = new EditorHandler(this);
         recipesHandler = new RecipesHandler(this);
 
-        if (Updater.isOutdated()) {
+        if (updater.isOutdated()) {
             log("");
-            log("A new version is available (v" + Updater.getLatestVersion() + ")!");
-            log("Version's description: \"" + Updater.getVersionDescription() + "\"");
+            log("A new version is available (v" + updater.getLatestVersion() + ")!");
+            log("Version's description: \"" + updater.getVersionDescription() + "\"");
             log("");
         }
 
@@ -120,52 +121,19 @@ public class WildToolsPlugin extends JavaPlugin implements WildTools {
     }
 
     private boolean loadNMSAdapter() {
-        String version = null;
+        try {
+            INMSLoader nmsLoader = NMSHandlersFactory.createNMSLoader(this);
+            this.nmsAdapter = nmsLoader.loadNMSHandler(NMSAdapter.class);
+            this.nmsWorld = nmsLoader.loadNMSHandler(NMSWorld.class);
 
-        if (ServerVersion.isLessThan(ServerVersion.v1_17)) {
-            version = getServer().getClass().getPackage().getName().split("\\.")[3];
-        } else {
-            ReflectMethod<Integer> getDataVersion = new ReflectMethod<>(UnsafeValues.class, "getDataVersion");
-            int dataVersion = getDataVersion.invoke(Bukkit.getUnsafe());
+            return true;
+        } catch (NMSLoadException error) {
+            log("The plugin doesn't support your minecraft version.");
+            log("Please try a different version.");
+            error.printStackTrace();
 
-            List<Pair<Integer, String>> versions = Arrays.asList(
-                    new Pair<>(2729, null),
-                    new Pair<>(2730, "v1_17"),
-                    new Pair<>(2974, null),
-                    new Pair<>(2975, "v1_18"),
-                    new Pair<>(3336, null),
-                    new Pair<>(3337, "v1_19"),
-                    new Pair<>(3465, "v1_20_1"),
-                    new Pair<>(3578, "v1_20_2"),
-                    new Pair<>(3700, "v1_20_3")
-            );
-
-            for (Pair<Integer, String> versionData : versions) {
-                if (dataVersion <= versionData.getX()) {
-                    version = versionData.getY();
-                    break;
-                }
-            }
-
-            if (version == null) {
-                log("Data version: " + dataVersion);
-            }
+            return false;
         }
-
-        if (version != null) {
-            try {
-                nmsAdapter = (NMSAdapter) Class.forName(String.format("com.bgsoftware.wildtools.nms.%s.NMSAdapter", version)).newInstance();
-                nmsWorld = (NMSWorld) Class.forName(String.format("com.bgsoftware.wildtools.nms.%s.NMSWorld", version)).newInstance();
-                return true;
-            } catch (Exception error) {
-                error.printStackTrace();
-            }
-        }
-
-        log("&cThe plugin doesn't support your minecraft version.");
-        log("&cPlease try a different version.");
-
-        return false;
     }
 
     private void loadAPI() {
@@ -212,6 +180,10 @@ public class WildToolsPlugin extends JavaPlugin implements WildTools {
 
     public NMSWorld getNMSWorld() {
         return nmsWorld;
+    }
+
+    public Updater getUpdater() {
+        return updater;
     }
 
     public static void log(String message) {

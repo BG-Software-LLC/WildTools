@@ -1,6 +1,5 @@
 package com.bgsoftware.wildtools.listeners;
 
-import com.bgsoftware.wildtools.Updater;
 import com.bgsoftware.wildtools.WildToolsPlugin;
 import com.bgsoftware.wildtools.api.objects.tools.Tool;
 import com.bgsoftware.wildtools.tools.ToolBreaksTracker;
@@ -39,7 +38,7 @@ public class PlayerListener implements Listener {
     }
 
     /**
-     * Just notifies me if the server is using WildBuster
+     * Just notifies me if the server is using WildTools
      */
 
     @EventHandler
@@ -49,9 +48,9 @@ public class PlayerListener implements Listener {
                     sendMessage(e.getPlayer(), "&8[&fWildSeries&8] &7This server is using WildTools v" + plugin.getDescription().getVersion()), 5L);
         }
 
-        if (e.getPlayer().isOp() && Updater.isOutdated()) {
+        if (e.getPlayer().isOp() && plugin.getUpdater().isOutdated()) {
             Bukkit.getScheduler().runTaskLater(plugin, () ->
-                    sendMessage(e.getPlayer(), "&b&lWildTools &7A new version is available (v" + Updater.getLatestVersion() + ")!"), 20L);
+                    sendMessage(e.getPlayer(), "&b&lWildTools &7A new version is available (v" + plugin.getUpdater().getLatestVersion() + ")!"), 20L);
         }
 
     }

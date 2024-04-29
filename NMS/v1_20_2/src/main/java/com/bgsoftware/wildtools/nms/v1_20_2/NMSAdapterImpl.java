@@ -1,10 +1,11 @@
-package com.bgsoftware.wildtools.nms.v1_20_1;
+package com.bgsoftware.wildtools.nms.v1_20_2;
 
 import com.bgsoftware.common.reflection.ReflectField;
+import com.bgsoftware.wildtools.nms.NMSAdapter;
 import com.bgsoftware.wildtools.nms.alogrithms.PaperGlowEnchantment;
 import com.bgsoftware.wildtools.nms.alogrithms.SpigotGlowEnchantment;
-import com.bgsoftware.wildtools.nms.v1_20_1.tool.ToolItemStackImpl;
-import com.bgsoftware.wildtools.nms.v1_20_1.world.FakeCraftBlock;
+import com.bgsoftware.wildtools.nms.v1_20_2.tool.ToolItemStackImpl;
+import com.bgsoftware.wildtools.nms.v1_20_2.world.FakeCraftBlock;
 import com.bgsoftware.wildtools.recipes.AdvancedShapedRecipe;
 import com.bgsoftware.wildtools.utils.items.DestroySpeedCategory;
 import com.bgsoftware.wildtools.utils.items.ToolItemStack;
@@ -21,11 +22,12 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
-import org.bukkit.craftbukkit.v1_20_R1.block.data.CraftBlockData;
-import org.bukkit.craftbukkit.v1_20_R1.entity.CraftItem;
-import org.bukkit.craftbukkit.v1_20_R1.entity.CraftLivingEntity;
-import org.bukkit.craftbukkit.v1_20_R1.inventory.CraftInventoryView;
-import org.bukkit.craftbukkit.v1_20_R1.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_20_R2.block.data.CraftBlockData;
+import org.bukkit.craftbukkit.v1_20_R2.entity.CraftItem;
+import org.bukkit.craftbukkit.v1_20_R2.entity.CraftLivingEntity;
+import org.bukkit.craftbukkit.v1_20_R2.inventory.CraftInventoryView;
+import org.bukkit.craftbukkit.v1_20_R2.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_20_R2.legacy.CraftLegacy;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
@@ -42,10 +44,16 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-public class NMSAdapter implements com.bgsoftware.wildtools.nms.NMSAdapter {
+public class NMSAdapterImpl implements NMSAdapter {
 
     private static final ReflectField<ItemStack> ITEM_STACK_HANDLE = new ReflectField<>(
             CraftItemStack.class, ItemStack.class, "handle");
+
+    @Override
+    public void loadLegacy() {
+        // Load legacy by accessing the CraftLegacy class.
+        CraftLegacy.fromLegacy(Material.ACACIA_BOAT);
+    }
 
     @Override
     public ToolItemStack createToolItemStack(org.bukkit.inventory.ItemStack bukkitItem) {

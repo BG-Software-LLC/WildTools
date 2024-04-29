@@ -1,10 +1,11 @@
-package com.bgsoftware.wildtools.nms.v1_18;
+package com.bgsoftware.wildtools.nms.v1_20_3;
 
 import com.bgsoftware.common.reflection.ReflectField;
-import com.bgsoftware.wildtools.nms.alogrithms.PaperGlowEnchantment;
-import com.bgsoftware.wildtools.nms.alogrithms.SpigotGlowEnchantment;
-import com.bgsoftware.wildtools.nms.v1_18.tool.ToolItemStackImpl;
-import com.bgsoftware.wildtools.nms.v1_18.world.FakeCraftBlock;
+import com.bgsoftware.wildtools.nms.NMSAdapter;
+import com.bgsoftware.wildtools.nms.v1_20_3.alogrithms.PaperGlowEnchantment;
+import com.bgsoftware.wildtools.nms.v1_20_3.tool.ToolItemStackImpl;
+import com.bgsoftware.wildtools.nms.v1_20_3.world.FakeCraftBlock;
+import com.bgsoftware.wildtools.nms.v1_20_R3.alogrithms.SpigotGlowEnchantment;
 import com.bgsoftware.wildtools.recipes.AdvancedShapedRecipe;
 import com.bgsoftware.wildtools.utils.items.DestroySpeedCategory;
 import com.bgsoftware.wildtools.utils.items.ToolItemStack;
@@ -20,12 +21,16 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
+import org.bukkit.Registry;
 import org.bukkit.block.BlockFace;
-import org.bukkit.craftbukkit.v1_18_R2.block.data.CraftBlockData;
-import org.bukkit.craftbukkit.v1_18_R2.entity.CraftItem;
-import org.bukkit.craftbukkit.v1_18_R2.entity.CraftLivingEntity;
-import org.bukkit.craftbukkit.v1_18_R2.inventory.CraftInventoryView;
-import org.bukkit.craftbukkit.v1_18_R2.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_20_R3.CraftRegistry;
+import org.bukkit.craftbukkit.v1_20_R3.block.data.CraftBlockData;
+import org.bukkit.craftbukkit.v1_20_R3.entity.CraftItem;
+import org.bukkit.craftbukkit.v1_20_R3.entity.CraftLivingEntity;
+import org.bukkit.craftbukkit.v1_20_R3.inventory.CraftInventoryView;
+import org.bukkit.craftbukkit.v1_20_R3.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_20_R3.legacy.CraftLegacy;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
@@ -41,11 +46,21 @@ import org.bukkit.inventory.ShapelessRecipe;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
-public final class NMSAdapter implements com.bgsoftware.wildtools.nms.NMSAdapter {
+public class NMSAdapterImpl implements NMSAdapter {
+
+    private static final ReflectField<Map<NamespacedKey, Enchantment>> REGISTRY_CACHE =
+            new ReflectField<>(CraftRegistry.class, Map.class, "cache");
 
     private static final ReflectField<ItemStack> ITEM_STACK_HANDLE = new ReflectField<>(
             CraftItemStack.class, ItemStack.class, "handle");
+
+    @Override
+    public void loadLegacy() {
+        // Load legacy by accessing the CraftLegacy class.
+        CraftLegacy.fromLegacy(Material.ACACIA_BOAT);
+    }
 
     @Override
     public ToolItemStack createToolItemStack(org.bukkit.inventory.ItemStack bukkitItem) {
@@ -93,6 +108,17 @@ public final class NMSAdapter implements com.bgsoftware.wildtools.nms.NMSAdapter
     }
 
     @Override
+    public Enchantment createGlowEnchantment() {
+        Enchantment enchantment = getGlowEnchant();
+
+        Map<NamespacedKey, Enchantment> registryCache = REGISTRY_CACHE.get(Registry.ENCHANTMENT);
+
+        registryCache.put(enchantment.getKey(), enchantment);
+
+        return enchantment;
+    }
+
+    @Override
     public int getFarmlandId() {
         return Block.getId(Blocks.FARMLAND.defaultBlockState());
     }
@@ -116,7 +142,7 @@ public final class NMSAdapter implements com.bgsoftware.wildtools.nms.NMSAdapter
     public void playPickupAnimation(org.bukkit.entity.LivingEntity bukkitLivingEntity, org.bukkit.entity.Item item) {
         LivingEntity livingEntity = ((CraftLivingEntity) bukkitLivingEntity).getHandle();
         ItemEntity itemEntity = (ItemEntity) ((CraftItem) item).getHandle();
-        ServerLevel serverLevel = (ServerLevel) livingEntity.level;
+        ServerLevel serverLevel = (ServerLevel) livingEntity.level();
 
         ClientboundTakeItemEntityPacket takeItemEntityPacket = new ClientboundTakeItemEntityPacket(itemEntity.getId(),
                 livingEntity.getId(), itemEntity.getItem().getCount());
@@ -183,7 +209,7 @@ public final class NMSAdapter implements com.bgsoftware.wildtools.nms.NMSAdapter
 
     @Override
     public AdvancedShapedRecipe createRecipe(String toolName, org.bukkit.inventory.ItemStack result) {
-        return new com.bgsoftware.wildtools.nms.recipe.AdvancedRecipeClassImpl(toolName, result);
+        return new com.bgsoftware.wildtools.nms.v1_20_R3.recipe.AdvancedRecipeClassImpl(toolName, result);
     }
 
 }
