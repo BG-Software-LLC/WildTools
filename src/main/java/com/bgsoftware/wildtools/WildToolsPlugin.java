@@ -4,7 +4,6 @@ import com.bgsoftware.common.dependencies.DependenciesManager;
 import com.bgsoftware.common.nmsloader.INMSLoader;
 import com.bgsoftware.common.nmsloader.NMSHandlersFactory;
 import com.bgsoftware.common.nmsloader.NMSLoadException;
-import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.wildtools.api.WildTools;
 import com.bgsoftware.wildtools.api.WildToolsAPI;
 import com.bgsoftware.wildtools.command.CommandsHandler;
@@ -19,21 +18,15 @@ import com.bgsoftware.wildtools.listeners.AnvilListener;
 import com.bgsoftware.wildtools.listeners.BlocksListener;
 import com.bgsoftware.wildtools.listeners.EditorListener;
 import com.bgsoftware.wildtools.listeners.PlayerListener;
-import com.bgsoftware.wildtools.metrics.Metrics;
 import com.bgsoftware.wildtools.nms.NMSAdapter;
 import com.bgsoftware.wildtools.nms.NMSWorld;
-import com.bgsoftware.wildtools.utils.Pair;
-import com.bgsoftware.wildtools.utils.ServerVersion;
-import org.bukkit.Bukkit;
-import org.bukkit.UnsafeValues;
+import org.bstats.bukkit.Metrics;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.lang.reflect.Field;
-import java.util.Arrays;
-import java.util.List;
 
 public class WildToolsPlugin extends JavaPlugin implements WildTools {
 
@@ -72,7 +65,7 @@ public class WildToolsPlugin extends JavaPlugin implements WildTools {
 
         this.nmsAdapter.loadLegacy();
 
-        new Metrics(this);
+        new Metrics(this, 4107);
 
         log("******** ENABLE START ********");
 
