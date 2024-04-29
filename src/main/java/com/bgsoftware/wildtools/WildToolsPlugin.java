@@ -4,6 +4,7 @@ import com.bgsoftware.common.dependencies.DependenciesManager;
 import com.bgsoftware.common.nmsloader.INMSLoader;
 import com.bgsoftware.common.nmsloader.NMSHandlersFactory;
 import com.bgsoftware.common.nmsloader.NMSLoadException;
+import com.bgsoftware.common.updater.Updater;
 import com.bgsoftware.wildtools.api.WildTools;
 import com.bgsoftware.wildtools.api.WildToolsAPI;
 import com.bgsoftware.wildtools.command.CommandsHandler;
@@ -29,6 +30,8 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.lang.reflect.Field;
 
 public class WildToolsPlugin extends JavaPlugin implements WildTools {
+
+    private final Updater updater = new Updater(this, "wildtools");
 
     private static WildToolsPlugin plugin;
 
@@ -95,10 +98,10 @@ public class WildToolsPlugin extends JavaPlugin implements WildTools {
         editorHandler = new EditorHandler(this);
         recipesHandler = new RecipesHandler(this);
 
-        if (Updater.isOutdated()) {
+        if (updater.isOutdated()) {
             log("");
-            log("A new version is available (v" + Updater.getLatestVersion() + ")!");
-            log("Version's description: \"" + Updater.getVersionDescription() + "\"");
+            log("A new version is available (v" + updater.getLatestVersion() + ")!");
+            log("Version's description: \"" + updater.getVersionDescription() + "\"");
             log("");
         }
 
@@ -177,6 +180,10 @@ public class WildToolsPlugin extends JavaPlugin implements WildTools {
 
     public NMSWorld getNMSWorld() {
         return nmsWorld;
+    }
+
+    public Updater getUpdater() {
+        return updater;
     }
 
     public static void log(String message) {
