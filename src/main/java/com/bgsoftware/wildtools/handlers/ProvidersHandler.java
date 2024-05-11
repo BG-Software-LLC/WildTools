@@ -338,7 +338,7 @@ public class ProvidersHandler implements ProvidersManager {
             if (factions.getDescription().getAuthors().contains("drtshock")) {
                 Optional<ClaimsProvider> claimsProvider = createInstance("ClaimsProvider_FactionsUUID");
                 claimsProvider.ifPresent(this::addClaimsProvider);
-            } else {
+            } else if(factions.getDescription().getWebsite().contains("massivecraft")) {
                 Optional<ClaimsProvider> claimsProvider = createInstance("ClaimsProvider_MassiveFactions");
                 claimsProvider.ifPresent(this::addClaimsProvider);
             }
