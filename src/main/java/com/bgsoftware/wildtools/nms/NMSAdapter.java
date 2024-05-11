@@ -18,10 +18,15 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.Recipe;
 import org.bukkit.inventory.ShapedRecipe;
 
+import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.Map;
 
 public interface NMSAdapter {
+
+    default void loadLegacy() {
+
+    }
 
     ToolItemStack createToolItemStack(ItemStack other);
 
@@ -32,6 +37,25 @@ public interface NMSAdapter {
     Collection<Player> getOnlinePlayers();
 
     Enchantment getGlowEnchant();
+
+    default Enchantment createGlowEnchantment() {
+        Enchantment glowEnchant = getGlowEnchant();
+
+        try {
+            Field field = Enchantment.class.getDeclaredField("acceptingNew");
+            field.setAccessible(true);
+            field.set(null, true);
+            field.setAccessible(false);
+        } catch (Exception ignored) {
+        }
+
+        try {
+            Enchantment.registerEnchantment(glowEnchant);
+        } catch (Exception ignored) {
+        }
+
+        return glowEnchant;
+    }
 
     int getFarmlandId();
 

@@ -22,9 +22,4 @@ public class StackedItemProvider_WildStacker implements StackedItemProvider {
         WildStackerAPI.getWildStacker().getSystemManager().spawnItemWithAmount(location, itemStack, count);
     }
 
-    @Override
-    public boolean skipPickupItemEventCall() {
-        return true;
-    }
-
 }

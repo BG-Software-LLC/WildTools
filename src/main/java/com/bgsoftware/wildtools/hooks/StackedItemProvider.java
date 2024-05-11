@@ -16,8 +16,4 @@ public interface StackedItemProvider {
         dropItem(location, itemStack, itemStack.getAmount());
     }
 
-    default boolean skipPickupItemEventCall() {
-        return false;
-    }
-
 }

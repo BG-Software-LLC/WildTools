@@ -35,9 +35,4 @@ public class StackedItemProvider_Default implements StackedItemProvider {
         }
     }
 
-    @Override
-    public boolean skipPickupItemEventCall() {
-        return false;
-    }
-
 }

@@ -20,6 +20,7 @@ import org.bukkit.event.player.PlayerItemDamageEvent;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 public class BlocksListener implements Listener {
 
@@ -266,33 +267,38 @@ public class BlocksListener implements Listener {
     }
 
     private String getTime(long timeLeft) {
-        String time = "";
+        StringBuilder timeAsString = new StringBuilder();
 
-        // Get rid of miliseconds
-        timeLeft = timeLeft / 1000;
+        // Convert time to seconds
+        timeLeft = TimeUnit.MILLISECONDS.toSeconds(timeLeft);
 
         if (timeLeft >= 3600) {
-            if (timeLeft / 3600 == 1)
-                time += "1 hour, ";
-            else time += (timeLeft / 3600) + " hours, ";
+            long hoursLeft = timeLeft / 3600;
+            if (hoursLeft == 1) {
+                timeAsString.append(", 1 hour");
+            } else {
+                timeAsString.append(", ").append(hoursLeft).append(" hours");
+            }
             timeLeft %= 3600;
         }
 
         if (timeLeft >= 60) {
-            if (timeLeft / 60 == 1)
-                time += "1 minute, ";
-            else time += (timeLeft / 60) + " minutes, ";
+            long minutesLeft = timeLeft / 60;
+            if (minutesLeft == 1) {
+                timeAsString.append(", 1 minute");
+            } else {
+                timeAsString.append(", ").append(minutesLeft).append(" minutes");
+            }
             timeLeft %= 60;
         }
 
-        if (timeLeft != 0) {
-            if (timeLeft == 1)
-                time += timeLeft + " second";
-            else time += timeLeft + " seconds";
-            return time;
+        if (timeLeft == 1) {
+            timeAsString.append(", 1 second");
+        } else {
+            timeAsString.append(", ").append(timeLeft).append(" seconds");
         }
 
-        return time.substring(0, time.length() - 2);
+        return timeAsString.substring(2);
     }
 
 }
