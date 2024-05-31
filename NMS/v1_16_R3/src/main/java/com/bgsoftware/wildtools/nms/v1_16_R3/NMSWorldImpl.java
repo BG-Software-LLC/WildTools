@@ -11,6 +11,7 @@ import com.destroystokyo.paper.antixray.ChunkPacketBlockControllerAntiXray;
 import com.tuinity.tuinity.chunk.light.StarLightInterface;
 import net.minecraft.server.v1_16_R3.Block;
 import net.minecraft.server.v1_16_R3.BlockPosition;
+import net.minecraft.server.v1_16_R3.BlockProperties;
 import net.minecraft.server.v1_16_R3.Chunk;
 import net.minecraft.server.v1_16_R3.ChunkProviderServer;
 import net.minecraft.server.v1_16_R3.EntityPlayer;
@@ -167,8 +168,11 @@ public class NMSWorldImpl implements NMSWorld {
     }
 
     @Override
-    public int getCombinedId(org.bukkit.block.Block block) {
-        return Block.getCombinedId(((CraftBlock) block).getNMS());
+    public int getCombinedId(org.bukkit.block.Block bukkitBlock) {
+        IBlockData blockData = ((CraftBlock) bukkitBlock).getNMS();
+        if (blockData.get(BlockProperties.C))
+            blockData = blockData.set(BlockProperties.C, false);
+        return Block.getCombinedId(blockData);
     }
 
     @Override

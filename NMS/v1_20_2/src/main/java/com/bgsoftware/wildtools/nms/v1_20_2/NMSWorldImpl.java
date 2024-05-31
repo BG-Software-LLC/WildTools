@@ -15,6 +15,7 @@ import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.chunk.LevelChunk;
 import org.bukkit.CropState;
 import org.bukkit.Location;
@@ -137,7 +138,10 @@ public class NMSWorldImpl implements NMSWorld {
 
     @Override
     public int getCombinedId(org.bukkit.block.Block bukkitBlock) {
-        return Block.getId(((CraftBlock) bukkitBlock).getNMS());
+        BlockState blockState = ((CraftBlock) bukkitBlock).getNMS();
+        if (blockState.getValue(BlockStateProperties.WATERLOGGED))
+            blockState = blockState.setValue(BlockStateProperties.WATERLOGGED, false);
+        return Block.getId(blockState);
     }
 
     @Override
