@@ -149,7 +149,7 @@ public class NMSWorldImpl implements NMSWorld {
     @Override
     public int getCombinedId(org.bukkit.block.Block bukkitBlock) {
         BlockState blockState = ((CraftBlock) bukkitBlock).getNMS();
-        if (blockState.getValue(BlockStateProperties.WATERLOGGED))
+        if (blockState.hasProperty(BlockStateProperties.WATERLOGGED))
             blockState = blockState.setValue(BlockStateProperties.WATERLOGGED, false);
         return Block.getId(blockState);
     }
