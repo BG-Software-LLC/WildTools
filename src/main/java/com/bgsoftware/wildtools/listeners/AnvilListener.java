@@ -2,7 +2,7 @@ package com.bgsoftware.wildtools.listeners;
 
 import com.bgsoftware.wildtools.WildToolsPlugin;
 import com.bgsoftware.wildtools.api.objects.tools.Tool;
-import com.bgsoftware.wildtools.utils.Executor;
+import com.bgsoftware.wildtools.scheduler.Scheduler;
 import com.bgsoftware.wildtools.utils.items.ToolItemStack;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -99,15 +99,15 @@ public class AnvilListener implements Listener {
                 itemMeta.setDisplayName(renameText);
                 result.setItemMeta(itemMeta);
                 //We must set the exp 1 tick later - or renaming the item won't refresh exp
-                Executor.sync(() -> plugin.getNMSAdapter().setExpCost(e.getView(), expCost + 1), 1L);
+                Scheduler.runTask(() -> plugin.getNMSAdapter().setExpCost(e.getView(), expCost + 1), 1L);
             } else {
                 //We must set the exp 1 tick later - or renaming the item won't refresh exp
-                Executor.sync(() -> plugin.getNMSAdapter().setExpCost(e.getView(), expCost), 1L);
+                Scheduler.runTask(() -> plugin.getNMSAdapter().setExpCost(e.getView(), expCost), 1L);
             }
         }
 
         recentPrepares.add(anvilInventory);
-        Executor.sync(() -> recentPrepares.remove(anvilInventory), 5L);
+        Scheduler.runTask(() -> recentPrepares.remove(anvilInventory), 5L);
 
 
         result.setUses(finalUses);

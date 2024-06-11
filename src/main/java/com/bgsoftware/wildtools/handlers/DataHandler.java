@@ -18,7 +18,7 @@ import com.bgsoftware.wildtools.api.objects.tools.SellTool;
 import com.bgsoftware.wildtools.api.objects.tools.SortTool;
 import com.bgsoftware.wildtools.api.objects.tools.Tool;
 import com.bgsoftware.wildtools.hooks.PricesProvider_Default;
-import com.bgsoftware.wildtools.utils.Executor;
+import com.bgsoftware.wildtools.scheduler.Scheduler;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 
@@ -64,7 +64,7 @@ public class DataHandler {
 
         ProvidersHandler.pricesPlugin = cfg.getString("prices-plugin", "ShopGUIPlus");
 
-        Executor.sync(() -> {
+        Scheduler.runTask(() -> {
             plugin.getEvents().loadClaimingPlugins(cfg.getStringList("events-manipulations.claiming-plugins"));
             plugin.getEvents().loadNotifiedPlugins(cfg.getStringList("events-manipulations.other-plugins"));
         }, 20L);

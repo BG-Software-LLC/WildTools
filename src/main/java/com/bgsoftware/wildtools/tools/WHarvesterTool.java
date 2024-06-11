@@ -5,8 +5,8 @@ import com.bgsoftware.wildtools.api.events.HarvesterHoeSellEvent;
 import com.bgsoftware.wildtools.api.events.HarvesterHoeUseEvent;
 import com.bgsoftware.wildtools.api.objects.ToolMode;
 import com.bgsoftware.wildtools.api.objects.tools.HarvesterTool;
+import com.bgsoftware.wildtools.scheduler.Scheduler;
 import com.bgsoftware.wildtools.utils.BukkitUtils;
-import com.bgsoftware.wildtools.utils.Executor;
 import com.bgsoftware.wildtools.utils.Materials;
 import com.bgsoftware.wildtools.utils.items.ItemUtils;
 import com.bgsoftware.wildtools.utils.items.ToolItemStack;
@@ -25,7 +25,9 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class WHarvesterTool extends WTool implements HarvesterTool {
 
@@ -167,7 +169,7 @@ public class WHarvesterTool extends WTool implements HarvesterTool {
 
         int toolDurability = getDurability(player, usedItem.getItem());
         boolean usingDurability = isUsingDurability();
-        List<Location> alreadyBroken = new ArrayList<>();
+        Set<Location> alreadyBroken = new HashSet<>();
         int toolUsages = 0;
 
         outerLoop:
@@ -280,22 +282,26 @@ public class WHarvesterTool extends WTool implements HarvesterTool {
     }
 
     private int breakChorusFruit(Player player, Block block, ItemStack usedItem, SellInfo sellInfo,
-                                 List<Location> alreadyBroken, int toolUsages, int toolDurability,
+                                 Set<Location> alreadyBroken, int toolUsages, int toolDurability,
                                  boolean usingDurability, boolean foundFlower, WorldEditSession editSession) {
         int currentUsages = 0;
-
-        if (alreadyBroken.contains(block.getLocation()))
-            return currentUsages;
 
         if (usingDurability && toolUsages >= toolDurability)
             return currentUsages;
 
-        alreadyBroken.add(block.getLocation());
+        Location blockLocation = block.getLocation();
+
+        if (!alreadyBroken.add(blockLocation))
+            return currentUsages;
 
         if (block.getRelative(BlockFace.DOWN).getType().name().contains("END")) {
-            Executor.sync(() -> {
+            Scheduler.runTask(blockLocation, () -> {
                 block.setType(CHORUS_FLOWER);
-                player.getInventory().removeItem(new ItemStack(CHORUS_FLOWER));
+                if (Scheduler.isRegionScheduler()) {
+                    Scheduler.runTask(player, () -> player.getInventory().removeItem(new ItemStack(CHORUS_FLOWER)));
+                } else {
+                    player.getInventory().removeItem(new ItemStack(CHORUS_FLOWER));
+                }
             }, 2L);
             return currentUsages;
         }

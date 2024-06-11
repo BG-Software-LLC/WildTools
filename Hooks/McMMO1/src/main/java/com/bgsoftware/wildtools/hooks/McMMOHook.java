@@ -4,9 +4,9 @@ import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.wildtools.Locale;
 import com.bgsoftware.wildtools.WildToolsPlugin;
 import com.bgsoftware.wildtools.hooks.listener.IToolBlockListener;
+import com.bgsoftware.wildtools.scheduler.Scheduler;
 import com.bgsoftware.wildtools.utils.math.Vector3;
 import com.gmail.nossr50.events.skills.abilities.McMMOPlayerAbilityActivateEvent;
-import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.event.EventHandler;
@@ -83,7 +83,7 @@ public class McMMOHook {
             if (!messageCooldowns.contains(e.getPlayer().getUniqueId())) {
                 Locale.MCMMO_TOOL_SUPER_BREAKER.send(e.getPlayer());
                 messageCooldowns.add(e.getPlayer().getUniqueId());
-                Bukkit.getScheduler().runTaskLater(plugin, () -> messageCooldowns.remove(e.getPlayer().getUniqueId()), 100L);
+                Scheduler.runTask(() -> messageCooldowns.remove(e.getPlayer().getUniqueId()), 100L);
             }
         }
 

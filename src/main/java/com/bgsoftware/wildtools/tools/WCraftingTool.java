@@ -4,8 +4,8 @@ import com.bgsoftware.wildtools.Locale;
 import com.bgsoftware.wildtools.api.events.CraftingWandUseEvent;
 import com.bgsoftware.wildtools.api.objects.ToolMode;
 import com.bgsoftware.wildtools.api.objects.tools.CraftingTool;
+import com.bgsoftware.wildtools.scheduler.Scheduler;
 import com.bgsoftware.wildtools.utils.BukkitUtils;
-import com.bgsoftware.wildtools.utils.Executor;
 import com.bgsoftware.wildtools.recipes.RecipeChoice;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -103,7 +103,7 @@ public class WCraftingTool extends WTool implements CraftingTool {
             }
         }
 
-        Executor.sync(() -> {
+        Scheduler.runTask(e.getPlayer(), () -> {
             CraftingWandUseEvent craftingWandUseEvent = new CraftingWandUseEvent(e.getPlayer(), this,
                     toAdd.stream().map(ItemStack::clone).collect(Collectors.toList()));
             Bukkit.getPluginManager().callEvent(craftingWandUseEvent);

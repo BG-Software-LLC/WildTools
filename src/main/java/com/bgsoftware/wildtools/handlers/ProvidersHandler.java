@@ -20,7 +20,7 @@ import com.bgsoftware.wildtools.hooks.PricesProvider_ShopsBridgeWrapper;
 import com.bgsoftware.wildtools.hooks.StackedItemProvider;
 import com.bgsoftware.wildtools.hooks.StackedItemProvider_Default;
 import com.bgsoftware.wildtools.hooks.listener.IToolBlockListener;
-import com.bgsoftware.wildtools.utils.Executor;
+import com.bgsoftware.wildtools.scheduler.Scheduler;
 import com.bgsoftware.wildtools.utils.math.Vector3;
 import com.google.common.collect.Lists;
 import org.bukkit.Bukkit;
@@ -64,7 +64,7 @@ public class ProvidersHandler implements ProvidersManager {
     public ProvidersHandler(WildToolsPlugin plugin) {
         this.plugin = plugin;
         this.defaultContainer = new ContainerProvider_Default(plugin);
-        Executor.sync(this::loadProviders, 1L);
+        Scheduler.runTask(this::loadProviders, 1L);
     }
 
     /*

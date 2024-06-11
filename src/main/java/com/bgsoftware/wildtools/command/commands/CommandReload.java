@@ -1,14 +1,13 @@
 package com.bgsoftware.wildtools.command.commands;
 
-import com.bgsoftware.wildtools.command.ICommand;
 import com.bgsoftware.wildtools.Locale;
 import com.bgsoftware.wildtools.WildToolsPlugin;
+import com.bgsoftware.wildtools.command.ICommand;
 import com.bgsoftware.wildtools.handlers.DataHandler;
-
 import com.bgsoftware.wildtools.handlers.ProvidersHandler;
-import com.bgsoftware.wildtools.utils.Executor;
-import org.bukkit.command.CommandSender;
 import com.bgsoftware.wildtools.handlers.ToolsHandler;
+import com.bgsoftware.wildtools.scheduler.Scheduler;
+import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -47,7 +46,7 @@ public class CommandReload implements ICommand {
 
     @Override
     public void run(WildToolsPlugin plugin, CommandSender sender, String[] args) {
-        Executor.async(() -> {
+        Scheduler.runTaskAsync(() -> {
             WildToolsPlugin.log("******** RELOAD START ********");
             ToolsHandler.reload();
             DataHandler.reload();

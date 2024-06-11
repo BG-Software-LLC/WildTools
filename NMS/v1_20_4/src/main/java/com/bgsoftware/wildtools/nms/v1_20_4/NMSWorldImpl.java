@@ -1,7 +1,7 @@
 package com.bgsoftware.wildtools.nms.v1_20_4;
 
 import com.bgsoftware.wildtools.nms.NMSWorld;
-import com.bgsoftware.wildtools.utils.Executor;
+import com.bgsoftware.wildtools.scheduler.Scheduler;
 import com.bgsoftware.wildtools.utils.math.Vector3;
 import com.bgsoftware.wildtools.utils.world.WorldEditSession;
 import net.minecraft.core.BlockPos;
@@ -129,7 +129,7 @@ public class NMSWorldImpl implements NMSWorld {
 
         ChunkPos chunkPos = levelChunk.getPos();
 
-        Executor.sync(() -> {
+        Scheduler.runTask(levelChunk.level.getWorld(), chunkPos.x, chunkPos.z, () -> {
             ClientboundLightUpdatePacket lightUpdatePacket = new ClientboundLightUpdatePacket(
                     chunkPos, lightEngine, null, null);
             NMSUtils.sendPacketToRelevantPlayers(levelChunk.level, chunkPos.x, chunkPos.z, lightUpdatePacket);
