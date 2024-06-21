@@ -27,6 +27,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import javax.annotation.Nullable;
 import java.lang.reflect.Field;
 
 public class WildToolsPlugin extends JavaPlugin implements WildTools {
@@ -148,6 +149,7 @@ public class WildToolsPlugin extends JavaPlugin implements WildTools {
         }
     }
 
+    @Nullable
     public Enchantment getGlowEnchant() {
         return glowEnchant;
     }

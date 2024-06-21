@@ -220,8 +220,11 @@ public class DataHandler {
             if (cfg.contains("tools." + name + ".lore"))
                 tool.setLore(cfg.getStringList("tools." + name + ".lore"));
 
-            if (cfg.getBoolean("tools." + name + ".glow", false))
-                tool.addEnchantment(plugin.getGlowEnchant(), 1);
+            if (cfg.getBoolean("tools." + name + ".glow", false)) {
+                Enchantment glowEnchant = plugin.getGlowEnchant();
+                if (glowEnchant != null)
+                    tool.addEnchantment(glowEnchant, 1);
+            }
 
             if (cfg.getBoolean("tools." + name + ".spigot-unbreakable", false))
                 tool.setSpigotUnbreakable(cfg.getBoolean("tools." + name + ".spigot-unbreakable"));
