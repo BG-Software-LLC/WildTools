@@ -4,14 +4,16 @@ import com.bgsoftware.common.reflection.ClassInfo;
 import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.wildtools.nms.NMSWorld;
-import com.bgsoftware.wildtools.utils.Executor;
+import com.bgsoftware.wildtools.scheduler.Scheduler;
 import com.bgsoftware.wildtools.utils.math.Vector3;
 import com.bgsoftware.wildtools.utils.world.WorldEditSession;
 import com.destroystokyo.paper.antixray.ChunkPacketBlockControllerAntiXray;
 import com.tuinity.tuinity.chunk.light.StarLightInterface;
 import net.minecraft.server.v1_16_R3.Block;
 import net.minecraft.server.v1_16_R3.BlockPosition;
+import net.minecraft.server.v1_16_R3.BlockProperties;
 import net.minecraft.server.v1_16_R3.Chunk;
+import net.minecraft.server.v1_16_R3.ChunkCoordIntPair;
 import net.minecraft.server.v1_16_R3.ChunkProviderServer;
 import net.minecraft.server.v1_16_R3.EntityPlayer;
 import net.minecraft.server.v1_16_R3.IBlockData;
@@ -36,11 +38,8 @@ import org.bukkit.craftbukkit.v1_16_R3.inventory.CraftItemStack;
 import org.bukkit.entity.Player;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 public class NMSWorldImpl implements NMSWorld {
 
@@ -133,7 +132,6 @@ public class NMSWorldImpl implements NMSWorld {
     @Override
     public void refreshChunk(org.bukkit.Chunk bukkitChunk, List<WorldEditSession.BlockData> blocksList) {
         Chunk chunk = ((CraftChunk) bukkitChunk).getHandle();
-        Map<Integer, Set<Short>> blocks = new HashMap<>();
         WorldServer worldServer = (WorldServer) chunk.getWorld();
 
         ChunkProviderServer chunkProviderServer = worldServer.getChunkProvider();
@@ -160,15 +158,19 @@ public class NMSWorldImpl implements NMSWorld {
                 lightEngine.a(blockPosition);
             }
 
-            Executor.sync(() -> NMSUtils.sendPacketToRelevantPlayers(worldServer, chunk.getPos().x, chunk.getPos().z,
-                            new PacketPlayOutLightUpdate(chunk.getPos(), lightEngine, true)),
-                    2L);
+            ChunkCoordIntPair chunkCoord = chunk.getPos();
+            Scheduler.runTask(worldServer.getWorld(), chunkCoord.x, chunkCoord.z, () ->
+                            NMSUtils.sendPacketToRelevantPlayers(worldServer, chunkCoord.x, chunkCoord.z,
+                                    new PacketPlayOutLightUpdate(chunkCoord, lightEngine, true)), 2L);
         }
     }
 
     @Override
-    public int getCombinedId(org.bukkit.block.Block block) {
-        return Block.getCombinedId(((CraftBlock) block).getNMS());
+    public int getCombinedId(org.bukkit.block.Block bukkitBlock) {
+        IBlockData blockData = ((CraftBlock) bukkitBlock).getNMS();
+        if (blockData.contains(BlockProperties.C))
+            blockData = blockData.set(BlockProperties.C, false);
+        return Block.getCombinedId(blockData);
     }
 
     @Override

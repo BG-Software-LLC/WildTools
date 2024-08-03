@@ -31,7 +31,7 @@ public class FakeCraftBlock extends CraftBlock {
 
     @Override
     public BlockData getBlockData() {
-        return CraftBlockData.newData(blockType, null);
+        return blockType.createBlockData((String) null);
     }
 
     @Override

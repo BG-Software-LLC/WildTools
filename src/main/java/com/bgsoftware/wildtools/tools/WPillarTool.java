@@ -4,7 +4,9 @@ import com.bgsoftware.wildtools.api.events.PillarWandUseEvent;
 import com.bgsoftware.wildtools.api.objects.ToolMode;
 import com.bgsoftware.wildtools.api.objects.tools.PillarTool;
 import com.bgsoftware.wildtools.utils.BukkitUtils;
+import com.bgsoftware.wildtools.utils.ServerVersion;
 import com.bgsoftware.wildtools.utils.world.WorldEditSession;
+import com.bgsoftware.wildtools.world.BlockMaterial;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -13,6 +15,8 @@ import org.bukkit.block.Block;
 import org.bukkit.event.player.PlayerInteractEvent;
 
 public class WPillarTool extends WTool implements PillarTool {
+
+    private static final int MIN_WORLD_HEIGHT = ServerVersion.isAtLeast(ServerVersion.v1_18) ? -64 : 0;
 
     public WPillarTool(Material type, String name) {
         super(type, name, ToolMode.PILLAR);
@@ -23,8 +27,7 @@ public class WPillarTool extends WTool implements PillarTool {
         int maxY = getPoint(e.getClickedBlock(), true), minY = getPoint(e.getClickedBlock(), false),
                 x = e.getClickedBlock().getLocation().getBlockX(), z = e.getClickedBlock().getLocation().getBlockZ();
 
-        Material firstType = e.getClickedBlock().getType();
-        short firstData = e.getClickedBlock().getState().getData().toItemStack().getDurability();
+        BlockMaterial firstBlockMaterial = BlockMaterial.of(e.getClickedBlock());
 
         World world = e.getClickedBlock().getWorld();
 
@@ -39,7 +42,7 @@ public class WPillarTool extends WTool implements PillarTool {
 
             Block targetBlock = world.getBlockAt(x, y, z);
 
-            if (!BukkitUtils.canBreakBlock(e.getPlayer(), targetBlock, firstType, firstData, this))
+            if (!BukkitUtils.canBreakBlock(e.getPlayer(), targetBlock, firstBlockMaterial, this))
                 continue;
 
             if (!BukkitUtils.breakBlock(e.getPlayer(), targetBlock, e.getItem(), this, editSession, null))
@@ -70,15 +73,25 @@ public class WPillarTool extends WTool implements PillarTool {
         if (max) {
             while (isSameBlock) {
                 loc.add(0, 1, 0);
-                isSameBlock = canBreakBlock(block, loc.getBlock().getType(), loc.getBlock().getState().getData().toItemStack().getDurability()) && loc.getBlockY() <= 256;
+                if (loc.getBlockY() > block.getWorld().getMaxHeight()) {
+                    isSameBlock = false;
+                } else {
+                    BlockMaterial blockMaterial = BlockMaterial.of(loc.getBlock());
+                    isSameBlock = canBreakBlock(block, blockMaterial.getType(), blockMaterial.getData());
+                }
             }
         }
 
         //Find min block
         else {
             while (isSameBlock) {
-                loc = loc.clone().subtract(0, 1, 0);
-                isSameBlock = canBreakBlock(block, loc.getBlock().getType(), loc.getBlock().getState().getData().toItemStack().getDurability()) && loc.getBlockY() >= 0;
+                loc = loc.subtract(0, 1, 0);
+                if (loc.getBlockY() < MIN_WORLD_HEIGHT) {
+                    isSameBlock = false;
+                } else {
+                    BlockMaterial blockMaterial = BlockMaterial.of(loc.getBlock());
+                    isSameBlock = canBreakBlock(block, blockMaterial.getType(), blockMaterial.getData());
+                }
             }
         }
 

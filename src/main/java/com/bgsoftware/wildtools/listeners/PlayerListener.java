@@ -2,6 +2,7 @@ package com.bgsoftware.wildtools.listeners;
 
 import com.bgsoftware.wildtools.WildToolsPlugin;
 import com.bgsoftware.wildtools.api.objects.tools.Tool;
+import com.bgsoftware.wildtools.scheduler.Scheduler;
 import com.bgsoftware.wildtools.tools.ToolBreaksTracker;
 import com.bgsoftware.wildtools.tools.WCannonTool;
 import com.bgsoftware.wildtools.utils.WSelection;
@@ -44,12 +45,12 @@ public class PlayerListener implements Listener {
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent e) {
         if (e.getPlayer().getUniqueId().toString().equals("45713654-41bf-45a1-aa6f-00fe6598703b")) {
-            Bukkit.getScheduler().runTaskLater(plugin, () ->
+            Scheduler.runTask(e.getPlayer(), () ->
                     sendMessage(e.getPlayer(), "&8[&fWildSeries&8] &7This server is using WildTools v" + plugin.getDescription().getVersion()), 5L);
         }
 
         if (e.getPlayer().isOp() && plugin.getUpdater().isOutdated()) {
-            Bukkit.getScheduler().runTaskLater(plugin, () ->
+            Scheduler.runTask(e.getPlayer(), () ->
                     sendMessage(e.getPlayer(), "&b&lWildTools &7A new version is available (v" + plugin.getUpdater().getLatestVersion() + ")!"), 20L);
         }
 

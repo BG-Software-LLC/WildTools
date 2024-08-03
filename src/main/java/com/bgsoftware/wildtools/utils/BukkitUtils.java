@@ -5,6 +5,7 @@ import com.bgsoftware.wildtools.WildToolsPlugin;
 import com.bgsoftware.wildtools.api.objects.tools.Tool;
 import com.bgsoftware.wildtools.utils.items.ItemUtils;
 import com.bgsoftware.wildtools.utils.world.WorldEditSession;
+import com.bgsoftware.wildtools.world.BlockMaterial;
 import org.bukkit.CropState;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -42,7 +43,7 @@ public class BukkitUtils {
             "BEDROCK", "COMMAND", "REPEATING_COMMAND_BLOCK", "CHAIN_COMMAND_BLOCK", "COMMAND_BLOCK", "WATER",
             "STATIONARY_WATER", "LAVA", "STATIONARY_LAVA", "END_PORTAL_FRAME", "ENDER_PORTAL_FRAME", "BARRIER",
             "STRUCTURE_BLOCK", "STRUCTURE_VOID", "CAVE_AIR", "END_PORTAL", "ENDER_PORTAL", "NETHER_PORTAL", "PORTAL",
-            "BUBBLE_COLUMN", "REINFORCED_DEEPSLATE"
+            "BUBBLE_COLUMN"
     });
     private static final EnumSet<Material> FORCE_UPDATE_MATERIALS = createDisallowedBlocks(new String[]{
             "WATER", "STATIONARY_WATER", "LAVA", "STATIONARY_LAVA", "ENDER_PORTAL", "NETHER_PORTAL", "PORTAL",
@@ -50,16 +51,17 @@ public class BukkitUtils {
     });
 
     public static boolean canBreakBlock(Player player, Block block, Tool tool) {
-        return canBreakBlock(player, block, block.getType(), block.getState().getData().toItemStack().getDurability(), tool);
+        return canBreakBlock(player, block, BlockMaterial.of(block), tool);
     }
 
-    public static boolean canBreakBlock(Player player, Block block, Material firstType, short firstData, Tool tool) {
-        return canBreakBlock(player, block, firstType, firstData, tool, true);
+    public static boolean canBreakBlock(Player player, Block block, BlockMaterial firstBlockMaterial, Tool tool) {
+        return canBreakBlock(player, block, firstBlockMaterial, tool, true);
     }
 
-    public static boolean canBreakBlock(Player player, Block block, Material firstType, short firstData, Tool tool,
+    public static boolean canBreakBlock(Player player, Block block, BlockMaterial firstBlockMaterial, Tool tool,
                                         boolean checkDisallowedBlocks) {
-        return (!checkDisallowedBlocks || !DISALLOWED_BLOCKS.contains(block.getType())) && tool.canBreakBlock(block, firstType, firstData) &&
+        return (!checkDisallowedBlocks || !DISALLOWED_BLOCKS.contains(block.getType())) &&
+                tool.canBreakBlock(block, firstBlockMaterial.getType(), firstBlockMaterial.getData()) &&
                 (!tool.isOnlyInsideClaim() || plugin.getProviders().isInsideClaim(player, block.getLocation())) &&
                 !plugin.getNMSWorld().isOutsideWorldBorder(block.getLocation());
     }

@@ -3,8 +3,8 @@ package com.bgsoftware.wildtools.utils.items;
 import com.bgsoftware.wildtools.Locale;
 import com.bgsoftware.wildtools.WildToolsPlugin;
 import com.bgsoftware.wildtools.api.objects.tools.Tool;
+import com.bgsoftware.wildtools.scheduler.Scheduler;
 import com.bgsoftware.wildtools.tools.WHarvesterTool;
-import com.bgsoftware.wildtools.utils.Executor;
 import com.bgsoftware.wildtools.utils.Materials;
 import com.bgsoftware.wildtools.utils.world.WorldEditSession;
 import org.bukkit.Bukkit;
@@ -41,7 +41,7 @@ public class ItemUtils {
             } else {
                 ItemStackMap itemsToDrop = new ItemStackMap();
                 itemsToDrop.addItems(additionalItems.values());
-                Executor.sync(() -> itemsToDrop.forEach((itemToDrop, count) -> plugin.getProviders()
+                Scheduler.runTask(location, () -> itemsToDrop.forEach((itemToDrop, count) -> plugin.getProviders()
                         .getStackedItemProvider().dropItem(location, itemToDrop, count.get())));
             }
         }

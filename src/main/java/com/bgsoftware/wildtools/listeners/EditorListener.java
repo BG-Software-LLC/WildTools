@@ -1,7 +1,7 @@
 package com.bgsoftware.wildtools.listeners;
 
 import com.bgsoftware.wildtools.WildToolsPlugin;
-import com.bgsoftware.wildtools.utils.Executor;
+import com.bgsoftware.wildtools.scheduler.Scheduler;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -58,7 +58,7 @@ public class EditorListener implements Listener {
     public void onInventoryClickMonitor(InventoryClickEvent e){
         if(e.getCurrentItem() != null && e.isCancelled() && Arrays.stream(inventoryTitles).anyMatch(title -> e.getView().getTitle().contains(title))) {
             latestClickedItem.put(e.getWhoClicked().getUniqueId(), e.getCurrentItem());
-            Bukkit.getScheduler().runTaskLater(plugin, () -> latestClickedItem.remove(e.getWhoClicked().getUniqueId()), 20L);
+            Scheduler.runTask(() -> latestClickedItem.remove(e.getWhoClicked().getUniqueId()), 20L);
         }
     }
 
@@ -66,7 +66,7 @@ public class EditorListener implements Listener {
     public void onInventoryCloseMonitor(InventoryCloseEvent e){
         if(latestClickedItem.containsKey(e.getPlayer().getUniqueId())){
             ItemStack clickedItem = latestClickedItem.get(e.getPlayer().getUniqueId());
-            Bukkit.getScheduler().runTaskLater(plugin, () -> {
+            Scheduler.runTask(e.getPlayer(), () -> {
                 e.getPlayer().getInventory().removeItem(clickedItem);
                 ((Player) e.getPlayer()).updateInventory();
             }, 1L);
@@ -91,14 +91,14 @@ public class EditorListener implements Listener {
                     toolValues.put(player.getUniqueId(), "prices-list");
                     player.sendMessage("" + ChatColor.AQUA + ChatColor.BOLD + "WildTools" + ChatColor.GRAY + " Please enter a new value (-cancel to cancel):");
                     player.sendMessage("" + ChatColor.AQUA + ChatColor.BOLD + "WildTools" + ChatColor.GRAY + " If you enter a value that is already in the list, it will be removed.");
-                    Bukkit.getScheduler().runTaskLater(plugin, () -> player.closeInventory(), 1L);
+                    Scheduler.runTask(player, () -> player.closeInventory(), 1L);
                     break;
                 case 23:
                     noResetClose.add(player.getUniqueId());
                     player.openInventory(plugin.getEditor().getToolsEditor());
                     break;
                 case 40:
-                    Executor.async(() -> {
+                    Scheduler.runTaskAsync(() -> {
                         plugin.getEditor().saveConfiguration();
                         player.sendMessage("" + ChatColor.AQUA + ChatColor.BOLD + "WildTools " + ChatColor.GRAY + "Saved configuration successfully.");
                     });
@@ -237,7 +237,7 @@ public class EditorListener implements Listener {
                     return;
             }
 
-            Bukkit.getScheduler().runTaskLater(plugin, () -> player.closeInventory(), 1L);
+            Scheduler.runTask(player, () -> player.closeInventory(), 1L);
             player.sendMessage("" + ChatColor.AQUA + ChatColor.BOLD + "WildTools" + ChatColor.GRAY + " Please enter a new value (-cancel to cancel):");
 
             if(Arrays.asList(listValues).contains(toolValues.get(player.getUniqueId()))){
@@ -259,11 +259,10 @@ public class EditorListener implements Listener {
 
         Player player = (Player) e.getPlayer();
 
-        Bukkit.getScheduler().runTaskLater(plugin, () -> {
+        Scheduler.runTask(player, () -> {
             if(e.getView().getTitle().equals("" + ChatColor.AQUA + ChatColor.BOLD + "WildTools")){
                 if(!noResetClose.contains(player.getUniqueId())) {
-                    Bukkit.getScheduler().runTaskAsynchronously(plugin, () ->
-                            plugin.getEditor().reloadConfiguration());
+                    Scheduler.runTaskAsync(() -> plugin.getEditor().reloadConfiguration());
                 }
             }
 
@@ -311,7 +310,7 @@ public class EditorListener implements Listener {
                         ToolMode toolMode = ToolMode.valueOf(e.getMessage().toUpperCase());
                         plugin.getEditor().createTool(toolValues.get(e.getPlayer().getUniqueId()), toolMode);
                         toolTypes.put(e.getPlayer().getUniqueId(), toolValues.get(e.getPlayer().getUniqueId()));
-                        Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, () -> toolTypes.remove(e.getPlayer().getName()), 1L);
+                        Scheduler.runTask(() -> toolTypes.remove(e.getPlayer().getName()), 1L);
                     }catch(IllegalArgumentException ex){
                         e.getPlayer().sendMessage(ChatColor.RED + "Please enter a valid tool mode.");
                         return;
@@ -376,7 +375,7 @@ public class EditorListener implements Listener {
             }
         }
 
-        Executor.sync(() -> e.getPlayer().openInventory(plugin.getEditor().getToolEditor(toolName)));
+        Scheduler.runTask(e.getPlayer(), () -> e.getPlayer().openInventory(plugin.getEditor().getToolEditor(toolName)));
         toolValues.remove(e.getPlayer().getUniqueId());
     }
 

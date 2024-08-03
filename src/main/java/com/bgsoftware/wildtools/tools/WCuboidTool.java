@@ -5,6 +5,7 @@ import com.bgsoftware.wildtools.api.objects.ToolMode;
 import com.bgsoftware.wildtools.api.objects.tools.CuboidTool;
 import com.bgsoftware.wildtools.utils.BukkitUtils;
 import com.bgsoftware.wildtools.utils.world.WorldEditSession;
+import com.bgsoftware.wildtools.world.BlockMaterial;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -33,8 +34,7 @@ public class WCuboidTool extends WTool implements CuboidTool {
         Location max = e.getBlock().getLocation().add(radius, radius, radius),
                 min = e.getBlock().getLocation().subtract(radius, radius, radius);
 
-        Material firstType = e.getBlock().getType();
-        short firstData = e.getBlock().getState().getData().toItemStack().getDurability();
+        BlockMaterial firstBlockMaterial = BlockMaterial.of(e.getBlock());
 
         WorldEditSession editSession = new WorldEditSession(e.getBlock().getWorld());
         int toolDurability = getDurability(e.getPlayer(), inHand);
@@ -51,7 +51,7 @@ public class WCuboidTool extends WTool implements CuboidTool {
                     Block targetBlock = e.getPlayer().getWorld().getBlockAt(x, y, z);
 
                     if (targetBlock.getType() == Material.AIR ||
-                            !BukkitUtils.canBreakBlock(e.getPlayer(), targetBlock, firstType, firstData, this))
+                            !BukkitUtils.canBreakBlock(e.getPlayer(), targetBlock, firstBlockMaterial, this))
                         continue;
 
                     if (BukkitUtils.breakBlock(e.getPlayer(), targetBlock, inHand, this, editSession, null))

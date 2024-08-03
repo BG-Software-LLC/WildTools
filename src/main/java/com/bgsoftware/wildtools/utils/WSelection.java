@@ -1,16 +1,16 @@
 package com.bgsoftware.wildtools.utils;
 
+import com.bgsoftware.wildtools.api.objects.Selection;
 import com.bgsoftware.wildtools.api.objects.tools.Tool;
-import com.bgsoftware.wildtools.utils.BukkitUtils;
+import com.bgsoftware.wildtools.scheduler.ScheduledTask;
+import com.bgsoftware.wildtools.scheduler.Scheduler;
+import com.bgsoftware.wildtools.tools.WCannonTool;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.Dispenser;
-import com.bgsoftware.wildtools.WildToolsPlugin;
-import com.bgsoftware.wildtools.api.objects.Selection;
-import com.bgsoftware.wildtools.tools.WCannonTool;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
@@ -19,13 +19,11 @@ import java.util.UUID;
 
 public class WSelection implements Selection {
 
-    private static final WildToolsPlugin plugin = WildToolsPlugin.getPlugin();
-
     private final UUID uuid;
     private final World world;
 
     private Location rightClick, leftClick;
-    private int taskID;
+    private ScheduledTask task;
 
     public WSelection(UUID uuid, World world, Location rightClick, Location leftClick){
         this.uuid = uuid;
@@ -91,15 +89,18 @@ public class WSelection implements Selection {
 
     @Override
     public void remove(){
-        if(Bukkit.getScheduler().isCurrentlyRunning(taskID))
-            Bukkit.getScheduler().cancelTask(taskID);
+        if(task != null) {
+            task.cancel();
+            task = null;
+        }
+
         WCannonTool.removeSelection(Bukkit.getPlayer(uuid));
     }
 
     private void restartTask(){
-        if(Bukkit.getScheduler().isCurrentlyRunning(taskID))
-            Bukkit.getScheduler().cancelTask(taskID);
-        taskID = Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, this::remove, 20 * 60 * 10).getTaskId();
+        if(task != null)
+            task.cancel();
+        task = Scheduler.runTaskAsync(this::remove, 20 * 60 * 10);
     }
 
 }

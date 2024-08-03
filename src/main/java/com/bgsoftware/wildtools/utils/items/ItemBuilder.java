@@ -57,8 +57,11 @@ public class ItemBuilder {
         if (section.contains("lore"))
             withLore(section.getStringList("lore"));
 
-        if (section.getBoolean("glow", false))
-            itemMeta.addEnchant(plugin.getGlowEnchant(), 1, true);
+        if (section.getBoolean("glow", false)) {
+            Enchantment glowEnchant = plugin.getGlowEnchant();
+            if (glowEnchant != null)
+                itemMeta.addEnchant(glowEnchant, 1, true);
+        }
 
         if (section.contains("enchants")) {
             List<String> enchants = section.getStringList("enchants");

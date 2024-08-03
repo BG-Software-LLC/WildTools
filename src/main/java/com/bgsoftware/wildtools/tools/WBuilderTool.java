@@ -1,32 +1,24 @@
 package com.bgsoftware.wildtools.tools;
 
-import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.wildtools.Locale;
 import com.bgsoftware.wildtools.api.events.BuilderWandUseEvent;
 import com.bgsoftware.wildtools.api.objects.ToolMode;
 import com.bgsoftware.wildtools.api.objects.tools.BuilderTool;
 import com.bgsoftware.wildtools.utils.BukkitUtils;
 import com.bgsoftware.wildtools.utils.Materials;
+import com.bgsoftware.wildtools.utils.ServerVersion;
 import com.bgsoftware.wildtools.utils.inventory.InventoryUtils;
 import com.bgsoftware.wildtools.utils.items.ItemUtils;
 import com.bgsoftware.wildtools.utils.world.WorldEditSession;
-import com.destroystokyo.paper.util.set.OptimizedSmallEnumSet;
-import com.google.common.collect.ImmutableSet;
+import com.bgsoftware.wildtools.world.BlockMaterial;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.block.data.BlockData;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.EnumSet;
-import java.util.Set;
-
 public class WBuilderTool extends WTool implements BuilderTool {
-
-
-    private static final ReflectMethod<Object> GET_BLOCK_DATA = new ReflectMethod<>(Block.class, "getBlockData");
 
     private final int length;
 
@@ -54,21 +46,18 @@ public class WBuilderTool extends WTool implements BuilderTool {
     public boolean onBlockInteract(PlayerInteractEvent e) {
         e.setCancelled(true);
 
-        Material firstType = e.getClickedBlock().getType();
+        BlockMaterial firstBlockMaterial = BlockMaterial.of(e.getClickedBlock());
 
-        if (!firstType.isSolid())
+        if (!firstBlockMaterial.getType().isSolid())
             return false;
 
         BlockFace blockFace = e.getBlockFace();
 
-        ItemStack blockItemStack = null;
+        ItemStack blockItemStack;
 
-        if (GET_BLOCK_DATA.isValid()) {
-            BlockData blockData = (BlockData) GET_BLOCK_DATA.invoke(e.getClickedBlock());
-            blockItemStack = new ItemStack(blockData.getMaterial());
-        }
-
-        if (blockItemStack == null) {
+        if (!ServerVersion.isLegacy()) {
+            blockItemStack = new ItemStack(firstBlockMaterial.getType());
+        } else {
             blockItemStack = e.getClickedBlock().getState().getData().toItemStack(1);
             if ((blockItemStack.getType().name().contains("STEP") || blockItemStack.getType().name().contains("SLAB")) &&
                     blockItemStack.getDurability() >= 8)
@@ -81,8 +70,6 @@ public class WBuilderTool extends WTool implements BuilderTool {
         }
 
         int amountOfBlocks = InventoryUtils.countItems(e.getPlayer().getInventory(), blockItemStack);
-
-        short firstData = e.getClickedBlock().getState().getData().toItemStack().getDurability();
 
         WorldEditSession editSession = new WorldEditSession(e.getClickedBlock().getWorld());
         boolean usingDurability = isUsingDurability();
@@ -98,7 +85,7 @@ public class WBuilderTool extends WTool implements BuilderTool {
             Material nextBlockType = nextBlock.getType();
 
             if (!canPlaceThroughBlock(nextBlockType) ||
-                    !BukkitUtils.canBreakBlock(e.getPlayer(), nextBlock, firstType, firstData, this, false) ||
+                    !BukkitUtils.canBreakBlock(e.getPlayer(), nextBlock, firstBlockMaterial, this, false) ||
                     !BukkitUtils.placeBlock(e.getPlayer(), nextBlock, originalBlock, editSession)) {
                 break;
             }

@@ -3,7 +3,7 @@ package com.bgsoftware.wildtools.nms.v1_19;
 import com.bgsoftware.common.reflection.ClassInfo;
 import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.wildtools.nms.NMSWorld;
-import com.bgsoftware.wildtools.utils.Executor;
+import com.bgsoftware.wildtools.scheduler.Scheduler;
 import com.bgsoftware.wildtools.utils.math.Vector3;
 import com.bgsoftware.wildtools.utils.world.WorldEditSession;
 import com.destroystokyo.paper.antixray.ChunkPacketBlockControllerAntiXray;
@@ -19,6 +19,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.chunk.LevelChunk;
 import org.bukkit.CropState;
 import org.bukkit.Location;
@@ -140,7 +141,7 @@ public class NMSWorldImpl implements NMSWorld {
 
         ChunkPos chunkPos = levelChunk.getPos();
 
-        Executor.sync(() -> {
+        Scheduler.runTask(levelChunk.level.getWorld(), chunkPos.x, chunkPos.z, () -> {
             ClientboundLightUpdatePacket lightUpdatePacket = new ClientboundLightUpdatePacket(
                     chunkPos, lightEngine, null, null, true);
             NMSUtils.sendPacketToRelevantPlayers(levelChunk.level, chunkPos.x, chunkPos.z, lightUpdatePacket);
@@ -149,7 +150,10 @@ public class NMSWorldImpl implements NMSWorld {
 
     @Override
     public int getCombinedId(org.bukkit.block.Block bukkitBlock) {
-        return Block.getId(((CraftBlock) bukkitBlock).getNMS());
+        BlockState blockState = ((CraftBlock) bukkitBlock).getNMS();
+        if (blockState.hasProperty(BlockStateProperties.WATERLOGGED))
+            blockState = blockState.setValue(BlockStateProperties.WATERLOGGED, false);
+        return Block.getId(blockState);
     }
 
     @Override

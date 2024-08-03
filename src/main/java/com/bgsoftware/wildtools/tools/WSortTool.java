@@ -4,8 +4,8 @@ import com.bgsoftware.wildtools.Locale;
 import com.bgsoftware.wildtools.api.events.SortWandUseEvent;
 import com.bgsoftware.wildtools.api.objects.ToolMode;
 import com.bgsoftware.wildtools.api.objects.tools.SortTool;
+import com.bgsoftware.wildtools.scheduler.Scheduler;
 import com.bgsoftware.wildtools.utils.BukkitUtils;
-import com.bgsoftware.wildtools.utils.Executor;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.BlockState;
@@ -63,7 +63,7 @@ public class WSortTool extends WTool implements SortTool {
 
         List<ItemStack> affectedItems = convert(inventoryItems);
 
-        Executor.sync(() -> {
+        Scheduler.runTask(e.getPlayer(), () -> {
             SortWandUseEvent sortWandUseEvent = new SortWandUseEvent(e.getPlayer(), this,
                     affectedItems.stream().map(ItemStack::clone).collect(Collectors.toList()));
             Bukkit.getPluginManager().callEvent(sortWandUseEvent);

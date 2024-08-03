@@ -18,7 +18,7 @@ import com.bgsoftware.wildtools.api.objects.tools.SellTool;
 import com.bgsoftware.wildtools.api.objects.tools.SortTool;
 import com.bgsoftware.wildtools.api.objects.tools.Tool;
 import com.bgsoftware.wildtools.hooks.PricesProvider_Default;
-import com.bgsoftware.wildtools.utils.Executor;
+import com.bgsoftware.wildtools.scheduler.Scheduler;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 
@@ -64,7 +64,7 @@ public class DataHandler {
 
         ProvidersHandler.pricesPlugin = cfg.getString("prices-plugin", "ShopGUIPlus");
 
-        Executor.sync(() -> {
+        Scheduler.runTask(() -> {
             plugin.getEvents().loadClaimingPlugins(cfg.getStringList("events-manipulations.claiming-plugins"));
             plugin.getEvents().loadNotifiedPlugins(cfg.getStringList("events-manipulations.other-plugins"));
         }, 20L);
@@ -220,8 +220,11 @@ public class DataHandler {
             if (cfg.contains("tools." + name + ".lore"))
                 tool.setLore(cfg.getStringList("tools." + name + ".lore"));
 
-            if (cfg.getBoolean("tools." + name + ".glow", false))
-                tool.addEnchantment(plugin.getGlowEnchant(), 1);
+            if (cfg.getBoolean("tools." + name + ".glow", false)) {
+                Enchantment glowEnchant = plugin.getGlowEnchant();
+                if (glowEnchant != null)
+                    tool.addEnchantment(glowEnchant, 1);
+            }
 
             if (cfg.getBoolean("tools." + name + ".spigot-unbreakable", false))
                 tool.setSpigotUnbreakable(cfg.getBoolean("tools." + name + ".spigot-unbreakable"));
