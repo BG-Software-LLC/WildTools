@@ -4,9 +4,9 @@ import com.bgsoftware.wildtools.Locale;
 import com.bgsoftware.wildtools.api.events.CraftingWandUseEvent;
 import com.bgsoftware.wildtools.api.objects.ToolMode;
 import com.bgsoftware.wildtools.api.objects.tools.CraftingTool;
+import com.bgsoftware.wildtools.recipes.RecipeChoice;
 import com.bgsoftware.wildtools.scheduler.Scheduler;
 import com.bgsoftware.wildtools.utils.BukkitUtils;
-import com.bgsoftware.wildtools.recipes.RecipeChoice;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.BlockState;
@@ -95,8 +95,17 @@ public class WCraftingTool extends WTool implements CraftingTool {
                     }
 
                     ItemStack result = recipe.getResult().clone();
-                    result.setAmount(result.getAmount() * amountOfRecipes);
-                    toAdd.add(result);
+                    int resultAmount = result.getAmount() * amountOfRecipes;
+                    while (resultAmount > result.getMaxStackSize()) {
+                        ItemStack maxStackResult = result.clone();
+                        maxStackResult.setAmount(result.getMaxStackSize());
+                        toAdd.add(maxStackResult);
+                        resultAmount -= result.getMaxStackSize();
+                    }
+                    if (resultAmount > 0) {
+                        result.setAmount(resultAmount);
+                        toAdd.add(result);
+                    }
 
                     craftedItemsAmount += (amountOfRecipes * recipe.getResult().getAmount());
                 }
