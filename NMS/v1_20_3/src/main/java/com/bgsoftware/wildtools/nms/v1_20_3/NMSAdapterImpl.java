@@ -109,7 +109,11 @@ public class NMSAdapterImpl implements NMSAdapter {
 
     @Override
     public Enchantment createGlowEnchantment() {
-        Enchantment enchantment = getGlowEnchant();
+        Enchantment enchantment = Registry.ENCHANTMENT.get(NamespacedKey.minecraft("wildtools_glowing_enchant"));
+        if(enchantment != null)
+            return enchantment;
+
+        enchantment = getGlowEnchant();
 
         Map<NamespacedKey, Enchantment> registryCache = REGISTRY_CACHE.get(Registry.ENCHANTMENT);
 

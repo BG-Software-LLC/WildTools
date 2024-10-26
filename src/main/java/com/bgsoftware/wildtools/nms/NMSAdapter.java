@@ -42,7 +42,11 @@ public interface NMSAdapter {
 
     @Nullable
     default Enchantment createGlowEnchantment() {
-        Enchantment glowEnchant = getGlowEnchant();
+        Enchantment glowEnchant = Enchantment.getByName("wildtools_glowing_enchant");
+        if (glowEnchant != null)
+            return glowEnchant;
+
+        glowEnchant = getGlowEnchant();
 
         if (glowEnchant != null) {
             try {

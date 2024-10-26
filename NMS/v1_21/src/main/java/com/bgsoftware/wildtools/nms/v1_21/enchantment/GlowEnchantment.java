@@ -20,9 +20,10 @@ public class GlowEnchantment extends CraftEnchantment {
     private static final ReflectField<Boolean> REGISTRY_FROZEN = new ReflectField<>(
             MappedRegistry.class, boolean.class, Modifier.PRIVATE, 1);
 
-    private static final String GLOW_ENCHANTMENT_NAME = "wildtools_glowing_enchant";
+    public static final String GLOW_ENCHANTMENT_NAME = "wildtools_glowing_enchant";
+    public static final NamespacedKey GLOW_ENCHANTMENT_KEY = NamespacedKey.minecraft(GLOW_ENCHANTMENT_NAME);
 
-    private static final Enchantment HANDLE = initializeHandle();
+    private static GlowEnchantment INSTANCE;
 
     private static Enchantment initializeHandle() {
         Enchantment handle = new Enchantment(
@@ -55,8 +56,16 @@ public class GlowEnchantment extends CraftEnchantment {
         return handle;
     }
 
-    public GlowEnchantment() {
-        super(NamespacedKey.minecraft(GLOW_ENCHANTMENT_NAME), HANDLE);
+    private GlowEnchantment() {
+        super(GLOW_ENCHANTMENT_KEY, initializeHandle());
+    }
+
+    public static GlowEnchantment getInstance() {
+        if (INSTANCE == null) {
+            INSTANCE = new GlowEnchantment();
+        }
+
+        return INSTANCE;
     }
 
 }
