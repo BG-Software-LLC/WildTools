@@ -338,9 +338,12 @@ public class ProvidersHandler implements ProvidersManager {
             if (factions.getDescription().getAuthors().contains("drtshock")) {
                 Optional<ClaimsProvider> claimsProvider = createInstance("ClaimsProvider_FactionsUUID");
                 claimsProvider.ifPresent(this::addClaimsProvider);
-            } else if (factions.getDescription().getWebsite().contains("massivecraft")) {
-                Optional<ClaimsProvider> claimsProvider = createInstance("ClaimsProvider_MassiveFactions");
-                claimsProvider.ifPresent(this::addClaimsProvider);
+            } else {
+                String website = factions.getDescription().getWebsite();
+                if (website != null && website.contains("massivecraft")) {
+                    Optional<ClaimsProvider> claimsProvider = createInstance("ClaimsProvider_MassiveFactions");
+                    claimsProvider.ifPresent(this::addClaimsProvider);
+                }
             }
         }
         if (Bukkit.getPluginManager().isPluginEnabled("FactionsX")) {
