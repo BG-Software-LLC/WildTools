@@ -462,10 +462,11 @@ public abstract class WTool implements Tool {
     @Override
     public boolean canBreakBlock(Block block, Material firstType, short firstData) {
         BlockMaterial blockMaterial = BlockMaterial.of(block);
+        BlockMaterial firstBlockType = BlockMaterial.of(firstType, firstData);
 
         if (blockMaterial.getType() == null || blockMaterial.getType() == Material.AIR)
             return false;
-        if (isOnlySameType && (firstType != blockMaterial.getType() || firstData != blockMaterial.getData()))
+        if (isOnlySameType && !firstBlockType.equals(blockMaterial))
             return false;
         if (hasBlacklistedMaterials() && isBlacklistedMaterial(blockMaterial.getType(), blockMaterial.getData()))
             return false;
