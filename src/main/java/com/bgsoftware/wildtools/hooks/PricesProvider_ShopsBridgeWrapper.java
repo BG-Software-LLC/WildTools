@@ -20,7 +20,8 @@ public class PricesProvider_ShopsBridgeWrapper implements PricesProvider {
 
     @Override
     public double getPrice(Player player, ItemStack itemStack) {
-        return (this.bulkTransaction == null ? this.shopsBridge : this.bulkTransaction).getSellPrice(player, itemStack).doubleValue();
+        return (this.bulkTransaction == null ? this.shopsBridge : this.bulkTransaction)
+                .getSellPrice(player, itemStack).getPrice().doubleValue();
     }
 
     public void startBulkTransaction() {
