@@ -7,6 +7,7 @@ import com.bgsoftware.wildtools.api.objects.tools.Tool;
 import com.bgsoftware.wildtools.utils.BukkitUtils;
 import com.bgsoftware.wildtools.utils.items.ItemUtils;
 import com.bgsoftware.wildtools.utils.items.ToolItemStack;
+import com.bgsoftware.wildtools.world.BlockMaterial;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -460,14 +461,17 @@ public abstract class WTool implements Tool {
 
     @Override
     public boolean canBreakBlock(Block block, Material firstType, short firstData) {
-        if (block.getType() == null || block.getType() == Material.AIR)
+        BlockMaterial blockMaterial = BlockMaterial.of(block);
+
+        if (blockMaterial.getType() == null || blockMaterial.getType() == Material.AIR)
             return false;
-        if (isOnlySameType && (firstType != block.getType() || firstData != block.getData()))
+        if (isOnlySameType && (firstType != blockMaterial.getType() || firstData != blockMaterial.getData()))
             return false;
-        if (hasBlacklistedMaterials() && isBlacklistedMaterial(block.getType(), block.getData()))
+        if (hasBlacklistedMaterials() && isBlacklistedMaterial(blockMaterial.getType(), blockMaterial.getData()))
             return false;
-        if (hasWhitelistedMaterials() && !isWhitelistedMaterial(block.getType(), block.getData()))
+        if (hasWhitelistedMaterials() && !isWhitelistedMaterial(blockMaterial.getType(), blockMaterial.getData()))
             return false;
+
         return true;
     }
 
