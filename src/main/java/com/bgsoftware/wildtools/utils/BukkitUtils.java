@@ -42,8 +42,8 @@ public class BukkitUtils {
     public static final EnumSet<Material> DISALLOWED_BLOCKS = createDisallowedBlocks(new String[]{
             "BEDROCK", "COMMAND", "REPEATING_COMMAND_BLOCK", "CHAIN_COMMAND_BLOCK", "COMMAND_BLOCK", "WATER",
             "STATIONARY_WATER", "LAVA", "STATIONARY_LAVA", "END_PORTAL_FRAME", "ENDER_PORTAL_FRAME", "BARRIER",
-            "STRUCTURE_BLOCK", "STRUCTURE_VOID", "CAVE_AIR", "END_PORTAL", "ENDER_PORTAL", "NETHER_PORTAL", "PORTAL",
-            "BUBBLE_COLUMN"
+            "STRUCTURE_BLOCK", "STRUCTURE_VOID", "END_PORTAL", "ENDER_PORTAL", "NETHER_PORTAL", "PORTAL",
+            "BUBBLE_COLUMN", "CAVE_AIR", "VOID_AIR", "AIR"
     });
     private static final EnumSet<Material> FORCE_UPDATE_MATERIALS = createDisallowedBlocks(new String[]{
             "WATER", "STATIONARY_WATER", "LAVA", "STATIONARY_LAVA", "ENDER_PORTAL", "NETHER_PORTAL", "PORTAL",
