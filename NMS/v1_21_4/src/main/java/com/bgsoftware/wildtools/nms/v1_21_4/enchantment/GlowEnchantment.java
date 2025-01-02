@@ -2,6 +2,7 @@ package com.bgsoftware.wildtools.nms.v1_21_4.enchantment;
 
 import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.common.reflection.ReflectMethod;
+import net.minecraft.core.Holder;
 import net.minecraft.core.HolderSet;
 import net.minecraft.core.MappedRegistry;
 import net.minecraft.core.Registry;
@@ -15,6 +16,7 @@ import net.minecraft.world.item.enchantment.Enchantment;
 import org.bukkit.NamespacedKey;
 import org.bukkit.craftbukkit.enchantments.CraftEnchantment;
 
+import javax.annotation.Nullable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.Map;
@@ -45,7 +47,14 @@ public class GlowEnchantment extends CraftEnchantment {
 
     private static GlowEnchantment INSTANCE;
 
-    private static Enchantment initializeHandle() {
+    @Nullable
+    private static Holder<Enchantment> initializeHandle() {
+        Registry<Enchantment> registry = MinecraftServer.getServer().registryAccess()
+                .lookup(Registries.ENCHANTMENT).orElse(null);
+
+        if (registry == null)
+            return null;
+
         Enchantment handle = new Enchantment(
                 Component.empty(),
                 Enchantment.definition(
@@ -59,21 +68,21 @@ public class GlowEnchantment extends CraftEnchantment {
                 DataComponentMap.EMPTY
         );
 
-        MinecraftServer.getServer().registryAccess().lookup(Registries.ENCHANTMENT).ifPresent(registry -> {
-            try {
-                REGISTRY_FROZEN.set(registry, false);
-                try {
-                    // This may throw IllegalStateException which we don't care about.
-                    registry.createIntrusiveHolder(handle);
-                } catch (Throwable ignored) {
-                }
-                Registry.register(registry, ResourceLocation.withDefaultNamespace(GLOW_ENCHANTMENT_NAME), handle);
-            } finally {
-                freezeRegistry(registry);
-            }
-        });
+        Holder<Enchantment> holder;
 
-        return handle;
+        try {
+            REGISTRY_FROZEN.set(registry, false);
+            try {
+                // This may throw IllegalStateException which we don't care about.
+                registry.createIntrusiveHolder(handle);
+            } catch (Throwable ignored) {
+            }
+            holder = Registry.registerForHolder(registry, ResourceLocation.withDefaultNamespace(GLOW_ENCHANTMENT_NAME), handle);
+        } finally {
+            freezeRegistry(registry);
+        }
+
+        return holder;
     }
 
     private static void freezeRegistry(Registry<?> registry) {
@@ -108,7 +117,7 @@ public class GlowEnchantment extends CraftEnchantment {
     }
 
     private GlowEnchantment() {
-        super(GLOW_ENCHANTMENT_KEY, initializeHandle());
+        super(initializeHandle());
     }
 
     public static GlowEnchantment getInstance() {
