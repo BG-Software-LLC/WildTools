@@ -17,11 +17,12 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.craftbukkit.enchantments.CraftEnchantment;
 
 import javax.annotation.Nullable;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.Map;
 
-public class GlowEnchantment extends CraftEnchantment {
+public class GlowEnchantment {
 
     private static final ReflectField<Boolean> REGISTRY_FROZEN = new ReflectField<>(
             MappedRegistry.class, boolean.class, Modifier.PRIVATE, 1);
@@ -42,13 +43,15 @@ public class GlowEnchantment extends CraftEnchantment {
         REGISTRY_TAG_SET_UNBOUND = new ReflectMethod<>(tagSetClass, tagSetClass, 1, new Class[0]);
     }
 
-    public static final String GLOW_ENCHANTMENT_NAME = "wildtools_glowing_enchant";
+    private static final String GLOW_ENCHANTMENT_NAME = "wildtools_glowing_enchant";
     public static final NamespacedKey GLOW_ENCHANTMENT_KEY = NamespacedKey.minecraft(GLOW_ENCHANTMENT_NAME);
 
-    private static GlowEnchantment INSTANCE;
+    private static final HandleType HANDLE_TYPE = findHandleType();
+
+    private static final Object HANDLE = initializeHandle();
 
     @Nullable
-    private static Holder<Enchantment> initializeHandle() {
+    private static Object initializeHandle() {
         Registry<Enchantment> registry = MinecraftServer.getServer().registryAccess()
                 .lookup(Registries.ENCHANTMENT).orElse(null);
 
@@ -82,7 +85,11 @@ public class GlowEnchantment extends CraftEnchantment {
             freezeRegistry(registry);
         }
 
-        return holder;
+        return switch (HANDLE_TYPE) {
+            case HOLDER -> holder;
+            case RAW -> handle;
+            default -> throw new IllegalStateException("Cannot find valid handle type for enchantments");
+        };
     }
 
     private static void freezeRegistry(Registry<?> registry) {
@@ -116,16 +123,44 @@ public class GlowEnchantment extends CraftEnchantment {
         REGISTRY_ALL_TAGS.set(registry, allTags);
     }
 
-    private GlowEnchantment() {
-        super(initializeHandle());
+    private static HandleType findHandleType() {
+        Constructor<?> constructor = CraftEnchantment.class.getConstructors()[0];
+
+        if (constructor.getParameterCount() == 1 && constructor.getParameterTypes()[0] == Holder.class) {
+            return HandleType.HOLDER;
+        } else if (constructor.getParameterCount() == 2 && constructor.getParameterTypes()[0] == NamespacedKey.class &&
+                constructor.getParameterTypes()[1] == Enchantment.class) {
+            return HandleType.RAW;
+        } else {
+            return HandleType.UNKNOWN;
+        }
     }
 
-    public static GlowEnchantment getInstance() {
-        if (INSTANCE == null) {
-            INSTANCE = new GlowEnchantment();
-        }
+    public static CraftEnchantment createEnchantment() {
+        Constructor<?> constructor = CraftEnchantment.class.getConstructors()[0];
 
-        return INSTANCE;
+        try {
+            return switch (HANDLE_TYPE) {
+                case HOLDER -> (CraftEnchantment) constructor.newInstance(HANDLE);
+                case RAW ->
+                        (CraftEnchantment) constructor.newInstance(NamespacedKey.minecraft(GLOW_ENCHANTMENT_NAME), HANDLE);
+                default -> throw new IllegalStateException("Cannot find valid handle type for enchantments");
+            };
+        } catch (Throwable error) {
+            throw new RuntimeException(error);
+        }
+    }
+
+    private GlowEnchantment() {
+
+    }
+
+    private enum HandleType {
+
+        HOLDER,
+        RAW,
+        UNKNOWN
+
     }
 
 }

@@ -99,7 +99,7 @@ public class NMSAdapterImpl implements NMSAdapter {
 
     @Override
     public Enchantment getGlowEnchant() {
-        return GlowEnchantment.getInstance();
+        return GlowEnchantment.createEnchantment();
     }
 
     @Override
