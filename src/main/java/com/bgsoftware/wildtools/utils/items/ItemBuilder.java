@@ -58,9 +58,7 @@ public class ItemBuilder {
             withLore(section.getStringList("lore"));
 
         if (section.getBoolean("glow", false)) {
-            Enchantment glowEnchant = plugin.getGlowEnchant();
-            if (glowEnchant != null)
-                itemMeta.addEnchant(glowEnchant, 1, true);
+            plugin.getNMSAdapter().makeItemGlow(itemMeta);
         }
 
         if (section.contains("enchants")) {

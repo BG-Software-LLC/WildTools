@@ -19,6 +19,7 @@ import com.bgsoftware.wildtools.api.objects.tools.SortTool;
 import com.bgsoftware.wildtools.api.objects.tools.Tool;
 import com.bgsoftware.wildtools.hooks.PricesProvider_Default;
 import com.bgsoftware.wildtools.scheduler.Scheduler;
+import com.bgsoftware.wildtools.tools.WTool;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 
@@ -221,9 +222,7 @@ public class DataHandler {
                 tool.setLore(cfg.getStringList("tools." + name + ".lore"));
 
             if (cfg.getBoolean("tools." + name + ".glow", false)) {
-                Enchantment glowEnchant = plugin.getGlowEnchant();
-                if (glowEnchant != null)
-                    tool.addEnchantment(glowEnchant, 1);
+                ((WTool) tool).makeToolGlow();
             }
 
             if (cfg.getBoolean("tools." + name + ".spigot-unbreakable", false))

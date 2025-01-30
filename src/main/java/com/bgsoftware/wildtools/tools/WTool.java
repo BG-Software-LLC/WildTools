@@ -186,6 +186,12 @@ public abstract class WTool implements Tool {
         toolItemStack.setItemMeta(im);
     }
 
+    public void makeToolGlow() {
+        ItemMeta itemMeta = toolItemStack.getItemMeta();
+        plugin.getNMSAdapter().makeItemGlow(itemMeta);
+        toolItemStack.setItemMeta(itemMeta);
+    }
+
     @Override
     public void addBlacklistedMaterial(String type) {
         blacklistedMaterials.add(type);

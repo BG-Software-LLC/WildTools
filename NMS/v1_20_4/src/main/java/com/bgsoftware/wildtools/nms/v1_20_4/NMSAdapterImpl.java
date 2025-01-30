@@ -2,10 +2,8 @@ package com.bgsoftware.wildtools.nms.v1_20_4;
 
 import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.wildtools.nms.NMSAdapter;
-import com.bgsoftware.wildtools.nms.v1_20_3.alogrithms.PaperGlowEnchantment;
 import com.bgsoftware.wildtools.nms.v1_20_4.tool.ToolItemStackImpl;
 import com.bgsoftware.wildtools.nms.v1_20_4.world.FakeCraftBlock;
-import com.bgsoftware.wildtools.nms.v1_20_R3.alogrithms.SpigotGlowEnchantment;
 import com.bgsoftware.wildtools.recipes.AdvancedShapedRecipe;
 import com.bgsoftware.wildtools.utils.items.DestroySpeedCategory;
 import com.bgsoftware.wildtools.utils.items.ToolItemStack;
@@ -21,17 +19,13 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
-import org.bukkit.Registry;
 import org.bukkit.block.BlockFace;
-import org.bukkit.craftbukkit.CraftRegistry;
 import org.bukkit.craftbukkit.block.data.CraftBlockData;
 import org.bukkit.craftbukkit.entity.CraftItem;
 import org.bukkit.craftbukkit.entity.CraftLivingEntity;
 import org.bukkit.craftbukkit.inventory.CraftInventoryView;
 import org.bukkit.craftbukkit.inventory.CraftItemStack;
 import org.bukkit.craftbukkit.legacy.CraftLegacy;
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.block.BlockPlaceEvent;
@@ -42,16 +36,13 @@ import org.bukkit.inventory.Recipe;
 import org.bukkit.inventory.RecipeChoice;
 import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.inventory.ShapelessRecipe;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 public class NMSAdapterImpl implements NMSAdapter {
-
-    private static final ReflectField<Map<NamespacedKey, Enchantment>> REGISTRY_CACHE =
-            new ReflectField<>(CraftRegistry.class, Map.class, "cache");
 
     private static final ReflectField<ItemStack> ITEM_STACK_HANDLE = new ReflectField<>(
             CraftItemStack.class, ItemStack.class, "handle");
@@ -99,15 +90,8 @@ public class NMSAdapterImpl implements NMSAdapter {
     }
 
     @Override
-    public Enchantment getGlowEnchant() {
-        // Not supported
-        return null;
-    }
-
-    @Override
-    public Enchantment createGlowEnchantment() {
-        // Not supported
-        return null;
+    public void makeItemGlow(ItemMeta itemMeta) {
+        itemMeta.setEnchantmentGlintOverride(true);
     }
 
     @Override

@@ -17,6 +17,7 @@ import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.Recipe;
 import org.bukkit.inventory.ShapedRecipe;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import javax.annotation.Nullable;
 import java.lang.reflect.Field;
@@ -37,34 +38,7 @@ public interface NMSAdapter {
 
     Collection<Player> getOnlinePlayers();
 
-    @Nullable
-    Enchantment getGlowEnchant();
-
-    @Nullable
-    default Enchantment createGlowEnchantment() {
-        Enchantment glowEnchant = Enchantment.getByName("wildtools_glowing_enchant");
-        if (glowEnchant != null)
-            return glowEnchant;
-
-        glowEnchant = getGlowEnchant();
-
-        if (glowEnchant != null) {
-            try {
-                Field field = Enchantment.class.getDeclaredField("acceptingNew");
-                field.setAccessible(true);
-                field.set(null, true);
-                field.setAccessible(false);
-            } catch (Exception ignored) {
-            }
-
-            try {
-                Enchantment.registerEnchantment(glowEnchant);
-            } catch (Exception ignored) {
-            }
-        }
-
-        return glowEnchant;
-    }
+    void makeItemGlow(ItemMeta itemMeta);
 
     int getFarmlandId();
 

@@ -42,6 +42,7 @@ import org.bukkit.inventory.Recipe;
 import org.bukkit.inventory.RecipeChoice;
 import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.inventory.ShapelessRecipe;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -55,6 +56,8 @@ public class NMSAdapterImpl implements NMSAdapter {
 
     private static final ReflectField<ItemStack> ITEM_STACK_HANDLE = new ReflectField<>(
             CraftItemStack.class, ItemStack.class, "handle");
+
+    private static final Enchantment GLOW_ENCHANT = initializeGlowEnchantment();
 
     @Override
     public void loadLegacy() {
@@ -99,27 +102,8 @@ public class NMSAdapterImpl implements NMSAdapter {
     }
 
     @Override
-    public Enchantment getGlowEnchant() {
-        try {
-            return new PaperGlowEnchantment("wildtools_glowing_enchant");
-        } catch (Throwable error) {
-            return new SpigotGlowEnchantment("wildtools_glowing_enchant");
-        }
-    }
-
-    @Override
-    public Enchantment createGlowEnchantment() {
-        Enchantment enchantment = Registry.ENCHANTMENT.get(NamespacedKey.minecraft("wildtools_glowing_enchant"));
-        if(enchantment != null)
-            return enchantment;
-
-        enchantment = getGlowEnchant();
-
-        Map<NamespacedKey, Enchantment> registryCache = REGISTRY_CACHE.get(Registry.ENCHANTMENT);
-
-        registryCache.put(enchantment.getKey(), enchantment);
-
-        return enchantment;
+    public void makeItemGlow(ItemMeta itemMeta) {
+        itemMeta.addEnchant(GLOW_ENCHANT, 1, true);
     }
 
     @Override
@@ -214,6 +198,22 @@ public class NMSAdapterImpl implements NMSAdapter {
     @Override
     public AdvancedShapedRecipe createRecipe(String toolName, org.bukkit.inventory.ItemStack result) {
         return new com.bgsoftware.wildtools.nms.v1_20_R3.recipe.AdvancedRecipeClassImpl(toolName, result);
+    }
+
+    private static Enchantment initializeGlowEnchantment() {
+        Enchantment glowEnchant;
+
+        try {
+            glowEnchant = new PaperGlowEnchantment("wildtools_glowing_enchant");
+        } catch (Throwable error) {
+            glowEnchant = new SpigotGlowEnchantment("wildtools_glowing_enchant");
+        }
+
+        Map<NamespacedKey, Enchantment> registryCache = REGISTRY_CACHE.get(Registry.ENCHANTMENT);
+
+        registryCache.put(glowEnchant.getKey(), glowEnchant);
+
+        return glowEnchant;
     }
 
 }

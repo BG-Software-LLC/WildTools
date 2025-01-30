@@ -23,12 +23,10 @@ import com.bgsoftware.wildtools.listeners.PlayerListener;
 import com.bgsoftware.wildtools.nms.NMSAdapter;
 import com.bgsoftware.wildtools.nms.NMSWorld;
 import org.bstats.bukkit.Metrics;
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import javax.annotation.Nullable;
 import java.lang.reflect.Field;
 
 public class WildToolsPlugin extends JavaPlugin implements WildTools {
@@ -42,8 +40,6 @@ public class WildToolsPlugin extends JavaPlugin implements WildTools {
     private EditorHandler editorHandler;
     private RecipesHandler recipesHandler;
     private EventsHandler eventsHandler;
-
-    private Enchantment glowEnchant;
 
     private NMSAdapter nmsAdapter;
     private NMSWorld nmsWorld;
@@ -86,8 +82,6 @@ public class WildToolsPlugin extends JavaPlugin implements WildTools {
         CommandsHandler commandsHandler = new CommandsHandler(this);
         getCommand("tools").setExecutor(commandsHandler);
         getCommand("tools").setTabCompleter(commandsHandler);
-
-        this.glowEnchant = nmsAdapter.createGlowEnchantment();
 
         providersHandler = new ProvidersHandler(this);
         toolsManager = new ToolsHandler(this);
@@ -148,11 +142,6 @@ public class WildToolsPlugin extends JavaPlugin implements WildTools {
             setEnabled(false);
             ex.printStackTrace();
         }
-    }
-
-    @Nullable
-    public Enchantment getGlowEnchant() {
-        return glowEnchant;
     }
 
     @Override
