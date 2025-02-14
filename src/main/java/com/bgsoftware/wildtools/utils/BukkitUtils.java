@@ -151,6 +151,7 @@ public class BukkitUtils {
 
         plugin.getEvents().callBreakEvent(blockBreakEvent, false);
 
+        Material originalType = block.getType();
         Location blockLocation = block.getLocation();
 
         if (editSession == null) {
@@ -164,8 +165,16 @@ public class BukkitUtils {
                 return false;
         }
 
-        if (tool != null)
+        if (tool != null) {
             collectDropsFromTool(player, block, tool, editSession, dropItemFunction);
+
+            if (tool.hasStatistics()) {
+                try {
+                    player.incrementStatistic(Statistic.MINE_BLOCK, originalType);
+                } catch (IllegalArgumentException ignored) {
+                }
+            }
+        }
 
         return true;
     }
