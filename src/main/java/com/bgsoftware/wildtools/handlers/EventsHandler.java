@@ -14,12 +14,14 @@ import org.bukkit.plugin.RegisteredListener;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class EventsHandler {
 
@@ -27,10 +29,10 @@ public class EventsHandler {
             "BentoBox", "FabledSkyBlock", "Factions", "FactionsX", "GriefPrevention", "IslandWorld", "Lands",
             "PlotSquared", "Residence", "SuperiorSkyblock2", "Villages", "WorldGuard");
 
-    private final List<CachedListenerMethod> claimingPluginsBreakMethods = new ArrayList<>();
-    private final List<CachedListenerMethod> claimingPluginsPlaceMethods = new ArrayList<>();
-    private final List<CachedListenerMethod> claimingPluginsInteractMethods = new ArrayList<>();
-    private final List<CachedListenerMethod> globalNotifiedPluginsBreakMethods = new ArrayList<>();
+    private final List<CachedListenerMethod> claimingPluginsBreakMethods = new LinkedList<>();
+    private final List<CachedListenerMethod> claimingPluginsPlaceMethods = new LinkedList<>();
+    private final List<CachedListenerMethod> claimingPluginsInteractMethods = new LinkedList<>();
+    private final List<CachedListenerMethod> globalNotifiedPluginsBreakMethods = new LinkedList<>();
     private final Map<Tool, List<CachedListenerMethod>> notifiedPluginsBreakMethodsTools = new HashMap<>();
 
     private static final WildToolsPlugin plugin = WildToolsPlugin.getPlugin();
@@ -98,7 +100,7 @@ public class EventsHandler {
                 .filter(tool -> !tool.getNotifiedPlugins().isEmpty())
                 .forEach(tool -> {
                     List<CachedListenerMethod> notifiedPlugins = notifiedPluginsBreakMethodsTools
-                            .computeIfAbsent(tool, t -> new ArrayList<>());
+                            .computeIfAbsent(tool, t -> new LinkedList<>());
                     loadNotifiedPluginListeners0(tool.getNotifiedPlugins(), notifiedPlugins);
                     if (notifiedPlugins.isEmpty())
                         notifiedPluginsBreakMethodsTools.remove(tool);
@@ -107,10 +109,16 @@ public class EventsHandler {
 
     private void loadNotifiedPluginListeners0(Collection<String> notifiedPlugins, List<CachedListenerMethod> cachedListenerMethods) {
         cachedListenerMethods.clear();
+
+        Set<CachedListenerMethod> cachedListenerMethodsSet = new LinkedHashSet<>();
+
         for (RegisteredListener registeredListener : BlockBreakEvent.getHandlerList().getRegisteredListeners()) {
-            if (notifiedPlugins.contains(registeredListener.getPlugin().getName()))
-                addAllMethods(cachedListenerMethods, registeredListener.getListener(), BlockBreakEvent.class);
+            if (notifiedPlugins.contains(registeredListener.getPlugin().getName())) {
+                addAllMethods0(cachedListenerMethodsSet, registeredListener.getListener(), BlockBreakEvent.class);
+            }
         }
+
+        cachedListenerMethods.addAll(cachedListenerMethodsSet);
         cachedListenerMethods.sort(CachedListenerMethod::compareTo);
     }
 
@@ -119,11 +127,17 @@ public class EventsHandler {
     }
 
     private static void addAllMethods(List<CachedListenerMethod> methodsList, Listener listener, Class<?> eventClass) {
+        Set<CachedListenerMethod> methodsSet = new LinkedHashSet<>();
+        addAllMethods0(methodsSet, listener, eventClass);
+        methodsList.addAll(methodsSet);
+    }
+
+    private static void addAllMethods0(Set<CachedListenerMethod> methods, Listener listener, Class<?> eventClass) {
         for (Method method : listener.getClass().getDeclaredMethods()) {
             EventHandler eventHandler = method.getAnnotation(EventHandler.class);
             if (eventHandler != null && method.getParameterCount() == 1 && method.getParameterTypes()[0].equals(eventClass)) {
                 method.setAccessible(true);
-                methodsList.add(new CachedListenerMethod(listener, method, eventHandler));
+                methods.add(new CachedListenerMethod(listener, method, eventHandler));
             }
         }
 
@@ -135,7 +149,7 @@ public class EventsHandler {
                 EventHandler eventHandler = method.getAnnotation(EventHandler.class);
                 if (eventHandler != null && method.getParameterCount() == 1 && method.getParameterTypes()[0].equals(eventClass)) {
                     method.setAccessible(true);
-                    methodsList.add(new CachedListenerMethod(listener, method, eventHandler));
+                    methods.add(new CachedListenerMethod(listener, method, eventHandler));
                 }
             }
         }
@@ -166,6 +180,19 @@ public class EventsHandler {
         public int compareTo(@NotNull CachedListenerMethod o) {
             return eventHandler.priority().compareTo(o.eventHandler.priority());
         }
+
+        @Override
+        public boolean equals(Object object) {
+            if (object == null || getClass() != object.getClass()) return false;
+            CachedListenerMethod that = (CachedListenerMethod) object;
+            return this.method.equals(that.method);
+        }
+
+        @Override
+        public int hashCode() {
+            return this.method.hashCode();
+        }
+
     }
 
 }
