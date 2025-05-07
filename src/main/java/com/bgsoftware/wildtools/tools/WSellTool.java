@@ -12,6 +12,7 @@ import com.bgsoftware.wildtools.utils.math.NumberUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.Inventory;
@@ -74,9 +75,13 @@ public class WSellTool extends WTool implements SellTool {
         if (!toSell.isEmpty())
             reduceDurablility(e.getPlayer(), 1, e.getItem());
 
+        Block soldContainer = e.getClickedBlock();
+
         for (SoldItem soldItem : toSell.values()) {
             SellWandLogger.log(e.getPlayer().getName() + " sold x" + soldItem.getItem().getAmount() + " " +
-                    soldItem.getItem().getType() + " for $" + soldItem.getPrice() + " (Multiplier: " + multiplier + ")");
+                    soldItem.getItem().getType() + " from " + soldContainer.getWorld().getName() + "," +
+                    soldContainer.getX() + "," + soldContainer.getY() + "," + soldContainer.getZ() + " for $" +
+                    soldItem.getPrice() + " (Multiplier: " + multiplier + ")");
         }
 
         if (!message.isEmpty())

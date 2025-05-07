@@ -53,7 +53,7 @@ public class SellWandLogger {
 
     private static class LogsFormatter extends Formatter{
 
-        private static final SimpleDateFormat dateFormat = new SimpleDateFormat("[HH:mm:ss dd:MM:yy]");
+        private static final SimpleDateFormat dateFormat = new SimpleDateFormat("[dd/MM/yy HH:mm:ss]");
 
         @Override
         public String format(LogRecord record) {
