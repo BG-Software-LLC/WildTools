@@ -1,4 +1,4 @@
-package com.bgsoftware.wildtools.nms.v1_21_6.world;
+package com.bgsoftware.wildtools.nms.v1_21_7.world;
 
 import org.bukkit.Material;
 import org.bukkit.block.Block;

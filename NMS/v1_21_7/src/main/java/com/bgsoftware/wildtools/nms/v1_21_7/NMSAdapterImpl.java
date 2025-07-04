@@ -1,9 +1,9 @@
-package com.bgsoftware.wildtools.nms.v1_21_6;
+package com.bgsoftware.wildtools.nms.v1_21_7;
 
 import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.wildtools.nms.NMSAdapter;
-import com.bgsoftware.wildtools.nms.v1_21_6.tool.ToolItemStackImpl;
-import com.bgsoftware.wildtools.nms.v1_21_6.world.FakeCraftBlock;
+import com.bgsoftware.wildtools.nms.v1_21_7.tool.ToolItemStackImpl;
+import com.bgsoftware.wildtools.nms.v1_21_7.world.FakeCraftBlock;
 import com.bgsoftware.wildtools.recipes.AdvancedShapedRecipe;
 import com.bgsoftware.wildtools.utils.items.DestroySpeedCategory;
 import com.bgsoftware.wildtools.utils.items.ToolItemStack;

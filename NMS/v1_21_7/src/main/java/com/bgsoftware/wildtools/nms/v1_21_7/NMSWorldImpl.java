@@ -1,4 +1,4 @@
-package com.bgsoftware.wildtools.nms.v1_21_6;
+package com.bgsoftware.wildtools.nms.v1_21_7;
 
 import com.bgsoftware.wildtools.nms.NMSWorld;
 import com.bgsoftware.wildtools.scheduler.Scheduler;

@@ -1,4 +1,4 @@
-package com.bgsoftware.wildtools.nms.v1_21_6.tool;
+package com.bgsoftware.wildtools.nms.v1_21_7.tool;
 
 import com.bgsoftware.wildtools.utils.items.ToolItemStack;
 import net.minecraft.core.component.DataComponents;
