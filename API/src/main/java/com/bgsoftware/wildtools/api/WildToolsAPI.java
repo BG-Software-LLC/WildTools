@@ -1,17 +1,9 @@
 package com.bgsoftware.wildtools.api;
 
 import com.bgsoftware.wildtools.api.objects.Selection;
-import com.bgsoftware.wildtools.api.objects.tools.CannonTool;
-import com.bgsoftware.wildtools.api.objects.tools.CraftingTool;
-import com.bgsoftware.wildtools.api.objects.tools.CuboidTool;
-import com.bgsoftware.wildtools.api.objects.tools.HarvesterTool;
-import com.bgsoftware.wildtools.api.objects.tools.LightningTool;
-import com.bgsoftware.wildtools.api.objects.tools.PillarTool;
-import com.bgsoftware.wildtools.api.objects.tools.Tool;
+import com.bgsoftware.wildtools.api.objects.tools.*;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-
-import com.bgsoftware.wildtools.api.objects.tools.SellTool;
 
 public class WildToolsAPI {
 
@@ -35,6 +27,16 @@ public class WildToolsAPI {
      */
     public static Tool getTool(String name){
         return instance.getToolsManager().getTool(name);
+    }
+
+    /**
+     * Get a builder-tool object by an item-stack
+     *
+     * @param itemStack an item-stack to check
+     * @return builder-tool object
+     */
+    public static NormalTool getNormalTool(ItemStack itemStack) {
+        return instance.getToolsManager().getNormalTool(itemStack);
     }
 
     /**

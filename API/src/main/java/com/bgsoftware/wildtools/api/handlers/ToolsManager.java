@@ -1,26 +1,22 @@
 package com.bgsoftware.wildtools.api.handlers;
 
 import com.bgsoftware.wildtools.api.objects.Selection;
-import com.bgsoftware.wildtools.api.objects.tools.BuilderTool;
-import com.bgsoftware.wildtools.api.objects.tools.CannonTool;
-import com.bgsoftware.wildtools.api.objects.tools.CraftingTool;
-import com.bgsoftware.wildtools.api.objects.tools.CuboidTool;
-import com.bgsoftware.wildtools.api.objects.tools.DrainTool;
-import com.bgsoftware.wildtools.api.objects.tools.HarvesterTool;
-import com.bgsoftware.wildtools.api.objects.tools.LightningTool;
-import com.bgsoftware.wildtools.api.objects.tools.PillarTool;
-import com.bgsoftware.wildtools.api.objects.tools.SortTool;
-import com.bgsoftware.wildtools.api.objects.tools.Tool;
+import com.bgsoftware.wildtools.api.objects.tools.*;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import com.bgsoftware.wildtools.api.objects.tools.IceTool;
-import com.bgsoftware.wildtools.api.objects.tools.SellTool;
-
 import java.util.List;
 
 public interface ToolsManager {
+
+    /**
+     * Get a normal tool from an item.
+     * @param itemStack The item to get a normal tool from.
+     * @return If tool exists, the tool will be returned. Otherwise, null.
+     */
+    NormalTool getNormalTool(ItemStack itemStack);
+
 
     /**
      * Get a builder tool from an item.

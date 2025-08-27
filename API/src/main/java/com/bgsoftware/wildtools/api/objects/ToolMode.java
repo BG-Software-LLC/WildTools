@@ -2,6 +2,7 @@ package com.bgsoftware.wildtools.api.objects;
 
 public enum ToolMode {
 
+    NORMAL,
     BUILDER,
     CANNON,
     CRAFTING,

@@ -3,20 +3,7 @@ package com.bgsoftware.wildtools.handlers;
 import com.bgsoftware.common.config.CommentedConfiguration;
 import com.bgsoftware.wildtools.SellWandLogger;
 import com.bgsoftware.wildtools.WildToolsPlugin;
-import com.bgsoftware.wildtools.api.objects.tools.BuilderTool;
-import com.bgsoftware.wildtools.api.objects.tools.CannonTool;
-import com.bgsoftware.wildtools.api.objects.tools.CraftingTool;
-import com.bgsoftware.wildtools.api.objects.tools.CrowbarTool;
-import com.bgsoftware.wildtools.api.objects.tools.CuboidTool;
-import com.bgsoftware.wildtools.api.objects.tools.DrainTool;
-import com.bgsoftware.wildtools.api.objects.tools.HarvesterTool;
-import com.bgsoftware.wildtools.api.objects.tools.IceTool;
-import com.bgsoftware.wildtools.api.objects.tools.LightningTool;
-import com.bgsoftware.wildtools.api.objects.tools.MagnetTool;
-import com.bgsoftware.wildtools.api.objects.tools.PillarTool;
-import com.bgsoftware.wildtools.api.objects.tools.SellTool;
-import com.bgsoftware.wildtools.api.objects.tools.SortTool;
-import com.bgsoftware.wildtools.api.objects.tools.Tool;
+import com.bgsoftware.wildtools.api.objects.tools.*;
 import com.bgsoftware.wildtools.hooks.PricesProvider_Default;
 import com.bgsoftware.wildtools.scheduler.Scheduler;
 import com.bgsoftware.wildtools.tools.WTool;
@@ -103,6 +90,9 @@ public class DataHandler {
             Tool tool;
 
             switch (cfg.getString("tools." + name + ".tool-mode", "")) {
+                case "NORMAL":
+                    tool = plugin.getToolsManager().registerTool(type, name, NormalTool.class, null);
+                    break;
                 case "BUILDER":
                     if (!cfg.contains("tools." + name + ".length")) {
                         WildToolsPlugin.log("Couldn't find a length for tool " + name + ", skipping");

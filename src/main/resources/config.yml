@@ -35,6 +35,9 @@ events-manipulations:
 # The default config has basic trench-pickaxe, tray-pickaxe, sand-wand, sell-wand, lightning-wand, harvester-hoe
 # and cannon-wand examples. Each tool-mode has it's own configuration options, make sure you don't mix them.
 #
+# *** Normal Tool-Mode ***
+# Tools in this mode will work as a normal tool, but with added features like omni-tool etc.
+#
 # *** Builder Tool-Mode ***
 # Tools in this mode will create a pillar of the same block as the clicked one.
 # Required sections:
