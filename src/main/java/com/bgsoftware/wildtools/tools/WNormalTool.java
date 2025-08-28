@@ -1,9 +1,11 @@
 package com.bgsoftware.wildtools.tools;
 
+import com.bgsoftware.wildtools.api.events.NormalWandUseEvent;
 import com.bgsoftware.wildtools.api.objects.ToolMode;
 import com.bgsoftware.wildtools.api.objects.tools.NormalTool;
 import com.bgsoftware.wildtools.utils.BukkitUtils;
 import com.bgsoftware.wildtools.world.BlockMaterial;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -28,6 +30,25 @@ public class WNormalTool extends WTool implements NormalTool {
             e.setCancelled(true);
             return true;
         }
+
+        NormalWandUseEvent normalWandUseEvent = new NormalWandUseEvent(e.getPlayer(), this, targetBlock.getLocation());
+        Bukkit.getPluginManager().callEvent(normalWandUseEvent);
+
+        if (normalWandUseEvent.isCancelled()) {
+            e.setCancelled(true);
+            return true;
+        }
+
+        boolean usingDurability = isUsingDurability();
+        if (usingDurability) {
+            int toolDurability = getDurability(e.getPlayer(), inHand);
+            if (toolDurability <= 0) {
+                e.setCancelled(true);
+                return true;
+            }
+            reduceDurablility(e.getPlayer(), 1, inHand);
+        }
+
 
         return false;
     }
