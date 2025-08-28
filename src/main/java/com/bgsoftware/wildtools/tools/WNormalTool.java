@@ -12,9 +12,11 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.inventory.ItemStack;
 
 public class WNormalTool extends WTool implements NormalTool {
+
     public WNormalTool(Material type, String name) {
         super(type, name, ToolMode.NORMAL);
     }
+
     @Override
     public boolean onBlockBreak(BlockBreakEvent e) {
         ItemStack inHand = e.getPlayer().getItemInHand();
@@ -31,7 +33,7 @@ public class WNormalTool extends WTool implements NormalTool {
             return true;
         }
 
-        NormalWandUseEvent normalWandUseEvent = new NormalWandUseEvent(e.getPlayer(), this, targetBlock.getLocation());
+        NormalWandUseEvent normalWandUseEvent = new NormalWandUseEvent(e.getPlayer(), this, targetBlock);
         Bukkit.getPluginManager().callEvent(normalWandUseEvent);
 
         if (normalWandUseEvent.isCancelled()) {
