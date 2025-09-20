@@ -1,0 +1,19 @@
+group 'Hooks:SilkSpawners_CandC2'
+
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(16))
+    }
+}
+
+dependencies {
+    compileOnly "de.corneliusmay:SilkSpawners:2.3.2"
+    compileOnly "org.spigotmc:v1_8_R3-Taco:latest"
+    compileOnly project(":API")
+    compileOnly rootProject
+}
+
+if (project.hasProperty('hook.compile_silkspawners_candc2') &&
+        !Boolean.valueOf(project.findProperty("hook.compile_silkspawners_candc2").toString())) {
+    project.tasks.all { task -> task.enabled = false }
+}

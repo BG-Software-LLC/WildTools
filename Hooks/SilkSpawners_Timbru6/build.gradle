@@ -1,4 +1,4 @@
-group 'Hooks:SilkSpawners6'
+group 'Hooks:SilkSpawners_Timbru6'
 
 dependencies {
     compileOnly "de.dustplanet:SilkSpawners:6.0.0"
@@ -7,7 +7,7 @@ dependencies {
     compileOnly rootProject
 }
 
-if (project.hasProperty('hook.compile_silkspawners6') &&
-        !Boolean.valueOf(project.findProperty("hook.compile_silkspawners6").toString())) {
+if (project.hasProperty('hook.compile_silkspawners_timbru6') &&
+        !Boolean.valueOf(project.findProperty("hook.compile_silkspawners_timbru6").toString())) {
     project.tasks.all { task -> task.enabled = false }
 }

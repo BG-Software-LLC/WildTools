@@ -303,12 +303,17 @@ public class ProvidersHandler implements ProvidersManager {
         } else if (Bukkit.getPluginManager().isPluginEnabled("SilkSpawners")) {
             Plugin silkSpawners = Bukkit.getPluginManager().getPlugin("SilkSpawners");
             if (silkSpawners.getDescription().getVersion().startsWith("5")) {
-                Optional<DropsProvider> dropsProvider = createInstance("DropsProvider_SilkSpawners5");
+                Optional<DropsProvider> dropsProvider = createInstance("DropsProvider_SilkSpawners_Timbru5");
                 dropsProvider.ifPresent(this::addDropsProvider);
-            } else if (silkSpawners.getDescription().getVersion().startsWith("6")) {
-                Optional<DropsProvider> dropsProvider = createInstance("DropsProvider_SilkSpawners6");
+            } else if (silkSpawners.getDescription().getVersion().startsWith("6") ||
+                    silkSpawners.getDescription().getVersion().startsWith("7") ||
+                    silkSpawners.getDescription().getVersion().startsWith("8")) {
+                Optional<DropsProvider> dropsProvider = createInstance("DropsProvider_SilkSpawners_Timbru6");
                 dropsProvider.ifPresent(this::addDropsProvider);
             }
+        } else if (Bukkit.getPluginManager().isPluginEnabled("SilkSpawners_v2")) {
+            Optional<DropsProvider> dropsProvider = createInstance("DropsProvider_SilkSpawners_CandC2");
+            dropsProvider.ifPresent(this::addDropsProvider);
         } else if (Bukkit.getPluginManager().isPluginEnabled("MergedSpawner")) {
             Optional<DropsProvider> dropsProvider = createInstance("DropsProvider_MergedSpawner");
             dropsProvider.ifPresent(this::addDropsProvider);
