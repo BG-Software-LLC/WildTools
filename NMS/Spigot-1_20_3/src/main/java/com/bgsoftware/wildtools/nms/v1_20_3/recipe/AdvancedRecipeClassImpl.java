@@ -1,4 +1,4 @@
-package com.bgsoftware.wildtools.nms.v1_20_R3.recipe;
+package com.bgsoftware.wildtools.nms.v1_20_3.recipe;
 
 import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.wildtools.WildToolsPlugin;

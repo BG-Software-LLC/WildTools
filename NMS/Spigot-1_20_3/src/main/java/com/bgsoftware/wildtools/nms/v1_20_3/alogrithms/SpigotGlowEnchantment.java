@@ -1,4 +1,4 @@
-package com.bgsoftware.wildtools.nms.v1_20_R3.alogrithms;
+package com.bgsoftware.wildtools.nms.v1_20_3.alogrithms;
 
 import org.bukkit.NamespacedKey;
 import org.bukkit.enchantments.Enchantment;

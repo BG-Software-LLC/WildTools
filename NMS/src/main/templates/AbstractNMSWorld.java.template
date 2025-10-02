@@ -1,0 +1,201 @@
+package com.bgsoftware.wildtools.nms.${NMS_VERSION};
+
+import com.bgsoftware.common.reflection.ClassInfo;
+import com.bgsoftware.common.reflection.ReflectField;
+import com.bgsoftware.common.reflection.ReflectMethod;
+import com.bgsoftware.wildtools.nms.NMSWorld;
+import com.bgsoftware.wildtools.scheduler.Scheduler;
+import com.bgsoftware.wildtools.utils.math.Vector3;
+import com.bgsoftware.wildtools.utils.world.WorldEditSession;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientboundLightUpdatePacket;
+import net.minecraft.server.level.ChunkHolder;
+import net.minecraft.server.level.ChunkMap;
+import net.minecraft.server.level.ServerChunkCache;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.level.ThreadedLevelLightEngine;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.chunk.LevelChunk;
+import org.bukkit.CropState;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.World;
+import org.bukkit.WorldBorder;
+import org.bukkit.block.data.Ageable;
+import org.bukkit.block.data.BlockData;
+import ${CRAFTBUKKIT_PACKAGE}.CraftChunk;
+import ${CRAFTBUKKIT_PACKAGE}.CraftWorld;
+import ${CRAFTBUKKIT_PACKAGE}.block.CraftBlock;
+import ${CRAFTBUKKIT_PACKAGE}.entity.CraftPlayer;
+import ${CRAFTBUKKIT_PACKAGE}.inventory.CraftItemStack;
+import org.bukkit.entity.Player;
+
+import java.lang.reflect.Modifier;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+
+public abstract class AbstractNMSWorld implements NMSWorld {
+
+    private static final ReflectMethod<Void> SEND_PACKETS_TO_RELEVANT_PLAYERS = new ReflectMethod<>(
+            ChunkHolder.class, 1, Packet.class, boolean.class);
+    private static final ReflectField<Map<Long, ChunkHolder>> VISIBLE_CHUNKS = new ReflectField<>(
+            ChunkMap.class, Map.class, Modifier.PUBLIC | Modifier.VOLATILE, 1);
+    private static final ReflectMethod<Void> UPDATE_NEARBY_BLOCKS = new ReflectMethod<>(
+            new ClassInfo("com.destroystokyo.paper.antixray.ChunkPacketBlockControllerAntiXray", ClassInfo.PackageType.UNKNOWN),
+            "updateNearbyBlocks", Level.class, BlockPos.class);
+
+    @Override
+    public List<org.bukkit.inventory.ItemStack> getBlockDrops(Player bukkitPlayer, org.bukkit.block.Block bukkitBlock, boolean silkTouch) {
+        List<org.bukkit.inventory.ItemStack> drops = new LinkedList<>();
+
+        ServerPlayer serverPlayer = ((CraftPlayer) bukkitPlayer).getHandle();
+        ServerLevel serverLevel = (ServerLevel) ((CraftWorld) bukkitPlayer.getWorld()).getHandle();
+        BlockPos blockPos = new BlockPos(bukkitBlock.getX(), bukkitBlock.getY(), bukkitBlock.getZ());
+        BlockState blockState = serverLevel.getBlockState(blockPos);
+        ItemStack itemStack = serverPlayer.getMainHandItem();
+        BlockEntity blockEntity = serverLevel.getBlockEntity(blockPos);
+
+        Block.getDrops(blockState, serverLevel, blockPos, blockEntity, serverPlayer, itemStack).forEach(dropItem ->
+                drops.add(CraftItemStack.asCraftMirror(dropItem)));
+
+        return drops;
+    }
+
+    @Override
+    public int getExpFromBlock(org.bukkit.block.Block bukkitBlock, Player bukkitPlayer) {
+        ServerPlayer serverPlayer = ((CraftPlayer) bukkitPlayer).getHandle();
+        BlockState blockState = ((CraftBlock) bukkitBlock).getNMS();
+        return getExpDrop(blockState, serverPlayer, ((CraftBlock) bukkitBlock).getPosition());
+    }
+
+    protected abstract int getExpDrop(BlockState blockState, ServerPlayer serverPlayer, BlockPos blockPos);
+
+    @Override
+    public boolean isFullyGrown(org.bukkit.block.Block block) {
+        switch (block.getType()) {
+            case CACTUS:
+            case SUGAR_CANE:
+            case PUMPKIN:
+            case MELON:
+            case BAMBOO:
+                return true;
+        }
+
+        CraftBlock craftBlock = (CraftBlock) block;
+        BlockData blockData = craftBlock.getBlockData();
+        return ((Ageable) blockData).getAge() == ((Ageable) blockData).getMaximumAge();
+    }
+
+    @Override
+    public void setCropState(org.bukkit.block.Block block, CropState cropState) {
+        if (block.getType() == Material.CHORUS_PLANT) {
+            block.setType(Material.CHORUS_FLOWER);
+        } else {
+            CraftBlock craftBlock = (CraftBlock) block;
+            BlockData blockData = craftBlock.getBlockData();
+            if (blockData instanceof Ageable) {
+                ((Ageable) blockData).setAge(cropState.ordinal());
+                craftBlock.setBlockData(blockData, true);
+            } else {
+                block.setType(Material.AIR);
+            }
+        }
+    }
+
+    @Override
+    public void setBlockFast(World world, Vector3 location, int combinedId, boolean sendUpdate) {
+        ServerLevel serverLevel = ((CraftWorld) world).getHandle();
+        BlockPos blockPos = new BlockPos(location.getX(), location.getY(), location.getZ());
+
+        if (sendUpdate) {
+            serverLevel.setBlock(blockPos, Block.stateById(combinedId), 18);
+            return;
+        }
+
+        LevelChunk levelChunk = serverLevel.getChunkAt(blockPos);
+
+        if (combinedId == 0)
+            serverLevel.levelEvent(null, 2001, blockPos, Block.getId(serverLevel.getBlockState(blockPos)));
+
+        setBlockState(levelChunk, blockPos, Block.stateById(combinedId));
+
+        if (UPDATE_NEARBY_BLOCKS.isValid() && serverLevel.chunkPacketBlockController instanceof
+                ${PAPER_PACKAGE}.ChunkPacketBlockControllerAntiXray) {
+            UPDATE_NEARBY_BLOCKS.invoke(serverLevel.chunkPacketBlockController, serverLevel, blockPos);
+        }
+    }
+
+    protected abstract void setBlockState(LevelChunk levelChunk, BlockPos blockPos, BlockState blockState);
+
+    @Override
+    public void refreshChunk(org.bukkit.Chunk bukkitChunk, List<WorldEditSession.BlockData> blocksList) {
+        ServerLevel serverLevel = ((CraftChunk) bukkitChunk).getCraftWorld().getHandle();
+        LevelChunk levelChunk = serverLevel.getChunk(bukkitChunk.getX(), bukkitChunk.getZ());
+        ServerChunkCache serverChunkCache = levelChunk.level.getChunkSource();
+        ThreadedLevelLightEngine lightEngine = (ThreadedLevelLightEngine) levelChunk.level.getLightEngine();
+
+        for (WorldEditSession.BlockData blockData : blocksList) {
+            BlockPos blockPos = new BlockPos(blockData.location.getX(), blockData.location.getY(), blockData.location.getZ());
+            serverChunkCache.blockChanged(blockPos);
+            lightEngine.checkBlock(blockPos);
+        }
+
+        ChunkPos chunkPos = levelChunk.getPos();
+
+        Scheduler.runTask(levelChunk.level.getWorld(), chunkPos.x, chunkPos.z, () -> {
+            ClientboundLightUpdatePacket lightUpdatePacket = createLightUpdatePacket(chunkPos, lightEngine);
+            sendPacketToRelevantPlayers(levelChunk.level, chunkPos.x, chunkPos.z, lightUpdatePacket);
+        }, 2L);
+    }
+
+    protected abstract ClientboundLightUpdatePacket createLightUpdatePacket(ChunkPos chunkPos, ThreadedLevelLightEngine lightEngine);
+
+    @Override
+    public int getCombinedId(org.bukkit.block.Block bukkitBlock) {
+        BlockState blockState = ((CraftBlock) bukkitBlock).getNMS();
+        if (blockState.hasProperty(BlockStateProperties.WATERLOGGED))
+            blockState = blockState.setValue(BlockStateProperties.WATERLOGGED, false);
+        return Block.getId(blockState);
+    }
+
+    @Override
+    public boolean isOutsideWorldBorder(Location location) {
+        WorldBorder worldBorder = location.getWorld().getWorldBorder();
+        int radius = (int) worldBorder.getSize() / 2;
+        return location.getBlockX() > (worldBorder.getCenter().getBlockX() + radius) ||
+                location.getBlockX() < (worldBorder.getCenter().getBlockX() - radius) ||
+                location.getBlockZ() > (worldBorder.getCenter().getBlockZ() + radius) ||
+                location.getBlockZ() < (worldBorder.getCenter().getBlockZ() - radius);
+    }
+
+    @Override
+    public int getMinHeight(World world) {
+        return world.getMinHeight();
+    }
+
+    private void sendPacketToRelevantPlayers(ServerLevel serverLevel, int chunkX, int chunkZ, Packet<?> packet) {
+        ChunkMap chunkMap = serverLevel.getChunkSource().chunkMap;
+        ChunkPos chunkPos = new ChunkPos(chunkX, chunkZ);
+        ChunkHolder chunkHolder;
+
+        try {
+            chunkHolder = chunkMap.getVisibleChunkIfPresent(chunkPos.toLong());
+        } catch (Throwable ex) {
+            chunkHolder = VISIBLE_CHUNKS.get(chunkMap).get(chunkPos.toLong());
+        }
+
+        if (chunkHolder != null) {
+            SEND_PACKETS_TO_RELEVANT_PLAYERS.invoke(chunkHolder, packet, false);
+        }
+    }
+
+}

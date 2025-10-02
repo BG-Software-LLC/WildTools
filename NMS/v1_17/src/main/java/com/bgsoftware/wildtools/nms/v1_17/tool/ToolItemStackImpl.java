@@ -1,29 +1,14 @@
 package com.bgsoftware.wildtools.nms.v1_17.tool;
 
-import com.bgsoftware.wildtools.utils.items.ToolItemStack;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.stats.Stats;
-import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import org.bukkit.craftbukkit.v1_17_R1.entity.CraftPlayer;
-import org.bukkit.craftbukkit.v1_17_R1.event.CraftEventFactory;
-import org.bukkit.craftbukkit.v1_17_R1.inventory.CraftItemStack;
-import org.bukkit.entity.Player;
 
-public class ToolItemStackImpl extends ToolItemStack {
+import java.util.function.Function;
 
-    private final ItemStack nmsItem;
+public class ToolItemStackImpl extends com.bgsoftware.wildtools.nms.v1_17.tool.AbstractToolItemStack {
 
     public ToolItemStackImpl(ItemStack nmsItem) {
-        this.nmsItem = nmsItem;
-        this.setItem(CraftItemStack.asCraftMirror(nmsItem));
-    }
-
-    @Override
-    public ToolItemStack copy() {
-        return new ToolItemStackImpl(nmsItem.copy());
+        super(nmsItem);
     }
 
     @Override
@@ -38,31 +23,19 @@ public class ToolItemStackImpl extends ToolItemStack {
 
     @Override
     public int getTag(String key, int def) {
-        CompoundTag compoundTag = this.nmsItem.getTag();
-        return compoundTag == null || !compoundTag.contains(key, 3) ? def : compoundTag.getInt(key);
+        return getTagInternal(compoundTag ->
+                compoundTag.contains(key, 3) ? compoundTag.getInt(key) : def, def);
     }
 
     @Override
     public String getTag(String key, String def) {
-        CompoundTag compoundTag = this.nmsItem.getTag();
-        return compoundTag == null || !compoundTag.contains(key, 8) ? def : compoundTag.getString(key);
+        return getTagInternal(compoundTag ->
+                compoundTag.contains(key, 8) ? compoundTag.getString(key) : def, def);
     }
 
-    @Override
-    public void breakTool(Player player) {
-        ServerPlayer serverPlayer = ((CraftPlayer) player).getHandle();
-
-        serverPlayer.broadcastBreakEvent(EquipmentSlot.MAINHAND);
-        Item item = this.nmsItem.getItem();
-
-        if (this.nmsItem.getCount() == 1)
-            CraftEventFactory.callPlayerItemBreakEvent(serverPlayer, this.nmsItem);
-
-        this.nmsItem.shrink(1);
-
-        serverPlayer.awardStat(Stats.ITEM_BROKEN.get(item));
-
-        this.nmsItem.setDamageValue(0);
+    private <R> R getTagInternal(Function<CompoundTag, R> function, R def) {
+        CompoundTag compoundTag = this.nmsItem.getTag();
+        return compoundTag == null ? def : function.apply(compoundTag);
     }
 
 }

@@ -1,6 +1,5 @@
 package com.bgsoftware.wildtools.nms.v1_20_3.alogrithms;
 
-import com.bgsoftware.wildtools.nms.v1_20_R3.alogrithms.SpigotGlowEnchantment;
 import io.papermc.paper.enchantments.EnchantmentRarity;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.EntityCategory;
