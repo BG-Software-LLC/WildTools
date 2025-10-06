@@ -1,0 +1,86 @@
+package com.bgsoftware.wildtools.nms.${NMS_VERSION}.world;
+
+import org.bukkit.Material;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
+import org.bukkit.block.data.BlockData;
+import ${CRAFTBUKKIT_PACKAGE}.block.data.CraftBlockData;
+
+import javax.annotation.Nullable;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
+
+public class FakeBlockFactory {
+
+    public static Block createFakeBlock(Block delegate, Material blockType, BlockState originalState) {
+        return (Block) Proxy.newProxyInstance(
+                Block.class.getClassLoader(),
+                new Class<?>[]{Block.class},
+                new FakeBlockHandler(delegate, blockType, originalState)
+        );
+    }
+
+    private FakeBlockFactory() {
+    }
+
+    @Nullable
+    private static Method findMethod(Class<?> clazz, String name, Class<?>... parameterTypes) {
+        try {
+            return clazz.getMethod(name, parameterTypes);
+        } catch (NoSuchMethodException error) {
+            throw new RuntimeException(error);
+        }
+    }
+
+    private static class FakeBlockHandler implements InvocationHandler {
+
+        private static final Method GET_TYPE_METHOD = findMethod(Block.class, "getType");
+        private static final Method GET_BLOCK_DATA_METHOD = findMethod(Block.class, "getBlockData");
+        private static final Method GET_STATE_METHOD = findMethod(Block.class, "getState");
+        private static final Method SET_BLOCK_DATA_METHOD = findMethod(Block.class, "setBlockData", BlockData.class, boolean.class);
+
+        private final Block delegate;
+        private final BlockState originalState;
+        private Material blockType;
+
+        private FakeBlockHandler(Block delegate, Material blockType, BlockState originalState) {
+            this.delegate = delegate;
+            this.blockType = blockType;
+            this.originalState = originalState;
+        }
+
+        @Override
+        public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+            if (method.equals(GET_TYPE_METHOD)) {
+                return getType();
+            } else if (method.equals(GET_BLOCK_DATA_METHOD)) {
+                return getBlockData();
+            } else if (method.equals(GET_STATE_METHOD)) {
+                return getState();
+            } else if (method.equals(SET_BLOCK_DATA_METHOD)) {
+                preSetBlockDataMethod((BlockData) args[0]);
+            }
+
+            return method.invoke(this.delegate, args);
+        }
+
+        private Material getType() {
+            return this.blockType;
+        }
+
+        private BlockData getBlockData() {
+            return this.blockType.createBlockData((String) null);
+        }
+
+        private BlockState getState() {
+            return this.originalState;
+        }
+
+        private void preSetBlockDataMethod(BlockData blockData) {
+            this.blockType = blockData.getMaterial();
+        }
+
+    }
+
+}

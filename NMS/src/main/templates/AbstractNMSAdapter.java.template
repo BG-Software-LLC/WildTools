@@ -3,12 +3,16 @@ package com.bgsoftware.wildtools.nms.${NMS_VERSION};
 import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.wildtools.nms.NMSAdapter;
 import com.bgsoftware.wildtools.nms.${NMS_VERSION}.tool.ToolItemStackImpl;
-import com.bgsoftware.wildtools.nms.${NMS_VERSION}.world.FakeCraftBlock;
+import com.bgsoftware.wildtools.nms.${NMS_VERSION}.world.FakeBlockFactory;
 import com.bgsoftware.wildtools.recipes.AdvancedShapedRecipe;
 import com.bgsoftware.wildtools.utils.items.DestroySpeedCategory;
 import com.bgsoftware.wildtools.utils.items.ToolItemStack;
+import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientboundTakeItemEntityPacket;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
+import net.minecraft.server.level.ServerChunkCache;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.inventory.AnvilMenu;
@@ -101,7 +105,7 @@ public abstract class AbstractNMSAdapter implements NMSAdapter {
     @Override
     public BlockPlaceEvent getFakePlaceEvent(Player player, org.bukkit.block.Block block, org.bukkit.block.Block copyBlock) {
         org.bukkit.block.BlockState originalState = block.getState();
-        FakeCraftBlock fakeBlock = new FakeCraftBlock(block, copyBlock.getType(), originalState);
+        org.bukkit.block.Block fakeBlock = FakeBlockFactory.createFakeBlock(block, copyBlock.getType(), originalState);
         return new BlockPlaceEvent(
                 fakeBlock,
                 originalState,
@@ -122,8 +126,10 @@ public abstract class AbstractNMSAdapter implements NMSAdapter {
         ClientboundTakeItemEntityPacket takeItemEntityPacket = new ClientboundTakeItemEntityPacket(itemEntity.getId(),
                 livingEntity.getId(), itemEntity.getItem().getCount());
 
-        serverLevel.getChunkSource().broadcast(itemEntity, takeItemEntityPacket);
+        sendPacket(serverLevel.getChunkSource(), itemEntity, takeItemEntityPacket);
     }
+
+    protected abstract void sendPacket(ServerChunkCache serverChunkCache, Entity entity, Packet<? super ClientGamePacketListener> packet);
 
     @Override
     public DestroySpeedCategory getDestroySpeedCategory(Material material) {

@@ -3,6 +3,10 @@ package com.bgsoftware.wildtools.nms.v1_20_3;
 import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.wildtools.nms.v1_20_3.alogrithms.PaperGlowEnchantment;
 import com.bgsoftware.wildtools.nms.v1_20_3.alogrithms.SpigotGlowEnchantment;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
+import net.minecraft.server.level.ServerChunkCache;
+import net.minecraft.world.entity.Entity;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Registry;
 import org.bukkit.craftbukkit.v1_20_R3.CraftRegistry;
@@ -17,6 +21,11 @@ public class NMSAdapterImpl extends com.bgsoftware.wildtools.nms.v1_20_3.Abstrac
             new ReflectField<>(CraftRegistry.class, Map.class, "cache");
 
     private static final Enchantment GLOW_ENCHANT = initializeGlowEnchantment();
+
+    @Override
+    protected void sendPacket(ServerChunkCache serverChunkCache, Entity entity, Packet<? super ClientGamePacketListener> packet) {
+        serverChunkCache.broadcast(entity, packet);
+    }
 
     @Override
     public void makeItemGlow(ItemMeta itemMeta) {
