@@ -50,7 +50,7 @@ public abstract class AbstractNMSWorld implements NMSWorld {
     private static final ReflectField<Map<Long, ChunkHolder>> VISIBLE_CHUNKS = new ReflectField<>(
             ChunkMap.class, Map.class, Modifier.PUBLIC | Modifier.VOLATILE, 1);
     private static final ReflectMethod<Void> UPDATE_NEARBY_BLOCKS = new ReflectMethod<>(
-            new ClassInfo("com.destroystokyo.paper.antixray.ChunkPacketBlockControllerAntiXray", ClassInfo.PackageType.UNKNOWN),
+            new ClassInfo("${PAPER_PACKAGE}.ChunkPacketBlockControllerAntiXray", ClassInfo.PackageType.UNKNOWN),
             "updateNearbyBlocks", Level.class, BlockPos.class);
 
     @Override
