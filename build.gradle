@@ -40,8 +40,8 @@ allprojects {
             file.text.contains('Bukkit.broadcastMessage')
         }.getFiles()
 
-//        if(!filesWithDebug.isEmpty())
-//            throw new GradleException("Found debug messages: " + filesWithDebug)
+        if(!filesWithDebug.isEmpty())
+            throw new GradleException("Found debug messages: " + filesWithDebug)
     }
 
     build {
@@ -70,7 +70,7 @@ dependencies {
     implementation 'com.bgsoftware.common.config:CommentedConfiguration:b1'
     implementation 'com.bgsoftware.common.shopsbridge:ShopsBridge:b20:all@jar'
     implementation 'com.bgsoftware.common.dependencies:DependenciesManager:b2'
-    implementation 'com.bgsoftware.common.nmsloader:NMSLoader:b15'
+    implementation 'com.bgsoftware.common.nmsloader:NMSLoader:b16'
 
     implementation 'org.bstats:bstats-bukkit:3.0.0'
 
