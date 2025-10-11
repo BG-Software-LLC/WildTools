@@ -1,5 +1,5 @@
 <p align="center">
-<img src="https://bg-software.com/imgs/wildtools-logo.png" />
+<img src="https://static.bg-software.com/imgs/wildtools-logo.png" />
 <h2 align="center">The most optimized all-in-one tools plugin!</h2>
 </p>
 <br>
