@@ -10,6 +10,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 public class DropsProvider_RoseStacker implements DropsProvider {
@@ -19,19 +21,19 @@ public class DropsProvider_RoseStacker implements DropsProvider {
         if (!(block.getState() instanceof CreatureSpawner))
             return null;
 
-        List<ItemStack> drops = new ArrayList<>();
+        ItemStack dropItem;
         StackedSpawner stackedSpawner = RoseStackerAPI.getInstance().getStackedSpawner(block);
 
         if (stackedSpawner != null) {
-            drops.add(ItemUtils.getSpawnerAsStackedItemStack(stackedSpawner.getSpawner().getSpawnedType(), stackedSpawner.getStackSize()));
+            dropItem = ItemUtils.getSpawnerAsStackedItemStack(stackedSpawner.getSpawner().getSpawnedType(), stackedSpawner.getStackSize());
             stackedSpawner.setStackSize(0);
             stackedSpawner.updateDisplay();
             RoseStackerAPI.getInstance().removeSpawnerStack(stackedSpawner);
         } else {
-            drops.add(DropsProviders_Default.getSpawnerItem((CreatureSpawner) block.getState()));
+            dropItem = DropsProviders_Default.getSpawnerItem((CreatureSpawner) block.getState());
         }
 
-        return drops;
+        return Collections.singletonList(dropItem);
     }
 
     @Override

@@ -2,7 +2,7 @@ package com.bgsoftware.wildtools.hooks;
 
 import com.bgsoftware.wildtools.WildToolsPlugin;
 import com.bgsoftware.wildtools.api.hooks.DropsProvider;
-import com.bgsoftware.wildtools.utils.items.ItemUtils;
+import com.bgsoftware.wildtools.utils.Materials;
 import com.gmail.nossr50.datatypes.player.McMMOPlayer;
 import com.gmail.nossr50.datatypes.skills.SecondaryAbility;
 import com.gmail.nossr50.datatypes.skills.SkillType;
@@ -15,7 +15,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class DropsProvider_mcMMO1 implements DropsProvider {
 
@@ -23,11 +22,12 @@ public class DropsProvider_mcMMO1 implements DropsProvider {
 
     @Override
     public List<ItemStack> getBlockDrops(Player player, Block block) {
-        if (!ItemUtils.isCrops(block.getType()) || !shouldBonusDrops(player))
+        if (!Materials.isCrop(block.getType()) || !shouldBonusDrops(player))
             return null;
 
-        return plugin.getNMSWorld().getBlockDrops(player, block, false).stream()
-                .peek(itemStack -> itemStack.setAmount(itemStack.getAmount() * 2)).collect(Collectors.toList());
+        List<ItemStack> drops = plugin.getNMSWorld().getBlockDrops(player, block, false);
+        drops.forEach(itemStack -> itemStack.setAmount(itemStack.getAmount() * 2));
+        return drops;
     }
 
     @Override

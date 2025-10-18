@@ -7,7 +7,8 @@ import org.bukkit.block.CreatureSpawner;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 public class DropsProvider_SilkSpawners_Timbru6 implements DropsProvider {
@@ -23,17 +24,15 @@ public class DropsProvider_SilkSpawners_Timbru6 implements DropsProvider {
         if (!(block.getState() instanceof CreatureSpawner))
             return null;
 
-        List<ItemStack> drops = new ArrayList<>();
-
         String entityId = silkUtil.getSpawnerEntityID(block);
         if (entityId == null)
             entityId = silkUtil.getDefaultEntityID();
 
         String mobName = silkUtil.getCreatureName(entityId).toLowerCase().replace(" ", "");
 
-        drops.add(silkUtil.newSpawnerItem(entityId, silkUtil.getCustomSpawnerName(mobName), 1, false));
+        ItemStack dropItem = silkUtil.newSpawnerItem(entityId, silkUtil.getCustomSpawnerName(mobName), 1, false);
 
-        return drops;
+        return Collections.singletonList(dropItem);
     }
 
     @Override

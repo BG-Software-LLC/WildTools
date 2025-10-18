@@ -4,13 +4,10 @@ import com.bgsoftware.wildtools.Locale;
 import com.bgsoftware.wildtools.WildToolsPlugin;
 import com.bgsoftware.wildtools.api.objects.tools.Tool;
 import com.bgsoftware.wildtools.scheduler.Scheduler;
-import com.bgsoftware.wildtools.tools.WHarvesterTool;
-import com.bgsoftware.wildtools.utils.Materials;
 import com.bgsoftware.wildtools.utils.world.WorldEditSession;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -26,8 +23,6 @@ import java.util.Random;
 import java.util.UUID;
 
 public class ItemUtils {
-
-    private static final Material BAMBOO = Materials.getSafeMaterial("BAMBOO", null);
 
     private static final WildToolsPlugin plugin = WildToolsPlugin.getPlugin();
 
@@ -153,12 +148,6 @@ public class ItemUtils {
             return Integer.MAX_VALUE;
 
         return usingDurability ? toolItemStack.getMaxDurability() - toolItemStack.getDurability() + 1 : toolItemStack.getUses();
-    }
-
-    public static boolean isCrops(Material type) {
-        return WHarvesterTool.crops.contains(type.name()) && type != Material.CACTUS &&
-                type != Materials.SUGAR_CANE.parseMaterial() && type != Materials.MELON.parseMaterial() &&
-                type != Material.PUMPKIN && type != BAMBOO;
     }
 
 }

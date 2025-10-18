@@ -11,6 +11,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
+import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -18,8 +19,10 @@ import java.util.Map;
 
 public class ContainerProvider_Default implements ExtendedContainerProvider {
 
-    private static final Material BARREL = Materials.getSafeMaterial("BARREL", null);
-    private static final Material SHULKER_BOX = Materials.getSafeMaterial("SHULKER_BOX", null);
+    @Nullable
+    private static final Material BARREL = Materials.getSafeMaterial("BARREL").orElse(null);
+    @Nullable
+    private static final Material SHULKER_BOX = Materials.getSafeMaterial("SHULKER_BOX").orElse(null);
 
     private final WildToolsPlugin plugin;
 

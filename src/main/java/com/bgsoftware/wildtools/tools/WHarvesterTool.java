@@ -26,35 +26,22 @@ import org.bukkit.inventory.ItemStack;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
 public class WHarvesterTool extends WTool implements HarvesterTool {
 
-    private static final Material BAMBOO = Materials.getSafeMaterial("BAMBOO", null);
-    private static final Material CHORUS_FLOWER = Materials.getSafeMaterial("CHORUS_FLOWER", null);
+    private static final Material BAMBOO = Materials.getSafeMaterial("BAMBOO").orElse(null);
+    private static final Material CHORUS_FLOWER = Materials.getSafeMaterial("CHORUS_FLOWER").orElse(null);
 
-    public static final List<String> crops = Arrays.asList(
-            "CROPS", "WHEAT",
-            "CARROT", "CARROTS",
-            "POTATO", "POTATOES",
-            "BEETROOT_BLOCK", "BEETROOTS",
-            "NETHER_WARTS", "NETHER_WART",
-            "CACTUS", "BAMBOO",
-            "SUGAR_CANE_BLOCK", "SUGAR_CANE",
-            "MELON_BLOCK", "MELON",
-            "PUMPKIN",
-            "COCOA"
-    );
-
-    private static final BlockFace[] nearbyBlocks = new BlockFace[]{
-            BlockFace.UP, BlockFace.DOWN, BlockFace.WEST, BlockFace.EAST, BlockFace.NORTH, BlockFace.SOUTH
-    };
+    private static final List<BlockFace> nearbyBlocks = new LinkedList<>(
+            Arrays.asList(BlockFace.UP, BlockFace.DOWN, BlockFace.WEST, BlockFace.EAST, BlockFace.NORTH, BlockFace.SOUTH));
 
     private final int radius;
 
     private int farmlandRadius;
-    private String activateAction;
+    private HarvesterAction activateAction;
     private boolean oneLayerOnly;
 
     public WHarvesterTool(Material type, String name, int radius) {
@@ -62,7 +49,7 @@ public class WHarvesterTool extends WTool implements HarvesterTool {
         this.radius = radius;
         this.farmlandRadius = -1;
         this.oneLayerOnly = false;
-        this.activateAction = "RIGHT_CLICK";
+        this.activateAction = HarvesterAction.RIGHT_CLICK;
     }
 
     @Override
@@ -82,13 +69,15 @@ public class WHarvesterTool extends WTool implements HarvesterTool {
 
     @Override
     public String getActivationAction() {
-        return activateAction;
+        return activateAction.name();
     }
 
     @Override
     public void setActivationAction(String activateAction) {
-        if (activateAction.equals("RIGHT_CLICK") || activateAction.equals("LEFT_CLICK"))
-            this.activateAction = activateAction;
+        try {
+            this.activateAction = HarvesterAction.valueOf(activateAction.toUpperCase(java.util.Locale.ENGLISH));
+        } catch (Throwable ignored) {
+        }
     }
 
     @Override
@@ -128,7 +117,7 @@ public class WHarvesterTool extends WTool implements HarvesterTool {
         // Preventing usage of harvester hoes as regular hoes
         e.setCancelled(true);
 
-        if (!getActivationAction().equals("RIGHT_CLICK"))
+        if (this.activateAction != HarvesterAction.RIGHT_CLICK)
             return false;
 
         return handleUse(e.getPlayer(), e.getClickedBlock(), ToolItemStack.of(e.getItem()));
@@ -139,7 +128,7 @@ public class WHarvesterTool extends WTool implements HarvesterTool {
         // Preventing usage of harvester hoes as regular hoes
         e.setCancelled(true);
 
-        if (!getActivationAction().equals("LEFT_CLICK"))
+        if (this.activateAction != HarvesterAction.LEFT_CLICK)
             return false;
 
         return handleUse(e.getPlayer(), e.getClickedBlock(), ToolItemStack.of(e.getItem()));
@@ -183,11 +172,12 @@ public class WHarvesterTool extends WTool implements HarvesterTool {
                     Block targetBlock = blockLocation.getBlock();
                     Material blockType = targetBlock.getType();
 
-                    if (!isHarvestableBlock(blockType) || !BukkitUtils.canBreakBlock(player, targetBlock, this))
+                    if (!Materials.isHarvestable(blockType) || !BukkitUtils.canBreakBlock(player, targetBlock, this))
                         continue;
 
-                    if (farmlandRadius >= 0 && (blockType == Material.DIRT || blockType == Materials.GRASS_BLOCK.parseMaterial()) &&
-                            isBetweenBlocks(farmlandMax, farmlandMin, blockLocation) && BukkitUtils.hasBreakAccess(block, player)) {
+                    if (farmlandRadius >= 0 && Materials.isFarmland(blockType) &&
+                            isBetweenBlocks(farmlandMax, farmlandMin, blockLocation) &&
+                            BukkitUtils.hasBreakAccess(block, player)) {
                         editSession.setType(blockLocation, Materials.getFarmlandId());
                         toolUsages++;
                         continue;
@@ -196,16 +186,16 @@ public class WHarvesterTool extends WTool implements HarvesterTool {
                     if (!isBetweenBlocks(cropsMax, cropsMin, blockLocation))
                         continue;
 
-                    if (targetBlock.getType().name().contains("CHORUS")) {
+                    if (Materials.isChorus(blockType)) {
                         toolUsages += breakChorusFruit(player, targetBlock, usedItem.getItem(), sellInfo,
                                 alreadyBroken, toolUsages, toolDurability, usingDurability, false, editSession);
                         continue;
                     }
 
-                    if (!crops.contains(blockType.name()) || !plugin.getNMSWorld().isFullyGrown(targetBlock))
+                    if (!Materials.isCrop(blockType) || !plugin.getNMSWorld().isFullyGrown(targetBlock))
                         continue;
 
-                    if (blockType == Material.CACTUS || blockType == Materials.SUGAR_CANE.parseMaterial() ||
+                    if (blockType == Material.CACTUS || blockType == Materials.SUGAR_CANE.toBukkitType() ||
                             blockType == BAMBOO) {
                         if (y == cropsMax.getBlockY()) {
                             // Checking if the block is the bottom crop
@@ -294,7 +284,7 @@ public class WHarvesterTool extends WTool implements HarvesterTool {
         if (!alreadyBroken.add(blockLocation))
             return currentUsages;
 
-        if (block.getRelative(BlockFace.DOWN).getType().name().contains("END")) {
+        if (Materials.isEndBlock(block.getRelative(BlockFace.DOWN).getType())) {
             Scheduler.runTask(blockLocation, () -> {
                 block.setType(CHORUS_FLOWER);
                 if (Scheduler.isRegionScheduler()) {
@@ -306,7 +296,7 @@ public class WHarvesterTool extends WTool implements HarvesterTool {
             return currentUsages;
         }
 
-        boolean isFlower = block.getType().name().contains("FLOWER");
+        boolean isFlower = Materials.isFlower(block.getType());
 
         if (BukkitUtils.breakBlock(player, block, usedItem, this, editSession, itemStack ->
                 sellInfo.handleItem(player, isFlower ? new ItemStack(CHORUS_FLOWER) : itemStack)))
@@ -314,7 +304,7 @@ public class WHarvesterTool extends WTool implements HarvesterTool {
 
         for (BlockFace blockFace : nearbyBlocks) {
             Block nearbyBlock = block.getRelative(blockFace);
-            if (nearbyBlock.getType().name().contains("CHORUS"))
+            if (Materials.isChorus(nearbyBlock.getType()))
                 currentUsages += breakChorusFruit(player, nearbyBlock, usedItem, sellInfo, alreadyBroken,
                         toolUsages + currentUsages, toolDurability, usingDurability,
                         isFlower || foundFlower, editSession);
@@ -343,11 +333,6 @@ public class WHarvesterTool extends WTool implements HarvesterTool {
         return currentUsages;
     }
 
-    private boolean isHarvestableBlock(Material type) {
-        return type == Material.DIRT || type == Materials.GRASS_BLOCK.parseMaterial() ||
-                type.name().contains("CHORUS") || crops.contains(type.name());
-    }
-
     private static class SellInfo {
 
         private final boolean hasSellMode;
@@ -374,6 +359,13 @@ public class WHarvesterTool extends WTool implements HarvesterTool {
 
             return itemStack;
         }
+
+    }
+
+    private enum HarvesterAction {
+
+        RIGHT_CLICK,
+        LEFT_CLICK
 
     }
 

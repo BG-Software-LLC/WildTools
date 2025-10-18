@@ -1,14 +1,14 @@
 package com.bgsoftware.wildtools.hooks;
 
 import com.bgsoftware.wildtools.api.hooks.DropsProvider;
-import org.bukkit.Material;
+import com.bgsoftware.wildtools.utils.Materials;
 import org.bukkit.block.Block;
 import org.bukkit.block.CreatureSpawner;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BlockStateMeta;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class DropsProviders_Default implements DropsProvider {
@@ -18,11 +18,9 @@ public class DropsProviders_Default implements DropsProvider {
         if (!(block.getState() instanceof CreatureSpawner))
             return null;
 
-        List<ItemStack> drops = new ArrayList<>();
+        ItemStack dropItem = getSpawnerItem((CreatureSpawner) block.getState());
 
-        drops.add(getSpawnerItem((CreatureSpawner) block.getState()));
-
-        return drops;
+        return Collections.singletonList(dropItem);
     }
 
     @Override
@@ -31,13 +29,7 @@ public class DropsProviders_Default implements DropsProvider {
     }
 
     public static ItemStack getSpawnerItem(CreatureSpawner creatureSpawner) {
-        ItemStack itemStack;
-
-        try {
-            itemStack = new ItemStack(Material.MOB_SPAWNER);
-        } catch (Throwable ex) {
-            itemStack = new ItemStack(Material.matchMaterial("SPAWNER"));
-        }
+        ItemStack itemStack = new ItemStack(Materials.SPAWNER.toBukkitType());
 
         try {
             BlockStateMeta blockStateMeta = (BlockStateMeta) itemStack.getItemMeta();

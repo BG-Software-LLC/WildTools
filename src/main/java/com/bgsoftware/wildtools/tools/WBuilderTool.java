@@ -59,13 +59,15 @@ public class WBuilderTool extends WTool implements BuilderTool {
             blockItemStack = new ItemStack(firstBlockMaterial.getType());
         } else {
             blockItemStack = e.getClickedBlock().getState().getData().toItemStack(1);
-            if ((blockItemStack.getType().name().contains("STEP") || blockItemStack.getType().name().contains("SLAB")) &&
-                    blockItemStack.getDurability() >= 8)
-                blockItemStack.setDurability((short) (blockItemStack.getDurability() - 8));
-            else if (blockItemStack.getType() == Material.LOG && blockItemStack.getDurability() >= 4) {
-                blockItemStack.setDurability((short) (blockItemStack.getDurability() % 4));
-            } else if (blockItemStack.getType() == Material.LOG_2 && blockItemStack.getDurability() >= 2) {
-                blockItemStack.setDurability((short) (blockItemStack.getDurability() % 2));
+            Material itemType = blockItemStack.getType();
+            short itemDurability = blockItemStack.getDurability();
+
+            if (Materials.isSlab(itemType) && itemDurability >= 8)
+                blockItemStack.setDurability((short) (itemDurability - 8));
+            else if (itemType == Material.LOG && itemDurability >= 4) {
+                blockItemStack.setDurability((short) (itemDurability % 4));
+            } else if (itemType == Material.LOG_2 && itemDurability >= 2) {
+                blockItemStack.setDurability((short) (itemDurability % 2));
             }
         }
 
@@ -84,7 +86,7 @@ public class WBuilderTool extends WTool implements BuilderTool {
 
             Material nextBlockType = nextBlock.getType();
 
-            if (!canPlaceThroughBlock(nextBlockType) ||
+            if (!Materials.isPlaceThroughBlock(nextBlockType) ||
                     !BukkitUtils.canBreakBlock(e.getPlayer(), nextBlock, firstBlockMaterial, this, false) ||
                     !BukkitUtils.placeBlock(e.getPlayer(), nextBlock, originalBlock, editSession)) {
                 break;
@@ -109,10 +111,6 @@ public class WBuilderTool extends WTool implements BuilderTool {
             reduceDurablility(e.getPlayer(), usingDurability ? iter : 1, e.getItem());
 
         return true;
-    }
-
-    private static boolean canPlaceThroughBlock(Material type) {
-        return !type.isSolid() && type != Materials.COBWEB.parseMaterial() && !ItemUtils.isCrops(type);
     }
 
 }

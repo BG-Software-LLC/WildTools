@@ -4,7 +4,7 @@ import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.wildtools.WildToolsPlugin;
 import com.bgsoftware.wildtools.api.objects.ToolMode;
 import com.bgsoftware.wildtools.api.objects.tools.Tool;
-import com.bgsoftware.wildtools.utils.BukkitUtils;
+import com.bgsoftware.wildtools.utils.Materials;
 import com.bgsoftware.wildtools.utils.items.ItemUtils;
 import com.bgsoftware.wildtools.utils.items.ToolItemStack;
 import com.bgsoftware.wildtools.world.BlockMaterial;
@@ -570,7 +570,7 @@ public abstract class WTool implements Tool {
 
     @Override
     public boolean onBlockHit(PlayerInteractEvent e) {
-        if (isInstantBreak() && !BukkitUtils.DISALLOWED_BLOCKS.contains(e.getClickedBlock().getType()))
+        if (isInstantBreak() && !Materials.isBlacklisted(e.getClickedBlock().getType()))
             return onBlockBreak(new BlockBreakEvent(e.getClickedBlock(), e.getPlayer()));
 
         return false;

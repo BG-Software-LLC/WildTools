@@ -26,7 +26,7 @@ public class ItemBuilder {
     }
 
     public ItemBuilder(Materials type) {
-        this(type.parseMaterial(), 0);
+        this(type.toItemStack(1));
     }
 
     public ItemBuilder(Material type) {

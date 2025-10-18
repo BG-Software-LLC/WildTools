@@ -4,6 +4,7 @@ import com.bgsoftware.wildtools.api.events.CrowbarWandUseEvent;
 import com.bgsoftware.wildtools.api.objects.ToolMode;
 import com.bgsoftware.wildtools.api.objects.tools.CrowbarTool;
 import com.bgsoftware.wildtools.utils.BukkitUtils;
+import com.bgsoftware.wildtools.utils.Materials;
 import com.bgsoftware.wildtools.utils.items.ItemUtils;
 import com.bgsoftware.wildtools.utils.world.WorldEditSession;
 import org.bukkit.Bukkit;
@@ -32,7 +33,7 @@ public class WCrowbarTool extends WTool implements CrowbarTool {
 
     @Override
     public boolean onBlockInteract(PlayerInteractEvent e) {
-        if (!e.getClickedBlock().getType().name().contains("SPAWNER"))
+        if (!Materials.isSpawner(e.getClickedBlock().getType()))
             return false;
 
         if (!BukkitUtils.canBreakBlock(e.getPlayer(), e.getClickedBlock(), this) ||

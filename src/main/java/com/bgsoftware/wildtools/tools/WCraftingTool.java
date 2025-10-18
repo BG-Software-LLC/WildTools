@@ -7,6 +7,7 @@ import com.bgsoftware.wildtools.api.objects.tools.CraftingTool;
 import com.bgsoftware.wildtools.recipes.RecipeChoice;
 import com.bgsoftware.wildtools.scheduler.Scheduler;
 import com.bgsoftware.wildtools.utils.BukkitUtils;
+import com.bgsoftware.wildtools.utils.Materials;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.BlockState;
@@ -88,9 +89,9 @@ public class WCraftingTool extends WTool implements CraftingTool {
                         RecipeChoice clonedIngredient = ingredient.copy();
                         clonedIngredient.setAmount(clonedIngredient.getAmount() * amountOfRecipes);
                         clonedIngredient.remove(inventory);
-                        if (clonedIngredient.test("BOTTLE"))
+                        if (clonedIngredient.test(Materials::isBottle))
                             toAdd.add(new ItemStack(Material.GLASS_BOTTLE, clonedIngredient.getAmount()));
-                        else if (clonedIngredient.test("BUCKET"))
+                        else if (clonedIngredient.test(Materials::isBucket))
                             toAdd.add(new ItemStack(Material.BUCKET, clonedIngredient.getAmount()));
                     }
 

@@ -8,7 +8,7 @@ import org.bukkit.block.CreatureSpawner;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class DropsProvider_WildStacker implements DropsProvider {
@@ -18,24 +18,22 @@ public class DropsProvider_WildStacker implements DropsProvider {
         if (!(block.getState() instanceof CreatureSpawner))
             return null;
 
-        List<ItemStack> drops = new ArrayList<>();
-
         StackedSpawner stackedSpawner = WildStackerAPI.getStackedSpawner((CreatureSpawner) block.getState());
 
         int spawnerStackAmount = stackedSpawner.getStackAmount();
 
+        ItemStack dropItem;
         try {
-            drops.add(stackedSpawner.getDropItem());
+            dropItem = stackedSpawner.getDropItem();
         } catch (Throwable ex) {
-            ItemStack itemStack = DropsProviders_Default.getSpawnerItem((CreatureSpawner) block.getState());
-            itemStack.setAmount(spawnerStackAmount);
-            drops.add(itemStack);
+            dropItem = DropsProviders_Default.getSpawnerItem((CreatureSpawner) block.getState());
+            dropItem.setAmount(spawnerStackAmount);
         }
 
         // We want to unstack the spawner when getting drops from stacked spawners.
         stackedSpawner.runUnstack(spawnerStackAmount);
 
-        return drops;
+        return Collections.singletonList(dropItem);
     }
 
     @Override

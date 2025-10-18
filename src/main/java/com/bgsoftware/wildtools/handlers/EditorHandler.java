@@ -26,7 +26,7 @@ public class EditorHandler {
 
     public CommentedConfiguration config;
 
-    public EditorHandler(WildToolsPlugin plugin){
+    public EditorHandler(WildToolsPlugin plugin) {
         this.plugin = plugin;
 
         File file = new File(plugin.getDataFolder(), "config.yml");
@@ -43,7 +43,7 @@ public class EditorHandler {
         loadSettingsEditor();
     }
 
-    public void saveConfiguration(){
+    public void saveConfiguration() {
         try {
             config.save(new File(plugin.getDataFolder(), "config.yml"));
         } catch (IOException error) {
@@ -54,32 +54,32 @@ public class EditorHandler {
         DataHandler.reload();
     }
 
-    public void reloadConfiguration(){
+    public void reloadConfiguration() {
         try {
             config.load(new File(plugin.getDataFolder(), "config.yml"));
-        }catch(Exception ex){
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
     }
 
-    public Inventory getSettingsEditor(){
-        Inventory inventory = Bukkit.createInventory(null, 9 * 5, ""+ ChatColor.AQUA + ChatColor.BOLD + "WildTools");
+    public Inventory getSettingsEditor() {
+        Inventory inventory = Bukkit.createInventory(null, 9 * 5, "" + ChatColor.AQUA + ChatColor.BOLD + "WildTools");
         inventory.setContents(settingsEditor);
         return inventory;
     }
 
-    public Inventory getToolsEditor(){
+    public Inventory getToolsEditor() {
         List<String> toolNames = new ArrayList<>(config.getConfigurationSection("tools").getKeys(false));
         int size = (toolNames.size() / 9) + 1;
 
-        if(toolNames.size() % 9 != 0)
+        if (toolNames.size() % 9 != 0)
             size++;
 
         Inventory editor = Bukkit.createInventory(null, size * 9, "" + ChatColor.DARK_GRAY + ChatColor.BOLD + "Tools Editor");
 
         toolNames.sort(Comparator.naturalOrder());
 
-        for(int i = 0; i < toolNames.size(); i++){
+        for (int i = 0; i < toolNames.size(); i++) {
             editor.setItem(i, new ItemBuilder(Material.valueOf(getFromConfig(toolNames.get(i), "type", String.class, "")))
                     .withName(getFromConfig(toolNames.get(i), "name", String.class, ""))
                     .withLore("&7Click here to edit " + toolNames.get(i)).build());
@@ -92,15 +92,15 @@ public class EditorHandler {
     }
 
     @SuppressWarnings("unchecked")
-    public Inventory getToolEditor(String toolName){
-        if(plugin.getToolsManager().getTool(toolName) == null)
+    public Inventory getToolEditor(String toolName) {
+        if (plugin.getToolsManager().getTool(toolName) == null)
             return getSettingsEditor();
 
         Inventory editor = Bukkit.createInventory(null, 9 * 6, "" + ChatColor.DARK_GRAY + ChatColor.BOLD + "Tool Editor");
 
-        ItemStack bluePane = new ItemBuilder(Materials.getBlueGlassPane()).withName("&6").build();
+        ItemStack bluePane = new ItemBuilder(Materials.LIGHT_BLUE_STAINED_GLASS_PANE).withName("&6").build();
 
-        for(int i = 0; i < editor.getSize(); i++)
+        for (int i = 0; i < editor.getSize(); i++)
             editor.setItem(i, bluePane);
 
         editor.setItem(46, new ItemBuilder(Material.valueOf(getFromConfig(toolName, "type", String.class, "")))
@@ -123,7 +123,7 @@ public class EditorHandler {
                 .withName("&bTool Auto-Collect").withLore("&7Auto-Collect: " + getFromConfig(toolName, "auto-collect", Boolean.class, false)).build());
         editor.setItem(15, new ItemBuilder(Material.ANVIL)
                 .withName("&bTool Uses").withLore("&7Uses: " + getFromConfig(toolName, "uses", Integer.class, -1)).build());
-        editor.setItem(16, new ItemBuilder(Materials.getGodApple())
+        editor.setItem(16, new ItemBuilder(Materials.ENCHANTED_GOLDEN_APPLE)
                 .withName("&bTool Enchants").withLore("&7Enchantments:", getEnchants(toolName)).build());
         editor.setItem(19, new ItemBuilder(Material.QUARTZ)
                 .withName("&bTool Whitelisted Drops").withLore("&7Whitelisted Drops: ",
@@ -148,7 +148,7 @@ public class EditorHandler {
                         getFromConfig(toolName, "blacklisted-drops", List.class, new ArrayList<>())).build());
         editor.setItem(30, new ItemBuilder(Material.SUGAR)
                 .withName("&bTool Instant-Break").withLore("&7Instant-Break: " + getFromConfig(toolName, "instant-break", Boolean.class, false)).build());
-        editor.setItem(31, new ItemBuilder(Materials.EXPERIENCE_BOTTLE.parseMaterial())
+        editor.setItem(31, new ItemBuilder(Materials.EXPERIENCE_BOTTLE.toBukkitType())
                 .withName("&bTool Anvil Combine Exp").withLore("&7Anvil Combine Exp: " + getFromConfig(toolName, "anvil-combine-exp", Integer.class, -1)).build());
         editor.setItem(32, new ItemBuilder(Material.GOLD_INGOT)
                 .withName("&bTool Anvil Combine Limit").withLore("&7Anvil Combine Limit: " + getFromConfig(toolName, "anvil-combine-limit", Integer.class, -1)).build());
@@ -158,13 +158,13 @@ public class EditorHandler {
 
         ToolMode toolMode = ToolMode.valueOf(getFromConfig(toolName, "tool-mode", String.class, ""));
 
-        if(toolMode == ToolMode.BUILDER){
+        if (toolMode == ToolMode.BUILDER) {
             editor.setItem(50, new ItemBuilder(Material.FEATHER)
                     .withName("&bTool Length").withLore("&7Length: " + getFromConfig(toolName, "length", Integer.class, 0)).build());
-        }else if(toolMode == ToolMode.CUBOID){
+        } else if (toolMode == ToolMode.CUBOID) {
             editor.setItem(50, new ItemBuilder(Material.FEATHER)
                     .withName("&bTool Break-Level").withLore("&7Break-Level: " + getFromConfig(toolName, "break-level", Integer.class, 3)).build());
-        }else if(toolMode == ToolMode.HARVESTER){
+        } else if (toolMode == ToolMode.HARVESTER) {
             editor.setItem(50, new ItemBuilder(Material.FEATHER)
                     .withName("&bTool Radius").withLore("&7Radius: " + getFromConfig(toolName, "radius", Integer.class, 0)).build());
             editor.setItem(51, new ItemBuilder(Materials.FARMLAND)
@@ -173,16 +173,16 @@ public class EditorHandler {
                     .withName("&bTool Active Action").withLore("&7Active Action: " + getFromConfig(toolName, "active-action", String.class, "")).build());
             editor.setItem(53, new ItemBuilder(Material.GOLD_INGOT)
                     .withName("&bTool Multiplier").withLore("&7Multiplier: " + getFromConfig(toolName, "multiplier", Double.class, 1.0)).build());
-        }else if(toolMode == ToolMode.ICE){
+        } else if (toolMode == ToolMode.ICE) {
             editor.setItem(50, new ItemBuilder(Material.FEATHER)
                     .withName("&bTool Radius").withLore("&7Radius: " + getFromConfig(toolName, "radius", Integer.class, 0)).build());
-        }else if(toolMode == ToolMode.CANNON){
+        } else if (toolMode == ToolMode.CANNON) {
             editor.setItem(50, new ItemBuilder(Material.TNT)
                     .withName("&bTool TNT-Amount").withLore("&7TNT-Amount: " + getFromConfig(toolName, "tnt-amount", Integer.class, 0)).build());
-        }else if(toolMode == ToolMode.CRAFTING){
+        } else if (toolMode == ToolMode.CRAFTING) {
             editor.setItem(50, new ItemBuilder(Materials.CRAFTING_TABLE)
                     .withName("&bTool Recipes").withLore("&7Recipes: ", getFromConfig(toolName, "craftings", List.class, new ArrayList<>())).build());
-        }else if(toolMode == ToolMode.SELL){
+        } else if (toolMode == ToolMode.SELL) {
             editor.setItem(50, new ItemBuilder(Material.GOLD_INGOT)
                     .withName("&bTool Multiplier").withLore("&7Multiplier: " + getFromConfig(toolName, "multiplier", Double.class, 1.0)).build());
         }
@@ -194,7 +194,7 @@ public class EditorHandler {
         config.set("tools." + toolName + ".type", "STICK");
         config.set("tools." + toolName + ".tool-mode", toolMode.name());
 
-        switch (toolMode){
+        switch (toolMode) {
             case BUILDER:
                 config.set("tools." + toolName + ".length", 1);
                 break;
@@ -218,19 +218,19 @@ public class EditorHandler {
         }
     }
 
-    private <T> T getFromConfig(String toolName, String key, Class<T> type, T def){
+    private <T> T getFromConfig(String toolName, String key, Class<T> type, T def) {
         return type.cast(config.get("tools." + toolName + "." + key, def));
     }
 
-    private void loadSettingsEditor(){
+    private void loadSettingsEditor() {
         Inventory editor = Bukkit.createInventory(null, 9 * 5);
 
-        ItemStack glassPane = new ItemBuilder(Materials.getBlackGlassPane()).withName("&6").build();
+        ItemStack glassPane = new ItemBuilder(Materials.BLACK_STAINED_GLASS_PANE).withName("&6").build();
 
-        for(int i = 0; i < 9; i++)
+        for (int i = 0; i < 9; i++)
             editor.setItem(i, glassPane);
 
-        for(int i = 36; i < 45; i++)
+        for (int i = 36; i < 45; i++)
             editor.setItem(i, glassPane);
 
         editor.setItem(9, glassPane);
@@ -252,10 +252,10 @@ public class EditorHandler {
         settingsEditor = editor.getContents();
     }
 
-    private List<String> getEnchants(String toolName){
+    private List<String> getEnchants(String toolName) {
         List<String> list = new ArrayList<>();
 
-        if(config.contains("tools." + toolName + ".enchants")) {
+        if (config.contains("tools." + toolName + ".enchants")) {
             for (String enchantment : config.getStringList("tools." + toolName + ".enchants")) {
                 try {
                     Enchantment ench = Enchantment.getByName(enchantment.split(":")[0]);
@@ -269,8 +269,8 @@ public class EditorHandler {
         return list;
     }
 
-    private String getIntAsString(int level){
-        switch (level){
+    private String getIntAsString(int level) {
+        switch (level) {
             case 1:
                 return "I";
             case 2:
