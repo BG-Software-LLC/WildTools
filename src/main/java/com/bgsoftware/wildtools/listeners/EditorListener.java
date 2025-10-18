@@ -1,8 +1,9 @@
 package com.bgsoftware.wildtools.listeners;
 
 import com.bgsoftware.wildtools.WildToolsPlugin;
+import com.bgsoftware.wildtools.api.objects.ToolMode;
+import com.bgsoftware.wildtools.handlers.EditorHandler;
 import com.bgsoftware.wildtools.scheduler.Scheduler;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -12,7 +13,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
-import com.bgsoftware.wildtools.api.objects.ToolMode;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
@@ -52,11 +52,10 @@ public class EditorListener implements Listener {
      */
 
     private Map<UUID, ItemStack> latestClickedItem = new HashMap<>();
-    private String[] inventoryTitles = new String[] {"WildTools", "Tools Editor", "Tool Editor"};
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onInventoryClickMonitor(InventoryClickEvent e){
-        if(e.getCurrentItem() != null && e.isCancelled() && Arrays.stream(inventoryTitles).anyMatch(title -> e.getView().getTitle().contains(title))) {
+        if(e.getCurrentItem() != null && e.isCancelled() && e.getView().getTopInventory().getHolder() instanceof EditorHandler.EditorMenu) {
             latestClickedItem.put(e.getWhoClicked().getUniqueId(), e.getCurrentItem());
             Scheduler.runTask(() -> latestClickedItem.remove(e.getWhoClicked().getUniqueId()), 20L);
         }

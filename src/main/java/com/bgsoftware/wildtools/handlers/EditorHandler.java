@@ -10,6 +10,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 
 import java.io.File;
@@ -63,7 +64,9 @@ public class EditorHandler {
     }
 
     public Inventory getSettingsEditor() {
-        Inventory inventory = Bukkit.createInventory(null, 9 * 5, "" + ChatColor.AQUA + ChatColor.BOLD + "WildTools");
+        EditorMenu editorMenu = new EditorMenu();
+        Inventory inventory = Bukkit.createInventory(editorMenu, 9 * 5, "" + ChatColor.AQUA + ChatColor.BOLD + "WildTools");
+        editorMenu.setInventory(inventory);
         inventory.setContents(settingsEditor);
         return inventory;
     }
@@ -75,7 +78,9 @@ public class EditorHandler {
         if (toolNames.size() % 9 != 0)
             size++;
 
-        Inventory editor = Bukkit.createInventory(null, size * 9, "" + ChatColor.DARK_GRAY + ChatColor.BOLD + "Tools Editor");
+        EditorMenu editorMenu = new EditorMenu();
+        Inventory editor = Bukkit.createInventory(editorMenu, size * 9, "" + ChatColor.DARK_GRAY + ChatColor.BOLD + "Tools Editor");
+        editorMenu.setInventory(editor);
 
         toolNames.sort(Comparator.naturalOrder());
 
@@ -96,7 +101,9 @@ public class EditorHandler {
         if (plugin.getToolsManager().getTool(toolName) == null)
             return getSettingsEditor();
 
-        Inventory editor = Bukkit.createInventory(null, 9 * 6, "" + ChatColor.DARK_GRAY + ChatColor.BOLD + "Tool Editor");
+        EditorMenu editorMenu = new EditorMenu();
+        Inventory editor = Bukkit.createInventory(editorMenu, 9 * 6, "" + ChatColor.DARK_GRAY + ChatColor.BOLD + "Tool Editor");
+        editorMenu.setInventory(editor);
 
         ItemStack bluePane = new ItemBuilder(Materials.LIGHT_BLUE_STAINED_GLASS_PANE).withName("&6").build();
 
@@ -223,7 +230,9 @@ public class EditorHandler {
     }
 
     private void loadSettingsEditor() {
-        Inventory editor = Bukkit.createInventory(null, 9 * 5);
+        EditorMenu editorMenu = new EditorMenu();
+        Inventory editor = Bukkit.createInventory(editorMenu, 9 * 5);
+        editorMenu.setInventory(editor);
 
         ItemStack glassPane = new ItemBuilder(Materials.BLACK_STAINED_GLASS_PANE).withName("&6").build();
 
@@ -295,4 +304,20 @@ public class EditorHandler {
                 return "" + level;
         }
     }
+
+    public static class EditorMenu implements InventoryHolder {
+
+        private Inventory inventory;
+
+        public void setInventory(Inventory inventory) {
+            this.inventory = inventory;
+        }
+
+        @Override
+        public Inventory getInventory() {
+            return this.inventory;
+        }
+
+    }
+
 }
