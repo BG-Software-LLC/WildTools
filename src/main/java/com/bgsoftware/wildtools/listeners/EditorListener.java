@@ -13,6 +13,8 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
@@ -55,7 +57,7 @@ public class EditorListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onInventoryClickMonitor(InventoryClickEvent e){
-        if(e.getCurrentItem() != null && e.isCancelled() && e.getView().getTopInventory().getHolder() instanceof EditorHandler.EditorMenu) {
+        if(e.getCurrentItem() != null && e.isCancelled() && isEditorMenu(e.getView())) {
             latestClickedItem.put(e.getWhoClicked().getUniqueId(), e.getCurrentItem());
             Scheduler.runTask(() -> latestClickedItem.remove(e.getWhoClicked().getUniqueId()), 20L);
         }
@@ -376,6 +378,11 @@ public class EditorListener implements Listener {
 
         Scheduler.runTask(e.getPlayer(), () -> e.getPlayer().openInventory(plugin.getEditor().getToolEditor(toolName)));
         toolValues.remove(e.getPlayer().getUniqueId());
+    }
+
+    private static boolean isEditorMenu(InventoryView inventoryView) {
+        Inventory topInventory = inventoryView.getTopInventory();
+        return topInventory != null && topInventory.getHolder() instanceof EditorHandler.EditorMenu;
     }
 
 }
