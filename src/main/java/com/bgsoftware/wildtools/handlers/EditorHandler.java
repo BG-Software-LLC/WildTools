@@ -64,7 +64,7 @@ public class EditorHandler {
     }
 
     public Inventory getSettingsEditor() {
-        EditorMenu editorMenu = new EditorMenu();
+        EditorMenu editorMenu = new EditorMenu(EditorMenuType.SETTINGS);
         Inventory inventory = Bukkit.createInventory(editorMenu, 9 * 5, "" + ChatColor.AQUA + ChatColor.BOLD + "WildTools");
         editorMenu.setInventory(inventory);
         inventory.setContents(settingsEditor);
@@ -78,7 +78,7 @@ public class EditorHandler {
         if (toolNames.size() % 9 != 0)
             size++;
 
-        EditorMenu editorMenu = new EditorMenu();
+        EditorMenu editorMenu = new EditorMenu(EditorMenuType.TOOLS);
         Inventory editor = Bukkit.createInventory(editorMenu, size * 9, "" + ChatColor.DARK_GRAY + ChatColor.BOLD + "Tools Editor");
         editorMenu.setInventory(editor);
 
@@ -101,7 +101,7 @@ public class EditorHandler {
         if (plugin.getToolsManager().getTool(toolName) == null)
             return getSettingsEditor();
 
-        EditorMenu editorMenu = new EditorMenu();
+        EditorMenu editorMenu = new EditorMenu(EditorMenuType.TOOL_EDITOR);
         Inventory editor = Bukkit.createInventory(editorMenu, 9 * 6, "" + ChatColor.DARK_GRAY + ChatColor.BOLD + "Tool Editor");
         editorMenu.setInventory(editor);
 
@@ -230,9 +230,7 @@ public class EditorHandler {
     }
 
     private void loadSettingsEditor() {
-        EditorMenu editorMenu = new EditorMenu();
-        Inventory editor = Bukkit.createInventory(editorMenu, 9 * 5);
-        editorMenu.setInventory(editor);
+        Inventory editor = Bukkit.createInventory(null, 9 * 5);
 
         ItemStack glassPane = new ItemBuilder(Materials.BLACK_STAINED_GLASS_PANE).withName("&6").build();
 
@@ -307,7 +305,17 @@ public class EditorHandler {
 
     public static class EditorMenu implements InventoryHolder {
 
+        private final EditorMenuType menuType;
+
         private Inventory inventory;
+
+        private EditorMenu(EditorMenuType menuType) {
+            this.menuType = menuType;
+        }
+
+        public EditorMenuType getMenuType() {
+            return menuType;
+        }
 
         public void setInventory(Inventory inventory) {
             this.inventory = inventory;
@@ -317,6 +325,14 @@ public class EditorHandler {
         public Inventory getInventory() {
             return this.inventory;
         }
+
+    }
+
+    public enum EditorMenuType {
+
+        SETTINGS,
+        TOOLS,
+        TOOL_EDITOR
 
     }
 
