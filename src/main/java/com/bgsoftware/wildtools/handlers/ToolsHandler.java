@@ -14,12 +14,12 @@ import com.bgsoftware.wildtools.handlers.legacy.ToolSectionViewAdapters;
 import com.bgsoftware.wildtools.handlers.loaders.CommonToolLoader;
 import com.bgsoftware.wildtools.tools.*;
 import com.bgsoftware.wildtools.utils.items.ToolItemStack;
+import com.bgsoftware.wildtools.api.objects.tools.BaseTool;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.*;
-import java.util.function.Function;
 
 @SuppressWarnings("unchecked")
 public class ToolsHandler implements ToolsManager {
@@ -120,18 +120,21 @@ public class ToolsHandler implements ToolsManager {
     @Override
     public <T extends Tool> T registerTool(String kindId, Material type, String name, ToolSectionView cfg) {
         ToolKindFactory factory = kindFactories.get(kindId.toUpperCase());
-        if (factory == null)
-            throw new IllegalArgumentException("Unknown tool kind: " + kindId);
+        if (factory == null) throw new IllegalArgumentException("Unknown tool kind: " + kindId);
 
         Tool tool = factory.create(type, name, cfg);
-        if (tool == null)
-            throw new IllegalArgumentException("Tool factory returned null for " + kindId);
+        if (tool == null) throw new IllegalArgumentException("Tool factory returned null for " + kindId);
 
-        CommonToolLoader.applyCommonProperties(tool, cfg);
+        if (tool instanceof BaseTool) {
+            WTool backend = new WTool(type, name, getKind(kindId)) {};
+            ((BaseTool) tool).bindDelegate(backend);
+            CommonToolLoader.applyCommonProperties(tool, cfg);
+        } else {
+            CommonToolLoader.applyCommonProperties(tool, cfg);
+        }
 
         Tool prev = toolsByName.put(tool.getName().toLowerCase(), tool);
         if (prev != null) tools.remove(prev);
-
         tools.add(tool);
         tools.sort(toolComparator);
         return (T) tool;
