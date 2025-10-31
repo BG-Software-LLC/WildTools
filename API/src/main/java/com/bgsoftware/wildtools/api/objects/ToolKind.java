@@ -6,7 +6,11 @@ import com.bgsoftware.wildtools.api.objects.tools.Tool;
 public interface ToolKind {
     String id();
 
-    int sortOrder();
+    default int sortOrder() {
+        return 0;
+    }
 
-    boolean isSimilar(ItemStack stack, Tool tool);
+    default boolean isSimilar(ItemStack stack, Tool tool) {
+        return tool.isSimilar(stack);
+    }
 }
