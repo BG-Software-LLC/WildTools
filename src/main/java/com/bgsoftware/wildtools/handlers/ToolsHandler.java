@@ -128,10 +128,9 @@ public class ToolsHandler implements ToolsManager {
         if (tool instanceof BaseTool) {
             WTool backend = new WTool(type, name, getKind(kindId)) {};
             ((BaseTool) tool).bindDelegate(backend);
-            CommonToolLoader.applyCommonProperties(tool, cfg);
-        } else {
-            CommonToolLoader.applyCommonProperties(tool, cfg);
         }
+
+        CommonToolLoader.applyCommonProperties(tool, cfg);
 
         Tool prev = toolsByName.put(tool.getName().toLowerCase(), tool);
         if (prev != null) tools.remove(prev);
