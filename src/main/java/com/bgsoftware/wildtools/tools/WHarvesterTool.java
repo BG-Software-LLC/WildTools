@@ -3,6 +3,7 @@ package com.bgsoftware.wildtools.tools;
 import com.bgsoftware.wildtools.Locale;
 import com.bgsoftware.wildtools.api.events.HarvesterHoeSellEvent;
 import com.bgsoftware.wildtools.api.events.HarvesterHoeUseEvent;
+import com.bgsoftware.wildtools.api.objects.ToolKind;
 import com.bgsoftware.wildtools.api.objects.ToolMode;
 import com.bgsoftware.wildtools.api.objects.tools.HarvesterTool;
 import com.bgsoftware.wildtools.scheduler.Scheduler;
@@ -57,8 +58,8 @@ public class WHarvesterTool extends WTool implements HarvesterTool {
     private String activateAction;
     private boolean oneLayerOnly;
 
-    public WHarvesterTool(Material type, String name, int radius) {
-        super(type, name, ToolMode.HARVESTER);
+    public WHarvesterTool(Material type, String name, int radius, ToolKind kind) {
+        super(type, name, kind);
         this.radius = radius;
         this.farmlandRadius = -1;
         this.oneLayerOnly = false;

@@ -1,6 +1,6 @@
 package com.bgsoftware.wildtools.api.handlers;
 
-import com.bgsoftware.wildtools.api.objects.Selection;
+import com.bgsoftware.wildtools.api.objects.*;
 import com.bgsoftware.wildtools.api.objects.tools.BuilderTool;
 import com.bgsoftware.wildtools.api.objects.tools.CannonTool;
 import com.bgsoftware.wildtools.api.objects.tools.CraftingTool;
@@ -19,6 +19,7 @@ import com.bgsoftware.wildtools.api.objects.tools.IceTool;
 import com.bgsoftware.wildtools.api.objects.tools.SellTool;
 
 import java.util.List;
+import java.util.Map;
 
 public interface ToolsManager {
 
@@ -133,14 +134,46 @@ public interface ToolsManager {
     double getPrice(Player player, ItemStack itemStack);
 
     /**
+     * Register a new tool kind.
+     * @param kind The tool kind to register.
+     * @param factory The factory for creating tools of this kind.
+     */
+    void registerToolKind(ToolKind kind,
+                          ToolKindFactory factory);
+
+    /**
+     * Get a tool kind by its id.
+     * @param id The id to check.
+     * @return If exists, the tool kind. Otherwise, null.
+     */
+    ToolKind getKind(String id);
+
+    /**
+     * Get all the registered tool kinds.
+     */
+    Map<String, ToolKind> getRegisteredKinds();
+
+    /**
      * Register a new tool.
      * @param type The type of the tool.
      * @param name The name of the tool.
      * @param toolClass The tool class.
      * @param arg Additional arguments for the item.
      * @return The new tool.
+     * @deprecated Use {@link #registerTool(String, Material, String, ToolSectionView)} instead.
      */
+    @Deprecated
     <T extends Tool> T registerTool(Material type, String name, Class<T> toolClass, Object arg);
+
+    /**
+     * Register a new tool.
+     * @param kindId The kind id of the tool.
+     * @param type The type of the tool.
+     * @param name The name of the tool.
+     * @param cfg The tool section view configuration.
+     * @return The new tool.
+     */
+    <T extends Tool> T registerTool(String kindId, Material type, String name, ToolSectionView cfg);
 
     /**
      * Check whether or not a player is owning an item or not.

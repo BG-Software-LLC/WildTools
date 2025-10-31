@@ -1,5 +1,6 @@
 package com.bgsoftware.wildtools.api.objects.tools;
 
+import com.bgsoftware.wildtools.api.objects.ToolKind;
 import com.bgsoftware.wildtools.api.objects.ToolMode;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -229,6 +230,11 @@ public interface Tool {
      * Get the tool mode.
      */
     ToolMode getToolMode();
+
+    /**
+     * Get the kind of the tool.
+     */
+    ToolKind getKind();
 
     /**
      * Get the name of the tool.

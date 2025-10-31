@@ -2,6 +2,7 @@ package com.bgsoftware.wildtools.tools;
 
 import com.bgsoftware.wildtools.Locale;
 import com.bgsoftware.wildtools.api.events.CraftingWandUseEvent;
+import com.bgsoftware.wildtools.api.objects.ToolKind;
 import com.bgsoftware.wildtools.api.objects.ToolMode;
 import com.bgsoftware.wildtools.api.objects.tools.CraftingTool;
 import com.bgsoftware.wildtools.recipes.RecipeChoice;
@@ -31,8 +32,8 @@ public class WCraftingTool extends WTool implements CraftingTool {
 
     private final List<Recipe> craftings;
 
-    public WCraftingTool(Material type, String name, List<String> craftings) {
-        super(type, name, ToolMode.CRAFTING);
+    public WCraftingTool(Material type, String name, List<String> craftings, ToolKind kind) {
+        super(type, name, kind);
         this.craftings = parseCraftings(craftings);
     }
 

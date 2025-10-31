@@ -2,7 +2,9 @@ package com.bgsoftware.wildtools.tools;
 
 import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.wildtools.WildToolsPlugin;
+import com.bgsoftware.wildtools.api.objects.ToolKind;
 import com.bgsoftware.wildtools.api.objects.ToolMode;
+import com.bgsoftware.wildtools.api.objects.tools.BaseTool;
 import com.bgsoftware.wildtools.api.objects.tools.Tool;
 import com.bgsoftware.wildtools.utils.BukkitUtils;
 import com.bgsoftware.wildtools.utils.items.ItemUtils;
@@ -51,7 +53,8 @@ public abstract class WTool implements Tool {
 
     private final ToolItemStack toolItemStack;
     private final String name;
-    private final ToolMode toolMode;
+    private ToolMode toolMode;
+    private ToolKind kind;
 
     private boolean isOnlySameType = false;
     private boolean isOnlyInsideClaim = false;
@@ -71,10 +74,18 @@ public abstract class WTool implements Tool {
     private int anvilCombineExp = -1;
     private int anvilCombineLimit = 0;
 
-    public WTool(Material type, String name, ToolMode toolMode) {
+    public WTool(Material type, String name, ToolKind kind) {
         this.toolItemStack = ToolItemStack.of(type);
-        this.toolMode = toolMode;
         this.name = name;
+        this.kind = kind;
+
+        ToolMode detectedMode = null;
+        try {
+            detectedMode = ToolMode.valueOf(kind.id().toUpperCase());
+        } catch (IllegalArgumentException ignored) {
+        }
+
+        this.toolMode = detectedMode;
     }
 
     @Override
@@ -271,6 +282,11 @@ public abstract class WTool implements Tool {
     @Override
     public ToolMode getToolMode() {
         return this.toolMode;
+    }
+
+    @Override
+    public ToolKind getKind() {
+        return kind;
     }
 
     @Override
