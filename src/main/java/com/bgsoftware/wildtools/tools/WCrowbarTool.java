@@ -1,6 +1,7 @@
 package com.bgsoftware.wildtools.tools;
 
 import com.bgsoftware.wildtools.api.events.CrowbarWandUseEvent;
+import com.bgsoftware.wildtools.api.objects.ToolKind;
 import com.bgsoftware.wildtools.api.objects.ToolMode;
 import com.bgsoftware.wildtools.api.objects.tools.CrowbarTool;
 import com.bgsoftware.wildtools.utils.BukkitUtils;
@@ -21,8 +22,8 @@ public class WCrowbarTool extends WTool implements CrowbarTool {
 
     private final List<String> commandsOnUse;
 
-    public WCrowbarTool(Material type, String name, List<String> commandsOnUse) {
-        super(type, name, ToolMode.CROWBAR);
+    public WCrowbarTool(Material type, String name, List<String> commandsOnUse, ToolKind kind) {
+        super(type, name, kind);
         this.commandsOnUse = commandsOnUse;
     }
 

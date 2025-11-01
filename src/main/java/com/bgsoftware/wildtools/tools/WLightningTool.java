@@ -1,6 +1,7 @@
 package com.bgsoftware.wildtools.tools;
 
 import com.bgsoftware.wildtools.api.events.LightningWandUseEvent;
+import com.bgsoftware.wildtools.api.objects.ToolKind;
 import com.bgsoftware.wildtools.api.objects.ToolMode;
 import com.bgsoftware.wildtools.api.objects.tools.LightningTool;
 import org.bukkit.Bukkit;
@@ -19,8 +20,8 @@ import java.util.List;
 
 public class WLightningTool extends WTool implements LightningTool {
 
-    public WLightningTool(Material type, String name) {
-        super(type, name, ToolMode.LIGHTNING);
+    public WLightningTool(Material type, String name, ToolKind kind) {
+        super(type, name, kind);
     }
 
     @Override
