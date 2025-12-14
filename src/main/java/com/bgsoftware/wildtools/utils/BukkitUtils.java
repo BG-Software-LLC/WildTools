@@ -1,5 +1,6 @@
 package com.bgsoftware.wildtools.utils;
 
+import com.bgsoftware.common.reflection.ClassInfo;
 import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.wildtools.WildToolsPlugin;
 import com.bgsoftware.wildtools.api.objects.tools.Tool;
@@ -33,6 +34,8 @@ public class BukkitUtils {
 
     private static final ReflectMethod<Boolean> BLOCK_BREAK_EVENT_IS_DROP_ITEMS = new ReflectMethod<>(
             BlockBreakEvent.class, "isDropItems");
+
+    private static final String DO_TILE_DROPS_GAMERULE_NAME = initializeDoTileDropsGameruleName();
 
     private static final WildToolsPlugin plugin = WildToolsPlugin.getPlugin();
     private static final List<BlockFace> blockFaces = new LinkedList<>(Arrays.asList(
@@ -193,7 +196,7 @@ public class BukkitUtils {
         if (plugin.getProviders().getBlockDrops(drops, player, block, false))
             return drops;
 
-        if (!Boolean.parseBoolean(block.getWorld().getGameRuleValue("doTileDrops")))
+        if (!Boolean.parseBoolean(block.getWorld().getGameRuleValue(DO_TILE_DROPS_GAMERULE_NAME)))
             return new ArrayList<>();
 
         return plugin.getNMSWorld().getBlockDrops(player, block, tool.hasSilkTouch());
@@ -234,6 +237,11 @@ public class BukkitUtils {
         }
 
         return false;
+    }
+
+    private static String initializeDoTileDropsGameruleName() {
+        ClassInfo classInfo = new ClassInfo("org.bukkit.GameRules", ClassInfo.PackageType.UNKNOWN);
+        return classInfo.findClass() == null ? "doTileDrops" : "block_drops";
     }
 
 }
