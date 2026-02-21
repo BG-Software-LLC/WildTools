@@ -5,6 +5,7 @@ import com.bgsoftware.wildtools.api.objects.tools.Tool;
 import com.bgsoftware.wildtools.utils.items.ToolItemStack;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventException;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
@@ -62,19 +63,20 @@ public class EventsHandler {
         callMethods(claimingPluginsInteractMethods, playerInteractEvent);
     }
 
-    private static void setEventExecutors(HandlerList handlerList,
+    private static void setEventExecutors(HandlerList handlerList, EventPriority maxPriority,
                                           Collection<String> whitelistedPlugins,
                                           List<RegisteredListener> cachedEventExecutors) {
         cachedEventExecutors.clear();
-        collectEventExecutors(handlerList, whitelistedPlugins, cachedEventExecutors);
+        collectEventExecutors(handlerList, maxPriority, whitelistedPlugins, cachedEventExecutors);
         cachedEventExecutors.sort(COMPARATOR);
     }
 
-    private static void collectEventExecutors(HandlerList handlerList,
+    private static void collectEventExecutors(HandlerList handlerList, EventPriority maxPriority,
                                               Collection<String> whitelistedPlugins,
                                               Collection<RegisteredListener> cachedEventExecutors) {
         for (RegisteredListener registeredListener : handlerList.getRegisteredListeners()) {
-            if (whitelistedPlugins.contains(registeredListener.getPlugin().getName())) {
+            if (registeredListener.getPriority().ordinal() <= maxPriority.ordinal() &&
+                    whitelistedPlugins.contains(registeredListener.getPlugin().getName())) {
                 cachedEventExecutors.add(registeredListener);
             }
         }
@@ -86,9 +88,9 @@ public class EventsHandler {
         // We want to initialize some well-known plugins for claims.
         claimingPlugins.addAll(PRE_DEFINED_CLAIMING_PLUGINS);
 
-        setEventExecutors(BlockBreakEvent.getHandlerList(), claimingPlugins, claimingPluginsBreakMethods);
-        setEventExecutors(BlockPlaceEvent.getHandlerList(), claimingPlugins, claimingPluginsPlaceMethods);
-        setEventExecutors(PlayerInteractEvent.getHandlerList(), claimingPlugins, claimingPluginsInteractMethods);
+        setEventExecutors(BlockBreakEvent.getHandlerList(), EventPriority.NORMAL, claimingPlugins, claimingPluginsBreakMethods);
+        setEventExecutors(BlockPlaceEvent.getHandlerList(), EventPriority.NORMAL, claimingPlugins, claimingPluginsPlaceMethods);
+        setEventExecutors(PlayerInteractEvent.getHandlerList(), EventPriority.NORMAL, claimingPlugins, claimingPluginsInteractMethods);
     }
 
     public void loadNotifiedPlugins(List<String> otherPlugins) {
@@ -110,7 +112,7 @@ public class EventsHandler {
 
     private void loadNotifiedPluginListeners0(Collection<String> notifiedPlugins, List<RegisteredListener> cachedListenerMethods) {
         Set<RegisteredListener> cachedListenerMethodsSet = new LinkedHashSet<>();
-        collectEventExecutors(BlockBreakEvent.getHandlerList(), notifiedPlugins, cachedListenerMethodsSet);
+        collectEventExecutors(BlockBreakEvent.getHandlerList(), EventPriority.MONITOR, notifiedPlugins, cachedListenerMethodsSet);
 
         cachedListenerMethods.clear();
         cachedListenerMethods.addAll(cachedListenerMethodsSet);
