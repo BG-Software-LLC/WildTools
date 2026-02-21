@@ -140,8 +140,6 @@ public class BukkitUtils {
         if (blockBreakEvent.isCancelled())
             return false;
 
-        plugin.getEvents().callBreakEvent(blockBreakEvent, false);
-
         Material originalType = block.getType();
         Location blockLocation = block.getLocation();
 
