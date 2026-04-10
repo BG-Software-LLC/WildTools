@@ -73,9 +73,11 @@ public abstract class AbstractNMSWorld implements NMSWorld {
     @Override
     public int getExpFromBlock(org.bukkit.block.Block bukkitBlock, Player bukkitPlayer) {
         ServerPlayer serverPlayer = ((CraftPlayer) bukkitPlayer).getHandle();
-        BlockState blockState = ((CraftBlock) bukkitBlock).getNMS();
+        BlockState blockState = getBlockState(bukkitBlock);
         return getExpDrop(blockState, serverPlayer, ((CraftBlock) bukkitBlock).getPosition());
     }
+
+    protected abstract BlockState getBlockState(org.bukkit.block.Block block);
 
     protected abstract int getExpDrop(BlockState blockState, ServerPlayer serverPlayer, BlockPos blockPos);
 
@@ -138,8 +140,11 @@ public abstract class AbstractNMSWorld implements NMSWorld {
 
     @Override
     public void refreshChunk(org.bukkit.Chunk bukkitChunk, List<WorldEditSession.BlockData> blocksList) {
+        int chunkX = bukkitChunk.getX();
+        int chunkZ = bukkitChunk.getZ();
+
         ServerLevel serverLevel = ((CraftChunk) bukkitChunk).getCraftWorld().getHandle();
-        LevelChunk levelChunk = serverLevel.getChunk(bukkitChunk.getX(), bukkitChunk.getZ());
+        LevelChunk levelChunk = serverLevel.getChunk(chunkX, chunkZ);
         ServerChunkCache serverChunkCache = levelChunk.level.getChunkSource();
         ThreadedLevelLightEngine lightEngine = (ThreadedLevelLightEngine) levelChunk.level.getLightEngine();
 
@@ -149,11 +154,9 @@ public abstract class AbstractNMSWorld implements NMSWorld {
             lightEngine.checkBlock(blockPos);
         }
 
-        ChunkPos chunkPos = levelChunk.getPos();
-
-        Scheduler.runTask(levelChunk.level.getWorld(), chunkPos.x, chunkPos.z, () -> {
-            ClientboundLightUpdatePacket lightUpdatePacket = createLightUpdatePacket(chunkPos, lightEngine);
-            sendPacketToRelevantPlayers(levelChunk.level, chunkPos.x, chunkPos.z, lightUpdatePacket);
+        Scheduler.runTask(levelChunk.level.getWorld(), chunkX, chunkZ, () -> {
+            ClientboundLightUpdatePacket lightUpdatePacket = createLightUpdatePacket(new ChunkPos(chunkX, chunkZ), lightEngine);
+            sendPacketToRelevantPlayers(levelChunk.level, chunkX, chunkZ, lightUpdatePacket);
         }, 2L);
     }
 
@@ -161,7 +164,7 @@ public abstract class AbstractNMSWorld implements NMSWorld {
 
     @Override
     public int getCombinedId(org.bukkit.block.Block bukkitBlock) {
-        BlockState blockState = ((CraftBlock) bukkitBlock).getNMS();
+        BlockState blockState = getBlockState(bukkitBlock);
         if (blockState.hasProperty(BlockStateProperties.WATERLOGGED))
             blockState = blockState.setValue(BlockStateProperties.WATERLOGGED, false);
         return Block.getId(blockState);
@@ -184,13 +187,15 @@ public abstract class AbstractNMSWorld implements NMSWorld {
 
     private void sendPacketToRelevantPlayers(ServerLevel serverLevel, int chunkX, int chunkZ, Packet<?> packet) {
         ChunkMap chunkMap = serverLevel.getChunkSource().chunkMap;
-        ChunkPos chunkPos = new ChunkPos(chunkX, chunkZ);
-        ChunkHolder chunkHolder;
 
+        // Copied from ChunkPos#toLong
+        long packedPos = (long) chunkX & 4294967295L | ((long) chunkZ & 4294967295L) << 32;
+
+        ChunkHolder chunkHolder;
         try {
-            chunkHolder = chunkMap.getVisibleChunkIfPresent(chunkPos.toLong());
+            chunkHolder = chunkMap.getVisibleChunkIfPresent(packedPos);
         } catch (Throwable ex) {
-            chunkHolder = VISIBLE_CHUNKS.get(chunkMap).get(chunkPos.toLong());
+            chunkHolder = VISIBLE_CHUNKS.get(chunkMap).get(packedPos);
         }
 
         if (chunkHolder != null) {

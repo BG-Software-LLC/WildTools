@@ -4,24 +4,20 @@ plugins {
 
 java {
     toolchain {
-        languageVersion.set(JavaLanguageVersion.of(21))
+        languageVersion.set(JavaLanguageVersion.of(25))
     }
 }
 
-group 'NMS:v1_21_4'
+group 'NMS:v26_1'
 
 dependencies {
-    paperweight.paperDevBundle("1.21.4-R0.1-SNAPSHOT")
+    paperweight.paperDevBundle("26.1.1.build.+")
     compileOnly project(":NMS:Spigot-1_20_3")
     compileOnly project(":NMS:Paper-1_20_3")
     compileOnly project(":API")
     compileOnly rootProject
 }
 
-assemble {
-    dependsOn(reobfJar)
-}
-
-if (project.hasProperty('nms.compile_v1_21') && !Boolean.valueOf(project.findProperty("nms.compile_v1_21").toString())) {
+if (project.hasProperty('nms.compile_v26_1') && !Boolean.valueOf(project.findProperty("nms.compile_v26_1").toString())) {
     project.tasks.all { task -> task.enabled = false }
 }

@@ -1,4 +1,4 @@
-package com.bgsoftware.wildtools.nms.v1_20_4;
+package com.bgsoftware.wildtools.nms.v26_1;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.protocol.game.ClientboundLightUpdatePacket;
@@ -10,21 +10,21 @@ import net.minecraft.world.level.chunk.LevelChunk;
 import org.bukkit.block.Block;
 import org.bukkit.craftbukkit.block.CraftBlock;
 
-public class NMSWorldImpl extends com.bgsoftware.wildtools.nms.v1_20_4.AbstractNMSWorld {
+public class NMSWorldImpl extends com.bgsoftware.wildtools.nms.v26_1.AbstractNMSWorld {
 
     @Override
     protected BlockState getBlockState(Block block) {
-        return ((CraftBlock) block).getNMS();
+        return ((CraftBlock) block).getBlockState();
     }
 
     @Override
     protected int getExpDrop(BlockState blockState, ServerPlayer serverPlayer, BlockPos blockPos) {
-        return blockState.getBlock().getExpDrop(blockState, serverPlayer.serverLevel(), blockPos, serverPlayer.getMainHandItem(), true);
+        return blockState.getBlock().getExpDrop(blockState, serverPlayer.level(), blockPos, serverPlayer.getMainHandItem(), true);
     }
 
     @Override
     protected void setBlockState(LevelChunk levelChunk, BlockPos blockPos, BlockState blockState) {
-        levelChunk.setBlockState(blockPos, blockState, true);
+        levelChunk.setBlockState(blockPos, blockState, 3);
     }
 
     @Override
