@@ -15,7 +15,7 @@ dependencies {
     compileOnly project(":NMS:Spigot")
     compileOnly project(":NMS:Paper")
     compileOnly project(":API")
-    compileOnly rootProject
+    compileOnly project(":")
 }
 
 assemble {
