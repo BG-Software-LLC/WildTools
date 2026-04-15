@@ -194,9 +194,16 @@ public abstract class WTool implements Tool {
 
     @Override
     public void addEnchantment(Enchantment ench, int level) {
-        ItemMeta im = toolItemStack.getItemMeta();
-        im.addEnchant(ench, level, true);
-        toolItemStack.setItemMeta(im);
+        ItemMeta itemMeta = toolItemStack.getItemMeta();
+        itemMeta.addEnchant(ench, level, true);
+        toolItemStack.setItemMeta(itemMeta);
+    }
+
+    @Override
+    public void addItemFlag(String itemFlagName) {
+        ItemMeta itemMeta = toolItemStack.getItemMeta();
+        plugin.getNMSAdapter().addItemFlag(itemMeta, itemFlagName);
+        toolItemStack.setItemMeta(itemMeta);
     }
 
     public void makeToolGlow() {

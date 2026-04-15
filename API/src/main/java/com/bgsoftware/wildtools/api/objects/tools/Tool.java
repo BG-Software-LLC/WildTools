@@ -133,6 +133,12 @@ public interface Tool {
     void addEnchantment(Enchantment ench, int level);
 
     /**
+     * Add an item flag for the tool item.
+     * @param itemFlagName The name of the item flag.
+     */
+    void addItemFlag(String itemFlagName);
+
+    /**
      * Add a blacklisted material to the tool.
      * All materials beside the blacklisted ones will be affected by the tool.
      * Please note: this feature doesn't work with whitelisted materials.

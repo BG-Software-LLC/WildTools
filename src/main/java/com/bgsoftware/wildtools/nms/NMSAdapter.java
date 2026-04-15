@@ -40,6 +40,8 @@ public interface NMSAdapter {
 
     void makeItemGlow(ItemMeta itemMeta);
 
+    void addItemFlag(ItemMeta itemMeta, String itemFlagName);
+
     int getFarmlandId();
 
     BlockPlaceEvent getFakePlaceEvent(Player player, Block block, Block copyBlock);
