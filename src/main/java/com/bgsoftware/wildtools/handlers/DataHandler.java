@@ -231,6 +231,9 @@ public class DataHandler {
             if (cfg.contains("tools." + name + ".custom-model"))
                 tool.setCustomModel(cfg.getInt("tools." + name + ".custom-model"));
 
+            if (cfg.contains("tools." + name + ".item-model"))
+                tool.setItemModel(cfg.getString("tools." + name + ".item-model"));
+
             if (cfg.contains("tools." + name + ".enchants")) {
                 List<String> enchants = cfg.getStringList("tools." + name + ".enchants");
                 for (String line : enchants)

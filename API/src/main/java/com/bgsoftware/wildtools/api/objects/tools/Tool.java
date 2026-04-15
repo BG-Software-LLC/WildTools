@@ -40,6 +40,12 @@ public interface Tool {
     void setCustomModel(int customModel);
 
     /**
+     * Set item-model for the item;
+     * @param itemModel The item model for the item.
+     */
+    void setItemModel(String itemModel);
+
+    /**
      * Set whether or not the tool should only affect blocks of the same type.
      * @param onlySameType True if tool should only affect similar blocks, otherwise false.
      */
