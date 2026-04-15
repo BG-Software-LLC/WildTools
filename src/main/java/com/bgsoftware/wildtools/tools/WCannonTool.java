@@ -1,6 +1,7 @@
 package com.bgsoftware.wildtools.tools;
 
 import com.bgsoftware.wildtools.api.events.CannonWandUseEvent;
+import com.bgsoftware.wildtools.api.objects.ToolKind;
 import com.bgsoftware.wildtools.utils.WSelection;
 import com.bgsoftware.wildtools.utils.items.ItemUtils;
 import org.bukkit.Bukkit;
@@ -29,8 +30,8 @@ public class WCannonTool extends WTool implements CannonTool {
 
     private final int tntAmount;
 
-    public WCannonTool(Material type, String name, int tntAmount){
-        super(type, name, ToolMode.CANNON);
+    public WCannonTool(Material type, String name, int tntAmount, ToolKind kind){
+        super(type, name, kind);
         this.tntAmount = tntAmount;
     }
 

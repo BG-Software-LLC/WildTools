@@ -1,6 +1,7 @@
 package com.bgsoftware.wildtools.tools;
 
 import com.bgsoftware.wildtools.api.events.IceWandUseEvent;
+import com.bgsoftware.wildtools.api.objects.ToolKind;
 import com.bgsoftware.wildtools.api.objects.ToolMode;
 import com.bgsoftware.wildtools.api.objects.tools.IceTool;
 import com.bgsoftware.wildtools.utils.BukkitUtils;
@@ -18,8 +19,8 @@ public class WIceTool extends WTool implements IceTool {
 
     private final int radius;
 
-    public WIceTool(Material type, String name, int radius) {
-        super(type, name, ToolMode.ICE);
+    public WIceTool(Material type, String name, int radius, ToolKind kind) {
+        super(type, name, kind);
         this.radius = radius;
     }
 

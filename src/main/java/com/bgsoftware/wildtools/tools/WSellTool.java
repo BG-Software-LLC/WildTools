@@ -5,6 +5,7 @@ import com.bgsoftware.wildtools.SellWandLogger;
 import com.bgsoftware.wildtools.api.events.SellWandUseEvent;
 import com.bgsoftware.wildtools.api.hooks.SellInfo;
 import com.bgsoftware.wildtools.api.hooks.SoldItem;
+import com.bgsoftware.wildtools.api.objects.ToolKind;
 import com.bgsoftware.wildtools.api.objects.ToolMode;
 import com.bgsoftware.wildtools.api.objects.tools.SellTool;
 import com.bgsoftware.wildtools.utils.BukkitUtils;
@@ -22,8 +23,8 @@ import java.util.Map;
 
 public class WSellTool extends WTool implements SellTool {
 
-    public WSellTool(Material type, String name) {
-        super(type, name, ToolMode.SELL);
+    public WSellTool(Material type, String name, ToolKind kind) {
+        super(type, name, kind);
     }
 
     @Override

@@ -1,6 +1,7 @@
 package com.bgsoftware.wildtools.tools;
 
 import com.bgsoftware.wildtools.api.events.DrainWandUseEvent;
+import com.bgsoftware.wildtools.api.objects.ToolKind;
 import com.bgsoftware.wildtools.api.objects.ToolMode;
 import com.bgsoftware.wildtools.api.objects.tools.DrainTool;
 import com.bgsoftware.wildtools.utils.BukkitUtils;
@@ -18,8 +19,8 @@ public class WDrainTool extends WTool implements DrainTool {
 
     private final int radius;
 
-    public WDrainTool(Material type, String name, int radius) {
-        super(type, name, ToolMode.DRAIN);
+    public WDrainTool(Material type, String name, int radius, ToolKind kind) {
+        super(type, name, kind);
         this.radius = radius;
     }
 

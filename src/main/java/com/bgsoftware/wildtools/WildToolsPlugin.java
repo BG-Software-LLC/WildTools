@@ -8,6 +8,7 @@ import com.bgsoftware.common.nmsloader.config.NMSConfiguration;
 import com.bgsoftware.common.updater.Updater;
 import com.bgsoftware.wildtools.api.WildTools;
 import com.bgsoftware.wildtools.api.WildToolsAPI;
+import com.bgsoftware.wildtools.api.events.PluginInitializeEvent;
 import com.bgsoftware.wildtools.command.CommandsHandler;
 import com.bgsoftware.wildtools.events.EventsSimulation;
 import com.bgsoftware.wildtools.handlers.DataHandler;
@@ -25,6 +26,7 @@ import com.bgsoftware.wildtools.nms.NMSWorld;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryType;
+import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.lang.reflect.Field;
@@ -84,8 +86,15 @@ public class WildToolsPlugin extends JavaPlugin implements WildTools {
         getCommand("tools").setTabCompleter(commandsHandler);
 
         providersHandler = new ProvidersHandler(this);
-        toolsManager = new ToolsHandler(this);
         eventsHandler = new EventsHandler();
+
+        toolsManager = new ToolsHandler(this);
+
+        this.toolsManager.registerBuiltinKindsPublic();
+
+        getServer().getPluginManager().callEvent(
+                new PluginInitializeEvent(this)
+        );
 
         DataHandler.loadData();
         Locale.reload();

@@ -1,6 +1,7 @@
 package com.bgsoftware.wildtools.tools;
 
 import com.bgsoftware.wildtools.api.events.PillarWandUseEvent;
+import com.bgsoftware.wildtools.api.objects.ToolKind;
 import com.bgsoftware.wildtools.api.objects.ToolMode;
 import com.bgsoftware.wildtools.api.objects.tools.PillarTool;
 import com.bgsoftware.wildtools.utils.BukkitUtils;
@@ -18,8 +19,8 @@ public class WPillarTool extends WTool implements PillarTool {
 
     private static final int MIN_WORLD_HEIGHT = ServerVersion.isAtLeast(ServerVersion.v1_18) ? -64 : 0;
 
-    public WPillarTool(Material type, String name) {
-        super(type, name, ToolMode.PILLAR);
+    public WPillarTool(Material type, String name, ToolKind kind) {
+        super(type, name, kind);
     }
 
     @Override

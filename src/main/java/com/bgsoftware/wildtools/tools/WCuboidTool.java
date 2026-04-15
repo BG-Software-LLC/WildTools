@@ -1,6 +1,7 @@
 package com.bgsoftware.wildtools.tools;
 
 import com.bgsoftware.wildtools.api.events.CuboidWandUseEvent;
+import com.bgsoftware.wildtools.api.objects.ToolKind;
 import com.bgsoftware.wildtools.api.objects.ToolMode;
 import com.bgsoftware.wildtools.api.objects.tools.CuboidTool;
 import com.bgsoftware.wildtools.utils.BukkitUtils;
@@ -17,8 +18,8 @@ public class WCuboidTool extends WTool implements CuboidTool {
 
     private final int breakLevel;
 
-    public WCuboidTool(Material type, String name, int breakLevel) {
-        super(type, name, ToolMode.CUBOID);
+    public WCuboidTool(Material type, String name, int breakLevel, ToolKind kind) {
+        super(type, name, kind);
         this.breakLevel = breakLevel;
     }
 

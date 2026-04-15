@@ -2,6 +2,7 @@ package com.bgsoftware.wildtools.tools;
 
 import com.bgsoftware.wildtools.Locale;
 import com.bgsoftware.wildtools.api.events.SortWandUseEvent;
+import com.bgsoftware.wildtools.api.objects.ToolKind;
 import com.bgsoftware.wildtools.api.objects.ToolMode;
 import com.bgsoftware.wildtools.api.objects.tools.SortTool;
 import com.bgsoftware.wildtools.scheduler.Scheduler;
@@ -25,8 +26,8 @@ import java.util.stream.Collectors;
 
 public class WSortTool extends WTool implements SortTool {
 
-    public WSortTool(Material type, String name) {
-        super(type, name, ToolMode.SORT);
+    public WSortTool(Material type, String name, ToolKind kind) {
+        super(type, name, kind);
     }
 
     @Override

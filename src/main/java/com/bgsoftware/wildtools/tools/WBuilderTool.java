@@ -2,6 +2,7 @@ package com.bgsoftware.wildtools.tools;
 
 import com.bgsoftware.wildtools.Locale;
 import com.bgsoftware.wildtools.api.events.BuilderWandUseEvent;
+import com.bgsoftware.wildtools.api.objects.ToolKind;
 import com.bgsoftware.wildtools.api.objects.ToolMode;
 import com.bgsoftware.wildtools.api.objects.tools.BuilderTool;
 import com.bgsoftware.wildtools.utils.BukkitUtils;
@@ -22,8 +23,8 @@ public class WBuilderTool extends WTool implements BuilderTool {
 
     private final int length;
 
-    public WBuilderTool(Material type, String name, int length) {
-        super(type, name, ToolMode.BUILDER);
+    public WBuilderTool(Material type, String name, int length, ToolKind kind) {
+        super(type, name, kind);
         this.length = length;
     }
 
