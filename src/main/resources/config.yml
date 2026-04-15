@@ -132,6 +132,7 @@ events-manipulations:
 # enchants: Enchantments for the tool (LIST)
 #      Please follow the "ENCHANTMENT:LEVEL" format for enchantments.
 #      (Check https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/enchantments/Enchantment.html)
+# flags: Item Flags for the tool (LIST) (Check https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/inventory/ItemFlag.html)
 # whitelisted-blocks: Which blocks will be dug by the tool? [LIST]
 # blacklisted-blocks: Which blocks won't be dug by the tool? [LIST]
 # whitelisted-drops: Which items will be dropped by the tool? [LIST]
