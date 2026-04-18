@@ -87,6 +87,11 @@ public class NMSAdapterImpl implements NMSAdapter {
     }
 
     @Override
+    public void addItemFlag(ItemMeta itemMeta, String itemFlagName) {
+        // Doesn't exists
+    }
+
+    @Override
     public int getFarmlandId() {
         return Block.getId(Blocks.SOIL);
     }

@@ -37,6 +37,7 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.InventoryView;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.Recipe;
 import org.bukkit.inventory.RecipeChoice;
 import org.bukkit.inventory.ShapedRecipe;
@@ -96,6 +97,12 @@ public abstract class AbstractNMSAdapter implements NMSAdapter {
 
     @Override
     public abstract void makeItemGlow(ItemMeta itemMeta);
+
+    @Override
+    public void addItemFlag(ItemMeta itemMeta, String itemFlagName) {
+        ItemFlag itemFlag = ItemFlag.valueOf(itemFlagName);
+        itemMeta.addItemFlags(itemFlag);
+    }
 
     @Override
     public int getFarmlandId() {

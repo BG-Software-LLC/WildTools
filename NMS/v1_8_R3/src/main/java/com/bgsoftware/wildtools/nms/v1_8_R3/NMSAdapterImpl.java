@@ -27,6 +27,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.lang.reflect.Field;
@@ -70,6 +71,12 @@ public class NMSAdapterImpl implements NMSAdapter {
     @Override
     public void makeItemGlow(ItemMeta itemMeta) {
         itemMeta.addEnchant(GLOW_ENCHANT, 1, true);
+    }
+
+    @Override
+    public void addItemFlag(ItemMeta itemMeta, String itemFlagName) {
+        ItemFlag itemFlag = ItemFlag.valueOf(itemFlagName);
+        itemMeta.addItemFlags(itemFlag);
     }
 
     @Override

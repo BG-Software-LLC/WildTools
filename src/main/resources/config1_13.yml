@@ -114,6 +114,7 @@ events-manipulations:
 # vanilla-damage: Tool will be damaged by vanilla actions (BOOLEAN) (Default false)
 # spigot-unbreakable: Set spigot's unbreakable flag (BOOLEAN) (Default false)
 # custom-model: Set a custom model for the tool. (INTEGER) (Default null)
+# item-model: Set an item model for the tool. (STRING) (Default null)
 # omni-tool: Tool will change it's type depends on broken block (BOOLEAN) (Default false)
 #      Tool's default type must be a tool, such as pickaxe, shovel or axe.
 # uses: Custom durability for the tool (INTEGER)
@@ -131,6 +132,7 @@ events-manipulations:
 # enchants: Enchantments for the tool (LIST)
 #      Please follow the "ENCHANTMENT:LEVEL" format for enchantments.
 #      (Check https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/enchantments/Enchantment.html)
+# flags: Item Flags for the tool (LIST) (Check https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/inventory/ItemFlag.html)
 # whitelisted-blocks: Which blocks will be dug by the tool? [LIST]
 # blacklisted-blocks: Which blocks won't be dug by the tool? [LIST]
 # whitelisted-drops: Which items will be dropped by the tool? [LIST]

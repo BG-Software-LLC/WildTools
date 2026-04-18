@@ -92,11 +92,13 @@ public class DataHandler {
 
         for (String name : cfg.getConfigurationSection("tools").getKeys(false)) {
             Material type;
+            String materialName = cfg.getString("tools." + name + ".type");
 
             try {
-                type = Material.valueOf(cfg.getString("tools." + name + ".type"));
+                type = Material.valueOf(materialName);
             } catch (IllegalArgumentException e) {
-                WildToolsPlugin.log("Couldn't find a valid type for tool " + name + ", skipping");
+                WildToolsPlugin.log("Couldn't convert '" + materialName +
+                        "' into an material for tool '" + name + "', skipping...");
                 continue;
             }
 
@@ -105,7 +107,7 @@ public class DataHandler {
             switch (cfg.getString("tools." + name + ".tool-mode", "")) {
                 case "BUILDER":
                     if (!cfg.contains("tools." + name + ".length")) {
-                        WildToolsPlugin.log("Couldn't find a length for tool " + name + ", skipping");
+                        WildToolsPlugin.log("Couldn't find a length for tool '" + name + "', skipping...");
                         continue;
                     }
 
@@ -113,7 +115,7 @@ public class DataHandler {
                     break;
                 case "CANNON":
                     if (!cfg.contains("tools." + name + ".tnt-amount")) {
-                        WildToolsPlugin.log("Couldn't find a tnt amount for tool " + name + ", skipping");
+                        WildToolsPlugin.log("Couldn't find a tnt amount for tool '" + name + "', skipping...");
                         continue;
                     }
 
@@ -121,7 +123,7 @@ public class DataHandler {
                     break;
                 case "CRAFTING":
                     if (!cfg.contains("tools." + name + ".craftings")) {
-                        WildToolsPlugin.log("Couldn't find a craftings list for tool " + name + ", skipping");
+                        WildToolsPlugin.log("Couldn't find a craftings list for tool '" + name + "', skipping...");
                         continue;
                     }
 
@@ -132,7 +134,7 @@ public class DataHandler {
                     break;
                 case "CUBOID":
                     if (!cfg.contains("tools." + name + ".break-level")) {
-                        WildToolsPlugin.log("Couldn't find a break-level for tool " + name + ", skipping");
+                        WildToolsPlugin.log("Couldn't find a break-level for tool '" + name + "', skipping...");
                         continue;
                     }
 
@@ -140,7 +142,7 @@ public class DataHandler {
                     break;
                 case "DRAIN":
                     if (!cfg.contains("tools." + name + ".radius")) {
-                        WildToolsPlugin.log("Couldn't find a radius for tool " + name + ", skipping");
+                        WildToolsPlugin.log("Couldn't find a radius for tool '" + name + "', skipping...");
                         continue;
                     }
 
@@ -148,7 +150,7 @@ public class DataHandler {
                     break;
                 case "HARVESTER":
                     if (!cfg.contains("tools." + name + ".radius")) {
-                        WildToolsPlugin.log("Couldn't find a radius for tool " + name + ", skipping");
+                        WildToolsPlugin.log("Couldn't find a radius for tool '" + name + "', skipping...");
                         continue;
                     }
 
@@ -160,7 +162,7 @@ public class DataHandler {
                     break;
                 case "ICE":
                     if (!cfg.contains("tools." + name + ".radius")) {
-                        WildToolsPlugin.log("Couldn't find a radius for tool " + name + ", skipping");
+                        WildToolsPlugin.log("Couldn't find a radius for tool '" + name + "', skipping...");
                         continue;
                     }
 
@@ -231,14 +233,44 @@ public class DataHandler {
             if (cfg.contains("tools." + name + ".custom-model"))
                 tool.setCustomModel(cfg.getInt("tools." + name + ".custom-model"));
 
+            if (cfg.contains("tools." + name + ".item-model"))
+                tool.setItemModel(cfg.getString("tools." + name + ".item-model"));
+
             if (cfg.contains("tools." + name + ".enchants")) {
-                List<String> enchants = cfg.getStringList("tools." + name + ".enchants");
-                for (String line : enchants)
-                    try {
-                        tool.addEnchantment(Enchantment.getByName(line.split(":")[0]),
-                                Integer.parseInt(line.split(":")[1]));
-                    } catch (IllegalArgumentException ignored) {
+                for (String enchant : cfg.getStringList("tools." + name + ".enchants")) {
+                    String[] sections = enchant.split(":");
+
+                    if (sections.length != 2) {
+                        WildToolsPlugin.log("Invalid enchantment syntax '" + enchant +
+                                "' for tool '" + name + "', skipping...");
+                        continue;
                     }
+
+                    Enchantment enchantment = Enchantment.getByName(sections[0]);
+                    if (enchantment == null) {
+                        WildToolsPlugin.log("Couldn't convert '" + sections[0] +
+                                "' into an enchantment for tool '" + name + "', skipping...");
+                        continue;
+                    }
+
+                    try {
+                        tool.addEnchantment(enchantment, Integer.parseInt(sections[1]));
+                    } catch (NumberFormatException ex) {
+                        WildToolsPlugin.log("Couldn't convert '" + sections[1] +
+                                "' into an enchantment level for tool '" + name + "', skipping...");
+                    }
+                }
+            }
+
+            if (cfg.contains("tools." + name + ".flags")) {
+                for (String flag : cfg.getStringList("tools." + name + ".flags")) {
+                    try {
+                        tool.addItemFlag(flag);
+                    } catch (IllegalArgumentException ex) {
+                        WildToolsPlugin.log("Couldn't convert '" + flag +
+                                "' into an item flag for tool '" + name + "', skipping...");
+                    }
+                }
             }
 
             if (cfg.contains("tools." + name + ".blacklisted-blocks")) {
