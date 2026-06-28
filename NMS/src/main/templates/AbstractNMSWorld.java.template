@@ -145,8 +145,8 @@ public abstract class AbstractNMSWorld implements NMSWorld {
 
         ServerLevel serverLevel = ((CraftChunk) bukkitChunk).getCraftWorld().getHandle();
         LevelChunk levelChunk = serverLevel.getChunk(chunkX, chunkZ);
-        ServerChunkCache serverChunkCache = levelChunk.level.getChunkSource();
-        ThreadedLevelLightEngine lightEngine = (ThreadedLevelLightEngine) levelChunk.level.getLightEngine();
+        ServerChunkCache serverChunkCache = serverLevel.getChunkSource();
+        ThreadedLevelLightEngine lightEngine = (ThreadedLevelLightEngine) serverLevel.getLightEngine();
 
         for (WorldEditSession.BlockData blockData : blocksList) {
             BlockPos blockPos = new BlockPos(blockData.location.getX(), blockData.location.getY(), blockData.location.getZ());
@@ -154,9 +154,9 @@ public abstract class AbstractNMSWorld implements NMSWorld {
             lightEngine.checkBlock(blockPos);
         }
 
-        Scheduler.runTask(levelChunk.level.getWorld(), chunkX, chunkZ, () -> {
+        Scheduler.runTask(serverLevel.getWorld(), chunkX, chunkZ, () -> {
             ClientboundLightUpdatePacket lightUpdatePacket = createLightUpdatePacket(new ChunkPos(chunkX, chunkZ), lightEngine);
-            sendPacketToRelevantPlayers(levelChunk.level, chunkX, chunkZ, lightUpdatePacket);
+            sendPacketToRelevantPlayers(serverLevel, chunkX, chunkZ, lightUpdatePacket);
         }, 2L);
     }
 
