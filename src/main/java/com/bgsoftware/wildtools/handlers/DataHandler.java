@@ -18,6 +18,7 @@ import com.bgsoftware.wildtools.api.objects.tools.SellTool;
 import com.bgsoftware.wildtools.api.objects.tools.SortTool;
 import com.bgsoftware.wildtools.api.objects.tools.Tool;
 import com.bgsoftware.wildtools.hooks.PricesProvider_Default;
+import com.bgsoftware.wildtools.hooks.OrebfuscatorHook;
 import com.bgsoftware.wildtools.scheduler.Scheduler;
 import com.bgsoftware.wildtools.tools.WTool;
 import org.bukkit.Material;
@@ -64,6 +65,14 @@ public class DataHandler {
         }
 
         ProvidersHandler.pricesPlugin = cfg.getString("prices-plugin", "ShopGUIPlus");
+
+        OrebfuscatorHook.configure(
+                cfg.getBoolean("orebfuscator-hook.enabled", true),
+                cfg.getInt("orebfuscator-hook.max-blocks-per-batch", 96),
+                cfg.getInt("orebfuscator-hook.delay-between-batches-ticks", 1),
+                cfg.getInt("orebfuscator-hook.max-blocks-per-chunk-per-session", 512),
+                cfg.getInt("orebfuscator-hook.max-pending-blocks", 8192)
+        );
 
         Scheduler.runTask(() -> {
             plugin.getEvents().loadClaimingPlugins(cfg.getStringList("events-manipulations.claiming-plugins"));

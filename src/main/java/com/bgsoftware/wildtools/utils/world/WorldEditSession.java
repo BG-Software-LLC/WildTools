@@ -2,6 +2,7 @@ package com.bgsoftware.wildtools.utils.world;
 
 import com.bgsoftware.wildtools.WildToolsPlugin;
 import com.bgsoftware.wildtools.hooks.listener.IToolBlockListener;
+import com.bgsoftware.wildtools.hooks.OrebfuscatorHook;
 import com.bgsoftware.wildtools.utils.items.ItemStackMap;
 import com.bgsoftware.wildtools.utils.math.NumberUtils;
 import com.bgsoftware.wildtools.utils.math.Vector2;
@@ -119,6 +120,10 @@ public class WorldEditSession {
 
         this.affectedBlocksByChunks.forEach((chunkVector, affectedBlocks) ->
                 plugin.getNMSWorld().refreshChunk(chunkVector.toChunk(world), affectedBlocks));
+
+        // Fast NMS edits can leave Orebfuscator fake ores on the client.
+        // Queue a throttled deobfuscation pass after the real block changes are applied.
+        OrebfuscatorHook.deobfuscate(this.world, this.affectedBlocksByChunks);
 
         Location bukkitDropLocation = this.dropLocation.toLocation(this.world);
 

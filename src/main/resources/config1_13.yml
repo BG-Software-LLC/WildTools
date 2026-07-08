@@ -7,6 +7,21 @@
 
 # Choose which prices plugin to check for prices:
 # Auto, CMI, EconomyShopGUI, Essentials, ExcellentShop, GUIShop, newtShop, NextGens, QuantumShop, ShopGUIPlus, zShop
+
+# Orebfuscator integration for trench/cuboid tools and any other WildTools fast block edits.
+# This fixes fake ores staying visible after WildTools changes blocks through NMS instead of normal Bukkit updates.
+# The hook is throttled so big trench pickaxes do not dump thousands of Orebfuscator updates in one tick.
+orebfuscator-hook:
+  enabled: true
+  # How many changed blocks are sent to Orebfuscator in one scheduled call. Lower = safer, higher = faster reveal.
+  max-blocks-per-batch: 96
+  # Ticks between batches. 1 spreads work across ticks and is recommended for busy servers.
+  delay-between-batches-ticks: 1
+  # Safety cap per chunk per WildTools session. 0 = no per-chunk cap.
+  max-blocks-per-chunk-per-session: 512
+  # Global queue safety cap. If the server is being spammed with trench tools, extra visual refreshes are skipped instead of lagging the server. 0 = no queue cap.
+  max-pending-blocks: 8192
+
 prices-plugin: 'ShopGUIPlus'
 
 # Path to the logs file.
