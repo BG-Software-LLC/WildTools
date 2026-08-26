@@ -70,10 +70,8 @@ public class BukkitUtils {
         return !playerInteractEvent.isCancelled();
     }
 
-    public static boolean breakBlock(Player player, Block block, ItemStack usedItem,
-                                     @Nullable Tool tool,
-                                     @Nullable WorldEditSession editSession,
-                                     @Nullable Function<ItemStack, ItemStack> dropItemFunction) {
+    public static boolean breakBlock(Player player, Block block, ItemStack usedItem, @Nullable Tool tool,
+                                     @Nullable WorldEditSession editSession, @Nullable Function<ItemStack, ItemStack> dropItemFunction) {
         BlockBreakEvent blockBreakEvent = new BlockBreakEvent(block, player);
         block.setMetadata("drop-items", new FixedMetadataValue(plugin, tool == null));
 
@@ -126,9 +124,7 @@ public class BukkitUtils {
         return true;
     }
 
-    public static boolean seedBlock(Player player, Block block,
-                                    @Nullable Tool tool,
-                                    @Nullable WorldEditSession editSession,
+    public static boolean seedBlock(Player player, Block block, @Nullable Tool tool, @Nullable WorldEditSession editSession,
                                     @Nullable Function<ItemStack, ItemStack> dropItemFunction) {
         BlockBreakEvent blockBreakEvent = new BlockBreakEvent(block, player);
         block.setMetadata("drop-items", new FixedMetadataValue(plugin, tool == null));
@@ -144,11 +140,10 @@ public class BukkitUtils {
         Location blockLocation = block.getLocation();
 
         if (editSession == null) {
-            plugin.getNMSWorld().setCropState(block, CropState.SEEDED);
+            placeCrop(player, block);
         } else {
-            boolean result = editSession.setType(blockLocation, false,
-                    vec -> plugin.getNMSWorld().setCropState(block, CropState.SEEDED),
-                    WorldEditSession.SetBlockPriority.CROPS);
+            boolean result = editSession.setType(blockLocation, false, vec ->
+                            placeCrop(player, block), WorldEditSession.SetBlockPriority.CROPS);
 
             if (!result)
                 return false;
@@ -166,6 +161,17 @@ public class BukkitUtils {
         }
 
         return true;
+    }
+
+    private static void placeCrop(Player player, Block block) {
+        plugin.getNMSWorld().setCropState(block, CropState.SEEDED);
+
+        BlockPlaceEvent placeEvent = plugin.getNMSAdapter().getFakePlaceEvent(player, block, block);
+        plugin.getEvents().callPlaceEvent(placeEvent);
+
+        if (placeEvent.isCancelled()) {
+            block.setType(Material.AIR);
+        }
     }
 
     public static boolean placeBlock(Player player, Block block, Block materialBlock,
