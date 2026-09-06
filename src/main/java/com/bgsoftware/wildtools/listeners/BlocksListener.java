@@ -16,6 +16,8 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemDamageEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -24,7 +26,7 @@ import java.util.concurrent.TimeUnit;
 
 public class BlocksListener implements Listener {
 
-    private static final Map<UUID, Material> lastClickedType = new HashMap<>();
+    private final Map<UUID, Map<Integer, OmniInteraction>> lastOmniInteractions = new HashMap<>();
 
     private final WildToolsPlugin plugin;
 
@@ -227,24 +229,25 @@ public class BlocksListener implements Listener {
             return;
 
         Material blockType = e.getClickedBlock().getType();
+        String world = e.getClickedBlock().getWorld().getName();
+        ItemStack itemInHand = plugin.getNMSAdapter().getItemInHand(e.getPlayer(), e);
+        int heldSlot = e.getPlayer().getInventory().getHeldItemSlot();
 
-        if (lastClickedType.get(e.getPlayer().getUniqueId()) == blockType)
+        Map<Integer, OmniInteraction> playerInteractions = lastOmniInteractions.get(e.getPlayer().getUniqueId());
+        OmniInteraction lastInteraction = playerInteractions == null ? null : playerInteractions.get(heldSlot);
+        if (lastInteraction != null && lastInteraction.matches(world, blockType, itemInHand))
             return;
 
-        ToolItemStack toolItemStack = ToolItemStack.of(plugin.getNMSAdapter().getItemInHand(e.getPlayer(), e));
+        ToolItemStack toolItemStack = ToolItemStack.of(itemInHand);
         Tool tool = toolItemStack.getTool();
 
         if (tool == null || !tool.isOmni())
             return;
 
-        String world = e.getClickedBlock().getWorld().getName();
-
         if (!tool.isWhitelistedWorld(world) || tool.isBlacklistedWorld(world)) {
             e.setCancelled(true);
             return;
         }
-
-        lastClickedType.put(e.getPlayer().getUniqueId(), blockType);
 
         String replaceTypeName;
 
@@ -264,6 +267,31 @@ public class BlocksListener implements Listener {
 
         if (toolItemStack.getType() != replaceType)
             toolItemStack.setType(replaceType);
+
+        lastOmniInteractions.computeIfAbsent(e.getPlayer().getUniqueId(), uuid -> new HashMap<>())
+                .put(heldSlot, new OmniInteraction(world, blockType, toolItemStack.getItem()));
+    }
+
+    @EventHandler
+    public void onPlayerQuit(PlayerQuitEvent e) {
+        lastOmniInteractions.remove(e.getPlayer().getUniqueId());
+    }
+
+    private static class OmniInteraction {
+
+        private final String world;
+        private final Material blockType;
+        private final ItemStack itemInHand;
+
+        private OmniInteraction(String world, Material blockType, ItemStack itemInHand) {
+            this.world = world;
+            this.blockType = blockType;
+            this.itemInHand = itemInHand.clone();
+        }
+
+        private boolean matches(String world, Material blockType, ItemStack itemInHand) {
+            return this.world.equals(world) && this.blockType == blockType && this.itemInHand.equals(itemInHand);
+        }
     }
 
     private String getTime(long timeLeft) {
