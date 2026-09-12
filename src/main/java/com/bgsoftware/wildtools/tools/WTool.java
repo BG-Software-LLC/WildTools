@@ -2,13 +2,13 @@ package com.bgsoftware.wildtools.tools;
 
 import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.wildtools.WildToolsPlugin;
+import com.bgsoftware.wildtools.utils.TextFormatter;
 import com.bgsoftware.wildtools.api.objects.ToolMode;
 import com.bgsoftware.wildtools.api.objects.tools.Tool;
 import com.bgsoftware.wildtools.utils.Materials;
 import com.bgsoftware.wildtools.utils.items.ItemUtils;
 import com.bgsoftware.wildtools.utils.items.ToolItemStack;
 import com.bgsoftware.wildtools.world.BlockMaterial;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.block.Block;
@@ -84,7 +84,7 @@ public abstract class WTool implements Tool {
     @Override
     public void setDisplayName(String name) {
         ItemMeta im = toolItemStack.getItemMeta();
-        im.setDisplayName(ChatColor.translateAlternateColorCodes('&', name));
+        im.setDisplayName(TextFormatter.format(name));
         toolItemStack.setItemMeta(im);
     }
 
@@ -94,7 +94,7 @@ public abstract class WTool implements Tool {
         List<String> _lore = new ArrayList<>();
 
         for (String line : lore)
-            _lore.add(ChatColor.translateAlternateColorCodes('&', line));
+            _lore.add(TextFormatter.format(line));
 
         im.setLore(_lore);
         toolItemStack.setItemMeta(im);

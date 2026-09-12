@@ -2,6 +2,7 @@ package com.bgsoftware.wildtools.utils.items;
 
 import com.bgsoftware.wildtools.WildToolsPlugin;
 import com.bgsoftware.wildtools.utils.Materials;
+import com.bgsoftware.wildtools.utils.TextFormatter;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
@@ -75,18 +76,18 @@ public class ItemBuilder {
 
     public ItemBuilder withName(String name) {
         if (!name.isEmpty())
-            itemMeta.setDisplayName(ChatColor.translateAlternateColorCodes('&', name));
+            itemMeta.setDisplayName(TextFormatter.format(name));
         return this;
     }
 
     public ItemBuilder withLore(String firstLine, List<String> listLine) {
         List<String> loreList = new ArrayList<>();
 
-        firstLine = ChatColor.translateAlternateColorCodes('&', firstLine);
+        firstLine = TextFormatter.format(firstLine);
         loreList.add(firstLine);
 
         for (String line : listLine) {
-            loreList.add(ChatColor.getLastColors(firstLine) + ChatColor.translateAlternateColorCodes('&', line));
+            loreList.add(ChatColor.getLastColors(firstLine) + TextFormatter.format(line));
         }
 
         if (loreList.size() > 10) {
@@ -104,7 +105,7 @@ public class ItemBuilder {
         List<String> loreList = new ArrayList<>();
 
         for (String line : listLine) {
-            loreList.add(ChatColor.translateAlternateColorCodes('&', line));
+            loreList.add(TextFormatter.format(line));
         }
 
         itemMeta.setLore(loreList);
@@ -115,7 +116,7 @@ public class ItemBuilder {
         List<String> loreList = new ArrayList<>();
 
         for (String line : lore) {
-            loreList.add(ChatColor.translateAlternateColorCodes('&', line));
+            loreList.add(TextFormatter.format(line));
         }
 
         itemMeta.setLore(loreList);
