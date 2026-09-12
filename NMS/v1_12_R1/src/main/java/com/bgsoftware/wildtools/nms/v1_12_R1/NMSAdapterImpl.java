@@ -128,7 +128,7 @@ public class NMSAdapterImpl implements NMSAdapter {
     }
 
     @Override
-    public DestroySpeedCategory getDestroySpeedCategory(Material material) {
+    public synchronized DestroySpeedCategory getDestroySpeedCategory(Material material) {
         return DESTROY_SPEED_CATEGORIES.computeIfAbsent(material, mat -> {
             IBlockData blockData = CraftMagicNumbers.getBlock(mat).getBlockData();
 

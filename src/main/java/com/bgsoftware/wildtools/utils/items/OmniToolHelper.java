@@ -22,10 +22,10 @@ public class OmniToolHelper {
 
                 EnumMap<DestroySpeedCategory, Material> categoryMap = new EnumMap<>(DestroySpeedCategory.class);
 
-                categoryMap.put(DestroySpeedCategory.AXE, getSafeMaterial(prefix + "AXE", material));
-                categoryMap.put(DestroySpeedCategory.HOE, getSafeMaterial(prefix + "HOE", material));
-                categoryMap.put(DestroySpeedCategory.SHOVEL, getSafeMaterial(prefix + shovelSuffix, material));
-                categoryMap.put(DestroySpeedCategory.PICKAXE, getSafeMaterial(prefix + "PICKAXE", material));
+                categoryMap.put(DestroySpeedCategory.AXE, Materials.getSafeMaterial(prefix + "AXE").orElse(material));
+                categoryMap.put(DestroySpeedCategory.HOE, Materials.getSafeMaterial(prefix + "HOE").orElse(material));
+                categoryMap.put(DestroySpeedCategory.SHOVEL, Materials.getSafeMaterial(prefix + shovelSuffix).orElse(material));
+                categoryMap.put(DestroySpeedCategory.PICKAXE, Materials.getSafeMaterial(prefix + "PICKAXE").orElse(material));
 
                 TOOL_TYPE_CACHE.put(material, categoryMap);
             }
@@ -58,14 +58,6 @@ public class OmniToolHelper {
         EnumMap<DestroySpeedCategory, Material> categoryMap = TOOL_TYPE_CACHE.get(toolType);
 
         return categoryMap != null ? categoryMap.get(category) : toolType;
-    }
-
-    private static Material getSafeMaterial(String name, Material fallback) {
-        try {
-            return Material.valueOf(name);
-        } catch (IllegalArgumentException e) {
-            return fallback;
-        }
     }
 
 }

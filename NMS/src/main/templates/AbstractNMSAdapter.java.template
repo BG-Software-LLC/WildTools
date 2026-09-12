@@ -140,7 +140,7 @@ public abstract class AbstractNMSAdapter implements NMSAdapter {
     protected abstract void sendPacket(ServerChunkCache serverChunkCache, Entity entity, Packet<? super ClientGamePacketListener> packet);
 
     @Override
-    public DestroySpeedCategory getDestroySpeedCategory(Material material) {
+    public synchronized DestroySpeedCategory getDestroySpeedCategory(Material material) {
         return DESTROY_SPEED_CATEGORIES.computeIfAbsent(material, mat -> {
             if (Tag.MINEABLE_AXE.isTagged(mat)) {
                 return DestroySpeedCategory.AXE;
