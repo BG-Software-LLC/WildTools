@@ -17,15 +17,12 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.inventory.AnvilMenu;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.state.BlockState;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
 import ${CRAFTBUKKIT_PACKAGE}.CraftWorld;
-import ${CRAFTBUKKIT_PACKAGE}.block.data.CraftBlockData;
 import ${CRAFTBUKKIT_PACKAGE}.entity.CraftItem;
 import ${CRAFTBUKKIT_PACKAGE}.entity.CraftLivingEntity;
 import ${CRAFTBUKKIT_PACKAGE}.inventory.CraftInventoryView;
@@ -43,15 +40,19 @@ import org.bukkit.inventory.RecipeChoice;
 import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.inventory.ShapelessRecipe;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.Tag;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.EnumMap;
 import java.util.List;
 
 public abstract class AbstractNMSAdapter implements NMSAdapter {
 
     private static final ReflectField<ItemStack> ITEM_STACK_HANDLE = new ReflectField<>(
             CraftItemStack.class, ItemStack.class, "handle");
+
+    private static final EnumMap<Material, DestroySpeedCategory> DESTROY_SPEED_CATEGORIES = new EnumMap<>(Material.class);
 
     @Override
     public void loadLegacy() {
@@ -139,16 +140,22 @@ public abstract class AbstractNMSAdapter implements NMSAdapter {
     protected abstract void sendPacket(ServerChunkCache serverChunkCache, Entity entity, Packet<? super ClientGamePacketListener> packet);
 
     @Override
-    public DestroySpeedCategory getDestroySpeedCategory(Material material) {
-        BlockState blockState = ((CraftBlockData) material.createBlockData()).getState();
+    public synchronized DestroySpeedCategory getDestroySpeedCategory(Material material) {
+        return DESTROY_SPEED_CATEGORIES.computeIfAbsent(material, mat -> {
+            if (Tag.MINEABLE_AXE.isTagged(mat)) {
+                return DestroySpeedCategory.AXE;
+            }
 
-        if (Items.DIAMOND_AXE.getDestroySpeed(new ItemStack(Items.DIAMOND_AXE), blockState) == 8f)
-            return DestroySpeedCategory.AXE;
+            if (Tag.MINEABLE_HOE.isTagged(mat)) {
+                return DestroySpeedCategory.HOE;
+            }
 
-        if (Items.DIAMOND_SHOVEL.getDestroySpeed(new ItemStack(Items.DIAMOND_SHOVEL), blockState) == 8f)
-            return DestroySpeedCategory.SHOVEL;
+            if (Tag.MINEABLE_SHOVEL.isTagged(mat)) {
+                return DestroySpeedCategory.SHOVEL;
+            }
 
-        return DestroySpeedCategory.PICKAXE;
+            return DestroySpeedCategory.PICKAXE;
+        });
     }
 
     @Override

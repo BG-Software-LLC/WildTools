@@ -4,9 +4,11 @@ import com.bgsoftware.wildtools.Locale;
 import com.bgsoftware.wildtools.WildToolsPlugin;
 import com.bgsoftware.wildtools.api.objects.tools.Tool;
 import com.bgsoftware.wildtools.tools.ToolBreaksTracker;
-import com.bgsoftware.wildtools.utils.ServerVersion;
+import com.bgsoftware.wildtools.utils.items.DestroySpeedCategory;
+import com.bgsoftware.wildtools.utils.items.OmniToolHelper;
 import com.bgsoftware.wildtools.utils.items.ToolItemStack;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.block.BlockFace;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -16,15 +18,11 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemDamageEvent;
+import org.bukkit.inventory.ItemStack;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 public class BlocksListener implements Listener {
-
-    private static final Map<UUID, Material> lastClickedType = new HashMap<>();
 
     private final WildToolsPlugin plugin;
 
@@ -47,9 +45,7 @@ public class BlocksListener implements Listener {
         if (tool == null)
             return;
 
-        String world = e.getBlock().getWorld().getName();
-
-        if (!tool.isWhitelistedWorld(world) || tool.isBlacklistedWorld(world)) {
+        if (!isWhitelistedWorld(tool, e.getBlock().getWorld())) {
             e.setCancelled(true);
             return;
         }
@@ -99,9 +95,7 @@ public class BlocksListener implements Listener {
         if (tool == null)
             return;
 
-        String world = e.getPlayer().getWorld().getName();
-
-        if (!tool.isWhitelistedWorld(world) || tool.isBlacklistedWorld(world)) {
+        if (!isWhitelistedWorld(tool, e.getPlayer().getWorld())) {
             e.setCancelled(true);
             return;
         }
@@ -184,9 +178,7 @@ public class BlocksListener implements Listener {
         if (tool == null)
             return;
 
-        String world = e.getRightClicked().getWorld().getName();
-
-        if (!tool.isWhitelistedWorld(world) || tool.isBlacklistedWorld(world)) {
+        if (!isWhitelistedWorld(tool, e.getRightClicked().getWorld())) {
             e.setCancelled(true);
             return;
         }
@@ -223,47 +215,47 @@ public class BlocksListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onOmniInteract(PlayerInteractEvent e) {
-        if (e.getAction() != Action.LEFT_CLICK_BLOCK)
+        if (e.getAction() != Action.LEFT_CLICK_BLOCK) {
             return;
+        }
 
-        Material blockType = e.getClickedBlock().getType();
+        ItemStack handItem = plugin.getNMSAdapter().getItemInHand(e.getPlayer(), e);
 
-        if (lastClickedType.get(e.getPlayer().getUniqueId()) == blockType)
+        if (handItem == null || handItem.getType() == Material.AIR) {
             return;
+        }
 
-        ToolItemStack toolItemStack = ToolItemStack.of(plugin.getNMSAdapter().getItemInHand(e.getPlayer(), e));
+        ToolItemStack toolItemStack = ToolItemStack.of(handItem);
         Tool tool = toolItemStack.getTool();
 
-        if (tool == null || !tool.isOmni())
+        if (tool == null || !tool.isOmni()) {
             return;
+        }
 
-        String world = e.getClickedBlock().getWorld().getName();
-
-        if (!tool.isWhitelistedWorld(world) || tool.isBlacklistedWorld(world)) {
+        if (!isWhitelistedWorld(tool, e.getClickedBlock().getWorld())) {
             e.setCancelled(true);
             return;
         }
 
-        lastClickedType.put(e.getPlayer().getUniqueId(), blockType);
+        Material toolType = toolItemStack.getType();
+        Material blockType = e.getClickedBlock().getType();
+        DestroySpeedCategory destroySpeedCategory = plugin.getNMSAdapter().getDestroySpeedCategory(blockType);
 
-        String replaceTypeName;
-
-        switch (plugin.getNMSAdapter().getDestroySpeedCategory(blockType)) {
-            case AXE:
-                replaceTypeName = "AXE";
-                break;
-            case SHOVEL:
-                replaceTypeName = ServerVersion.isLegacy() ? "SPADE" : "SHOVEL";
-                break;
-            default:
-                replaceTypeName = "PICKAXE";
-                break;
+        if (OmniToolHelper.isAlreadyCorrectToolType(toolType, destroySpeedCategory)) {
+            return;
         }
 
-        Material replaceType = Material.valueOf(toolItemStack.getType().name().split("_")[0] + "_" + replaceTypeName);
+        Material newToolType = OmniToolHelper.getNewToolType(toolType, destroySpeedCategory);
 
-        if (toolItemStack.getType() != replaceType)
-            toolItemStack.setType(replaceType);
+        if (toolType != newToolType) {
+            toolItemStack.setType(newToolType);
+        }
+    }
+
+    private boolean isWhitelistedWorld(Tool tool, World world) {
+        String worldName = world.getName();
+
+        return tool.isWhitelistedWorld(worldName) && !tool.isBlacklistedWorld(worldName);
     }
 
     private String getTime(long timeLeft) {

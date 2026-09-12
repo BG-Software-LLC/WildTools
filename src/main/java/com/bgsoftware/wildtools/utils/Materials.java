@@ -29,6 +29,7 @@ public enum Materials {
     LIGHT_BLUE_STAINED_GLASS_PANE("STAINED_GLASS_PANE", 3),
     ENCHANTED_GOLDEN_APPLE("GOLDEN_APPLE", 1);
 
+    private static final EnumSet<Material> TOOLS = EnumSet.noneOf(Material.class);
     private static final Map<Material, EnumSet<Tag>> MATERIAL_TAGS = initializeMaterialTags();
 
     private static int farmlandId = -1;
@@ -105,6 +106,22 @@ public enum Materials {
         return hasMaterialTag(material, Tag.FORCE_UPDATE);
     }
 
+    public static boolean isAxe(Material material) {
+        return hasMaterialTag(material, Tag.AXE);
+    }
+
+    public static boolean isHoe(Material material) {
+        return hasMaterialTag(material, Tag.HOE);
+    }
+
+    public static boolean isPickaxe(Material material) {
+        return hasMaterialTag(material, Tag.PICKAXE);
+    }
+
+    public static boolean isShovel(Material material) {
+        return hasMaterialTag(material, Tag.SHOVEL);
+    }
+
     private static boolean hasMaterialTag(Material material, Tag tag) {
         EnumSet<Tag> tags = MATERIAL_TAGS.get(material);
         return tags != null && tags.contains(tag);
@@ -115,6 +132,10 @@ public enum Materials {
             farmlandId = WildToolsPlugin.getPlugin().getNMSAdapter().getFarmlandId();
 
         return farmlandId;
+    }
+
+    public static EnumSet<Material> getTools() {
+        return TOOLS;
     }
 
     public static Optional<Material> getSafeMaterial(String name) {
@@ -185,6 +206,22 @@ public enum Materials {
             if (materialName.contains("BUCKET")) {
                 tags.add(Tag.BUCKET);
             }
+            if (materialName.endsWith("_AXE")) {
+                tags.add(Tag.AXE);
+                TOOLS.add(material);
+            }
+            if (materialName.endsWith("_HOE")) {
+                tags.add(Tag.HOE);
+                TOOLS.add(material);
+            }
+            if (materialName.endsWith("_PICKAXE")) {
+                tags.add(Tag.PICKAXE);
+                TOOLS.add(material);
+            }
+            if (ServerVersion.isLegacy() ? materialName.endsWith("_SPADE") : materialName.endsWith("_SHOVEL")) {
+                tags.add(Tag.SHOVEL);
+                TOOLS.add(material);
+            }
 
             if (!tags.isEmpty())
                 materialTags.put(material, tags);
@@ -207,7 +244,11 @@ public enum Materials {
         BOTTLE,
         BUCKET,
         BLACKLISTED_BLOCK,
-        FORCE_UPDATE
+        FORCE_UPDATE,
+        AXE,
+        HOE,
+        PICKAXE,
+        SHOVEL,
 
     }
 

@@ -40,12 +40,18 @@ import org.bukkit.inventory.meta.ItemMeta;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.EnumMap;
 
 public class NMSAdapterImpl implements NMSAdapter {
 
     private static final ReflectField<ItemStack> ITEM_STACK_HANDLE = new ReflectField<>(CraftItemStack.class, ItemStack.class, "handle");
 
+    private static final EnumMap<Material, DestroySpeedCategory> DESTROY_SPEED_CATEGORIES = new EnumMap<>(Material.class);
+
     private static final Enchantment GLOW_ENCHANT = initializeGlowEnchantment();
+    private static final ItemStack DIAMOND_AXE_ITEM_STACK = new ItemStack(Items.DIAMOND_AXE);
+    private static final ItemStack DIAMOND_HOE_ITEM_STACK = new ItemStack(Items.DIAMOND_HOE);
+    private static final ItemStack DIAMOND_SHOVEL_ITEM_STACK = new ItemStack(Items.DIAMOND_SHOVEL);
 
     @Override
     public ToolItemStack createToolItemStack(org.bukkit.inventory.ItemStack bukkitItem) {
@@ -122,16 +128,24 @@ public class NMSAdapterImpl implements NMSAdapter {
     }
 
     @Override
-    public DestroySpeedCategory getDestroySpeedCategory(Material material) {
-        IBlockData blockData = CraftMagicNumbers.getBlock(material).getBlockData();
+    public synchronized DestroySpeedCategory getDestroySpeedCategory(Material material) {
+        return DESTROY_SPEED_CATEGORIES.computeIfAbsent(material, mat -> {
+            IBlockData blockData = CraftMagicNumbers.getBlock(mat).getBlockData();
 
-        if (Items.DIAMOND_AXE.getDestroySpeed(new ItemStack(Items.DIAMOND_AXE), blockData) == 8f)
-            return DestroySpeedCategory.AXE;
+            if (Items.DIAMOND_AXE.getDestroySpeed(DIAMOND_AXE_ITEM_STACK, blockData) == 8f) {
+                return DestroySpeedCategory.AXE;
+            }
 
-        if (Items.DIAMOND_SHOVEL.getDestroySpeed(new ItemStack(Items.DIAMOND_SHOVEL), blockData) == 8f)
-            return DestroySpeedCategory.SHOVEL;
+            if (Items.DIAMOND_HOE.getDestroySpeed(DIAMOND_HOE_ITEM_STACK, blockData) == 8f) {
+                return DestroySpeedCategory.HOE;
+            }
 
-        return DestroySpeedCategory.PICKAXE;
+            if (Items.DIAMOND_SHOVEL.getDestroySpeed(DIAMOND_SHOVEL_ITEM_STACK, blockData) == 8f) {
+                return DestroySpeedCategory.SHOVEL;
+            }
+
+            return DestroySpeedCategory.PICKAXE;
+        });
     }
 
     @Override
