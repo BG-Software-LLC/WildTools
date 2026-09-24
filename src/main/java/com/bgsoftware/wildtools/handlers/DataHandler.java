@@ -54,12 +54,14 @@ public class DataHandler {
 
         CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(file);
 
-        if (cfg.hasFailed())
+        if (cfg.hasFailed()) {
             return;
+        }
 
         try {
             cfg.syncWithConfig(file, plugin.getResource("config.yml"), "tools");
         } catch (IOException error) {
+            //noinspection all
             error.printStackTrace();
             return;
         }
@@ -196,54 +198,69 @@ public class DataHandler {
                     continue;
             }
 
-            if (cfg.contains("tools." + name + ".cooldown"))
+            if (cfg.contains("tools." + name + ".cooldown")) {
                 tool.setCooldown(cfg.getLong("tools." + name + ".cooldown"));
+            }
 
-            if (cfg.contains("tools." + name + ".auto-collect"))
+            if (cfg.contains("tools." + name + ".auto-collect")) {
                 tool.setAutoCollect(cfg.getBoolean("tools." + name + ".auto-collect"));
+            }
 
-            if (cfg.contains("tools." + name + ".instant-break"))
+            if (cfg.contains("tools." + name + ".instant-break")) {
                 tool.setInstantBreak(cfg.getBoolean("tools." + name + ".instant-break"));
+            }
 
-            if (cfg.contains("tools." + name + ".silk-touch"))
+            if (cfg.contains("tools." + name + ".silk-touch")) {
                 tool.setSilkTouch(cfg.getBoolean("tools." + name + ".silk-touch"));
+            }
 
-            if (cfg.contains("tools." + name + ".only-same-type"))
+            if (cfg.contains("tools." + name + ".only-same-type")) {
                 tool.setOnlySameType(cfg.getBoolean("tools." + name + ".only-same-type"));
+            }
 
-            if (cfg.contains("tools." + name + ".only-inside-claim"))
+            if (cfg.contains("tools." + name + ".only-inside-claim")) {
                 tool.setOnlyInsideClaim(cfg.getBoolean("tools." + name + ".only-inside-claim"));
+            }
 
-            if (cfg.contains("tools." + name + ".unbreakable"))
+            if (cfg.contains("tools." + name + ".unbreakable")) {
                 tool.setUnbreakable(cfg.getBoolean("tools." + name + ".unbreakable"));
+            }
 
-            if (cfg.contains("tools." + name + ".vanilla-damage"))
+            if (cfg.contains("tools." + name + ".vanilla-damage")) {
                 tool.setVanillaDamage(cfg.getBoolean("tools." + name + ".vanilla-damage"));
+            }
 
-            if (cfg.contains("tools." + name + ".uses"))
+            if (cfg.contains("tools." + name + ".uses")) {
                 tool.setUsesLeft(cfg.getInt("tools." + name + ".uses"));
+            }
 
-            if (cfg.contains("tools." + name + ".keep-inventory"))
+            if (cfg.contains("tools." + name + ".keep-inventory")) {
                 tool.setKeepInventory(cfg.getBoolean("tools." + name + ".keep-inventory"));
+            }
 
-            if (cfg.contains("tools." + name + ".name"))
+            if (cfg.contains("tools." + name + ".name")) {
                 tool.setDisplayName(cfg.getString("tools." + name + ".name"));
+            }
 
-            if (cfg.contains("tools." + name + ".lore"))
+            if (cfg.contains("tools." + name + ".lore")) {
                 tool.setLore(cfg.getStringList("tools." + name + ".lore"));
+            }
 
             if (cfg.getBoolean("tools." + name + ".glow", false)) {
                 ((WTool) tool).makeToolGlow();
             }
 
-            if (cfg.getBoolean("tools." + name + ".spigot-unbreakable", false))
+            if (cfg.getBoolean("tools." + name + ".spigot-unbreakable", false)) {
                 tool.setSpigotUnbreakable(cfg.getBoolean("tools." + name + ".spigot-unbreakable"));
+            }
 
-            if (cfg.contains("tools." + name + ".custom-model"))
+            if (cfg.contains("tools." + name + ".custom-model")) {
                 tool.setCustomModel(cfg.getInt("tools." + name + ".custom-model"));
+            }
 
-            if (cfg.contains("tools." + name + ".item-model"))
+            if (cfg.contains("tools." + name + ".item-model")) {
                 tool.setItemModel(cfg.getString("tools." + name + ".item-model"));
+            }
 
             if (cfg.contains("tools." + name + ".enchants")) {
                 for (String enchant : cfg.getStringList("tools." + name + ".enchants")) {
@@ -284,45 +301,59 @@ public class DataHandler {
 
             if (cfg.contains("tools." + name + ".blacklisted-blocks")) {
                 List<String> materials = cfg.getStringList("tools." + name + ".blacklisted-blocks");
-                for (String mat : materials)
+
+                for (String mat : materials) {
                     tool.addBlacklistedMaterial(mat);
+                }
             }
 
             if (cfg.contains("tools." + name + ".whitelisted-blocks")) {
                 List<String> materials = cfg.getStringList("tools." + name + ".whitelisted-blocks");
-                for (String mat : materials)
+
+                for (String mat : materials) {
                     tool.addWhitelistedMaterial(mat);
+                }
             }
 
             if (cfg.contains("tools." + name + ".blacklisted-drops")) {
                 List<String> drops = cfg.getStringList("tools." + name + ".blacklisted-drops");
-                for (String drop : drops)
+
+                for (String drop : drops) {
                     tool.addBlacklistedDrop(drop);
+                }
             }
 
             if (cfg.contains("tools." + name + ".whitelisted-drops")) {
                 List<String> drops = cfg.getStringList("tools." + name + ".whitelisted-drops");
-                for (String drop : drops)
+
+                for (String drop : drops) {
                     tool.addWhitelistedDrop(drop);
+                }
             }
 
-            if (cfg.contains("tools." + name + ".multiplier"))
+            if (cfg.contains("tools." + name + ".multiplier")) {
                 tool.setMultiplier(cfg.getDouble("tools." + name + ".multiplier"));
+            }
 
-            if (cfg.contains("tools." + name + ".omni-tool") && type.name().contains("_"))
+            if (cfg.contains("tools." + name + ".omni-tool") && type.name().contains("_")) {
                 tool.setOmni(cfg.getBoolean("tools." + name + ".omni-tool"));
+            }
 
-            if (cfg.contains("tools." + name + ".private"))
+            if (cfg.contains("tools." + name + ".private")) {
                 tool.setPrivate(cfg.getBoolean("tools." + name + ".private"));
+            }
 
-            if (cfg.contains("tools." + name + ".uses-progress"))
+            if (cfg.contains("tools." + name + ".uses-progress")) {
                 tool.setUsesProgress(cfg.getBoolean("tools." + name + ".uses-progress"));
+            }
 
-            if (cfg.contains("tools." + name + ".anvil-combine-exp"))
+            if (cfg.contains("tools." + name + ".anvil-combine-exp")) {
                 tool.setAnvilCombineExp(cfg.getInt("tools." + name + ".anvil-combine-exp"));
+            }
 
-            if (cfg.contains("tools." + name + ".anvil-combine-limit"))
+            if (cfg.contains("tools." + name + ".anvil-combine-limit")) {
                 tool.setAnvilCombineLimit(cfg.getInt("tools." + name + ".anvil-combine-limit"));
+            }
 
             if (cfg.contains("tools." + name + ".blacklisted-worlds")) {
                 tool.setBlacklistedWorlds(cfg.getStringList("tools." + name + ".blacklisted-worlds"));
@@ -332,8 +363,9 @@ public class DataHandler {
                 tool.setWhitelistedWorlds(cfg.getStringList("tools." + name + ".whitelisted-worlds"));
             }
 
-            if (cfg.contains("tools." + name + ".notified-plugins"))
+            if (cfg.contains("tools." + name + ".notified-plugins")) {
                 tool.setNotifiedPlugins(cfg.getStringList("tools." + name + ".notified-plugins"));
+            }
 
             toolsAmount++;
         }

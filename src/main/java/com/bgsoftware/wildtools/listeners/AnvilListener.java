@@ -8,7 +8,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.inventory.PrepareAnvilEvent;
 import org.bukkit.inventory.AnvilInventory;
 import org.bukkit.inventory.ItemStack;
@@ -31,21 +30,21 @@ public class AnvilListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onAnvilAdd(InventoryClickEvent e){
-        if(!(e.getClickedInventory() instanceof AnvilInventory))
+        if (!(e.getClickedInventory() instanceof AnvilInventory)) {
             return;
+        }
 
         AnvilInventory inventory = (AnvilInventory) e.getClickedInventory();
 
-        if(e.getRawSlot() != 0 && inventory.getItem(0) == null)
+        if (e.getRawSlot() != 0 && inventory.getItem(0) == null) {
             return;
+        }
 
         ItemStack itemStack = null;
 
-        if(e.getRawSlot() != 0){
+        if (e.getRawSlot() != 0) {
             itemStack = inventory.getItem(0);
-        }
-
-        else switch (e.getClick()){
+        } else switch (e.getClick()){
             case RIGHT:
             case LEFT:
                 itemStack = e.getCursor();
@@ -59,14 +58,14 @@ public class AnvilListener implements Listener {
                 break;
         }
 
-        Tool tool = plugin.getToolsManager().getTool(itemStack);
+        Tool tool = this.plugin.getToolsManager().getTool(itemStack);
 
-        if(tool == null) {
-            renameTexts.remove(inventory);
+        if (tool == null) {
+            this.renameTexts.remove(inventory);
             return;
         }
 
-        renameTexts.put(inventory, plugin.getNMSAdapter().getRenameText(e.getView()));
+        this.renameTexts.put(inventory, this.plugin.getNMSAdapter().getRenameText(e.getView()));
     }
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
@@ -78,12 +77,13 @@ public class AnvilListener implements Listener {
 
         Tool firstSlot = firstItem.getTool(), secondSlot = secondItem.getTool();
 
-        if(firstSlot == null || !firstSlot.equals(secondSlot) || !firstSlot.isAnvilCombine() ||
-                firstSlot.isUnbreakable() || firstSlot.isUsingDurability())
+        if (firstSlot == null || !firstSlot.equals(secondSlot) || !firstSlot.isAnvilCombine() ||
+                firstSlot.isUnbreakable() || firstSlot.isUsingDurability()) {
             return;
+        }
 
-        String originalRenameText = renameTexts.remove(e.getInventory());
-        String renameText = plugin.getNMSAdapter().getRenameText(e.getView());
+        String originalRenameText = this.renameTexts.remove(e.getInventory());
+        String renameText = this.plugin.getNMSAdapter().getRenameText(e.getView());
 
         int firstUses = firstItem.getUses(), secondUses = secondItem.getUses();
         int finalUses = firstSlot.hasAnvilCombineLimit() ?
@@ -94,21 +94,20 @@ public class AnvilListener implements Listener {
 
         int expCost = firstSlot.getAnvilCombineExp();
 
-        if(!recentPrepares.contains(anvilInventory)) {
+        if (!this.recentPrepares.contains(anvilInventory)) {
             if (!renameText.equals(originalRenameText)) {
                 itemMeta.setDisplayName(renameText);
                 result.setItemMeta(itemMeta);
                 //We must set the exp 1 tick later - or renaming the item won't refresh exp
-                Scheduler.runTask(() -> plugin.getNMSAdapter().setExpCost(e.getView(), expCost + 1), 1L);
+                Scheduler.runTask(() -> this.plugin.getNMSAdapter().setExpCost(e.getView(), expCost + 1), 1L);
             } else {
                 //We must set the exp 1 tick later - or renaming the item won't refresh exp
-                Scheduler.runTask(() -> plugin.getNMSAdapter().setExpCost(e.getView(), expCost), 1L);
+                Scheduler.runTask(() -> this.plugin.getNMSAdapter().setExpCost(e.getView(), expCost), 1L);
             }
         }
 
-        recentPrepares.add(anvilInventory);
-        Scheduler.runTask(() -> recentPrepares.remove(anvilInventory), 5L);
-
+        this.recentPrepares.add(anvilInventory);
+        Scheduler.runTask(() -> this.recentPrepares.remove(anvilInventory), 5L);
 
         result.setUses(finalUses);
 
@@ -117,20 +116,23 @@ public class AnvilListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onAnvilResultClick(InventoryClickEvent e){
-        if(e.getClickedInventory() == null || e.getClickedInventory().getType() != InventoryType.ANVIL || e.getRawSlot() != 2)
+        if (!(e.getClickedInventory() instanceof AnvilInventory) || e.getRawSlot() != 2) {
             return;
+        }
 
         ItemStack firstItem = e.getClickedInventory().getItem(0), secondItem = e.getClickedInventory().getItem(1);
 
-        Tool firstSlot = plugin.getToolsManager().getTool(firstItem),
-                secondSlot = plugin.getToolsManager().getTool(secondItem);
+        Tool firstSlot = this.plugin.getToolsManager().getTool(firstItem);
+        Tool secondSlot = this.plugin.getToolsManager().getTool(secondItem);
 
-        if(firstSlot == null || !firstSlot.equals(secondSlot) || !firstSlot.isAnvilCombine() ||
-                firstSlot.isUnbreakable() || firstSlot.isUsingDurability())
+        if (firstSlot == null || !firstSlot.equals(secondSlot) || !firstSlot.isAnvilCombine() ||
+                firstSlot.isUnbreakable() || firstSlot.isUsingDurability()) {
             return;
+        }
 
-        if(Math.abs(firstSlot.getAnvilCombineExp() - plugin.getNMSAdapter().getExpCost(e.getView())) > 1)
+        if (Math.abs(firstSlot.getAnvilCombineExp() - this.plugin.getNMSAdapter().getExpCost(e.getView())) > 1) {
             e.setCancelled(true);
+        }
     }
 
 }

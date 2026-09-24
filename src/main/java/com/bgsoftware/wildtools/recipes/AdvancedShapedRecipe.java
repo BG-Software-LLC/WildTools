@@ -5,8 +5,10 @@ import org.bukkit.inventory.ShapedRecipe;
 
 public interface AdvancedShapedRecipe {
 
+    @SuppressWarnings("UnusedReturnValue")
     AdvancedShapedRecipe setIngredient(char key, ItemStack itemStack);
 
+    @SuppressWarnings("UnusedReturnValue")
     AdvancedShapedRecipe shape(String... shape);
 
     ShapedRecipe toRecipe();

@@ -111,8 +111,9 @@ public enum Materials {
     }
 
     public static int getFarmlandId() {
-        if (farmlandId == -1)
+        if (farmlandId == -1) {
             farmlandId = WildToolsPlugin.getPlugin().getNMSAdapter().getFarmlandId();
+        }
 
         return farmlandId;
     }
@@ -186,8 +187,9 @@ public enum Materials {
                 tags.add(Tag.BUCKET);
             }
 
-            if (!tags.isEmpty())
+            if (!tags.isEmpty()) {
                 materialTags.put(material, tags);
+            }
         }
 
         return materialTags.isEmpty() ? Collections.emptyMap() : Collections.unmodifiableMap(materialTags);

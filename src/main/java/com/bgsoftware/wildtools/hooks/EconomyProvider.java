@@ -6,6 +6,4 @@ public interface EconomyProvider {
 
     void depositPlayer(Player player, double price);
 
-
-
 }

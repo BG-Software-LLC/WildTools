@@ -18,11 +18,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Optional Orebfuscator integration.
- *
+ * <p>
  * WildTools changes many blocks through fast NMS edits, so Orebfuscator does not always see
  * a normal Bukkit block update for every fake ore that needs to be revealed again. This hook
  * asks Orebfuscator to deobfuscate the affected positions after the WorldEditSession has applied.
- *
+ * <p>
  * The integration is reflection based so WildTools can still compile and run without
  * Orebfuscator/Orebfuscator API installed.
  */
@@ -63,18 +63,21 @@ public final class OrebfuscatorHook {
     }
 
     public static void deobfuscate(World world, Map<Vector2, List<WorldEditSession.BlockData>> affectedBlocksByChunks) {
-        if (!enabled || world == null || affectedBlocksByChunks == null || affectedBlocksByChunks.isEmpty())
+        if (!enabled || world == null || affectedBlocksByChunks == null || affectedBlocksByChunks.isEmpty()) {
             return;
+        }
 
-        if (maxPendingBlocks > 0 && PENDING_BLOCKS.get() >= maxPendingBlocks)
+        if (maxPendingBlocks > 0 && PENDING_BLOCKS.get() >= maxPendingBlocks) {
             return;
+        }
 
         int batchDelayIndex = 0;
 
         for (Map.Entry<Vector2, List<WorldEditSession.BlockData>> entry : affectedBlocksByChunks.entrySet()) {
             List<WorldEditSession.BlockData> affectedBlocks = entry.getValue();
-            if (affectedBlocks == null || affectedBlocks.isEmpty())
+            if (affectedBlocks == null || affectedBlocks.isEmpty()) {
                 continue;
+            }
 
             List<Vector3> positions = new ArrayList<>();
             int maxBlocks = maxBlocksPerChunkPerSession <= 0 ? affectedBlocks.size() :
@@ -85,8 +88,9 @@ public final class OrebfuscatorHook {
             }
 
             for (int index = 0; index < positions.size(); index += maxBlocksPerBatch) {
-                if (maxPendingBlocks > 0 && PENDING_BLOCKS.get() >= maxPendingBlocks)
+                if (maxPendingBlocks > 0 && PENDING_BLOCKS.get() >= maxPendingBlocks) {
                     return;
+                }
 
                 int endIndex = Math.min(index + maxBlocksPerBatch, positions.size());
                 List<Vector3> batch = new ArrayList<>(positions.subList(index, endIndex));
@@ -117,16 +121,18 @@ public final class OrebfuscatorHook {
     private static void deobfuscateNow(World world, List<Vector3> positions) {
         try {
             Object service = loadService();
-            if (service == null)
+            if (service == null) {
                 return;
+            }
 
             List<Block> blocks = new ArrayList<>(positions.size());
             for (Vector3 position : positions) {
                 blocks.add(world.getBlockAt(position.getX(), position.getY(), position.getZ()));
             }
 
-            if (!blocks.isEmpty())
+            if (!blocks.isEmpty()) {
                 deobfuscateMethod.invoke(service, blocks);
+            }
         } catch (Throwable error) {
             if (!failureLogged) {
                 failureLogged = true;
@@ -148,20 +154,23 @@ public final class OrebfuscatorHook {
     }
 
     private static Object loadService() {
-        if (serviceChecked)
+        if (serviceChecked) {
             return orebfuscatorService;
+        }
 
         serviceChecked = true;
 
         try {
             Class<?> serviceClass = Class.forName("net.imprex.orebfuscator.api.OrebfuscatorService");
 
-            if (!Bukkit.getServicesManager().isProvidedFor(serviceClass))
+            if (!Bukkit.getServicesManager().isProvidedFor(serviceClass)) {
                 return null;
+            }
 
             Object service = Bukkit.getServicesManager().load(serviceClass);
-            if (service == null)
+            if (service == null) {
                 return null;
+            }
 
             orebfuscatorService = service;
             deobfuscateMethod = serviceClass.getMethod("deobfuscate", Collection.class);

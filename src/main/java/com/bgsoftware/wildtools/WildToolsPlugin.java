@@ -53,14 +53,14 @@ public class WildToolsPlugin extends JavaPlugin implements WildTools {
 
         DependenciesManager.inject(this);
 
-        shouldEnable = loadNMSAdapter();
+        this.shouldEnable = loadNMSAdapter();
 
         EventsSimulation.init();
     }
 
     @Override
     public void onEnable() {
-        if (!shouldEnable) {
+        if (!this.shouldEnable) {
             getServer().getPluginManager().disablePlugin(this);
             return;
         }
@@ -85,21 +85,21 @@ public class WildToolsPlugin extends JavaPlugin implements WildTools {
         getCommand("tools").setExecutor(commandsHandler);
         getCommand("tools").setTabCompleter(commandsHandler);
 
-        providersHandler = new ProvidersHandler(this);
-        toolsManager = new ToolsHandler(this);
-        eventsHandler = new EventsHandler();
+        this.providersHandler = new ProvidersHandler(this);
+        this.toolsManager = new ToolsHandler(this);
+        this.eventsHandler = new EventsHandler();
 
         DataHandler.loadData();
         Locale.reload();
         loadAPI();
 
-        editorHandler = new EditorHandler(this);
-        recipesHandler = new RecipesHandler(this);
+        this.editorHandler = new EditorHandler(this);
+        this.recipesHandler = new RecipesHandler(this);
 
-        if (updater.isOutdated()) {
+        if (this.updater.isOutdated()) {
             log("");
-            log("A new version is available (v" + updater.getLatestVersion() + ")!");
-            log("Version's description: \"" + updater.getVersionDescription() + "\"");
+            log("A new version is available (v" + this.updater.getLatestVersion() + ")!");
+            log("Version's description: \"" + this.updater.getVersionDescription() + "\"");
             log("");
         }
 
@@ -108,13 +108,16 @@ public class WildToolsPlugin extends JavaPlugin implements WildTools {
 
     @Override
     public void onDisable() {
-        if (!shouldEnable)
+        if (!this.shouldEnable) {
             return;
-
-        for (Player player : nmsAdapter.getOnlinePlayers()) {
-            while (player.getOpenInventory().getType() == InventoryType.CHEST)
-                player.closeInventory();
         }
+
+        for (Player player : this.nmsAdapter.getOnlinePlayers()) {
+            while (player.getOpenInventory().getType() == InventoryType.CHEST) {
+                player.closeInventory();
+            }
+        }
+
         SellWandLogger.close();
     }
 
@@ -128,6 +131,7 @@ public class WildToolsPlugin extends JavaPlugin implements WildTools {
         } catch (NMSLoadException error) {
             log("The plugin doesn't support your minecraft version.");
             log("Please try a different version.");
+            //noinspection all
             error.printStackTrace();
 
             return false;
@@ -142,42 +146,43 @@ public class WildToolsPlugin extends JavaPlugin implements WildTools {
         } catch (Exception ex) {
             log("Failed to set-up API - disabling plugin...");
             setEnabled(false);
+            //noinspection all
             ex.printStackTrace();
         }
     }
 
     @Override
     public ToolsHandler getToolsManager() {
-        return toolsManager;
+        return this.toolsManager;
     }
 
     @Override
     public ProvidersHandler getProviders() {
-        return providersHandler;
+        return this.providersHandler;
     }
 
     public EventsHandler getEvents() {
-        return eventsHandler;
+        return this.eventsHandler;
     }
 
     public EditorHandler getEditor() {
-        return editorHandler;
+        return this.editorHandler;
     }
 
     public RecipesHandler getRecipes() {
-        return recipesHandler;
+        return this.recipesHandler;
     }
 
     public NMSAdapter getNMSAdapter() {
-        return nmsAdapter;
+        return this.nmsAdapter;
     }
 
     public NMSWorld getNMSWorld() {
-        return nmsWorld;
+        return this.nmsWorld;
     }
 
     public Updater getUpdater() {
-        return updater;
+        return this.updater;
     }
 
     public static void log(String message) {

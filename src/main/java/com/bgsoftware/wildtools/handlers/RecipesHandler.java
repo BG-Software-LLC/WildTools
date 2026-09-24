@@ -107,7 +107,7 @@ public class RecipesHandler {
 
     }
 
-    private char[] charsToGenerate = new char[]{
+    private final char[] charsToGenerate = new char[]{
             'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I'
     };
 

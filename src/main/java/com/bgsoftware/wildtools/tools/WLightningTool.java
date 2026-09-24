@@ -53,8 +53,9 @@ public class WLightningTool extends WTool implements LightningTool {
 
     private void handleUse(Player player, ItemStack usedItem, Entity entity) {
         int toolDurability = getDurability(player, usedItem);
-        if (toolDurability <= 0)
+        if (toolDurability <= 0) {
             return;
+        }
 
         List<Creeper> creeperList = new LinkedList<>();
 
@@ -64,8 +65,9 @@ public class WLightningTool extends WTool implements LightningTool {
 
         for (Entity nearby : entity.getNearbyEntities(3, 3, 3)) {
             if (nearby instanceof Creeper) {
-                if (creeperList.size() >= toolDurability)
+                if (creeperList.size() >= toolDurability) {
                     break;
+                }
 
                 creeperList.add((Creeper) nearby);
             }
@@ -75,13 +77,16 @@ public class WLightningTool extends WTool implements LightningTool {
         Bukkit.getPluginManager().callEvent(lightningWandUseEvent);
 
         player.getWorld().strikeLightningEffect(entity.getLocation());
-        for (Creeper creeper : creeperList)
+
+        for (Creeper creeper : creeperList) {
             creeper.setPowered(true);
+        }
 
         boolean usingDurability = isUsingDurability();
 
-        if (creeperList.size() > 0)
+        if (!creeperList.isEmpty()) {
             reduceDurablility(player, usingDurability ? creeperList.size() : 1, usedItem);
+        }
     }
 
 }

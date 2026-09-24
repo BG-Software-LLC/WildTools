@@ -57,8 +57,6 @@ public class ProvidersHandler implements ProvidersManager {
     private StackedItemProvider stackedItemProvider;
     private EconomyProvider economyProvider;
 
-    private boolean checkPickupEventStatus = true;
-
     private final List<IToolBlockListener> toolBlockListeners = Lists.newArrayList();
 
     public ProvidersHandler(WildToolsPlugin plugin) {
@@ -84,22 +82,23 @@ public class ProvidersHandler implements ProvidersManager {
     }
 
     public double getPrice(Player player, ItemStack itemStack) {
-        if (plugin.getToolsManager().getTool(itemStack) != null)
+        if (this.plugin.getToolsManager().getTool(itemStack) != null) {
             return -1;
+        }
 
         try {
-            return pricesProvider.getPrice(player, itemStack);
+            return this.pricesProvider.getPrice(player, itemStack);
         } catch (Exception ex) {
             return -1;
         }
     }
 
     public int getTNTAmountFromBank(Player player) {
-        return factionsProvider.getTNTAmountFromBank(player);
+        return this.factionsProvider.getTNTAmountFromBank(player);
     }
 
     public void takeTNTFromBank(Player player, int amount) {
-        factionsProvider.takeTNTFromBank(player, amount);
+        this.factionsProvider.takeTNTFromBank(player, amount);
     }
 
     public boolean getBlockDrops(List<ItemStack> drops, Player player, Block block, boolean onlySpawner) {
@@ -108,6 +107,7 @@ public class ProvidersHandler implements ProvidersManager {
         for (DropsProvider dropsProvider : this.dropsProviders) {
             if (dropsProvider.isSpawnersOnly() == onlySpawner) {
                 List<ItemStack> hookDrops = dropsProvider.getBlockDrops(player, block);
+
                 if (hookDrops != null) {
                     drops.addAll(hookDrops);
                     foundDropsProvider = true;
@@ -119,65 +119,72 @@ public class ProvidersHandler implements ProvidersManager {
     }
 
     public boolean isContainer(BlockState blockState) {
-        for (ContainerProvider containerProvider : containerProviders) {
-            if (containerProvider.isContainer(blockState))
+        for (ContainerProvider containerProvider : this.containerProviders) {
+            if (containerProvider.isContainer(blockState)) {
                 return true;
+            }
         }
 
-        return defaultContainer.isContainer(blockState);
+        return this.defaultContainer.isContainer(blockState);
     }
 
     public SellInfo sellContainer(BlockState blockState, Inventory inventory, Player player) {
-        for (ContainerProvider containerProvider : containerProviders) {
-            if (containerProvider.isContainer(blockState))
+        for (ContainerProvider containerProvider : this.containerProviders) {
+            if (containerProvider.isContainer(blockState)) {
                 return containerProvider.sellContainer(blockState, inventory, player);
+            }
         }
 
-        if (defaultContainer.isContainer(blockState))
-            return defaultContainer.sellContainer(blockState, inventory, player);
+        if (this.defaultContainer.isContainer(blockState)) {
+            return this.defaultContainer.sellContainer(blockState, inventory, player);
+        }
 
         return EMPTY_INFO;
     }
 
     public void removeContainer(BlockState blockState, Inventory inventory, SellInfo sellInfo) {
-        for (ContainerProvider containerProvider : containerProviders) {
+        for (ContainerProvider containerProvider : this.containerProviders) {
             if (containerProvider.isContainer(blockState)) {
                 containerProvider.removeContainer(blockState, inventory, sellInfo);
                 return;
             }
         }
 
-        if (defaultContainer.isContainer(blockState))
-            defaultContainer.removeContainer(blockState, inventory, sellInfo);
+        if (this.defaultContainer.isContainer(blockState)) {
+            this.defaultContainer.removeContainer(blockState, inventory, sellInfo);
+        }
     }
 
     public List<Inventory> getAllInventories(BlockState blockState, Inventory chestInventory) {
-        for (ContainerProvider containerProvider : containerProviders) {
+        for (ContainerProvider containerProvider : this.containerProviders) {
             if (containerProvider instanceof ExtendedContainerProvider && containerProvider.isContainer(blockState)) {
                 return ((ExtendedContainerProvider) containerProvider).getAllInventories(blockState, chestInventory);
             }
         }
 
-        if (defaultContainer.isContainer(blockState))
-            return defaultContainer.getAllInventories(blockState, chestInventory);
+        if (this.defaultContainer.isContainer(blockState)) {
+            return this.defaultContainer.getAllInventories(blockState, chestInventory);
+        }
 
         return Collections.emptyList();
     }
 
     public void addItems(BlockState blockState, Inventory chestInventory, List<ItemStack> itemStackList) {
-        for (ContainerProvider containerProvider : containerProviders) {
+        for (ContainerProvider containerProvider : this.containerProviders) {
             if (containerProvider instanceof ExtendedContainerProvider && containerProvider.isContainer(blockState)) {
                 ((ExtendedContainerProvider) containerProvider).addItems(blockState, chestInventory, itemStackList);
                 return;
             }
         }
 
-        if (defaultContainer.isContainer(blockState))
-            defaultContainer.addItems(blockState, chestInventory, itemStackList);
+        if (this.defaultContainer.isContainer(blockState)) {
+            this.defaultContainer.addItems(blockState, chestInventory, itemStackList);
+        }
     }
 
     public boolean isInsideClaim(Player player, Location location) {
-        return claimsProviders.stream().anyMatch(claimsProvider -> claimsProvider.isPlayerClaim(player, location));
+        return this.claimsProviders.stream().anyMatch(claimsProvider ->
+                claimsProvider.isPlayerClaim(player, location));
     }
 
     /*
@@ -186,12 +193,12 @@ public class ProvidersHandler implements ProvidersManager {
 
     @Override
     public void addContainerProvider(ContainerProvider containerProvider) {
-        containerProviders.add(containerProvider);
+        this.containerProviders.add(containerProvider);
     }
 
     @Override
     public void addDropsProvider(DropsProvider dropsProvider) {
-        dropsProviders.add(dropsProvider);
+        this.dropsProviders.add(dropsProvider);
     }
 
     @Override
@@ -201,7 +208,7 @@ public class ProvidersHandler implements ProvidersManager {
 
     @Override
     public void addClaimsProvider(ClaimsProvider claimsProvider) {
-        claimsProviders.add(claimsProvider);
+        this.claimsProviders.add(claimsProvider);
     }
 
     public void registerToolBlockListener(IToolBlockListener toolBlockListener) {
@@ -213,15 +220,15 @@ public class ProvidersHandler implements ProvidersManager {
     }
 
     public boolean hasEconomyProvider() {
-        return !(economyProvider instanceof EconomyProvider_Default);
+        return !(this.economyProvider instanceof EconomyProvider_Default);
     }
 
     public StackedItemProvider getStackedItemProvider() {
-        return stackedItemProvider;
+        return this.stackedItemProvider;
     }
 
     public EconomyProvider getEconomyProvider() {
-        return economyProvider;
+        return this.economyProvider;
     }
 
     private void loadProviders() {
@@ -256,12 +263,13 @@ public class ProvidersHandler implements ProvidersManager {
     }
 
     private void loadPricesProvider() {
-        if (pricesProvider != null && !(pricesProvider instanceof PricesProvider_Default))
+        if (this.pricesProvider != null && !(this.pricesProvider instanceof PricesProvider_Default)) {
             return;
+            }
 
         setPricesProvider((pricesPlugin.equalsIgnoreCase("AUTO") ?
                 ShopsProvider.findAvailableProvider() : ShopsProvider.getShopsProvider(pricesPlugin))
-                .flatMap(shopsProvider -> shopsProvider.createInstance(plugin).map(shopsBridge ->
+                .flatMap(shopsProvider -> shopsProvider.createInstance(this.plugin).map(shopsBridge ->
                         (PricesProvider) new PricesProvider_ShopsBridgeWrapper(shopsProvider, shopsBridge)))
                 .orElseGet(PricesProvider_Default::new));
     }
@@ -323,7 +331,6 @@ public class ProvidersHandler implements ProvidersManager {
         } else {
             addDropsProvider(new DropsProviders_Default());
         }
-
     }
 
     private void loadContainerProviders() {
@@ -405,7 +412,7 @@ public class ProvidersHandler implements ProvidersManager {
         try {
             Class<?> clazz = Class.forName("com.bgsoftware.wildtools.hooks." + className);
             Method registerMethod = clazz.getMethod("register", WildToolsPlugin.class);
-            registerMethod.invoke(null, plugin);
+            registerMethod.invoke(null, this.plugin);
         } catch (Exception ignored) {
         }
     }
@@ -423,7 +430,7 @@ public class ProvidersHandler implements ProvidersManager {
             try {
                 Constructor<?> constructor = clazz.getConstructor(WildToolsPlugin.class);
                 // noinspection unchecked
-                return Optional.of((T) constructor.newInstance(plugin));
+                return Optional.of((T) constructor.newInstance(this.plugin));
             } catch (Exception error) {
                 // noinspection unchecked
                 return Optional.of((T) clazz.newInstance());
@@ -431,6 +438,7 @@ public class ProvidersHandler implements ProvidersManager {
         } catch (ClassNotFoundException ignored) {
             return Optional.empty();
         } catch (Throwable error) {
+            //noinspection all
             error.printStackTrace();
             return Optional.empty();
         }

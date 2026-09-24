@@ -39,14 +39,15 @@ public class WCraftingTool extends WTool implements CraftingTool {
 
     @Override
     public Iterator<Recipe> getCraftings() {
-        return craftings.iterator();
+        return this.craftings.iterator();
     }
 
     @Override
     public boolean onBlockInteract(PlayerInteractEvent e) {
         if ((e.getClickedBlock().getType() != Material.CHEST && e.getClickedBlock().getType() != Material.TRAPPED_CHEST) ||
-                !BukkitUtils.canInteractBlock(e.getPlayer(), e.getClickedBlock(), e.getItem()))
+                !BukkitUtils.canInteractBlock(e.getPlayer(), e.getClickedBlock(), e.getItem())) {
             return false;
+        }
 
         BlockState blockState = e.getClickedBlock().getState();
         Inventory chestInventory = ((InventoryHolder) e.getClickedBlock().getState()).getInventory();
@@ -72,10 +73,13 @@ public class WCraftingTool extends WTool implements CraftingTool {
                 ingredients = getIngredients(recipe, ((ShapelessRecipe) recipe).getIngredientList());
             } else if (recipe instanceof FurnaceRecipe) {
                 ingredients = Collections.singletonList(RecipeChoice.of(((FurnaceRecipe) recipe).getInput()));
-            } else continue;
-
-            if (ingredients.isEmpty())
+            } else {
                 continue;
+            }
+
+            if (ingredients.isEmpty()) {
+                continue;
+            }
 
             for (Inventory inventory : inventories) {
                 int amountOfRecipes = Integer.MAX_VALUE;
@@ -87,22 +91,27 @@ public class WCraftingTool extends WTool implements CraftingTool {
                 if (amountOfRecipes > 0) {
                     for (RecipeChoice ingredient : ingredients) {
                         RecipeChoice clonedIngredient = ingredient.copy();
+
                         clonedIngredient.setAmount(clonedIngredient.getAmount() * amountOfRecipes);
                         clonedIngredient.remove(inventory);
-                        if (clonedIngredient.test(Materials::isBottle))
+
+                        if (clonedIngredient.test(Materials::isBottle)) {
                             toAdd.add(new ItemStack(Material.GLASS_BOTTLE, clonedIngredient.getAmount()));
-                        else if (clonedIngredient.test(Materials::isBucket))
+                        } else if (clonedIngredient.test(Materials::isBucket)) {
                             toAdd.add(new ItemStack(Material.BUCKET, clonedIngredient.getAmount()));
+                        }
                     }
 
                     ItemStack result = recipe.getResult().clone();
                     int resultAmount = result.getAmount() * amountOfRecipes;
+
                     while (resultAmount > result.getMaxStackSize()) {
                         ItemStack maxStackResult = result.clone();
                         maxStackResult.setAmount(result.getMaxStackSize());
                         toAdd.add(maxStackResult);
                         resultAmount -= result.getMaxStackSize();
                     }
+
                     if (resultAmount > 0) {
                         result.setAmount(resultAmount);
                         toAdd.add(result);
@@ -134,14 +143,22 @@ public class WCraftingTool extends WTool implements CraftingTool {
     private List<Recipe> parseCraftings(List<String> recipes) {
         List<Recipe> recipeList = new ArrayList<>();
 
-        Recipe current;
         Iterator<Recipe> bukkitRecipes = Bukkit.recipeIterator();
 
         while (bukkitRecipes.hasNext()) {
-            current = bukkitRecipes.next();
+            Recipe current;
+
+            // Spigot throws AbstractMethodError for brewing recipes when iterating Bukkit recipes.
+            try {
+                current = bukkitRecipes.next();
+            } catch (AbstractMethodError ignored) {
+                continue;
+            }
+
             if (recipes.contains(current.getResult().getType().name()) ||
-                    recipes.contains(current.getResult().getType() + ":" + current.getResult().getDurability()))
+                    recipes.contains(current.getResult().getType() + ":" + current.getResult().getDurability())) {
                 recipeList.add(current);
+            }
         }
 
         return recipeList;

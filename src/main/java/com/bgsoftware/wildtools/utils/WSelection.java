@@ -47,16 +47,15 @@ public class WSelection implements Selection {
 
     @Override
     public boolean isReady(){
-        return rightClick != null && leftClick != null;
+        return this.rightClick != null && this.leftClick != null;
     }
 
     @Override
     public boolean isInside(){
-        Location loc = Bukkit.getPlayer(uuid).getLocation();
-        Location min = new Location(world, Math.min(rightClick.getBlockX(), leftClick.getBlockX()),
-                Math.min(rightClick.getBlockY(), leftClick.getBlockY()), Math.min(rightClick.getBlockZ(), leftClick.getBlockZ()));
-        Location max = new Location(world, Math.max(rightClick.getBlockX(), leftClick.getBlockX()),
-                Math.max(rightClick.getBlockY(), leftClick.getBlockY()), Math.max(rightClick.getBlockZ(), leftClick.getBlockZ()));
+        Location loc = Bukkit.getPlayer(this.uuid).getLocation();
+
+        Location min = getMinLocation();
+        Location max = getMaxLocation();
 
         return min.getBlockX() <= loc.getBlockX() && max.getBlockX() >= loc.getBlockX() &&
                 min.getBlockY() <= loc.getBlockY() && max.getBlockY() >= loc.getBlockY() &&
@@ -67,19 +66,19 @@ public class WSelection implements Selection {
     public List<Dispenser> getDispensers(Tool tool){
         List<Dispenser> dispensers = new ArrayList<>();
 
-        Location min = new Location(world, Math.min(rightClick.getBlockX(), leftClick.getBlockX()),
-                Math.min(rightClick.getBlockY(), leftClick.getBlockY()), Math.min(rightClick.getBlockZ(), leftClick.getBlockZ()));
-        Location max = new Location(world, Math.max(rightClick.getBlockX(), leftClick.getBlockX()),
-                Math.max(rightClick.getBlockY(), leftClick.getBlockY()), Math.max(rightClick.getBlockZ(), leftClick.getBlockZ()));
+        Location min = getMinLocation();
+        Location max = getMaxLocation();
 
-        Player player = Bukkit.getPlayer(uuid);
+        Player player = Bukkit.getPlayer(this.uuid);
 
-        for(int y = max.getBlockY(); y >= min.getBlockY(); y--){
-            for(int x = min.getBlockX(); x <= max.getBlockX(); x++){
-                for(int z = min.getBlockZ(); z <= max.getBlockZ(); z++){
+        for (int y = max.getBlockY(); y >= min.getBlockY(); y--) {
+            for (int x = min.getBlockX(); x <= max.getBlockX(); x++) {
+                for (int z = min.getBlockZ(); z <= max.getBlockZ(); z++) {
                     Block block = world.getBlockAt(x, y, z);
-                    if(block.getType() == Material.DISPENSER && BukkitUtils.canInteractBlock(player, block, player.getItemInHand()))
+
+                    if (block.getType() == Material.DISPENSER && BukkitUtils.canInteractBlock(player, block, player.getItemInHand())) {
                         dispensers.add((Dispenser) block.getState());
+                    }
                 }
             }
         }
@@ -89,18 +88,32 @@ public class WSelection implements Selection {
 
     @Override
     public void remove(){
-        if(task != null) {
-            task.cancel();
-            task = null;
+        if (this.task != null) {
+            this.task.cancel();
+            this.task = null;
         }
 
         WCannonTool.removeSelection(Bukkit.getPlayer(uuid));
     }
 
     private void restartTask(){
-        if(task != null)
-            task.cancel();
-        task = Scheduler.runTaskAsync(this::remove, 20 * 60 * 10);
+        if (this.task != null) {
+            this.task.cancel();
+        }
+
+        this.task = Scheduler.runTaskAsync(this::remove, 20 * 60 * 10);
+    }
+
+    private Location getMinLocation() {
+        return new Location(this.world, Math.min(this.rightClick.getBlockX(), this.leftClick.getBlockX()),
+                Math.min(this.rightClick.getBlockY(), this.leftClick.getBlockY()),
+                Math.min(this.rightClick.getBlockZ(), this.leftClick.getBlockZ()));
+    }
+
+    private Location getMaxLocation() {
+        return new Location(this.world, Math.max(this.rightClick.getBlockX(), this.leftClick.getBlockX()),
+                Math.max(this.rightClick.getBlockY(), this.leftClick.getBlockY()),
+                Math.max(this.rightClick.getBlockZ(), this.leftClick.getBlockZ()));
     }
 
 }

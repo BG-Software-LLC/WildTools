@@ -8,7 +8,6 @@ import com.bgsoftware.wildtools.utils.BukkitUtils;
 import com.bgsoftware.wildtools.utils.Materials;
 import com.bgsoftware.wildtools.utils.ServerVersion;
 import com.bgsoftware.wildtools.utils.inventory.InventoryUtils;
-import com.bgsoftware.wildtools.utils.items.ItemUtils;
 import com.bgsoftware.wildtools.utils.world.WorldEditSession;
 import com.bgsoftware.wildtools.world.BlockMaterial;
 import org.bukkit.Bukkit;
@@ -35,10 +34,14 @@ public class WBuilderTool extends WTool implements BuilderTool {
     @Override
     @SuppressWarnings("all")
     public boolean canBreakBlock(Block block, Material firstType, short firstData) {
-        if (hasBlacklistedMaterials() && isBlacklistedMaterial(firstType, firstData))
+        if (hasBlacklistedMaterials() && isBlacklistedMaterial(firstType, firstData)) {
             return false;
-        if (hasWhitelistedMaterials() && !isWhitelistedMaterial(firstType, firstData))
+        }
+
+        if (hasWhitelistedMaterials() && !isWhitelistedMaterial(firstType, firstData)) {
             return false;
+        }
+
         return true;
     }
 
@@ -48,8 +51,9 @@ public class WBuilderTool extends WTool implements BuilderTool {
 
         BlockMaterial firstBlockMaterial = BlockMaterial.of(e.getClickedBlock());
 
-        if (!firstBlockMaterial.getType().isSolid())
+        if (!firstBlockMaterial.getType().isSolid()) {
             return false;
+        }
 
         BlockFace blockFace = e.getBlockFace();
 
@@ -75,7 +79,8 @@ public class WBuilderTool extends WTool implements BuilderTool {
 
         WorldEditSession editSession = new WorldEditSession(e.getClickedBlock().getWorld());
         boolean usingDurability = isUsingDurability();
-        int toolIterations = Math.min(usingDurability ? getDurability(e.getPlayer(), e.getItem()) : length, Math.min(amountOfBlocks, length));
+        int toolIterations = Math.min(usingDurability ? getDurability(e.getPlayer(), e.getItem())
+                : length, Math.min(amountOfBlocks, length));
         int iter;
 
         Block originalBlock = e.getClickedBlock();
@@ -96,19 +101,22 @@ public class WBuilderTool extends WTool implements BuilderTool {
         BuilderWandUseEvent builderWandUseEvent = new BuilderWandUseEvent(e.getPlayer(), this, editSession.getAffectedBlocks());
         Bukkit.getPluginManager().callEvent(builderWandUseEvent);
 
-        if (builderWandUseEvent.isCancelled())
+        if (builderWandUseEvent.isCancelled()) {
             return true;
+        }
 
         editSession.apply();
 
         blockItemStack.setAmount(iter);
         InventoryUtils.removeItem(e.getPlayer().getInventory(), blockItemStack);
 
-        if (amountOfBlocks < length)
+        if (amountOfBlocks < length) {
             Locale.BUILDER_NO_BLOCK.send(e.getPlayer(), e.getClickedBlock().getType().name());
+        }
 
-        if (iter > 0)
+        if (iter > 0) {
             reduceDurablility(e.getPlayer(), usingDurability ? iter : 1, e.getItem());
+        }
 
         return true;
     }
