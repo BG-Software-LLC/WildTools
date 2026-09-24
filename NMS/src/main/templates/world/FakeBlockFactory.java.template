@@ -4,9 +4,7 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.data.BlockData;
-import ${CRAFTBUKKIT_PACKAGE}.block.data.CraftBlockData;
 
-import javax.annotation.Nullable;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
@@ -24,7 +22,6 @@ public class FakeBlockFactory {
     private FakeBlockFactory() {
     }
 
-    @Nullable
     private static Method findMethod(Class<?> clazz, String name, Class<?>... parameterTypes) {
         try {
             return clazz.getMethod(name, parameterTypes);
