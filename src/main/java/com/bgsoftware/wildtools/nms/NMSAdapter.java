@@ -7,7 +7,6 @@ import com.bgsoftware.wildtools.utils.items.ToolItemStack;
 import org.apache.commons.lang.Validate;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -19,8 +18,6 @@ import org.bukkit.inventory.Recipe;
 import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import javax.annotation.Nullable;
-import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.Map;
 
@@ -41,6 +38,8 @@ public interface NMSAdapter {
     void makeItemGlow(ItemMeta itemMeta);
 
     void addItemFlag(ItemMeta itemMeta, String itemFlagName);
+
+    void setItemModel(ItemMeta itemMeta, String itemModel);
 
     int getFarmlandId();
 

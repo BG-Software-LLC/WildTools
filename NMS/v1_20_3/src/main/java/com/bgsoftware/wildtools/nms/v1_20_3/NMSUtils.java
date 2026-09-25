@@ -1,0 +1,15 @@
+package com.bgsoftware.wildtools.nms.v1_20_3;
+
+import net.minecraft.world.item.ItemStack;
+import org.bukkit.craftbukkit.v1_20_R3.inventory.CraftItemStack;
+
+public class NMSUtils {
+
+    private NMSUtils() {
+    }
+
+    public static org.bukkit.inventory.ItemStack asMirror(ItemStack itemStack) {
+        return CraftItemStack.asCraftMirror(itemStack);
+    }
+
+}

@@ -4,6 +4,7 @@ import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.server.level.ServerChunkCache;
 import net.minecraft.world.entity.Entity;
+import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.meta.ItemMeta;
 
 public class NMSAdapterImpl extends com.bgsoftware.wildtools.nms.v1_21_3.AbstractNMSAdapter {
@@ -16,6 +17,11 @@ public class NMSAdapterImpl extends com.bgsoftware.wildtools.nms.v1_21_3.Abstrac
     @Override
     public void makeItemGlow(ItemMeta itemMeta) {
         itemMeta.setEnchantmentGlintOverride(true);
+    }
+
+    @Override
+    public void setItemModel(ItemMeta itemMeta, String itemModel) {
+        itemMeta.setItemModel(NamespacedKey.fromString(itemModel));
     }
 
 }

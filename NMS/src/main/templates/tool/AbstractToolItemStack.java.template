@@ -1,7 +1,7 @@
 package com.bgsoftware.wildtools.nms.${NMS_VERSION}.tool;
 
+import com.bgsoftware.wildtools.nms.${NMS_VERSION}.NMSUtils;
 import com.bgsoftware.wildtools.utils.items.ToolItemStack;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.stats.Stats;
 import net.minecraft.world.item.Item;
@@ -17,7 +17,7 @@ public abstract class AbstractToolItemStack extends ToolItemStack {
 
     public AbstractToolItemStack(ItemStack nmsItem) {
         this.nmsItem = nmsItem;
-        this.setItem(CraftItemStack.asCraftMirror(nmsItem));
+        this.setItem(NMSUtils.asMirror(nmsItem));
     }
 
     @Override

@@ -4,6 +4,7 @@ import com.bgsoftware.common.reflection.ClassInfo;
 import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.wildtools.nms.NMSWorld;
+import com.bgsoftware.wildtools.nms.${NMS_VERSION}.NMSUtils;
 import com.bgsoftware.wildtools.scheduler.Scheduler;
 import com.bgsoftware.wildtools.utils.math.Vector3;
 import com.bgsoftware.wildtools.utils.world.WorldEditSession;
@@ -65,7 +66,7 @@ public abstract class AbstractNMSWorld implements NMSWorld {
         BlockEntity blockEntity = serverLevel.getBlockEntity(blockPos);
 
         Block.getDrops(blockState, serverLevel, blockPos, blockEntity, serverPlayer, itemStack).forEach(dropItem ->
-                drops.add(CraftItemStack.asCraftMirror(dropItem)));
+                drops.add(NMSUtils.asMirror(dropItem)));
 
         return drops;
     }

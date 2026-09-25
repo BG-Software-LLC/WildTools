@@ -88,7 +88,12 @@ public class NMSAdapterImpl implements NMSAdapter {
 
     @Override
     public void addItemFlag(ItemMeta itemMeta, String itemFlagName) {
-        // Doesn't exists
+        // Doesn't exists.
+    }
+
+    @Override
+    public void setItemModel(ItemMeta itemMeta, String itemModel) {
+        // Doesn't exists.
     }
 
     @Override

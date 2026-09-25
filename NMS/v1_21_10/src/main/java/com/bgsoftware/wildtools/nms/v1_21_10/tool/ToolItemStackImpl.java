@@ -1,6 +1,7 @@
 package com.bgsoftware.wildtools.nms.v1_21_10.tool;
 
 import com.bgsoftware.common.reflection.ReflectField;
+import com.bgsoftware.common.reflection.ReflectMethod;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ItemStack;
@@ -12,8 +13,9 @@ import java.util.function.Function;
 
 public class ToolItemStackImpl extends com.bgsoftware.wildtools.nms.v1_21_10.tool.AbstractToolItemStack {
 
-    private static final ReflectField<CompoundTag> CUSTOM_DATA_TAG = new ReflectField<>(CustomData.class,
-            CompoundTag.class, Modifier.PRIVATE | Modifier.FINAL, 1);
+    private static final boolean SUPPORT_CUSTOM_DATA_UNSAFE = new ReflectMethod<>(CustomData.class, "getUnsafe").isValid();
+    private static final ReflectField<CompoundTag> CUSTOM_DATA_TAG = SUPPORT_CUSTOM_DATA_UNSAFE ? null :
+            new ReflectField<>(CustomData.class, CompoundTag.class, Modifier.PRIVATE | Modifier.FINAL, 1);
 
     public ToolItemStackImpl(ItemStack nmsItem) {
         super(nmsItem);
@@ -47,7 +49,7 @@ public class ToolItemStackImpl extends com.bgsoftware.wildtools.nms.v1_21_10.too
 
     private <R> R getTagInternal(Function<CompoundTag, R> function, R def) {
         CustomData customData = this.nmsItem.get(DataComponents.CUSTOM_DATA);
-        if(customData != null) {
+        if (customData != null) {
             CompoundTag compoundTag = getCustomDataTag(customData);
             return function.apply(compoundTag);
         }
@@ -55,11 +57,7 @@ public class ToolItemStackImpl extends com.bgsoftware.wildtools.nms.v1_21_10.too
     }
 
     private static CompoundTag getCustomDataTag(CustomData customData) {
-        try {
-            return customData.getUnsafe();
-        } catch (Throwable error) {
-            return CUSTOM_DATA_TAG.get(customData);
-        }
+        return SUPPORT_CUSTOM_DATA_UNSAFE ? customData.getUnsafe() : CUSTOM_DATA_TAG.get(customData);
     }
 
 }
