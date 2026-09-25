@@ -1,4 +1,4 @@
-package com.bgsoftware.wildtools.nms.v26_2.tool;
+package com.bgsoftware.wildtools.nms.v26_3.tool;
 
 import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.common.reflection.ReflectMethod;
@@ -11,7 +11,7 @@ import java.lang.reflect.Modifier;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-public class ToolItemStackImpl extends com.bgsoftware.wildtools.nms.v26_2.tool.AbstractToolItemStack {
+public class ToolItemStackImpl extends com.bgsoftware.wildtools.nms.v26_3.tool.AbstractToolItemStack {
 
     private static final boolean SUPPORT_CUSTOM_DATA_UNSAFE = new ReflectMethod<>(CustomData.class, "getUnsafe").isValid();
     private static final ReflectField<CompoundTag> CUSTOM_DATA_TAG = SUPPORT_CUSTOM_DATA_UNSAFE ? null :

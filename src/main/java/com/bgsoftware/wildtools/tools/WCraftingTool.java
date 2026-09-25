@@ -134,14 +134,22 @@ public class WCraftingTool extends WTool implements CraftingTool {
     private List<Recipe> parseCraftings(List<String> recipes) {
         List<Recipe> recipeList = new ArrayList<>();
 
-        Recipe current;
         Iterator<Recipe> bukkitRecipes = Bukkit.recipeIterator();
 
         while (bukkitRecipes.hasNext()) {
-            current = bukkitRecipes.next();
+            Recipe current;
+
+            // Spigot throws AbstractMethodError for brewing recipes when iterating Bukkit recipes.
+            try {
+                current = bukkitRecipes.next();
+            } catch (AbstractMethodError ignored) {
+                continue;
+            }
+
             if (recipes.contains(current.getResult().getType().name()) ||
-                    recipes.contains(current.getResult().getType() + ":" + current.getResult().getDurability()))
+                    recipes.contains(current.getResult().getType() + ":" + current.getResult().getDurability())) {
                 recipeList.add(current);
+            }
         }
 
         return recipeList;

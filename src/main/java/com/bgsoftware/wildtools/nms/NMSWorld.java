@@ -32,4 +32,8 @@ public interface NMSWorld {
 
     int getMinHeight(World world);
 
+    default boolean isBlockDropsGameRuleEnabled(World world) {
+        return Boolean.parseBoolean(world.getGameRuleValue("doTileDrops"));
+    }
+
 }

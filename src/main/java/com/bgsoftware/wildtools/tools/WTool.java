@@ -10,7 +10,6 @@ import com.bgsoftware.wildtools.utils.items.ToolItemStack;
 import com.bgsoftware.wildtools.world.BlockMaterial;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
 import org.bukkit.block.Block;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
@@ -38,9 +37,6 @@ public abstract class WTool implements Tool {
 
     private static final ReflectMethod<Void> SET_CUSTOM_MODEL_DATA = new ReflectMethod<>(
             ItemMeta.class, "setCustomModelData", Integer.class);
-
-    private static final ReflectMethod<Void> SET_ITEM_MODEL = new ReflectMethod<>(
-            ItemMeta.class, "setItemModel", NamespacedKey.class);
 
     protected static WildToolsPlugin plugin = WildToolsPlugin.getPlugin();
 
@@ -120,11 +116,9 @@ public abstract class WTool implements Tool {
 
     @Override
     public void setItemModel(String itemModel) {
-        if (SET_ITEM_MODEL.isValid()) {
-            ItemMeta itemMeta = toolItemStack.getItemMeta();
-            SET_ITEM_MODEL.invoke(itemMeta, NamespacedKey.fromString(itemModel));
-            toolItemStack.setItemMeta(itemMeta);
-        }
+        ItemMeta itemMeta = this.toolItemStack.getItemMeta();
+        plugin.getNMSAdapter().setItemModel(itemMeta, itemModel);
+        this.toolItemStack.setItemMeta(itemMeta);
     }
 
     @Override

@@ -20,7 +20,8 @@ public enum ServerVersion {
     v1_20(120),
     v1_21(121),
     v26_1(261),
-    v26_2(262);
+    v26_2(262),
+    v26_3(263);
 
     private static final ServerVersion currentVersion;
     private static final String bukkitVersion;
@@ -38,7 +39,6 @@ public enum ServerVersion {
     ServerVersion(int code) {
         this.code = code;
     }
-
 
     public static boolean isAtLeast(ServerVersion serverVersion) {
         return currentVersion.code >= serverVersion.code;

@@ -1,4 +1,4 @@
-package com.bgsoftware.wildtools.nms.v1_21_5;
+package com.bgsoftware.wildtools.nms.v26_3;
 
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
@@ -7,11 +7,11 @@ import net.minecraft.world.entity.Entity;
 import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.meta.ItemMeta;
 
-public class NMSAdapterImpl extends com.bgsoftware.wildtools.nms.v1_21_5.AbstractNMSAdapter {
+public class NMSAdapterImpl extends com.bgsoftware.wildtools.nms.v26_3.AbstractNMSAdapter {
 
     @Override
     protected void sendPacket(ServerChunkCache serverChunkCache, Entity entity, Packet<? super ClientGamePacketListener> packet) {
-        serverChunkCache.broadcast(entity, packet);
+        serverChunkCache.sendToTrackingPlayers(entity, packet);
     }
 
     @Override

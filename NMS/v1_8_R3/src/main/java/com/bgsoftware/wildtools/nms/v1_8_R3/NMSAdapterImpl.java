@@ -80,6 +80,11 @@ public class NMSAdapterImpl implements NMSAdapter {
     }
 
     @Override
+    public void setItemModel(ItemMeta itemMeta, String itemModel) {
+        // Doesn't exists.
+    }
+
+    @Override
     public int getFarmlandId() {
         return Block.getCombinedId(Blocks.FARMLAND.getBlockData());
     }

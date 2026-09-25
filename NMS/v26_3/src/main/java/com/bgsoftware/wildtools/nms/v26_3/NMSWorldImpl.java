@@ -1,4 +1,4 @@
-package com.bgsoftware.wildtools.nms.v26_1;
+package com.bgsoftware.wildtools.nms.v26_3;
 
 import com.bgsoftware.common.reflection.ReflectMethod;
 import net.minecraft.core.BlockPos;
@@ -13,7 +13,7 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.craftbukkit.block.CraftBlock;
 
-public class NMSWorldImpl extends com.bgsoftware.wildtools.nms.v26_1.AbstractNMSWorld {
+public class NMSWorldImpl extends com.bgsoftware.wildtools.nms.v26_3.AbstractNMSWorld {
 
     private static final ReflectMethod<BlockState> CRAFT_BLOCK_GET_NMS = new ReflectMethod<>(
             CraftBlock.class, BlockState.class, "getNMS");
@@ -47,8 +47,7 @@ public class NMSWorldImpl extends com.bgsoftware.wildtools.nms.v26_1.AbstractNMS
     @Override
     public boolean isBlockDropsGameRuleEnabled(World world) {
         if (blockDropsGameRule != null) {
-            Boolean value = world.getGameRuleValue(blockDropsGameRule);
-            return value != null && value;
+            return world.getGameRuleValue(blockDropsGameRule);
         }
 
         return false;
