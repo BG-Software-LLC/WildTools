@@ -1,6 +1,5 @@
 package com.bgsoftware.wildtools.scheduler;
 
-import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 

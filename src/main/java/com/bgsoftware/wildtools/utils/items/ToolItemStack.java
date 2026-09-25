@@ -40,12 +40,12 @@ public abstract class ToolItemStack {
     }
 
     public ItemStack getItem() {
-        return handle;
+        return this.handle;
     }
 
     @Nullable
     public Tool getTool() {
-        return tool;
+        return this.tool;
     }
 
     public boolean hasSellMode() {
@@ -61,8 +61,9 @@ public abstract class ToolItemStack {
     }
 
     public int getUses() {
-        if (tool != null)
+        if (tool != null) {
             return getTag("tool-uses", tool.getDefaultUses());
+        }
 
         return 0;
     }
@@ -74,7 +75,7 @@ public abstract class ToolItemStack {
     public void setToolType(String toolType) {
         toolType = toolType.toLowerCase();
         setTag("tool-type", toolType);
-        tool = plugin.getToolsManager().getTool(toolType);
+        this.tool = plugin.getToolsManager().getTool(toolType);
     }
 
     public String getOwner() {
@@ -87,47 +88,47 @@ public abstract class ToolItemStack {
     }
 
     public ItemMeta getItemMeta() {
-        return handle.getItemMeta();
+        return this.handle.getItemMeta();
     }
 
     public void setItemMeta(ItemMeta itemMeta) {
-        handle.setItemMeta(itemMeta);
+        this.handle.setItemMeta(itemMeta);
     }
 
     public boolean hasItemMeta() {
-        return handle.hasItemMeta();
+        return this.handle.hasItemMeta();
     }
 
     public Material getType() {
-        return handle.getType();
+        return this.handle.getType();
     }
 
     public void setType(Material type) {
-        handle.setType(type);
+        this.handle.setType(type);
     }
 
     public int getAmount() {
-        return handle.getAmount();
+        return this.handle.getAmount();
     }
 
     public void setAmount(int amount) {
-        handle.setAmount(amount);
+        this.handle.setAmount(amount);
     }
 
     public int getEnchantmentLevel(Enchantment enchantment) {
-        return handle.getEnchantmentLevel(enchantment);
+        return this.handle.getEnchantmentLevel(enchantment);
     }
 
     public void setDurability(short durability) {
-        handle.setDurability(durability);
+        this.handle.setDurability(durability);
     }
 
     public short getDurability() {
-        return handle.getDurability();
+        return this.handle.getDurability();
     }
 
     public short getMaxDurability() {
-        return handle.getType().getMaxDurability();
+        return this.handle.getType().getMaxDurability();
     }
 
     public abstract ToolItemStack copy();
@@ -155,7 +156,7 @@ public abstract class ToolItemStack {
 
         @Override
         public ItemStack getItem() {
-            return EMPTY_ITEM;
+            return this.EMPTY_ITEM;
         }
 
         @Nullable

@@ -22,7 +22,7 @@ import java.util.List;
 
 public class EditorHandler {
 
-    private WildToolsPlugin plugin;
+    private final WildToolsPlugin plugin;
     private ItemStack[] settingsEditor;
 
     public CommentedConfiguration config;
@@ -37,6 +37,7 @@ public class EditorHandler {
         try {
             this.config.syncWithConfig(file, plugin.getResource("config.yml"), "tools");
         } catch (IOException error) {
+            //noinspection all
             error.printStackTrace();
             return;
         }
@@ -48,6 +49,7 @@ public class EditorHandler {
         try {
             config.save(new File(plugin.getDataFolder(), "config.yml"));
         } catch (IOException error) {
+            //noinspection all
             error.printStackTrace();
             return;
         }
@@ -59,6 +61,7 @@ public class EditorHandler {
         try {
             config.load(new File(plugin.getDataFolder(), "config.yml"));
         } catch (Exception ex) {
+            //noinspection all
             ex.printStackTrace();
         }
     }

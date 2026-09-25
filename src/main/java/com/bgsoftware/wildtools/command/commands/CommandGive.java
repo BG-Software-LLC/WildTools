@@ -6,11 +6,15 @@ import com.bgsoftware.wildtools.api.objects.tools.Tool;
 import com.bgsoftware.wildtools.command.ICommand;
 import com.bgsoftware.wildtools.utils.items.ItemUtils;
 import com.bgsoftware.wildtools.utils.items.ToolItemStack;
+import com.bgsoftware.wildtools.utils.text.TextUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 public class CommandGive implements ICommand {
@@ -61,7 +65,6 @@ public class CommandGive implements ICommand {
             return;
         }
 
-        int uses = -1;
         int amount = 1;
 
         if (args.length >= 4) {
@@ -72,6 +75,8 @@ public class CommandGive implements ICommand {
                 return;
             }
         }
+
+        int uses = -1;
 
         if (args.length == 5) {
             try {
@@ -85,33 +90,32 @@ public class CommandGive implements ICommand {
         for (int i = 0; i < amount; i++) {
             ToolItemStack toolItem = ToolItemStack.of(tool.getFormattedItemStack(uses > -1 ? uses : tool.getDefaultUses()));
 
-            if (uses > -1)
+            if (uses > -1) {
                 toolItem.setUses(uses);
+            }
 
             ItemUtils.addItem(toolItem.getItem(), player.getInventory(), player.getLocation(), null);
         }
 
-        Locale.GIVE_TOOL_SUCCESS.send(sender, amount, tool.getName(), player.getName());
+        Locale.GIVE_TOOL_SUCCESS.send(sender, amount, TextUtils.getFormattedName(tool.getName()), player.getName());
     }
 
     @Override
     public List<String> tabComplete(WildToolsPlugin plugin, CommandSender sender, String[] args) {
-        if (!sender.hasPermission(getPermission()))
-            return new ArrayList<>();
-
         if (args.length == 3) {
             List<String> list = new ArrayList<>();
-            for (Tool tool : plugin.getToolsManager().getTools())
-                if (tool.getName().startsWith(args[2]))
+            String arg = args[2].toLowerCase();
+
+            for (Tool tool : plugin.getToolsManager().getTools()) {
+                if (tool.getName().toLowerCase().startsWith(arg)) {
                     list.add(tool.getName());
-            return list;
+                }
+            }
+
+            return Collections.unmodifiableList(list);
         }
 
-        if (args.length >= 4) {
-            return new ArrayList<>();
-        }
-
-        return null;
+        return Collections.emptyList();
     }
 
 }

@@ -21,11 +21,11 @@ public class Vector2 {
     }
 
     public int getX() {
-        return x;
+        return this.x;
     }
 
     public int getZ() {
-        return z;
+        return this.z;
     }
 
     public Chunk toChunk(World world) {
@@ -34,20 +34,27 @@ public class Vector2 {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
         Vector2 that = (Vector2) o;
-        return x == that.x && z == that.z;
+
+        return this.x == that.x && this.z == that.z;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(x, z);
+        return Objects.hash(this.x, this.z);
     }
 
     @Override
     public String toString() {
-        return "Vector2{" + x + ", " + z + "}";
+        return "Vector2{" + this.x + ", " + this.z + "}";
     }
 
 }

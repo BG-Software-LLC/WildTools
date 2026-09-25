@@ -54,12 +54,12 @@ public class WHarvesterTool extends WTool implements HarvesterTool {
 
     @Override
     public int getRadius() {
-        return radius;
+        return this.radius;
     }
 
     @Override
     public int getFarmlandRadius() {
-        return farmlandRadius;
+        return this.farmlandRadius;
     }
 
     @Override
@@ -69,7 +69,7 @@ public class WHarvesterTool extends WTool implements HarvesterTool {
 
     @Override
     public String getActivationAction() {
-        return activateAction.name();
+        return this.activateAction.name();
     }
 
     @Override
@@ -82,7 +82,7 @@ public class WHarvesterTool extends WTool implements HarvesterTool {
 
     @Override
     public boolean isOneLayerOnly() {
-        return oneLayerOnly;
+        return this.oneLayerOnly;
     }
 
     @Override
@@ -92,8 +92,10 @@ public class WHarvesterTool extends WTool implements HarvesterTool {
 
     @Override
     public boolean onAirInteract(PlayerInteractEvent e) {
-        if (e.getAction() != Action.RIGHT_CLICK_AIR || !e.getPlayer().isSneaking() || !e.getPlayer().hasPermission("wildtools.sellmode"))
+        if (e.getAction() != Action.RIGHT_CLICK_AIR || !e.getPlayer().isSneaking()
+                || !e.getPlayer().hasPermission("wildtools.sellmode")) {
             return false;
+        }
 
         ToolItemStack toolItemStack = ToolItemStack.of(e.getItem());
 
@@ -117,10 +119,12 @@ public class WHarvesterTool extends WTool implements HarvesterTool {
         // Preventing usage of harvester hoes as regular hoes
         e.setCancelled(true);
 
-        if (this.activateAction != HarvesterAction.RIGHT_CLICK)
+        if (this.activateAction != HarvesterAction.RIGHT_CLICK) {
             return false;
+        }
 
-        return handleUse(e.getPlayer(), e.getClickedBlock(), ToolItemStack.of(e.getItem()));
+        handleUse(e.getPlayer(), e.getClickedBlock(), ToolItemStack.of(e.getItem()));
+        return true;
     }
 
     @Override
@@ -128,23 +132,20 @@ public class WHarvesterTool extends WTool implements HarvesterTool {
         // Preventing usage of harvester hoes as regular hoes
         e.setCancelled(true);
 
-        if (this.activateAction != HarvesterAction.LEFT_CLICK)
+        if (this.activateAction != HarvesterAction.LEFT_CLICK) {
             return false;
+        }
 
-        return handleUse(e.getPlayer(), e.getClickedBlock(), ToolItemStack.of(e.getItem()));
+        handleUse(e.getPlayer(), e.getClickedBlock(), ToolItemStack.of(e.getItem()));
+        return true;
     }
 
-    private boolean isBetweenBlocks(Location max, Location min, Location location) {
-        return location.getBlockX() >= min.getBlockX() && location.getBlockX() <= max.getBlockX() &&
-                location.getBlockY() >= min.getBlockY() && location.getBlockY() <= max.getBlockY() &&
-                location.getBlockZ() >= min.getBlockZ() && location.getBlockZ() <= max.getBlockZ();
-    }
+    private void handleUse(Player player, Block block, ToolItemStack usedItem) {
+        Location farmlandMax = block.getLocation().add(this.farmlandRadius, this.oneLayerOnly ? 0 : this.farmlandRadius, this.farmlandRadius);
+        Location farmlandMin = block.getLocation().subtract(this.farmlandRadius, this.oneLayerOnly ? 0 : this.farmlandRadius, this.farmlandRadius);
 
-    private boolean handleUse(Player player, Block block, ToolItemStack usedItem) {
-        Location farmlandMax = block.getLocation().add(farmlandRadius, oneLayerOnly ? 0 : farmlandRadius, farmlandRadius);
-        Location farmlandMin = block.getLocation().subtract(farmlandRadius, oneLayerOnly ? 0 : farmlandRadius, farmlandRadius);
-        Location cropsMax = block.getLocation().add(radius, oneLayerOnly ? 0 : radius, radius);
-        Location cropsMin = block.getLocation().subtract(radius, oneLayerOnly ? 0 : radius, radius);
+        Location cropsMax = block.getLocation().add(this.radius, this.oneLayerOnly ? 0 : this.radius, this.radius);
+        Location cropsMin = block.getLocation().subtract(this.radius, this.oneLayerOnly ? 0 : this.radius, this.radius);
 
         Location absoluteMax = new Location(farmlandMax.getWorld(), Math.max(farmlandMax.getBlockX(), cropsMax.getBlockX()),
                 Math.max(farmlandMax.getBlockY(), cropsMax.getBlockY()), Math.max(farmlandMax.getBlockZ(), cropsMax.getBlockZ()));
@@ -165,17 +166,19 @@ public class WHarvesterTool extends WTool implements HarvesterTool {
         for (int y = absoluteMax.getBlockY(); y >= absoluteMin.getBlockY(); y--) {
             for (int x = absoluteMin.getBlockX(); x <= absoluteMax.getBlockX(); x++) {
                 for (int z = absoluteMin.getBlockZ(); z <= absoluteMax.getBlockZ(); z++) {
-                    if (usingDurability && toolUsages >= toolDurability)
+                    if (usingDurability && toolUsages >= toolDurability) {
                         break outerLoop;
+                    }
 
                     Location blockLocation = new Location(world, x, y, z);
                     Block targetBlock = blockLocation.getBlock();
                     Material blockType = targetBlock.getType();
 
-                    if (!Materials.isHarvestable(blockType) || !BukkitUtils.canBreakBlock(player, targetBlock, this))
+                    if (!Materials.isHarvestable(blockType) || !BukkitUtils.canBreakBlock(player, targetBlock, this)) {
                         continue;
+                    }
 
-                    if (farmlandRadius >= 0 && Materials.isFarmland(blockType) &&
+                    if (this.farmlandRadius >= 0 && Materials.isFarmland(blockType) &&
                             isBetweenBlocks(farmlandMax, farmlandMin, blockLocation) &&
                             BukkitUtils.hasBreakAccess(block, player)) {
                         editSession.setType(blockLocation, Materials.getFarmlandId());
@@ -183,8 +186,9 @@ public class WHarvesterTool extends WTool implements HarvesterTool {
                         continue;
                     }
 
-                    if (!isBetweenBlocks(cropsMax, cropsMin, blockLocation))
+                    if (!isBetweenBlocks(cropsMax, cropsMin, blockLocation)) {
                         continue;
+                    }
 
                     if (Materials.isChorus(blockType)) {
                         toolUsages += breakChorusFruit(player, targetBlock, usedItem.getItem(), sellInfo,
@@ -192,8 +196,9 @@ public class WHarvesterTool extends WTool implements HarvesterTool {
                         continue;
                     }
 
-                    if (!Materials.isCrop(blockType) || !plugin.getNMSWorld().isFullyGrown(targetBlock))
+                    if (!Materials.isCrop(blockType) || !plugin.getNMSWorld().isFullyGrown(targetBlock)) {
                         continue;
+                    }
 
                     if (blockType == Material.CACTUS || blockType == Materials.SUGAR_CANE.toBukkitType() ||
                             blockType == BAMBOO) {
@@ -201,10 +206,12 @@ public class WHarvesterTool extends WTool implements HarvesterTool {
                             // Checking if the block is the bottom crop
                             if (targetBlock.getRelative(BlockFace.DOWN).getType() != blockType) {
                                 Block aboveBlock = targetBlock.getRelative(BlockFace.UP);
+
                                 //Making sure there's a valid crop on top of the bottom one
-                                if (aboveBlock.getType() == blockType)
+                                if (aboveBlock.getType() == blockType) {
                                     toolUsages += breakTallCrop(player, aboveBlock, usedItem.getItem(), sellInfo,
                                             toolUsages, toolDurability, usingDurability, editSession);
+                                }
                             } else {
                                 toolUsages += breakTallCrop(player, targetBlock, usedItem.getItem(), sellInfo,
                                         toolUsages, toolDurability, usingDurability, editSession);
@@ -214,18 +221,22 @@ public class WHarvesterTool extends WTool implements HarvesterTool {
                         }
 
                         //Making sure it's not the bottom crop
-                        if (targetBlock.getRelative(BlockFace.DOWN).getType() != blockType)
+                        if (targetBlock.getRelative(BlockFace.DOWN).getType() != blockType) {
                             continue;
+                        }
 
                         if (BukkitUtils.breakBlock(player, targetBlock, usedItem.getItem(), this, editSession,
-                                itemStack -> sellInfo.handleItem(player, itemStack)))
+                                itemStack -> sellInfo.handleItem(player, itemStack))) {
                             toolUsages++;
+                        }
+
                         continue;
                     }
 
                     if (BukkitUtils.seedBlock(player, targetBlock, this, editSession,
-                            itemStack -> sellInfo.handleItem(player, itemStack)))
+                            itemStack -> sellInfo.handleItem(player, itemStack))) {
                         toolUsages++;
+                    }
                 }
             }
         }
@@ -233,8 +244,9 @@ public class WHarvesterTool extends WTool implements HarvesterTool {
         HarvesterHoeUseEvent harvesterHoeUseEvent = new HarvesterHoeUseEvent(player, this, editSession.getAffectedBlocks());
         Bukkit.getPluginManager().callEvent(harvesterHoeUseEvent);
 
-        if (harvesterHoeUseEvent.isCancelled())
-            return true;
+        if (harvesterHoeUseEvent.isCancelled()) {
+            return;
+        }
 
         if (sellInfo.hasSellMode) {
             double multiplier = getMultiplier();
@@ -252,23 +264,28 @@ public class WHarvesterTool extends WTool implements HarvesterTool {
 
                 plugin.getProviders().getEconomyProvider().depositPlayer(player, sellInfo.totalPrice);
 
-                //noinspection all
                 message = harvesterHoeSellEvent.getMessage()
                         .replace("{0}", sellInfo.totalAmount + "")
                         .replace("{1}", NumberUtils.format(sellInfo.totalPrice))
                         .replace("{2}", multiplier != 1 && Locale.MULTIPLIER.getMessage() != null ? Locale.MULTIPLIER.getMessage(multiplier) : "");
             }
 
-            if (message != null && !message.isEmpty())
+            if (message != null && !message.isEmpty()) {
                 player.sendMessage(message);
+            }
         }
 
         editSession.apply();
 
-        if (toolUsages > 0)
+        if (toolUsages > 0) {
             reduceDurablility(player, usingDurability ? toolUsages : 1, usedItem.getItem());
+        }
+    }
 
-        return true;
+    private boolean isBetweenBlocks(Location max, Location min, Location location) {
+        return location.getBlockX() >= min.getBlockX() && location.getBlockX() <= max.getBlockX() &&
+                location.getBlockY() >= min.getBlockY() && location.getBlockY() <= max.getBlockY() &&
+                location.getBlockZ() >= min.getBlockZ() && location.getBlockZ() <= max.getBlockZ();
     }
 
     private int breakChorusFruit(Player player, Block block, ItemStack usedItem, SellInfo sellInfo,
@@ -276,38 +293,44 @@ public class WHarvesterTool extends WTool implements HarvesterTool {
                                  boolean usingDurability, boolean foundFlower, WorldEditSession editSession) {
         int currentUsages = 0;
 
-        if (usingDurability && toolUsages >= toolDurability)
+        if (usingDurability && toolUsages >= toolDurability) {
             return currentUsages;
+        }
 
         Location blockLocation = block.getLocation();
 
-        if (!alreadyBroken.add(blockLocation))
+        if (!alreadyBroken.add(blockLocation)) {
             return currentUsages;
+        }
 
         if (Materials.isEndBlock(block.getRelative(BlockFace.DOWN).getType())) {
             Scheduler.runTask(blockLocation, () -> {
                 block.setType(CHORUS_FLOWER);
+
                 if (Scheduler.isRegionScheduler()) {
                     Scheduler.runTask(player, () -> player.getInventory().removeItem(new ItemStack(CHORUS_FLOWER)));
                 } else {
                     player.getInventory().removeItem(new ItemStack(CHORUS_FLOWER));
                 }
             }, 2L);
+
             return currentUsages;
         }
 
         boolean isFlower = Materials.isFlower(block.getType());
 
         if (BukkitUtils.breakBlock(player, block, usedItem, this, editSession, itemStack ->
-                sellInfo.handleItem(player, isFlower ? new ItemStack(CHORUS_FLOWER) : itemStack)))
+                sellInfo.handleItem(player, isFlower ? new ItemStack(CHORUS_FLOWER) : itemStack))) {
             currentUsages++;
+        }
 
         for (BlockFace blockFace : nearbyBlocks) {
             Block nearbyBlock = block.getRelative(blockFace);
-            if (Materials.isChorus(nearbyBlock.getType()))
+            if (Materials.isChorus(nearbyBlock.getType())) {
                 currentUsages += breakChorusFruit(player, nearbyBlock, usedItem, sellInfo, alreadyBroken,
                         toolUsages + currentUsages, toolDurability, usingDurability,
                         isFlower || foundFlower, editSession);
+            }
         }
 
         return currentUsages;
@@ -319,16 +342,19 @@ public class WHarvesterTool extends WTool implements HarvesterTool {
 
         Block aboveBlock = block.getRelative(BlockFace.UP);
 
-        if (aboveBlock.getType() == block.getType())
+        if (aboveBlock.getType() == block.getType()) {
             currentUsages += breakTallCrop(player, aboveBlock, usedItem, sellInfo,
                     toolUsages + currentUsages, toolDurability, usingDurability, editSession);
+            }
 
-        if (usingDurability && (toolUsages + currentUsages) >= toolDurability)
+        if (usingDurability && (toolUsages + currentUsages) >= toolDurability) {
             return currentUsages;
+        }
 
         if (BukkitUtils.breakBlock(player, block, usedItem, this, editSession,
-                itemStack -> sellInfo.handleItem(player, itemStack)))
+                itemStack -> sellInfo.handleItem(player, itemStack))) {
             currentUsages++;
+        }
 
         return currentUsages;
     }
@@ -346,14 +372,17 @@ public class WHarvesterTool extends WTool implements HarvesterTool {
         }
 
         ItemStack handleItem(Player player, ItemStack itemStack) {
-            if (!hasSellMode)
+            if (!this.hasSellMode) {
                 return itemStack;
+            }
 
             double price = plugin.getProviders().getPrice(player, itemStack);
+
             if (price > 0) {
-                itemsToSell.add(itemStack);
-                totalPrice += price;
-                totalAmount += itemStack.getAmount();
+                this.itemsToSell.add(itemStack);
+                this.totalPrice += price;
+                this.totalAmount += itemStack.getAmount();
+
                 return null;
             }
 

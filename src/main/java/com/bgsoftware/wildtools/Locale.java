@@ -4,6 +4,7 @@ import com.bgsoftware.common.config.CommentedConfiguration;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 
+import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
@@ -12,7 +13,7 @@ import java.util.Map;
 public class Locale {
 
     private static final WildToolsPlugin plugin = WildToolsPlugin.getPlugin();
-    private static Map<String, Locale> localeMap = new HashMap<>();
+    private static final Map<String, Locale> localeMap = new HashMap<>();
 
     public static Locale BUILDER_NO_BLOCK = new Locale("BUILDER_NO_BLOCK");
     public static Locale COMMAND_USAGE = new Locale("COMMAND_USAGE");
@@ -79,12 +80,14 @@ public class Locale {
 
     private String message;
 
+    @Nullable
     public String getMessage(Object... objects) {
-        if (message != null && !message.equals("")) {
-            String msg = message;
+        if (this.message != null && !this.message.isEmpty()) {
+            String msg = this.message;
 
-            for (int i = 0; i < objects.length; i++)
+            for (int i = 0; i < objects.length; i++) {
                 msg = msg.replace("{" + i + "}", objects[i].toString());
+            }
 
             return msg;
         }
@@ -92,10 +95,16 @@ public class Locale {
         return null;
     }
 
-    public void send(CommandSender sender, Object... objects) {
+    public void send(@Nullable CommandSender sender, Object... objects) {
+        if (sender == null) {
+            return;
+        }
+
         String message = getMessage(objects);
-        if (message != null && sender != null)
+
+        if (message != null) {
             sender.sendMessage(message);
+        }
     }
 
     private void setMessage(String message) {
@@ -109,20 +118,23 @@ public class Locale {
 
         File file = new File(WildToolsPlugin.getPlugin().getDataFolder(), "lang.yml");
 
-        if (!file.exists())
+        if (!file.exists()) {
             WildToolsPlugin.getPlugin().saveResource("lang.yml", false);
+        }
 
         CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(file);
 
         try {
             cfg.syncWithConfig(file, plugin.getResource("lang.yml"));
         } catch (IOException error) {
+            //noinspection all
             error.printStackTrace();
             return;
         }
 
-        for (String identifier : localeMap.keySet())
+        for (String identifier : localeMap.keySet()) {
             localeMap.get(identifier).setMessage(ChatColor.translateAlternateColorCodes('&', cfg.getString(identifier, "")));
+        }
 
         WildToolsPlugin.log(" - Found " + messagesAmount + " messages in lang.yml.");
         WildToolsPlugin.log("Loading messages done (Took " + (System.currentTimeMillis() - startTime) + "ms)");

@@ -31,8 +31,10 @@ public class BlockMaterial {
 
     public static BlockMaterial of(Material type, short data) {
         BlockMaterial blockMaterial = null;
-        if (data == 0)
+
+        if (data == 0) {
             blockMaterial = BLOCK_MATERIALS.get(type);
+        }
 
         return blockMaterial == null ? new BlockMaterial(type, data) : blockMaterial;
     }
@@ -43,32 +45,40 @@ public class BlockMaterial {
     }
 
     public Material getType() {
-        return type;
+        return this.type;
     }
 
     public short getData() {
-        return data;
+        return this.data;
     }
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
         BlockMaterial that = (BlockMaterial) o;
-        return data == that.data && type == that.type;
+
+        return this.data == that.data && this.type == that.type;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(type, data);
+        return Objects.hash(this.type, this.data);
     }
 
     private static Map<Material, BlockMaterial> initializeBlockMaterials() {
         EnumMap<Material, BlockMaterial> blockMaterialsMap = new EnumMap<>(Material.class);
 
         for (Material material : Material.values()) {
-            if (material.isBlock())
+            if (material.isBlock()) {
                 blockMaterialsMap.put(material, new BlockMaterial(material, (short) 0));
+            }
         }
 
         return Collections.unmodifiableMap(blockMaterialsMap);

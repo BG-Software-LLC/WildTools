@@ -44,7 +44,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@SuppressWarnings("unchecked")
 public class ToolsHandler implements ToolsManager {
 
     private static final Comparator<Tool> toolComparator = (o1, o2) -> {
@@ -162,6 +161,7 @@ public class ToolsHandler implements ToolsManager {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public <T extends Tool> T registerTool(Material type, String name, Class<T> toolClass, Object arg) {
         Tool tool;
         if(toolClass.isAssignableFrom(BuilderTool.class)){
