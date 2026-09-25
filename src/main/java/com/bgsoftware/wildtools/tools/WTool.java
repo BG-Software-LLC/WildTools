@@ -29,7 +29,6 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-@SuppressWarnings("all")
 public abstract class WTool implements Tool {
 
     private static final ReflectMethod<Void> SET_SPIGOT_UNBREAKABLE = new ReflectMethod<>(
@@ -79,38 +78,39 @@ public abstract class WTool implements Tool {
 
     @Override
     public void setDisplayName(String name) {
-        ItemMeta im = toolItemStack.getItemMeta();
-        im.setDisplayName(ChatColor.translateAlternateColorCodes('&', name));
-        toolItemStack.setItemMeta(im);
+        ItemMeta itemMeta = this.toolItemStack.getItemMeta();
+        itemMeta.setDisplayName(ChatColor.translateAlternateColorCodes('&', name));
+        this.toolItemStack.setItemMeta(itemMeta);
     }
 
     @Override
     public void setLore(List<String> lore) {
-        ItemMeta im = toolItemStack.getItemMeta();
+        ItemMeta itemMeta = this.toolItemStack.getItemMeta();
         List<String> _lore = new ArrayList<>();
 
-        for (String line : lore)
+        for (String line : lore) {
             _lore.add(ChatColor.translateAlternateColorCodes('&', line));
+        }
 
-        im.setLore(_lore);
-        toolItemStack.setItemMeta(im);
+        itemMeta.setLore(_lore);
+        this.toolItemStack.setItemMeta(itemMeta);
     }
 
     @Override
     public void setSpigotUnbreakable(boolean spigotUnbreakable) {
         if (SET_SPIGOT_UNBREAKABLE.isValid()) {
-            ItemMeta itemMeta = toolItemStack.getItemMeta();
+            ItemMeta itemMeta = this.toolItemStack.getItemMeta();
             SET_SPIGOT_UNBREAKABLE.invoke(itemMeta, spigotUnbreakable);
-            toolItemStack.setItemMeta(itemMeta);
+            this.toolItemStack.setItemMeta(itemMeta);
         }
     }
 
     @Override
     public void setCustomModel(int customModel) {
         if (SET_CUSTOM_MODEL_DATA.isValid()) {
-            ItemMeta itemMeta = toolItemStack.getItemMeta();
+            ItemMeta itemMeta = this.toolItemStack.getItemMeta();
             SET_CUSTOM_MODEL_DATA.invoke(itemMeta, customModel);
-            toolItemStack.setItemMeta(itemMeta);
+            this.toolItemStack.setItemMeta(itemMeta);
         }
     }
 
@@ -187,43 +187,43 @@ public abstract class WTool implements Tool {
     }
 
     @Override
-    public void addEnchantment(Enchantment ench, int level) {
-        ItemMeta itemMeta = toolItemStack.getItemMeta();
-        itemMeta.addEnchant(ench, level, true);
-        toolItemStack.setItemMeta(itemMeta);
+    public void addEnchantment(Enchantment enchantment, int level) {
+        ItemMeta itemMeta = this.toolItemStack.getItemMeta();
+        itemMeta.addEnchant(enchantment, level, true);
+        this.toolItemStack.setItemMeta(itemMeta);
     }
 
     @Override
     public void addItemFlag(String itemFlagName) {
-        ItemMeta itemMeta = toolItemStack.getItemMeta();
+        ItemMeta itemMeta = this.toolItemStack.getItemMeta();
         plugin.getNMSAdapter().addItemFlag(itemMeta, itemFlagName);
-        toolItemStack.setItemMeta(itemMeta);
+        this.toolItemStack.setItemMeta(itemMeta);
     }
 
     public void makeToolGlow() {
-        ItemMeta itemMeta = toolItemStack.getItemMeta();
+        ItemMeta itemMeta = this.toolItemStack.getItemMeta();
         plugin.getNMSAdapter().makeItemGlow(itemMeta);
-        toolItemStack.setItemMeta(itemMeta);
+        this.toolItemStack.setItemMeta(itemMeta);
     }
 
     @Override
     public void addBlacklistedMaterial(String type) {
-        blacklistedMaterials.add(type);
+        this.blacklistedMaterials.add(type);
     }
 
     @Override
     public void addWhitelistedMaterial(String type) {
-        whitelistedMaterials.add(type);
+        this.whitelistedMaterials.add(type);
     }
 
     @Override
     public void addBlacklistedDrop(String drop) {
-        blacklistedDrops.add(drop);
+        this.blacklistedDrops.add(drop);
     }
 
     @Override
     public void addWhitelistedDrop(String drop) {
-        whitelistedDrops.add(drop);
+        this.whitelistedDrops.add(drop);
     }
 
     @Override
@@ -265,7 +265,7 @@ public abstract class WTool implements Tool {
 
     @Override
     public ItemStack getItemStack() {
-        return toolItemStack.getItem().clone();
+        return this.toolItemStack.getItem().clone();
     }
 
     @Override
@@ -289,182 +289,187 @@ public abstract class WTool implements Tool {
 
     @Override
     public String getName() {
-        return name;
+        return this.name;
     }
 
     @Override
     public boolean isUnbreakable() {
-        return isUnbreakable;
+        return this.isUnbreakable;
     }
 
     @Override
     public boolean hasVanillaDamage() {
-        return isVanillaDamage;
+        return this.isVanillaDamage;
     }
 
     @Override
     public boolean isAutoCollect() {
-        return isAutoCollect;
+        return this.isAutoCollect;
     }
 
     @Override
     public boolean isInstantBreak() {
-        return isInstantBreak;
+        return this.isInstantBreak;
     }
 
     @Override
     public boolean hasSilkTouch() {
-        return isSilkTouch;
+        return this.isSilkTouch;
     }
 
     @Override
     public int getDefaultUses() {
-        return usesLeft;
+        return this.usesLeft;
     }
 
     @Override
     public boolean isUsingDurability() {
-        return usesLeft < 0;
+        return this.usesLeft < 0;
     }
 
     @Override
     public boolean isOnlySameType() {
-        return isOnlySameType;
+        return this.isOnlySameType;
     }
 
     @Override
     public boolean isOnlyInsideClaim() {
-        return isOnlyInsideClaim;
+        return this.isOnlyInsideClaim;
     }
 
     @Override
     public long getCooldown() {
-        return cooldown;
+        return this.cooldown;
     }
 
     @Override
     public boolean hasKeepInventory() {
-        return isKeepInventory;
+        return this.isKeepInventory;
     }
 
     @Override
     public boolean isOmni() {
-        return isOmni;
+        return this.isOmni;
     }
 
     @Override
     public boolean isPrivate() {
-        return isPrivateTool;
+        return this.isPrivateTool;
     }
 
     @Override
     public boolean isUsesProgress() {
-        return isUsingProgress;
+        return this.isUsingProgress;
     }
 
     @Override
     public boolean isAnvilCombine() {
-        return anvilCombineExp > 0;
+        return this.anvilCombineExp > 0;
     }
 
     @Override
     public boolean hasAnvilCombineLimit() {
-        return anvilCombineLimit > 0;
+        return this.anvilCombineLimit > 0;
     }
 
     @Override
     public Set<String> getBlacklistedMaterials() {
-        return blacklistedMaterials.isEmpty() ? Collections.emptySet() : Collections.unmodifiableSet(blacklistedMaterials);
+        return this.blacklistedMaterials.isEmpty() ? Collections.emptySet() :
+                Collections.unmodifiableSet(this.blacklistedMaterials);
     }
 
     @Override
     public Set<String> getWhitelistedMaterials() {
-        return whitelistedMaterials.isEmpty() ? Collections.emptySet() : Collections.unmodifiableSet(whitelistedMaterials);
+        return this.whitelistedMaterials.isEmpty() ? Collections.emptySet() :
+                Collections.unmodifiableSet(this.whitelistedMaterials);
     }
 
     @Override
     public Set<String> getBlacklistedDrops() {
-        return blacklistedDrops.isEmpty() ? Collections.emptySet() : Collections.unmodifiableSet(blacklistedDrops);
+        return this.blacklistedDrops.isEmpty() ? Collections.emptySet() :
+                Collections.unmodifiableSet(this.blacklistedDrops);
     }
 
     @Override
     public Set<String> getWhitelistedDrops() {
-        return whitelistedDrops.isEmpty() ? Collections.emptySet() : Collections.unmodifiableSet(whitelistedDrops);
+        return this.whitelistedDrops.isEmpty() ? Collections.emptySet() :
+                Collections.unmodifiableSet(this.whitelistedDrops);
     }
 
     @Override
     public Set<String> getNotifiedPlugins() {
-        return notifiedPlugins.isEmpty() ? Collections.emptySet() : Collections.unmodifiableSet(notifiedPlugins);
+        return this.notifiedPlugins.isEmpty() ? Collections.emptySet() :
+                Collections.unmodifiableSet(this.notifiedPlugins);
     }
 
     @Override
     public boolean hasBlacklistedMaterials() {
-        return !blacklistedMaterials.isEmpty();
+        return !this.blacklistedMaterials.isEmpty();
     }
 
     @Override
     public boolean hasWhitelistedMaterials() {
-        return !whitelistedMaterials.isEmpty();
+        return !this.whitelistedMaterials.isEmpty();
     }
 
     @Override
     public boolean hasBlacklistedDrops() {
-        return !blacklistedDrops.isEmpty();
+        return !this.blacklistedDrops.isEmpty();
     }
 
     @Override
     public boolean hasWhitelistedDrops() {
-        return !whitelistedDrops.isEmpty();
+        return !this.whitelistedDrops.isEmpty();
     }
 
     @Override
     public boolean isBlacklistedMaterial(Material type, short data) {
-        return isMaterialInList(type, data, blacklistedMaterials);
+        return isMaterialInList(type, data, this.blacklistedMaterials);
     }
 
     @Override
     public boolean isWhitelistedMaterial(Material type, short data) {
-        return isMaterialInList(type, data, whitelistedMaterials);
+        return isMaterialInList(type, data, this.whitelistedMaterials);
     }
 
     @Override
     public boolean isBlacklistedDrop(Material type, short data) {
-        return isMaterialInList(type, data, blacklistedDrops);
+        return isMaterialInList(type, data, this.blacklistedDrops);
     }
 
     @Override
     public boolean isWhitelistedDrop(Material type, short data) {
-        return isMaterialInList(type, data, whitelistedDrops);
+        return isMaterialInList(type, data, this.whitelistedDrops);
     }
 
     @Override
     public double getMultiplier() {
-        return multiplier;
+        return this.multiplier;
     }
 
     @Override
     public int getAnvilCombineExp() {
-        return anvilCombineExp;
+        return this.anvilCombineExp;
     }
 
     @Override
     public int getAnvilCombineLimit() {
-        return anvilCombineLimit;
+        return this.anvilCombineLimit;
     }
 
     @Override
     public boolean isBlacklistedWorld(String world) {
-        return blacklistedWorlds.contains(world);
+        return this.blacklistedWorlds.contains(world);
     }
 
     @Override
     public boolean isWhitelistedWorld(String world) {
-        return whitelistedWorlds.isEmpty() || whitelistedWorlds.contains(world);
+        return this.whitelistedWorlds.isEmpty() || this.whitelistedWorlds.contains(world);
     }
 
     @Override
     public boolean hasStatistics() {
-        return isStatistics;
+        return this.isStatistics;
     }
 
     /***********************************************************************************/
@@ -480,62 +485,81 @@ public abstract class WTool implements Tool {
     }
 
     @Override
+    @SuppressWarnings("all")
     public boolean canBreakBlock(Block block, Material firstType, short firstData) {
         BlockMaterial blockMaterial = BlockMaterial.of(block);
         BlockMaterial firstBlockType = BlockMaterial.of(firstType, firstData);
 
-        if (blockMaterial.getType() == null || blockMaterial.getType() == Material.AIR)
+        if (blockMaterial.getType() == null || blockMaterial.getType() == Material.AIR) {
             return false;
-        if (isOnlySameType && !firstBlockType.equals(blockMaterial))
+        }
+        if (this.isOnlySameType && !firstBlockType.equals(blockMaterial)) {
             return false;
-        if (hasBlacklistedMaterials() && isBlacklistedMaterial(blockMaterial.getType(), blockMaterial.getData()))
+        }
+        if (hasBlacklistedMaterials() && isBlacklistedMaterial(blockMaterial.getType(), blockMaterial.getData())) {
             return false;
-        if (hasWhitelistedMaterials() && !isWhitelistedMaterial(blockMaterial.getType(), blockMaterial.getData()))
+        }
+        if (hasWhitelistedMaterials() && !isWhitelistedMaterial(blockMaterial.getType(), blockMaterial.getData())) {
             return false;
+        }
 
         return true;
     }
 
     @Override
     public List<ItemStack> filterDrops(List<ItemStack> drops) {
-        if (!hasBlacklistedDrops() && !hasWhitelistedDrops())
+        if (!hasBlacklistedDrops() && !hasWhitelistedDrops()) {
             return drops.stream().filter(is -> is.getType() != Material.AIR).collect(Collectors.toList());
+        }
 
         List<ItemStack> filteredDrops = new ArrayList<>();
 
-        for (ItemStack is : drops) {
-            if (hasBlacklistedDrops() && !isBlacklistedDrop(is.getType(), is.getDurability()))
-                filteredDrops.add(is);
-            if (hasWhitelistedDrops() && isWhitelistedDrop(is.getType(), is.getDurability()))
-                filteredDrops.add(is);
+        for (ItemStack item : drops) {
+            if (hasBlacklistedDrops() && !isBlacklistedDrop(item.getType(), item.getDurability())) {
+                filteredDrops.add(item);
+            }
+            if (hasWhitelistedDrops() && isWhitelistedDrop(item.getType(), item.getDurability())) {
+                filteredDrops.add(item);
+            }
         }
 
-        return filteredDrops.stream().filter(is -> is.getType() != Material.AIR).collect(Collectors.toList());
+        return filteredDrops.stream().filter(item -> item.getType() != Material.AIR).collect(Collectors.toList());
     }
 
     @Override
-    public boolean isSimilar(ItemStack is) {
-        ToolItemStack other = ToolItemStack.of(is);
+    @SuppressWarnings("all")
+    public boolean isSimilar(ItemStack item) {
+        ToolItemStack other = ToolItemStack.of(item);
 
-        if (other.getToolType().equals(getName().toLowerCase()))
+        if (other.getToolType().equals(getName().toLowerCase())) {
             return true;
+        }
 
-        if (this.toolItemStack.getType() != is.getType() || this.toolItemStack.hasItemMeta() != is.hasItemMeta())
+        if (this.toolItemStack.getType() != item.getType() || this.toolItemStack.hasItemMeta() != item.hasItemMeta()) {
             return false;
+        }
 
         if (this.toolItemStack.hasItemMeta()) {
             int usesLeft = other.getUses();
+
             if (this.toolItemStack.getItemMeta().hasDisplayName()) {
-                if (!is.getItemMeta().hasDisplayName())
+                if (!item.getItemMeta().hasDisplayName()) {
                     return false;
-                if (!is.getItemMeta().getDisplayName().equals(this.toolItemStack.getItemMeta().getDisplayName().replace("{}", usesLeft + "")))
+                }
+                if (!item.getItemMeta().getDisplayName().equals(this.toolItemStack.getItemMeta().getDisplayName()
+                        .replace("{}", usesLeft + ""))) {
                     return false;
+                }
             }
+
             if (this.toolItemStack.getItemMeta().hasLore()) {
-                if (!is.getItemMeta().hasLore())
+                if (!item.getItemMeta().hasLore()) {
                     return false;
-                if (!is.getItemMeta().getLore().toString().equals(this.toolItemStack.getItemMeta().getLore().toString().replace("{}", usesLeft + "")))
+                }
+                if (!item.getItemMeta().getLore().toString().equals(this.toolItemStack.getItemMeta().getLore()
+                        .toString().replace("{}", usesLeft + ""))) {
                     return false;
+                }
             }
         }
 
@@ -544,10 +568,11 @@ public abstract class WTool implements Tool {
 
     @Override
     public void setLastUse(UUID uuid) {
-        if (cooldown <= 0)
+        if (this.cooldown <= 0) {
             return;
+        }
 
-        lastUses.put(uuid, System.currentTimeMillis());
+        this.lastUses.put(uuid, System.currentTimeMillis());
     }
 
     @Override
@@ -557,15 +582,16 @@ public abstract class WTool implements Tool {
 
     @Override
     public long getTimeLeft(UUID uuid) {
-        long lastUseTime = lastUses.getOrDefault(uuid, -1L);
+        long lastUseTime = this.lastUses.getOrDefault(uuid, -1L);
 
-        if (lastUseTime < 0)
+        if (lastUseTime < 0) {
             return 0;
+        }
 
-        long timeLeft = lastUseTime + cooldown - System.currentTimeMillis();
+        long timeLeft = lastUseTime + this.cooldown - System.currentTimeMillis();
 
         if (timeLeft <= 0) {
-            lastUses.remove(uuid);
+            this.lastUses.remove(uuid);
             return 0;
         }
 
@@ -584,8 +610,9 @@ public abstract class WTool implements Tool {
 
     @Override
     public boolean onBlockHit(PlayerInteractEvent e) {
-        if (isInstantBreak() && !Materials.isBlacklisted(e.getClickedBlock().getType()))
+        if (isInstantBreak() && !Materials.isBlacklisted(e.getClickedBlock().getType())) {
             return onBlockBreak(new BlockBreakEvent(e.getClickedBlock(), e.getPlayer()));
+        }
 
         return false;
     }
@@ -598,46 +625,20 @@ public abstract class WTool implements Tool {
     /***********************************************************************************/
 
     private boolean isMaterialInList(Material type, short data, Set<String> list) {
-        for (String mat : list) {
-            if (mat.contains(":")) {
-                if (mat.split(":")[0].equalsIgnoreCase(type.name()) && mat.split(":")[1].equalsIgnoreCase(data + ""))
+        for (String material : list) {
+            if (material.contains(":")) {
+                if (material.split(":")[0].equalsIgnoreCase(type.name())
+                        && material.split(":")[1].equalsIgnoreCase(data + "")) {
                     return true;
+                }
             } else {
-                if (mat.equalsIgnoreCase(type.name()))
+                if (material.equalsIgnoreCase(type.name())) {
                     return true;
+                }
             }
         }
+
         return false;
-    }
-
-    protected String getTime(long timeLeft) {
-        String time = "";
-
-        // Get rid of miliseconds
-        timeLeft = timeLeft / 1000;
-
-        if (timeLeft >= 3600) {
-            if (timeLeft / 3600 == 1)
-                time += "1 hour, ";
-            else time += (timeLeft / 3600) + " hours, ";
-            timeLeft %= 3600;
-        }
-
-        if (timeLeft >= 60) {
-            if (timeLeft / 60 == 1)
-                time += "1 minute, ";
-            else time += (timeLeft / 60) + " minutes, ";
-            timeLeft %= 60;
-        }
-
-        if (timeLeft != 0) {
-            if (timeLeft == 1)
-                time += timeLeft + " second";
-            else time += timeLeft + " seconds";
-            return time;
-        }
-
-        return time.substring(0, time.length() - 2);
     }
 
 }
