@@ -1,7 +1,7 @@
 package com.bgsoftware.wildtools;
 
 import com.bgsoftware.common.config.CommentedConfiguration;
-import org.bukkit.ChatColor;
+import com.bgsoftware.wildtools.utils.TextFormatter;
 import org.bukkit.command.CommandSender;
 
 import java.io.File;
@@ -122,7 +122,7 @@ public class Locale {
         }
 
         for (String identifier : localeMap.keySet())
-            localeMap.get(identifier).setMessage(ChatColor.translateAlternateColorCodes('&', cfg.getString(identifier, "")));
+            localeMap.get(identifier).setMessage(TextFormatter.format(cfg.getString(identifier, "")));
 
         WildToolsPlugin.log(" - Found " + messagesAmount + " messages in lang.yml.");
         WildToolsPlugin.log("Loading messages done (Took " + (System.currentTimeMillis() - startTime) + "ms)");

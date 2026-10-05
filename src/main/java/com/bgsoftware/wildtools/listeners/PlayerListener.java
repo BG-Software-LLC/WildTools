@@ -5,10 +5,9 @@ import com.bgsoftware.wildtools.api.objects.tools.Tool;
 import com.bgsoftware.wildtools.scheduler.Scheduler;
 import com.bgsoftware.wildtools.tools.ToolBreaksTracker;
 import com.bgsoftware.wildtools.tools.WCannonTool;
+import com.bgsoftware.wildtools.utils.TextFormatter;
 import com.bgsoftware.wildtools.utils.WSelection;
 import com.bgsoftware.wildtools.utils.items.ItemUtils;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -108,7 +107,7 @@ public class PlayerListener implements Listener {
     }
 
     private void sendMessage(Player player, String message) {
-        player.sendMessage(ChatColor.translateAlternateColorCodes('&', message));
+        player.sendMessage(TextFormatter.format(message));
     }
 
 }

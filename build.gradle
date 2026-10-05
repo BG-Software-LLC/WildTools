@@ -69,6 +69,9 @@ dependencies {
 
     implementation 'org.bstats:bstats-bukkit:3.0.0'
 
+    implementation 'net.kyori:adventure-text-minimessage:4.17.0'
+    implementation 'net.kyori:adventure-text-serializer-legacy:4.17.0'
+
     // Spigot jars
     compileOnly "org.spigotmc:v1_7_R3:latest"
     compileOnly 'org.spigotmc:v1_16_R3-Tuinity:latest'
@@ -89,6 +92,7 @@ subprojects.each { evaluationDependsOn(it.path) }
 
 shadowJar {
     relocate 'org.bstats', 'com.bgsoftware.wildtools.libs.org.bstats'
+    relocate 'net.kyori', 'com.bgsoftware.wildtools.libs.net.kyori'
 
     archiveClassifier.set('')
 
