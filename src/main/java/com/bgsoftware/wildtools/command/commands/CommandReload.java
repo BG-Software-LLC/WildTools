@@ -46,7 +46,7 @@ public class CommandReload implements ICommand {
 
     @Override
     public void run(WildToolsPlugin plugin, CommandSender sender, String[] args) {
-        Scheduler.runTaskAsync(() -> {
+        Scheduler.runTask(() -> {
             WildToolsPlugin.log("******** RELOAD START ********");
             ToolsHandler.reload();
             DataHandler.reload();

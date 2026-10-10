@@ -3,6 +3,7 @@ package com.bgsoftware.wildtools.handlers;
 import com.bgsoftware.common.config.CommentedConfiguration;
 import com.bgsoftware.wildtools.SellWandLogger;
 import com.bgsoftware.wildtools.WildToolsPlugin;
+import com.bgsoftware.wildtools.api.objects.ToolMode;
 import com.bgsoftware.wildtools.api.objects.tools.BuilderTool;
 import com.bgsoftware.wildtools.api.objects.tools.CannonTool;
 import com.bgsoftware.wildtools.api.objects.tools.CraftingTool;
@@ -20,6 +21,7 @@ import com.bgsoftware.wildtools.api.objects.tools.Tool;
 import com.bgsoftware.wildtools.hooks.PricesProvider_Default;
 import com.bgsoftware.wildtools.hooks.OrebfuscatorHook;
 import com.bgsoftware.wildtools.scheduler.Scheduler;
+import com.bgsoftware.wildtools.tools.WCustomTool;
 import com.bgsoftware.wildtools.tools.WTool;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
@@ -193,7 +195,11 @@ public class DataHandler {
                     tool = plugin.getToolsManager().registerTool(type, name, SortTool.class, null);
                     break;
                 default:
-                    continue;
+                    ToolMode toolMode = ToolMode.getByName(cfg.getString("tools." + name + ".tool-mode"));
+                    tool = plugin.getToolsManager().createCustomTool(type, name, toolMode);
+                    if (tool == null)
+                        continue;
+                    break;
             }
 
             if (cfg.contains("tools." + name + ".cooldown"))
@@ -334,6 +340,16 @@ public class DataHandler {
 
             if (cfg.contains("tools." + name + ".notified-plugins"))
                 tool.setNotifiedPlugins(cfg.getStringList("tools." + name + ".notified-plugins"));
+
+            if (tool instanceof WCustomTool) {
+                WCustomTool customTool = (WCustomTool) tool;
+                plugin.getToolsManager().registerTool(customTool);
+                if (!customTool.loadBehavior(cfg.getConfigurationSection("tools." + name))) {
+                    plugin.getToolsManager().unregisterTool(customTool);
+                    WildToolsPlugin.log("Couldn't create a behavior for tool '" + name + "', skipping...");
+                    continue;
+                }
+            }
 
             toolsAmount++;
         }
