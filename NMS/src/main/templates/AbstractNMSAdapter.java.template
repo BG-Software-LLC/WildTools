@@ -56,6 +56,10 @@ public abstract class AbstractNMSAdapter implements NMSAdapter {
 
     static {
         for (Material material : Material.values()) {
+            if (material.isLegacy() || !material.isBlock()) {
+                continue;
+            }
+
             if (Tag.MINEABLE_AXE.isTagged(material)) {
                 DESTROY_SPEED_CATEGORIES.put(material, DestroySpeedCategory.AXE);
             } else if (Tag.MINEABLE_HOE.isTagged(material)) {

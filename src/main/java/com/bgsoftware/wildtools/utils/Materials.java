@@ -191,7 +191,7 @@ public enum Materials {
                 tags.add(Tag.BUCKET);
             }
             if (materialName.endsWith("_AXE") || materialName.endsWith("_HOE") || materialName.endsWith("_PICKAXE")
-                    || ServerVersion.isLegacy() ? materialName.endsWith("_SPADE") : materialName.endsWith("_SHOVEL")) {
+                    || (ServerVersion.isLegacy() ? materialName.endsWith("_SPADE") : materialName.endsWith("_SHOVEL"))) {
                 OMNI_TOOLS.add(material);
             }
 

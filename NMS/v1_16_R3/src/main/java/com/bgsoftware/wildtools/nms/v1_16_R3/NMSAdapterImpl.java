@@ -63,6 +63,10 @@ public class NMSAdapterImpl implements NMSAdapter {
 
     static {
         for (Material material : Material.values()) {
+            if (material.isLegacy() || !material.isBlock()) {
+                continue;
+            }
+
             Block block = CraftMagicNumbers.getBlock(material);
 
             if (block == null) {

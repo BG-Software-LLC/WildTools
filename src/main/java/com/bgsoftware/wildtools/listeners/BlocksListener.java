@@ -225,6 +225,10 @@ public class BlocksListener implements Listener {
             return;
         }
 
+        if (!e.getPlayer().hasPermission("wildtools.use")) {
+            return;
+        }
+
         ToolItemStack toolItemStack = ToolItemStack.of(handItem);
         Tool tool = toolItemStack.getTool();
 

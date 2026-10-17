@@ -21,6 +21,7 @@ import com.bgsoftware.wildtools.hooks.PricesProvider_Default;
 import com.bgsoftware.wildtools.hooks.OrebfuscatorHook;
 import com.bgsoftware.wildtools.scheduler.Scheduler;
 import com.bgsoftware.wildtools.tools.WTool;
+import com.bgsoftware.wildtools.utils.Materials;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 
@@ -309,8 +310,14 @@ public class DataHandler {
             if (cfg.contains("tools." + name + ".multiplier"))
                 tool.setMultiplier(cfg.getDouble("tools." + name + ".multiplier"));
 
-            if (cfg.contains("tools." + name + ".omni-tool") && type.name().contains("_"))
-                tool.setOmni(cfg.getBoolean("tools." + name + ".omni-tool"));
+            if (cfg.contains("tools." + name + ".omni-tool") && type.name().contains("_")) {
+                if (Materials.getOmniTools().contains(type)) {
+                    tool.setOmni(cfg.getBoolean("tools." + name + ".omni-tool"));
+                } else {
+                    WildToolsPlugin.log("Couldn't set 'omni-tool' for tool '" + name
+                            + "', because its material is not a tool, skipping...");
+                }
+            }
 
             if (cfg.contains("tools." + name + ".private"))
                 tool.setPrivate(cfg.getBoolean("tools." + name + ".private"));

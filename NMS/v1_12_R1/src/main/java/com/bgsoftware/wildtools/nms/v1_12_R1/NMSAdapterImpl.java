@@ -55,6 +55,10 @@ public class NMSAdapterImpl implements NMSAdapter {
 
     static {
         for (Material material : Material.values()) {
+            if (!material.isBlock()) {
+                continue;
+            }
+
             IBlockData blockData = CraftMagicNumbers.getBlock(material).getBlockData();
 
             if (Items.DIAMOND_AXE.getDestroySpeed(DIAMOND_AXE_ITEM_STACK, blockData) == 8f) {
