@@ -147,6 +147,31 @@ public enum Materials {
                     materialName.equals("PORTAL") || materialName.equals("BUBBLE_COLUMN")) {
                 tags.add(Tag.FORCE_UPDATE);
             }
+            // Blocks that cannot stand on their own, for the same reason water and lava are above.
+            // The cuboid/trench path writes air straight into the chunk with no neighbour
+            // notification, so anything of these types sitting OUTSIDE the broken area is never
+            // told its support is gone and is left floating in mid air.
+            //
+            // BukkitUtils.shouldForceUpdate already catches most of these via its "the block above
+            // is non solid" rule, but that rule misses two whole groups:
+            //  - plants Minecraft counts as SOLID because their collision box is a full block tall,
+            //    even though they are one pixel wide (bamboo, cactus, scaffolding). Bamboo is the
+            //    one players report: break the bottom stalk and the rest of the stalk stays.
+            //  - anything hanging DOWNWARDS, because that rule only ever looks up. Vines are the
+            //    other report: break the top vine and the ones below it stay.
+            if (materialName.equals("BAMBOO") || materialName.equals("BAMBOO_SAPLING") ||
+                    materialName.equals("CACTUS") || materialName.equals("SCAFFOLDING") ||
+                    materialName.equals("SUGAR_CANE") || materialName.equals("SUGAR_CANE_BLOCK") ||
+                    materialName.equals("VINE") || materialName.equals("CAVE_VINES") ||
+                    materialName.equals("CAVE_VINES_PLANT") || materialName.equals("WEEPING_VINES") ||
+                    materialName.equals("WEEPING_VINES_PLANT") || materialName.equals("TWISTING_VINES") ||
+                    materialName.equals("TWISTING_VINES_PLANT") || materialName.equals("KELP") ||
+                    materialName.equals("KELP_PLANT") || materialName.equals("CHORUS_PLANT") ||
+                    materialName.equals("POINTED_DRIPSTONE") || materialName.equals("BIG_DRIPLEAF_STEM") ||
+                    materialName.equals("HANGING_ROOTS") || materialName.equals("GLOW_LICHEN") ||
+                    materialName.equals("SCULK_VEIN") || materialName.equals("LADDER")) {
+                tags.add(Tag.FORCE_UPDATE);
+            }
             if (materialName.equals("CROPS") || materialName.equals("WHEAT") || materialName.equals("CARROT") ||
                     materialName.equals("CARROTS") || materialName.equals("POTATO") || materialName.equals("POTATOES") ||
                     materialName.equals("BEETROOT_BLOCK") || materialName.equals("BEETROOTS") || materialName.equals("NETHER_WARTS") ||
