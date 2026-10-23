@@ -8,6 +8,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.inventory.PrepareAnvilEvent;
 import org.bukkit.inventory.AnvilInventory;
 import org.bukkit.inventory.ItemStack;
@@ -30,7 +31,7 @@ public class AnvilListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onAnvilAdd(InventoryClickEvent e){
-        if (!(e.getClickedInventory() instanceof AnvilInventory)) {
+        if (e.getClickedInventory() == null || e.getClickedInventory().getType() != InventoryType.ANVIL) {
             return;
         }
 
@@ -116,7 +117,7 @@ public class AnvilListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onAnvilResultClick(InventoryClickEvent e){
-        if (!(e.getClickedInventory() instanceof AnvilInventory) || e.getRawSlot() != 2) {
+        if (e.getClickedInventory() == null || e.getClickedInventory().getType() != InventoryType.ANVIL || e.getRawSlot() != 2) {
             return;
         }
 

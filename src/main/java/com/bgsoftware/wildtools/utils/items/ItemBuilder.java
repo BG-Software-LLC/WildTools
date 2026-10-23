@@ -99,10 +99,7 @@ public class ItemBuilder {
             }
 
             if (formattedLore.size() > 10) {
-                for (int i = 10; i < formattedLore.size(); i++) {
-                    formattedLore.remove(i);
-                }
-
+                formattedLore.subList(10, formattedLore.size()).clear();
                 formattedLore.add(ChatColor.getLastColors(firstLine) + "...");
             }
 

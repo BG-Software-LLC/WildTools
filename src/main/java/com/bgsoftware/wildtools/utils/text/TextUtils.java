@@ -23,17 +23,26 @@ public class TextUtils {
     }
 
     public static String getFormattedName(String string){
-        StringBuilder name = new StringBuilder();
-        String[] split = string.split("_");
-
-        for (int i = 0; i < split.length; i++) {
-            name.append(split[i].substring(0, 1).toUpperCase()).append(split[i].substring(1).toLowerCase());
-            if (i != split.length - 1) {
-                name.append(" ");
-            }
+        if (string == null || string.isEmpty()) {
+            return "";
         }
 
-        return name.toString();
+        StringBuilder stringBuilder = new StringBuilder();
+        String[] split = string.split("_");
+
+        for (String part : split) {
+            if (part.isEmpty()) {
+                continue;
+            }
+
+            if (stringBuilder.length() > 0) {
+                stringBuilder.append(" ");
+            }
+
+            stringBuilder.append(part.substring(0, 1).toUpperCase()).append(part.substring(1).toLowerCase());
+        }
+
+        return stringBuilder.toString();
     }
 
 }
