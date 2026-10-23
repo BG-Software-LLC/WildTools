@@ -221,7 +221,7 @@ public class BlocksListener implements Listener {
 
         ItemStack handItem = plugin.getNMSAdapter().getItemInHand(e.getPlayer(), e);
 
-        if (handItem == null || handItem.getType() == Material.AIR) {
+        if (handItem == null || handItem.getType() == Material.AIR || !OmniToolHelper.isOmniToolType(handItem.getType())) {
             return;
         }
 

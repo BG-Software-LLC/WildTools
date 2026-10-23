@@ -45,4 +45,8 @@ public class OmniToolHelper {
         return categoryMap != null ? categoryMap.get(category) : toolType;
     }
 
+    public static boolean isOmniToolType(Material toolType) {
+        return Materials.getOmniTools().contains(toolType);
+    }
+
 }

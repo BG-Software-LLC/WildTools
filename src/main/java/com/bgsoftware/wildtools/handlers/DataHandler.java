@@ -21,7 +21,7 @@ import com.bgsoftware.wildtools.hooks.PricesProvider_Default;
 import com.bgsoftware.wildtools.hooks.OrebfuscatorHook;
 import com.bgsoftware.wildtools.scheduler.Scheduler;
 import com.bgsoftware.wildtools.tools.WTool;
-import com.bgsoftware.wildtools.utils.Materials;
+import com.bgsoftware.wildtools.utils.items.OmniToolHelper;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 
@@ -311,11 +311,11 @@ public class DataHandler {
                 tool.setMultiplier(cfg.getDouble("tools." + name + ".multiplier"));
 
             if (cfg.contains("tools." + name + ".omni-tool") && type.name().contains("_")) {
-                if (Materials.getOmniTools().contains(type)) {
+                if (OmniToolHelper.isOmniToolType(type)) {
                     tool.setOmni(cfg.getBoolean("tools." + name + ".omni-tool"));
                 } else {
                     WildToolsPlugin.log("Couldn't set 'omni-tool' for tool '" + name
-                            + "', because its material is not a tool, skipping...");
+                            + "', because its material is not a supported omni-tool type, skipping...");
                 }
             }
 
