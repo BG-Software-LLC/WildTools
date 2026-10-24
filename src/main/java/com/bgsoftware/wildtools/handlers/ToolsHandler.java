@@ -37,10 +37,10 @@ import com.bgsoftware.wildtools.api.objects.tools.SortTool;
 import com.bgsoftware.wildtools.api.objects.tools.Tool;
 import com.bgsoftware.wildtools.tools.WDrainTool;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -54,7 +54,7 @@ public class ToolsHandler implements ToolsManager {
     private final WildToolsPlugin plugin;
 
     private final Map<String, Tool> toolsByName = new HashMap<>();
-    private final List<Tool> tools = new ArrayList<>();
+    private final List<Tool> tools = new LinkedList<>();
 
     public ToolsHandler(WildToolsPlugin plugin){
         this.plugin = plugin;
@@ -122,8 +122,9 @@ public class ToolsHandler implements ToolsManager {
 
     @Override
     public Tool getTool(ItemStack itemStack){
-        if(itemStack == null)
+        if (itemStack == null) {
             return null;
+        }
 
         ToolItemStack toolItemStack = ToolItemStack.of(itemStack);
 
@@ -131,23 +132,26 @@ public class ToolsHandler implements ToolsManager {
 
         Tool toolByName = getTool(toolName);
 
-        if(toolByName != null)
+        if (toolByName != null) {
             return toolByName;
+        }
 
-        for(Tool tool : tools)
-            if (tool.isSimilar(itemStack))
+        for (Tool tool : this.tools) {
+            if (tool.isSimilar(itemStack)) {
                 return tool;
+            }
+        }
 
         return null;
     }
 
     @Override
     public List<Tool> getTools(){
-        return Collections.unmodifiableList(tools);
+        return Collections.unmodifiableList(this.tools);
     }
 
     public void clearTools(){
-        tools.clear();
+        this.tools.clear();
     }
 
     @Override
@@ -164,41 +168,45 @@ public class ToolsHandler implements ToolsManager {
     @SuppressWarnings("unchecked")
     public <T extends Tool> T registerTool(Material type, String name, Class<T> toolClass, Object arg) {
         Tool tool;
-        if(toolClass.isAssignableFrom(BuilderTool.class)){
+
+        if (toolClass.isAssignableFrom(BuilderTool.class)) {
             tool = new WBuilderTool(type, name, (int) arg);
-        }else if(toolClass.isAssignableFrom(CannonTool.class)){
+        } else if(toolClass.isAssignableFrom(CannonTool.class)) {
             tool = new WCannonTool(type, name, (int) arg);
-        }else if(toolClass.isAssignableFrom(CraftingTool.class)){
+        } else if(toolClass.isAssignableFrom(CraftingTool.class)) {
             tool = new WCraftingTool(type, name, (List<String>) arg);
-        }else if(toolClass.isAssignableFrom(CrowbarTool.class)){
+        } else if(toolClass.isAssignableFrom(CrowbarTool.class)) {
             tool = new WCrowbarTool(type, name, (List<String>) arg);
-        }else if(toolClass.isAssignableFrom(CuboidTool.class)){
+        } else if(toolClass.isAssignableFrom(CuboidTool.class)) {
             tool = new WCuboidTool(type, name, (int) arg);
-        }else if(toolClass.isAssignableFrom(DrainTool.class)){
+        } else if(toolClass.isAssignableFrom(DrainTool.class)) {
             tool = new WDrainTool(type, name, (int) arg);
-        }else if(toolClass.isAssignableFrom(HarvesterTool.class)){
+        } else if(toolClass.isAssignableFrom(HarvesterTool.class)) {
             tool = new WHarvesterTool(type, name, (int) arg);
-        }else if(toolClass.isAssignableFrom(IceTool.class)){
+        } else if(toolClass.isAssignableFrom(IceTool.class)) {
             tool = new WIceTool(type, name, (int) arg);
-        }else if(toolClass.isAssignableFrom(LightningTool.class)){
+        } else if(toolClass.isAssignableFrom(LightningTool.class)) {
             tool = new WLightningTool(type, name);
-        }else if(toolClass.isAssignableFrom(MagnetTool.class)){
+        } else if(toolClass.isAssignableFrom(MagnetTool.class)) {
             tool = new WMagnetTool(type, name, (int) arg);
-        }else if(toolClass.isAssignableFrom(PillarTool.class)){
+        } else if(toolClass.isAssignableFrom(PillarTool.class)) {
             tool = new WPillarTool(type, name);
-        }else if(toolClass.isAssignableFrom(SellTool.class)){
+        } else if(toolClass.isAssignableFrom(SellTool.class)) {
             tool = new WSellTool(type, name);
-        }else if(toolClass.isAssignableFrom(SortTool.class)) {
+        } else if(toolClass.isAssignableFrom(SortTool.class)) {
             tool = new WSortTool(type, name);
-        }else throw new IllegalArgumentException("Couldn't find tool class " + toolClass.getName());
+        } else {
+            throw new IllegalArgumentException("Couldn't find tool class " + toolClass.getName());
+        }
 
-        if(toolsByName.containsKey(tool.getName().toLowerCase()))
-            tools.remove(toolsByName.get(tool.getName().toLowerCase()));
+        if (this.toolsByName.containsKey(tool.getName().toLowerCase())) {
+            this.tools.remove(this.toolsByName.get(tool.getName().toLowerCase()));
+        }
 
-        tools.add(tool);
-        toolsByName.put(tool.getName().toLowerCase(), tool);
+        this.tools.add(tool);
+        this.toolsByName.put(tool.getName().toLowerCase(), tool);
 
-        tools.sort(toolComparator);
+        this.tools.sort(toolComparator);
 
         return toolClass.cast(tool);
     }
@@ -208,8 +216,9 @@ public class ToolsHandler implements ToolsManager {
         ToolItemStack toolItemStack = ToolItemStack.of(itemStack);
         Tool tool = toolItemStack.getTool();
 
-        if(tool == null || !tool.isPrivate())
+        if (tool == null || !tool.isPrivate()) {
             return true;
+        }
 
         String uuid = toolItemStack.getOwner();
 
@@ -221,9 +230,11 @@ public class ToolsHandler implements ToolsManager {
     }
 
     private <T extends Tool> T getTool(ItemStack itemStack, ToolMode mode, Class<T> clazz){
-        for(Tool tool : tools)
-            if (tool.getToolMode() == mode && tool.isSimilar(itemStack))
+        for (Tool tool : this.tools) {
+            if (tool.getToolMode() == mode && tool.isSimilar(itemStack)) {
                 return clazz.cast(tool);
+            }
+        }
 
         return null;
     }

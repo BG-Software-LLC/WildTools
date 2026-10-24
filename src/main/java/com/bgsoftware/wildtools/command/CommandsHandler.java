@@ -13,8 +13,8 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 import com.bgsoftware.wildtools.command.commands.CommandSettings;
 
-import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 public class CommandsHandler implements CommandExecutor, TabCompleter {
@@ -24,12 +24,12 @@ public class CommandsHandler implements CommandExecutor, TabCompleter {
 
     public CommandsHandler(WildToolsPlugin plugin){
         this.plugin = plugin;
-        commands = new ArrayList<>();
-        commands.add(new CommandGive());
-        commands.add(new CommandInfo());
-        commands.add(new CommandList());
-        commands.add(new CommandReload());
-        commands.add(new CommandSettings());
+        this.commands = new LinkedList<>();
+        this.commands.add(new CommandGive());
+        this.commands.add(new CommandInfo());
+        this.commands.add(new CommandList());
+        this.commands.add(new CommandReload());
+        this.commands.add(new CommandSettings());
     }
 
     @Override
@@ -88,7 +88,7 @@ public class CommandsHandler implements CommandExecutor, TabCompleter {
             }
         }
 
-        List<String> list = new ArrayList<>();
+        List<String> list = new LinkedList<>();
 
         for (ICommand cmd : this.commands) {
             if (cmd.getPermission() == null || sender.hasPermission(cmd.getPermission())) {

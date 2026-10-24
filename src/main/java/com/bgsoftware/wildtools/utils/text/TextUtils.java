@@ -1,6 +1,6 @@
 package com.bgsoftware.wildtools.utils.text;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -15,7 +15,7 @@ public class TextUtils {
             return "None";
         }
 
-        List<String> formattedList = new ArrayList<>();
+        List<String> formattedList = new LinkedList<>();
 
         set.forEach(string -> formattedList.add(getFormattedName(string)));
 

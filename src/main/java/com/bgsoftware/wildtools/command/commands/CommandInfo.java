@@ -11,8 +11,8 @@ import com.bgsoftware.wildtools.utils.text.TextUtils;
 import org.bukkit.command.CommandSender;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 public class CommandInfo implements ICommand {
@@ -109,7 +109,7 @@ public class CommandInfo implements ICommand {
     @Override
     public List<String> tabComplete(WildToolsPlugin plugin, CommandSender sender, String[] args) {
         if (args.length == 2) {
-            List<String> list = new ArrayList<>();
+            List<String> list = new LinkedList<>();
             String arg = args[1].toLowerCase();
 
             for (Tool tool : plugin.getToolsManager().getTools()) {

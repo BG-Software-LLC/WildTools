@@ -17,11 +17,11 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -117,7 +117,7 @@ public class EditorListener implements Listener {
                 return;
             }
 
-            List<String> tools = new ArrayList<>(this.plugin.getEditor().config.getConfigurationSection("tools").getKeys(false));
+            List<String> tools = new LinkedList<>(this.plugin.getEditor().config.getConfigurationSection("tools").getKeys(false));
             tools.sort(Comparator.naturalOrder());
 
             if (e.getRawSlot() < tools.size()) {

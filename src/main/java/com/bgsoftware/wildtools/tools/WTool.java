@@ -18,11 +18,11 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -86,13 +86,13 @@ public abstract class WTool implements Tool {
     @Override
     public void setLore(List<String> lore) {
         ItemMeta itemMeta = this.toolItemStack.getItemMeta();
-        List<String> _lore = new ArrayList<>();
+        List<String> formattedLore = new LinkedList<>();
 
         for (String line : lore) {
-            _lore.add(ChatColor.translateAlternateColorCodes('&', line));
+            formattedLore.add(ChatColor.translateAlternateColorCodes('&', line));
         }
 
-        itemMeta.setLore(_lore);
+        itemMeta.setLore(formattedLore);
         this.toolItemStack.setItemMeta(itemMeta);
     }
 
@@ -512,7 +512,7 @@ public abstract class WTool implements Tool {
             return drops.stream().filter(is -> is.getType() != Material.AIR).collect(Collectors.toList());
         }
 
-        List<ItemStack> filteredDrops = new ArrayList<>();
+        List<ItemStack> filteredDrops = new LinkedList<>();
 
         for (ItemStack item : drops) {
             if (hasBlacklistedDrops() && !isBlacklistedDrop(item.getType(), item.getDurability())) {

@@ -14,10 +14,10 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -49,7 +49,7 @@ public class WSortTool extends WTool implements SortTool {
             return false;
         }
 
-        List<InventoryItem> inventoryItems = new ArrayList<>();
+        List<InventoryItem> inventoryItems = new LinkedList<>();
         Map<Inventory, ItemStack[]> originContents = new HashMap<>();
 
         for (Inventory inventory : inventories) {

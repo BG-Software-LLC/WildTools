@@ -12,7 +12,7 @@ import org.bukkit.event.Event;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -51,7 +51,7 @@ public class WMagnetTool extends WTool implements MagnetTool {
 
         boolean reduceDurability = false;
 
-        List<Item> affectedItems = new ArrayList<>();
+        List<Item> affectedItems = new LinkedList<>();
 
         for (Item item : nearbyItems) {
             if (!item.isValid() || item.isDead()) {
@@ -60,7 +60,7 @@ public class WMagnetTool extends WTool implements MagnetTool {
 
             if (EventsSimulation.simulateItemPickupEvent(player, item, true)) {
                 continue;
-                }
+            }
 
             ItemStack itemStack = plugin.getProviders().getStackedItemProvider().getItemStack(item);
 

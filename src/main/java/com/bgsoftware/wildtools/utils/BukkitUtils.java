@@ -23,8 +23,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Function;
@@ -186,14 +186,14 @@ public class BukkitUtils {
     }
 
     public static List<ItemStack> getBlockDrops(Player player, Block block, Tool tool) {
-        List<ItemStack> drops = new ArrayList<>();
+        List<ItemStack> drops = new LinkedList<>();
 
         if (plugin.getProviders().getBlockDrops(drops, player, block, false)) {
             return drops;
         }
 
         if (!plugin.getNMSWorld().isBlockDropsGameRuleEnabled(block.getWorld())) {
-            return new ArrayList<>();
+            return Collections.emptyList();
         }
 
         return plugin.getNMSWorld().getBlockDrops(player, block, tool.hasSilkTouch());
