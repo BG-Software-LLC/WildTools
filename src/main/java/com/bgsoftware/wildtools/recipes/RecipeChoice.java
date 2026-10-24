@@ -5,11 +5,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 public interface RecipeChoice extends Predicate<ItemStack> {
 

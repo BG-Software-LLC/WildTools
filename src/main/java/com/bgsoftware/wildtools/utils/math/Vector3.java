@@ -22,15 +22,15 @@ public class Vector3 {
     }
 
     public int getX() {
-        return x;
+        return this.x;
     }
 
     public int getY() {
-        return y;
+        return this.y;
     }
 
     public int getZ() {
-        return z;
+        return this.z;
     }
 
     public Location toLocation(World world) {
@@ -39,20 +39,27 @@ public class Vector3 {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
         Vector3 that = (Vector3) o;
-        return x == that.x && y == that.y && z == that.z;
+
+        return this.x == that.x && this.y == that.y && this.z == that.z;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(x, y, z);
+        return Objects.hash(this.x, this.y, this.z);
     }
 
     @Override
     public String toString() {
-        return "Vector3{" + x + ", " + y + ", " + z + "}";
+        return "Vector3{" + this.x + ", " + this.y + ", " + this.z + "}";
     }
 
 }

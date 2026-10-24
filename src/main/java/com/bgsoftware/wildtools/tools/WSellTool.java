@@ -34,8 +34,9 @@ public class WSellTool extends WTool implements SellTool {
             return false;
         }
 
-        if (!BukkitUtils.canInteractBlock(e.getPlayer(), e.getClickedBlock(), e.getItem()))
+        if (!BukkitUtils.canInteractBlock(e.getPlayer(), e.getClickedBlock(), e.getItem())) {
             return false;
+        }
 
         BlockState blockState = e.getClickedBlock().getState();
 
@@ -58,8 +59,9 @@ public class WSellTool extends WTool implements SellTool {
                 multiplier, message == null ? "" : message);
         Bukkit.getPluginManager().callEvent(sellWandUseEvent);
 
-        if (sellWandUseEvent.isCancelled())
+        if (sellWandUseEvent.isCancelled()) {
             return false;
+        }
 
         multiplier = sellWandUseEvent.getMultiplier();
         totalEarnings = sellWandUseEvent.getPrice() * multiplier;
@@ -68,12 +70,12 @@ public class WSellTool extends WTool implements SellTool {
 
         plugin.getProviders().removeContainer(blockState, inventory, sellInfo);
 
-        //noinspection all
         message = sellWandUseEvent.getMessage().replace("{0}", NumberUtils.format(totalEarnings))
                 .replace("{1}", multiplier != 1 && Locale.MULTIPLIER.getMessage() != null ? Locale.MULTIPLIER.getMessage(multiplier) : "");
 
-        if (!toSell.isEmpty())
+        if (!toSell.isEmpty()) {
             reduceDurablility(e.getPlayer(), 1, e.getItem());
+        }
 
         Block soldContainer = e.getClickedBlock();
 
@@ -84,8 +86,9 @@ public class WSellTool extends WTool implements SellTool {
                     soldItem.getPrice() + " (Multiplier: " + multiplier + ")");
         }
 
-        if (!message.isEmpty())
+        if (!message.isEmpty()) {
             e.getPlayer().sendMessage(message);
+        }
 
         return true;
     }

@@ -36,7 +36,6 @@ public class WorldEditSession {
     private boolean applied = false;
     private int minPriority = SetBlockPriority.values().length;
 
-
     public WorldEditSession(World world) {
         this.world = world;
     }
@@ -53,8 +52,10 @@ public class WorldEditSession {
 
     public boolean setType(Location bukkitLocation, int blockId) {
         ensureNotApplied();
+
         boolean isPlace = blockId != 0;
-        boolean updateBlock = dropLocation == null;
+        boolean updateBlock = this.dropLocation == null;
+
         return this.setType(bukkitLocation, isPlace, vec -> plugin.getNMSWorld().setBlockFast(this.world, vec, blockId, updateBlock), SetBlockPriority.NORMAL);
     }
 
@@ -64,8 +65,9 @@ public class WorldEditSession {
         Vector3 location = Vector3.of(bukkitLocation);
         boolean setTypeResult = this.setTypeInternal(location, isPlace, setBlockFunction, priority.ordinal());
 
-        if (setTypeResult && dropLocation == null)
-            dropLocation = location;
+        if (setTypeResult && this.dropLocation == null) {
+            this.dropLocation = location;
+        }
 
         return setTypeResult;
     }
@@ -75,8 +77,11 @@ public class WorldEditSession {
 
         if (isLocationValid(location)) {
             BlockData blockData = new BlockData(location, isPlace, setBlockFunction, priority);
-            if (this.minPriority > priority)
+
+            if (this.minPriority > priority) {
                 this.minPriority = priority;
+            }
+
             return setDirty(blockData);
         }
 
@@ -86,8 +91,9 @@ public class WorldEditSession {
     public void addDrops(List<ItemStack> drops) {
         ensureNotApplied();
 
-        if (this.itemsToDrop == null)
+        if (this.itemsToDrop == null) {
             this.itemsToDrop = new ItemStackMap();
+        }
 
         this.itemsToDrop.addItems(drops);
     }
@@ -138,24 +144,26 @@ public class WorldEditSession {
             orb.setExperience(this.expToDrop);
         }
 
-        applied = true;
+        this.applied = true;
     }
 
     private boolean setDirty(BlockData blockData) {
-        if (this.affectedBlocks.containsKey(blockData.location))
+        if (this.affectedBlocks.containsKey(blockData.location)) {
             return false;
+        }
 
         this.affectedBlocks.put(blockData.location, blockData);
 
         Vector2 chunk = new Vector2(blockData.location.getX() >> 4, blockData.location.getZ() >> 4);
-        affectedBlocksByChunks.computeIfAbsent(chunk, c -> new LinkedList<>()).add(blockData);
+        this.affectedBlocksByChunks.computeIfAbsent(chunk, c -> new LinkedList<>()).add(blockData);
 
         return true;
     }
 
     private void ensureNotApplied() {
-        if (applied)
+        if (this.applied) {
             throw new IllegalStateException("Cannot use an already applied session");
+        }
     }
 
     private boolean isLocationValid(Vector3 location) {
@@ -172,8 +180,10 @@ public class WorldEditSession {
 
             for (BlockData blockData : affectedBlocks) {
                 if (blockData.priority > priority) {
-                    if (chunkLeftOvers == null)
+                    if (chunkLeftOvers == null) {
                         chunkLeftOvers = leftOvers.computeIfAbsent(chunkVector, v -> new LinkedList<>());
+                    }
+
                     chunkLeftOvers.add(blockData);
                 } else {
                     blockData.setBlockFunction.run(blockData.location);

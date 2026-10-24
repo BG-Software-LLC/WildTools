@@ -12,7 +12,7 @@ import org.bukkit.event.Event;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -28,7 +28,7 @@ public class WMagnetTool extends WTool implements MagnetTool {
 
     @Override
     public int getRadius() {
-        return radius;
+        return this.radius;
     }
 
     @Override
@@ -44,21 +44,23 @@ public class WMagnetTool extends WTool implements MagnetTool {
     }
 
     private void handleUse(Player player, ItemStack usedItem, Event e) {
-        List<Item> nearbyItems = player.getNearbyEntities(radius, radius, radius).stream()
+        List<Item> nearbyItems = player.getNearbyEntities(this.radius, this.radius, this.radius).stream()
                 .filter(entity -> entity instanceof Item).map(entity -> (Item) entity).collect(Collectors.toList());
 
         ItemStack originalItem = usedItem.clone();
 
         boolean reduceDurability = false;
 
-        List<Item> affectedItems = new ArrayList<>();
+        List<Item> affectedItems = new LinkedList<>();
 
         for (Item item : nearbyItems) {
-            if (!item.isValid() || item.isDead())
+            if (!item.isValid() || item.isDead()) {
                 continue;
+            }
 
-            if (EventsSimulation.simulateItemPickupEvent(player, item, true))
+            if (EventsSimulation.simulateItemPickupEvent(player, item, true)) {
                 continue;
+            }
 
             ItemStack itemStack = plugin.getProviders().getStackedItemProvider().getItemStack(item);
 
@@ -68,20 +70,20 @@ public class WMagnetTool extends WTool implements MagnetTool {
                 affectedItems.add(item);
                 item.remove();
                 plugin.getNMSAdapter().playPickupAnimation(player, item);
-                reduceDurability = true;
             } else {
                 ItemStack additionalItem = additionalItems.get(0);
                 affectedItems.add(item);
                 plugin.getProviders().getStackedItemProvider().setItemStack(item, additionalItem);
-                reduceDurability = true;
             }
+
+            reduceDurability = true;
         }
 
         MagnetWandUseEvent magnetWandUseEvent = new MagnetWandUseEvent(player, this, affectedItems);
         Bukkit.getPluginManager().callEvent(magnetWandUseEvent);
 
         if (reduceDurability) {
-            // We need to check if the held item is different than the used item.
+            // We need to check if the held item is different from the used item.
             // If it is, we need to split it so a duplication glitch doesn't occur
             if (originalItem.equals(usedItem)) {
                 reduceDurablility(player, 1, usedItem);

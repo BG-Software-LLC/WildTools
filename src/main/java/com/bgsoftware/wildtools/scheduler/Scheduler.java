@@ -27,10 +27,6 @@ public class Scheduler {
 
     }
 
-    public static void initialize() {
-        // Do nothing, load static initializer
-    }
-
     public static boolean isRegionScheduler() {
         return IMP.isRegionScheduler();
     }
@@ -67,6 +63,7 @@ public class Scheduler {
         return runTask(task, 0L);
     }
 
+    @SuppressWarnings("UnusedReturnValue")
     public static ScheduledTask runTaskAsync(Runnable task) {
         return runTaskAsync(task, 0L);
     }

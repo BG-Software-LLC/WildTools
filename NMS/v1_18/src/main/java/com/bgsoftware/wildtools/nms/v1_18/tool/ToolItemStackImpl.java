@@ -1,6 +1,5 @@
 package com.bgsoftware.wildtools.nms.v1_18.tool;
 
-import com.bgsoftware.wildtools.utils.items.ToolItemStack;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ItemStack;
 

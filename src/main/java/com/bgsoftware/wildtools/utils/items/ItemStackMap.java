@@ -54,11 +54,13 @@ public class ItemStackMap extends ForwardingMap<ItemStack, Counter> {
     }
 
     private static ItemStack getItemStackAsKey(ItemStack itemStack) {
-        if (itemStack.getAmount() == 1)
+        if (itemStack.getAmount() == 1) {
             return itemStack;
+        }
 
         ItemStack itemKey = itemStack.clone();
         itemKey.setAmount(1);
+
         return itemKey;
     }
 
