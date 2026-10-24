@@ -113,12 +113,12 @@ public class CommandInfo implements ICommand {
             String arg = args[1].toLowerCase();
 
             for (Tool tool : plugin.getToolsManager().getTools()) {
-                if (tool.getName().toLowerCase().startsWith(arg)) {
+                if (tool.getName().toLowerCase().contains(arg)) {
                     list.add(tool.getName());
                 }
             }
 
-            return Collections.unmodifiableList(list);
+            return list;
         }
 
         return Collections.emptyList();

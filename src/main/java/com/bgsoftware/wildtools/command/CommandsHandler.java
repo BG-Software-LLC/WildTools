@@ -6,7 +6,6 @@ import com.bgsoftware.wildtools.WildToolsPlugin;
 import com.bgsoftware.wildtools.command.commands.CommandInfo;
 import com.bgsoftware.wildtools.command.commands.CommandList;
 import com.bgsoftware.wildtools.command.commands.CommandReload;
-
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;

@@ -100,22 +100,31 @@ public class CommandGive implements ICommand {
 
     @Override
     public List<String> tabComplete(WildToolsPlugin plugin, CommandSender sender, String[] args) {
-        if (args.length == 3) {
+        if (args.length == 2) {
+            List<String> list = new LinkedList<>();
+            String arg = args[1].toLowerCase();
+
+            for (Player player : plugin.getNMSAdapter().getOnlinePlayers()) {
+                if (player.getName().toLowerCase().contains(arg)) {
+                    list.add(player.getName());
+                }
+            }
+
+            return list;
+        } else if (args.length == 3) {
             List<String> list = new LinkedList<>();
             String arg = args[2].toLowerCase();
 
             for (Tool tool : plugin.getToolsManager().getTools()) {
-                if (tool.getName().toLowerCase().startsWith(arg)) {
+                if (tool.getName().toLowerCase().contains(arg)) {
                     list.add(tool.getName());
                 }
             }
 
-            return Collections.unmodifiableList(list);
-        } else if (args.length >= 4) {
-            return Collections.emptyList();
+            return list;
         }
 
-        return null;
+        return Collections.emptyList();
     }
 
 }
