@@ -97,7 +97,7 @@ public class BukkitUtils {
             boolean result;
 
             if ((tool != null && tool.isOmni()) || originalType.hasGravity() || shouldForceUpdate(block)) {
-                result = editSession.setType(blockLocation, false, vec -> block.setType(Material.AIR), WorldEditSession.SetBlockPriority.UPDATES);
+                result = editSession.setAirWithPhysics(blockLocation);
             } else {
                 result = editSession.setAir(blockLocation);
             }
