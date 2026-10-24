@@ -15,7 +15,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -79,7 +78,7 @@ public class ItemUtils {
         }
 
         if (itemMeta.hasLore()) {
-            List<String> lore = new ArrayList<>();
+            List<String> lore = new LinkedList<>();
 
             for (String line : tool.getItemStack().getItemMeta().getLore()) {
                 lore.add(line

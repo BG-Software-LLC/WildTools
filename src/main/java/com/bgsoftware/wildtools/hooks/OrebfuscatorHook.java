@@ -12,6 +12,7 @@ import org.bukkit.block.Block;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -79,7 +80,7 @@ public final class OrebfuscatorHook {
                 continue;
             }
 
-            List<Vector3> positions = new ArrayList<>();
+            List<Vector3> positions = new LinkedList<>();
             int maxBlocks = maxBlocksPerChunkPerSession <= 0 ? affectedBlocks.size() :
                     Math.min(affectedBlocks.size(), maxBlocksPerChunkPerSession);
 
@@ -93,7 +94,7 @@ public final class OrebfuscatorHook {
                 }
 
                 int endIndex = Math.min(index + maxBlocksPerBatch, positions.size());
-                List<Vector3> batch = new ArrayList<>(positions.subList(index, endIndex));
+                List<Vector3> batch = new LinkedList<>(positions.subList(index, endIndex));
 
                 int newPending = PENDING_BLOCKS.addAndGet(batch.size());
                 if (maxPendingBlocks > 0 && newPending > maxPendingBlocks) {

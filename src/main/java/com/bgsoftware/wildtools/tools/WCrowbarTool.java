@@ -14,7 +14,7 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 public class WCrowbarTool extends WTool implements CrowbarTool {
@@ -44,7 +44,7 @@ public class WCrowbarTool extends WTool implements CrowbarTool {
 
         CreatureSpawner creatureSpawner = (CreatureSpawner) e.getClickedBlock().getState();
 
-        List<ItemStack> itemsToDrop = new ArrayList<>();
+        List<ItemStack> itemsToDrop = new LinkedList<>();
 
         plugin.getProviders().getBlockDrops(itemsToDrop, e.getPlayer(), e.getClickedBlock(), true);
 

@@ -23,7 +23,6 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -363,7 +362,7 @@ public class WHarvesterTool extends WTool implements HarvesterTool {
 
         private final boolean hasSellMode;
 
-        private final List<ItemStack> itemsToSell = new ArrayList<>();
+        private final List<ItemStack> itemsToSell = new LinkedList<>();
         private double totalPrice = 0;
         private int totalAmount = 0;
 

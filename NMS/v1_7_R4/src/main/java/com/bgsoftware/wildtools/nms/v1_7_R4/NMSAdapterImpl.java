@@ -32,9 +32,9 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 public class NMSAdapterImpl implements NMSAdapter {
@@ -70,7 +70,7 @@ public class NMSAdapterImpl implements NMSAdapter {
     @SuppressWarnings("unchecked")
     public Collection<Player> getOnlinePlayers() {
         CraftServer craftServer = (CraftServer) Bukkit.getServer();
-        List<CraftPlayer> players = new ArrayList<>();
+        List<CraftPlayer> players = new LinkedList<>();
         try {
             Field playersField = craftServer.getClass().getDeclaredField("playerView");
             playersField.setAccessible(true);

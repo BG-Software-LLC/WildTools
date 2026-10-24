@@ -31,8 +31,8 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedList;
 
 public class NMSAdapterImpl implements NMSAdapter {
 
@@ -65,7 +65,7 @@ public class NMSAdapterImpl implements NMSAdapter {
 
     @Override
     public Collection<Player> getOnlinePlayers() {
-        return new ArrayList<>(Bukkit.getOnlinePlayers());
+        return new LinkedList<>(Bukkit.getOnlinePlayers());
     }
 
     @Override

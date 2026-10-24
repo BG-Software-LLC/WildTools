@@ -10,7 +10,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 @SuppressWarnings("UnusedReturnValue")
@@ -89,7 +89,7 @@ public class ItemBuilder {
 
     public ItemBuilder withLore(String firstLine, List<String> lore) {
         if (this.itemMeta != null && firstLine != null && lore != null && !firstLine.isEmpty()) {
-            ArrayList<String> formattedLore = new ArrayList<>();
+            List<String> formattedLore = new LinkedList<>();
 
             firstLine = ChatColor.translateAlternateColorCodes('&', firstLine);
             formattedLore.add(firstLine);
@@ -111,7 +111,7 @@ public class ItemBuilder {
 
     public ItemBuilder withLore(List<String> lore) {
         if (this.itemMeta != null && lore != null && !lore.isEmpty()) {
-            List<String> formattedLore = new ArrayList<>();
+            List<String> formattedLore = new LinkedList<>();
 
             for (String line : lore) {
                 formattedLore.add(ChatColor.translateAlternateColorCodes('&', line));
@@ -125,7 +125,7 @@ public class ItemBuilder {
 
     public ItemBuilder withLore(String... lore) {
         if (this.itemMeta != null && lore != null && lore.length > 0) {
-            List<String> formattedLore = new ArrayList<>();
+            List<String> formattedLore = new LinkedList<>();
 
             for (String line : lore) {
                 formattedLore.add(ChatColor.translateAlternateColorCodes('&', line));

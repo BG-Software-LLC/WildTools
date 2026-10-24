@@ -13,7 +13,7 @@ import org.bukkit.block.Block;
 import org.bukkit.block.Dispenser;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
@@ -64,7 +64,7 @@ public class WSelection implements Selection {
 
     @Override
     public List<Dispenser> getDispensers(Tool tool){
-        List<Dispenser> dispensers = new ArrayList<>();
+        List<Dispenser> dispensers = new LinkedList<>();
 
         Location min = getMinLocation();
         Location max = getMaxLocation();

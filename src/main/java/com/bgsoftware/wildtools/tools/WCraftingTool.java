@@ -20,10 +20,10 @@ import org.bukkit.inventory.Recipe;
 import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.inventory.ShapelessRecipe;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -59,7 +59,7 @@ public class WCraftingTool extends WTool implements CraftingTool {
         }
 
         Iterator<Recipe> craftings = getCraftings();
-        List<ItemStack> toAdd = new ArrayList<>();
+        List<ItemStack> toAdd = new LinkedList<>();
         int craftedItemsAmount = 0;
 
         while (craftings.hasNext()) {
@@ -68,7 +68,7 @@ public class WCraftingTool extends WTool implements CraftingTool {
 
             //Get the ingredients for the recipe
             if (recipe instanceof ShapedRecipe) {
-                ingredients = getIngredients(recipe, new ArrayList<>(((ShapedRecipe) recipe).getIngredientMap().values()));
+                ingredients = getIngredients(recipe, new LinkedList<>(((ShapedRecipe) recipe).getIngredientMap().values()));
             } else if (recipe instanceof ShapelessRecipe) {
                 ingredients = getIngredients(recipe, ((ShapelessRecipe) recipe).getIngredientList());
             } else if (recipe instanceof FurnaceRecipe) {
@@ -141,7 +141,7 @@ public class WCraftingTool extends WTool implements CraftingTool {
     }
 
     private List<Recipe> parseCraftings(List<String> recipes) {
-        List<Recipe> recipeList = new ArrayList<>();
+        List<Recipe> recipeList = new LinkedList<>();
 
         Iterator<Recipe> bukkitRecipes = Bukkit.recipeIterator();
 
@@ -167,7 +167,7 @@ public class WCraftingTool extends WTool implements CraftingTool {
     @SuppressWarnings("deprecation")
     private List<RecipeChoice> getIngredients(Recipe recipe, List<ItemStack> oldList) {
         Map<RecipeChoice, Integer> counts = new HashMap<>();
-        List<RecipeChoice> ingredients = new ArrayList<>();
+        List<RecipeChoice> ingredients = new LinkedList<>();
 
         for (ItemStack itemStack : oldList) {
             RecipeChoice recipeChoice;
