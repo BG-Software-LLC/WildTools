@@ -112,7 +112,7 @@ public class CommandGive implements ICommand {
 
             return Collections.unmodifiableList(list);
         } else if (args.length >= 4) {
-            return new ArrayList<>();
+            return Collections.emptyList();
         }
 
         return null;
