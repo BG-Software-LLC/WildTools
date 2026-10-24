@@ -32,13 +32,40 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import java.lang.reflect.Field;
 import java.util.Collection;
+import java.util.EnumMap;
 import java.util.LinkedList;
 
 public class NMSAdapterImpl implements NMSAdapter {
 
     private static final ReflectField<ItemStack> ITEM_STACK_HANDLE = new ReflectField<>(CraftItemStack.class, ItemStack.class, "handle");
 
+    private static final EnumMap<Material, DestroySpeedCategory> DESTROY_SPEED_CATEGORIES = new EnumMap<>(Material.class);
+
     private static final Enchantment GLOW_ENCHANT = initializeGlowEnchantment();
+
+    static {
+        ItemStack diamondAxe = new ItemStack(Items.DIAMOND_AXE);
+        ItemStack diamondHoe = new ItemStack(Items.DIAMOND_HOE);
+        ItemStack diamondShovel = new ItemStack(Items.DIAMOND_SHOVEL);
+
+        for (Material material : Material.values()) {
+            if (!material.isBlock()) {
+                continue;
+            }
+
+            Block block = CraftMagicNumbers.getBlock(material);
+
+            if (Items.DIAMOND_AXE.getDestroySpeed(diamondAxe, block) == 8f) {
+                DESTROY_SPEED_CATEGORIES.put(material, DestroySpeedCategory.AXE);
+            } else if (Items.DIAMOND_HOE.getDestroySpeed(diamondHoe, block) == 8f) {
+                DESTROY_SPEED_CATEGORIES.put(material, DestroySpeedCategory.HOE);
+            } else if (Items.DIAMOND_SHOVEL.getDestroySpeed(diamondShovel, block) == 8f) {
+                DESTROY_SPEED_CATEGORIES.put(material, DestroySpeedCategory.SHOVEL);
+            } else {
+                DESTROY_SPEED_CATEGORIES.put(material, DestroySpeedCategory.PICKAXE);
+            }
+        }
+    }
 
     @Override
     public ToolItemStack createToolItemStack(org.bukkit.inventory.ItemStack bukkitItem) {
@@ -111,15 +138,7 @@ public class NMSAdapterImpl implements NMSAdapter {
 
     @Override
     public DestroySpeedCategory getDestroySpeedCategory(Material material) {
-        Block block = CraftMagicNumbers.getBlock(material);
-
-        if (Items.DIAMOND_AXE.getDestroySpeed(new ItemStack(Items.DIAMOND_AXE), block) == 8f)
-            return DestroySpeedCategory.AXE;
-
-        if (Items.DIAMOND_SHOVEL.getDestroySpeed(new ItemStack(Items.DIAMOND_SHOVEL), block) == 8f)
-            return DestroySpeedCategory.SHOVEL;
-
-        return DestroySpeedCategory.PICKAXE;
+        return DESTROY_SPEED_CATEGORIES.getOrDefault(material, DestroySpeedCategory.PICKAXE);
     }
 
     private static Enchantment initializeGlowEnchantment() {

@@ -17,15 +17,12 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.inventory.AnvilMenu;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.state.BlockState;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
 import ${CRAFTBUKKIT_PACKAGE}.CraftWorld;
-import ${CRAFTBUKKIT_PACKAGE}.block.data.CraftBlockData;
 import ${CRAFTBUKKIT_PACKAGE}.entity.CraftItem;
 import ${CRAFTBUKKIT_PACKAGE}.entity.CraftLivingEntity;
 import ${CRAFTBUKKIT_PACKAGE}.inventory.CraftInventoryView;
@@ -43,8 +40,10 @@ import org.bukkit.inventory.RecipeChoice;
 import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.inventory.ShapelessRecipe;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.Tag;
 
 import java.util.Collection;
+import java.util.EnumMap;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -52,6 +51,26 @@ public abstract class AbstractNMSAdapter implements NMSAdapter {
 
     private static final ReflectField<ItemStack> ITEM_STACK_HANDLE = new ReflectField<>(
             CraftItemStack.class, ItemStack.class, "handle");
+
+    private static final EnumMap<Material, DestroySpeedCategory> DESTROY_SPEED_CATEGORIES = new EnumMap<>(Material.class);
+
+    static {
+        for (Material material : Material.values()) {
+            if (material.isLegacy() || !material.isBlock()) {
+                continue;
+            }
+
+            if (Tag.MINEABLE_AXE.isTagged(material)) {
+                DESTROY_SPEED_CATEGORIES.put(material, DestroySpeedCategory.AXE);
+            } else if (Tag.MINEABLE_HOE.isTagged(material)) {
+                DESTROY_SPEED_CATEGORIES.put(material, DestroySpeedCategory.HOE);
+            } else if (Tag.MINEABLE_SHOVEL.isTagged(material)) {
+                DESTROY_SPEED_CATEGORIES.put(material, DestroySpeedCategory.SHOVEL);
+            } else {
+                DESTROY_SPEED_CATEGORIES.put(material, DestroySpeedCategory.PICKAXE);
+            }
+        }
+    }
 
     @Override
     public void loadLegacy() {
@@ -145,15 +164,7 @@ public abstract class AbstractNMSAdapter implements NMSAdapter {
 
     @Override
     public DestroySpeedCategory getDestroySpeedCategory(Material material) {
-        BlockState blockState = ((CraftBlockData) material.createBlockData()).getState();
-
-        if (Items.DIAMOND_AXE.getDestroySpeed(new ItemStack(Items.DIAMOND_AXE), blockState) == 8f)
-            return DestroySpeedCategory.AXE;
-
-        if (Items.DIAMOND_SHOVEL.getDestroySpeed(new ItemStack(Items.DIAMOND_SHOVEL), blockState) == 8f)
-            return DestroySpeedCategory.SHOVEL;
-
-        return DestroySpeedCategory.PICKAXE;
+        return DESTROY_SPEED_CATEGORIES.getOrDefault(material, DestroySpeedCategory.PICKAXE);
     }
 
     @Override
