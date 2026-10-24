@@ -45,11 +45,12 @@ public class NMSAdapterImpl implements NMSAdapter {
     private static final EnumMap<Material, DestroySpeedCategory> DESTROY_SPEED_CATEGORIES = new EnumMap<>(Material.class);
 
     private static final Enchantment GLOW_ENCHANT = initializeGlowEnchantment();
-    private static final ItemStack DIAMOND_AXE_ITEM_STACK = new ItemStack(Items.DIAMOND_AXE);
-    private static final ItemStack DIAMOND_HOE_ITEM_STACK = new ItemStack(Items.DIAMOND_HOE);
-    private static final ItemStack DIAMOND_SPADE_ITEM_STACK = new ItemStack(Items.DIAMOND_SPADE);
 
     static {
+        ItemStack diamondAxe = new ItemStack(Items.DIAMOND_AXE);
+        ItemStack diamondHoe = new ItemStack(Items.DIAMOND_HOE);
+        ItemStack diamondSpade = new ItemStack(Items.DIAMOND_SPADE);
+
         for (Material material : Material.values()) {
             if (!material.isBlock()) {
                 continue;
@@ -57,11 +58,11 @@ public class NMSAdapterImpl implements NMSAdapter {
 
             Block block = CraftMagicNumbers.getBlock(material);
 
-            if (Items.DIAMOND_AXE.getDestroySpeed(DIAMOND_AXE_ITEM_STACK, block) == 8f) {
+            if (Items.DIAMOND_AXE.getDestroySpeed(diamondAxe, block) == 8f) {
                 DESTROY_SPEED_CATEGORIES.put(material, DestroySpeedCategory.AXE);
-            } else if (Items.DIAMOND_HOE.getDestroySpeed(DIAMOND_HOE_ITEM_STACK, block) == 8f) {
+            } else if (Items.DIAMOND_HOE.getDestroySpeed(diamondHoe, block) == 8f) {
                 DESTROY_SPEED_CATEGORIES.put(material, DestroySpeedCategory.HOE);
-            } else if (Items.DIAMOND_SPADE.getDestroySpeed(DIAMOND_SPADE_ITEM_STACK, block) == 8f) {
+            } else if (Items.DIAMOND_SPADE.getDestroySpeed(diamondSpade, block) == 8f) {
                 DESTROY_SPEED_CATEGORIES.put(material, DestroySpeedCategory.SHOVEL);
             } else {
                 DESTROY_SPEED_CATEGORIES.put(material, DestroySpeedCategory.PICKAXE);
