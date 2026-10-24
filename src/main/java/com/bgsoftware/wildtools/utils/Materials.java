@@ -29,6 +29,7 @@ public enum Materials {
     LIGHT_BLUE_STAINED_GLASS_PANE("STAINED_GLASS_PANE", 3),
     ENCHANTED_GOLDEN_APPLE("GOLDEN_APPLE", 1);
 
+    private static final EnumSet<Material> OMNI_TOOLS = EnumSet.noneOf(Material.class);
     private static final Map<Material, EnumSet<Tag>> MATERIAL_TAGS = initializeMaterialTags();
 
     private static int farmlandId = -1;
@@ -117,6 +118,10 @@ public enum Materials {
         return farmlandId;
     }
 
+    public static EnumSet<Material> getOmniTools() {
+        return OMNI_TOOLS;
+    }
+
     public static Optional<Material> getSafeMaterial(String name) {
         try {
             return Optional.of(Material.valueOf(name));
@@ -184,6 +189,10 @@ public enum Materials {
             }
             if (materialName.contains("BUCKET")) {
                 tags.add(Tag.BUCKET);
+            }
+            if (materialName.endsWith("_AXE") || materialName.endsWith("_HOE") || materialName.endsWith("_PICKAXE")
+                    || (ServerVersion.isLegacy() ? materialName.endsWith("_SPADE") : materialName.endsWith("_SHOVEL"))) {
+                OMNI_TOOLS.add(material);
             }
 
             if (!tags.isEmpty())
