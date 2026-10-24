@@ -1,29 +1,41 @@
 package com.bgsoftware.wildtools.utils.world;
 
+import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.wildtools.WildToolsPlugin;
 import com.bgsoftware.wildtools.hooks.listener.IToolBlockListener;
 import com.bgsoftware.wildtools.hooks.OrebfuscatorHook;
+import com.bgsoftware.wildtools.utils.Materials;
 import com.bgsoftware.wildtools.utils.items.ItemStackMap;
 import com.bgsoftware.wildtools.utils.math.NumberUtils;
 import com.bgsoftware.wildtools.utils.math.Vector2;
 import com.bgsoftware.wildtools.utils.math.Vector3;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.entity.ExperienceOrb;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class WorldEditSession {
 
     private static final WildToolsPlugin plugin = WildToolsPlugin.getPlugin();
     private static final int MAX_BLOCK_LOCATION = 29999984;
+    private static final BlockFace[] NEIGHBOUR_FACES = {BlockFace.UP, BlockFace.DOWN, BlockFace.NORTH,
+            BlockFace.SOUTH, BlockFace.WEST, BlockFace.EAST};
+    private static final ReflectMethod<Void> BLOCK_SET_TYPE = new ReflectMethod<>(
+            Block.class, "setType", Material.class, boolean.class);
+    private static final Material PLACEHOLDER = Materials.getSafeMaterial("STRUCTURE_VOID")
+            .orElse(Materials.getSafeMaterial("BARRIER").orElse(null));
 
     private final Map<Vector2, List<BlockData>> affectedBlocksByChunks = new LinkedHashMap<>();
     private final Map<Vector3, BlockData> affectedBlocks = new LinkedHashMap<>();
@@ -58,11 +70,22 @@ public class WorldEditSession {
         return this.setType(bukkitLocation, isPlace, vec -> plugin.getNMSWorld().setBlockFast(this.world, vec, blockId, updateBlock), SetBlockPriority.NORMAL);
     }
 
+    public boolean setAirWithPhysics(Location bukkitLocation) {
+        ensureNotApplied();
+        Block block = bukkitLocation.getBlock();
+        return this.setType(bukkitLocation, false, vec -> block.setType(Material.AIR), SetBlockPriority.UPDATES, true);
+    }
+
     public boolean setType(Location bukkitLocation, boolean isPlace, SetBlockFunction setBlockFunction, SetBlockPriority priority) {
+        return this.setType(bukkitLocation, isPlace, setBlockFunction, priority, false);
+    }
+
+    private boolean setType(Location bukkitLocation, boolean isPlace, SetBlockFunction setBlockFunction,
+                            SetBlockPriority priority, boolean breakWithPhysics) {
         ensureNotApplied();
 
         Vector3 location = Vector3.of(bukkitLocation);
-        boolean setTypeResult = this.setTypeInternal(location, isPlace, setBlockFunction, priority.ordinal());
+        boolean setTypeResult = this.setTypeInternal(location, isPlace, setBlockFunction, priority.ordinal(), breakWithPhysics);
 
         if (setTypeResult && dropLocation == null)
             dropLocation = location;
@@ -70,11 +93,12 @@ public class WorldEditSession {
         return setTypeResult;
     }
 
-    private boolean setTypeInternal(Vector3 location, boolean isPlace, SetBlockFunction setBlockFunction, int priority) {
+    private boolean setTypeInternal(Vector3 location, boolean isPlace, SetBlockFunction setBlockFunction, int priority,
+                                    boolean breakWithPhysics) {
         ensureNotApplied();
 
         if (isLocationValid(location)) {
-            BlockData blockData = new BlockData(location, isPlace, setBlockFunction, priority);
+            BlockData blockData = new BlockData(location, isPlace, setBlockFunction, priority, breakWithPhysics);
             if (this.minPriority > priority)
                 this.minPriority = priority;
             return setDirty(blockData);
@@ -166,6 +190,7 @@ public class WorldEditSession {
 
     private static Map<Vector2, List<BlockData>> applyBlocksByPriority(World world, Map<Vector2, List<BlockData>> affectedBlocksByChunks, int priority) {
         Map<Vector2, List<BlockData>> leftOvers = new LinkedHashMap<>();
+        List<BlockData> blocksToApply = new LinkedList<>();
 
         affectedBlocksByChunks.forEach((chunkVector, affectedBlocks) -> {
             List<BlockData> chunkLeftOvers = null;
@@ -176,14 +201,56 @@ public class WorldEditSession {
                         chunkLeftOvers = leftOvers.computeIfAbsent(chunkVector, v -> new LinkedList<>());
                     chunkLeftOvers.add(blockData);
                 } else {
-                    blockData.setBlockFunction.run(blockData.location);
-                    plugin.getProviders().notifyToolBlockListeners(world, blockData.location, blockData.isPlace ?
-                            IToolBlockListener.Action.BLOCK_PLACE : IToolBlockListener.Action.BLOCK_BREAK);
+                    blocksToApply.add(blockData);
                 }
             }
         });
 
+        // Updates of a block broken with physics could reach blocks of the session that are still waiting: an attached
+        // ladder would pop and drop its items a second time. So these neighbours become placeholders first, with no
+        // neighbour updates, and only the blocks outside the session react.
+        Set<Vector3> waitingBlocks = new HashSet<>();
+        if (PLACEHOLDER != null && BLOCK_SET_TYPE.isValid()) {
+            for (BlockData blockData : blocksToApply) {
+                if (blockData.breakWithPhysics)
+                    waitingBlocks.add(blockData.location);
+            }
+        }
+
+        List<Block> placeholders = new LinkedList<>();
+
+        try {
+            for (BlockData blockData : blocksToApply) {
+                if (blockData.breakWithPhysics && !waitingBlocks.isEmpty()) {
+                    waitingBlocks.remove(blockData.location);
+                    placePlaceholders(world, blockData.location, waitingBlocks, placeholders);
+                }
+
+                blockData.setBlockFunction.run(blockData.location);
+                plugin.getProviders().notifyToolBlockListeners(world, blockData.location, blockData.isPlace ?
+                        IToolBlockListener.Action.BLOCK_PLACE : IToolBlockListener.Action.BLOCK_BREAK);
+            }
+        } finally {
+            // Never leave a placeholder in the world, even if something above failed.
+            for (Block block : placeholders) {
+                if (block.getType() == PLACEHOLDER)
+                    BLOCK_SET_TYPE.invoke(block, Material.AIR, false);
+            }
+        }
+
         return leftOvers;
+    }
+
+    private static void placePlaceholders(World world, Vector3 location, Set<Vector3> waitingBlocks, List<Block> placeholders) {
+        for (BlockFace blockFace : NEIGHBOUR_FACES) {
+            Vector3 neighbour = new Vector3(location.getX() + blockFace.getModX(),
+                    location.getY() + blockFace.getModY(), location.getZ() + blockFace.getModZ());
+            if (waitingBlocks.remove(neighbour)) {
+                Block block = neighbour.toLocation(world).getBlock();
+                BLOCK_SET_TYPE.invoke(block, PLACEHOLDER, false);
+                placeholders.add(block);
+            }
+        }
     }
 
     public static class BlockData {
@@ -192,12 +259,15 @@ public class WorldEditSession {
         public final boolean isPlace;
         public final SetBlockFunction setBlockFunction;
         public final int priority;
+        public final boolean breakWithPhysics;
 
-        public BlockData(Vector3 location, boolean isPlace, SetBlockFunction setBlockFunction, int priority) {
+        public BlockData(Vector3 location, boolean isPlace, SetBlockFunction setBlockFunction, int priority,
+                         boolean breakWithPhysics) {
             this.location = location;
             this.isPlace = isPlace;
             this.setBlockFunction = setBlockFunction;
             this.priority = priority;
+            this.breakWithPhysics = breakWithPhysics;
         }
 
     }
