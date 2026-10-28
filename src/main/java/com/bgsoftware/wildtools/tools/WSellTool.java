@@ -34,7 +34,10 @@ public class WSellTool extends WTool implements SellTool {
             return false;
         }
 
-        if (!BukkitUtils.canInteractBlock(e.getPlayer(), e.getClickedBlock(), e.getItem()))
+        if (!BukkitUtils.hasInteractAccess(e.getPlayer(), e.getClickedBlock(), e.getItem()))
+            return false;
+
+        if (!BukkitUtils.canInteractBlock(e.getPlayer(), e.getClickedBlock(), this))
             return false;
 
         BlockState blockState = e.getClickedBlock().getState();

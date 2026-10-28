@@ -31,7 +31,10 @@ public class WSortTool extends WTool implements SortTool {
 
     @Override
     public boolean onBlockInteract(PlayerInteractEvent e) {
-        if (!BukkitUtils.canInteractBlock(e.getPlayer(), e.getClickedBlock(), e.getItem()))
+        if (!BukkitUtils.hasInteractAccess(e.getPlayer(), e.getClickedBlock(), e.getItem()))
+            return false;
+
+        if (!BukkitUtils.canInteractBlock(e.getPlayer(), e.getClickedBlock(), this))
             return false;
 
         if (e.getClickedBlock().getType() != Material.CHEST && e.getClickedBlock().getType() != Material.TRAPPED_CHEST) {
