@@ -1,4 +1,4 @@
-group 'Hooks:Towny'
+group 'Hooks:Towny98'
 
 dependencies {
     compileOnly "com.palmergames:Towny:0.98.0.0"
@@ -7,7 +7,7 @@ dependencies {
     compileOnly project(":")
 }
 
-if (project.hasProperty('hook.compile_towny') &&
-        !Boolean.valueOf(project.findProperty("hook.compile_towny").toString())) {
+if (project.hasProperty('hook.compile_towny98') &&
+        !Boolean.valueOf(project.findProperty("hook.compile_towny98").toString())) {
     project.tasks.all { task -> task.enabled = false }
 }

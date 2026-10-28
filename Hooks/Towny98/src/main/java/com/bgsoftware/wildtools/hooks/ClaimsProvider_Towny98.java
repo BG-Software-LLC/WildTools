@@ -4,12 +4,12 @@ import com.bgsoftware.wildtools.api.hooks.ClaimsProvider;
 import com.palmergames.bukkit.towny.TownyAPI;
 import com.palmergames.bukkit.towny.exceptions.NotRegisteredException;
 import com.palmergames.bukkit.towny.object.Resident;
-import com.palmergames.bukkit.towny.object.Town;
 import com.palmergames.bukkit.towny.object.TownBlock;
+import com.palmergames.bukkit.towny.object.WorldCoord;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
-public class ClaimsProvider_Towny implements ClaimsProvider {
+public class ClaimsProvider_Towny98 implements ClaimsProvider {
 
     @Override
     public boolean isPlayerClaim(Player player, Location location) {
@@ -17,20 +17,21 @@ public class ClaimsProvider_Towny implements ClaimsProvider {
 
         try {
             Resident resident = towny.getResident(player.getName());
+
             if (resident == null || !resident.hasTown()) {
                 return false;
             }
 
-            TownBlock locationTownBlock = towny.getTownBlock(location);
-            if (locationTownBlock == null) {
+            TownBlock townBlock = WorldCoord.parseWorldCoord(location).getTownBlock();
+
+            if (townBlock == null) {
                 return false;
             }
 
-            Town residentTown = resident.getTown();
-
-            return residentTown.hasTownBlock(locationTownBlock);
-        } catch (NotRegisteredException ex) {
+            return resident.getTown().hasTownBlock(townBlock);
+        } catch (NotRegisteredException e) {
             return false;
         }
     }
+
 }
