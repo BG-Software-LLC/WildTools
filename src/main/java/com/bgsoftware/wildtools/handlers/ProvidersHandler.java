@@ -368,8 +368,15 @@ public class ProvidersHandler implements ProvidersManager {
             claimsProvider.ifPresent(this::addClaimsProvider);
         }
         if (Bukkit.getPluginManager().isPluginEnabled("Towny")) {
-            Optional<ClaimsProvider> claimsProvider = createInstance("ClaimsProvider_Towny");
-            claimsProvider.ifPresent(this::addClaimsProvider);
+            Plugin plugin = Bukkit.getPluginManager().getPlugin("Towny");
+            int version = Integer.parseInt(plugin.getDescription().getVersion().split("\\.")[1]);
+            if (version < 98) {
+                Optional<ClaimsProvider> claimsProvider = createInstance("ClaimsProvider_Towny96");
+                claimsProvider.ifPresent(this::addClaimsProvider);
+            } else {
+                Optional<ClaimsProvider> claimsProvider = createInstance("ClaimsProvider_Towny98");
+                claimsProvider.ifPresent(this::addClaimsProvider);
+            }
         }
         if (Bukkit.getPluginManager().isPluginEnabled("Villages")) {
             Optional<ClaimsProvider> claimsProvider = createInstance("ClaimsProvider_Villages");
