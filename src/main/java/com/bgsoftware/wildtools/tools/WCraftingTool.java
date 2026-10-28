@@ -44,8 +44,13 @@ public class WCraftingTool extends WTool implements CraftingTool {
 
     @Override
     public boolean onBlockInteract(PlayerInteractEvent e) {
-        if ((e.getClickedBlock().getType() != Material.CHEST && e.getClickedBlock().getType() != Material.TRAPPED_CHEST) ||
-                !BukkitUtils.canInteractBlock(e.getPlayer(), e.getClickedBlock(), e.getItem()))
+        if ((e.getClickedBlock().getType() != Material.CHEST && e.getClickedBlock().getType() != Material.TRAPPED_CHEST))
+            return false;
+
+        if (!BukkitUtils.hasInteractAccess(e.getPlayer(), e.getClickedBlock(), e.getItem()))
+            return false;
+
+        if (!BukkitUtils.canInteractBlock(e.getPlayer(), e.getClickedBlock(), this))
             return false;
 
         BlockState blockState = e.getClickedBlock().getState();
