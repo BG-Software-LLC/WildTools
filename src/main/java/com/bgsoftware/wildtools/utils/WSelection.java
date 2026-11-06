@@ -76,9 +76,19 @@ public class WSelection implements Selection {
                 for (int z = min.getBlockZ(); z <= max.getBlockZ(); z++) {
                     Block block = world.getBlockAt(x, y, z);
 
-                    if (block.getType() == Material.DISPENSER && BukkitUtils.canInteractBlock(player, block, player.getItemInHand())) {
-                        dispensers.add((Dispenser) block.getState());
+                    if (block.getType() != Material.DISPENSER) {
+                        continue;
                     }
+
+                    if (!BukkitUtils.hasInteractAccess(player, block, player.getItemInHand())) {
+                        continue;
+                    }
+
+                    if (!BukkitUtils.canInteractBlock(player, block, tool)) {
+                        continue;
+                    }
+
+                    dispensers.add((Dispenser) block.getState());
                 }
             }
         }
