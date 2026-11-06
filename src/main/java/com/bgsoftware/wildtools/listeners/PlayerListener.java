@@ -1,5 +1,6 @@
 package com.bgsoftware.wildtools.listeners;
 
+import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.wildtools.WildToolsPlugin;
 import com.bgsoftware.wildtools.api.objects.tools.Tool;
 import com.bgsoftware.wildtools.scheduler.Scheduler;
@@ -23,11 +24,18 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
 public class PlayerListener implements Listener {
+
+    private static final ReflectMethod<List<ItemStack>> PLAYER_DEATH_EVENT_GET_ITEMS_TO_KEEP = new ReflectMethod<>(
+            PlayerDeathEvent.class, "getItemsToKeep");
+    private static final ReflectMethod<Boolean> PLAYER_DEATH_EVENT_GET_KEEP_INVENTORY = new ReflectMethod<>(
+            PlayerDeathEvent.class, "getKeepInventory");
 
     private final Map<UUID, LinkedList<ItemStack>> keepInventoryTools = new HashMap<>();
 
@@ -66,8 +74,33 @@ public class PlayerListener implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.LOWEST)
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onPlayerDeath(PlayerDeathEvent e) {
+        if (PLAYER_DEATH_EVENT_GET_KEEP_INVENTORY.isValid() &&
+                PLAYER_DEATH_EVENT_GET_KEEP_INVENTORY.invokeWithDef(e, false))
+            return;
+
+        if (PLAYER_DEATH_EVENT_GET_ITEMS_TO_KEEP.isValid()) {
+            List<ItemStack> itemsToKeep = PLAYER_DEATH_EVENT_GET_ITEMS_TO_KEEP.invoke(e);
+            if (itemsToKeep == null)
+                return;
+
+            Iterator<ItemStack> drops = e.getDrops().iterator();
+
+            while (drops.hasNext()) {
+                ItemStack itemStack = drops.next();
+                Tool tool = plugin.getToolsManager().getTool(itemStack);
+
+                if (tool == null || !tool.hasKeepInventory())
+                    continue;
+
+                drops.remove();
+                itemsToKeep.add(itemStack);
+            }
+
+            return;
+        }
+
         Inventory inventory = e.getEntity().getInventory();
 
         LinkedList<ItemStack> keepInventoryItems = null;

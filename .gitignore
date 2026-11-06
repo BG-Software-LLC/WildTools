@@ -5,10 +5,12 @@ gradle.properties
 # Ignore Gradle build output directory
 build
 
-# Ignore intellij files
+# Ignore Editor files
 .idea
 *.iml
+.vscode
 
 # Ignore output generated files
 target
 out
+bin
