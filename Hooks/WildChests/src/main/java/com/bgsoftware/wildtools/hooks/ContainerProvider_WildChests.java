@@ -14,9 +14,9 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import java.math.BigInteger;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -110,7 +110,7 @@ public class ContainerProvider_WildChests implements ExtendedContainerProvider {
 
     @Override
     public List<Inventory> getAllInventories(BlockState blockState, Inventory chestInventory) {
-        List<Inventory> inventories = new ArrayList<>();
+        List<Inventory> inventories = new LinkedList<>();
 
         Chest chest = WildChestsAPI.getChest(blockState.getLocation());
         if (chest instanceof StorageChest) {

@@ -24,8 +24,11 @@ public class WPillarTool extends WTool implements PillarTool {
 
     @Override
     public boolean onBlockInteract(PlayerInteractEvent e) {
-        int maxY = getPoint(e.getClickedBlock(), true), minY = getPoint(e.getClickedBlock(), false),
-                x = e.getClickedBlock().getLocation().getBlockX(), z = e.getClickedBlock().getLocation().getBlockZ();
+        int maxY = getPoint(e.getClickedBlock(), true);
+        int minY = getPoint(e.getClickedBlock(), false);
+
+        int x = e.getClickedBlock().getLocation().getBlockX();
+        int z = e.getClickedBlock().getLocation().getBlockZ();
 
         BlockMaterial firstBlockMaterial = BlockMaterial.of(e.getClickedBlock());
 
@@ -37,16 +40,19 @@ public class WPillarTool extends WTool implements PillarTool {
         int toolUsages = 0;
 
         for (int y = maxY; y >= minY; y--) {
-            if (usingDurability && toolUsages >= toolDurability)
+            if (usingDurability && toolUsages >= toolDurability) {
                 break;
+            }
 
             Block targetBlock = world.getBlockAt(x, y, z);
 
-            if (!BukkitUtils.canBreakBlock(e.getPlayer(), targetBlock, firstBlockMaterial, this))
+            if (!BukkitUtils.canBreakBlock(e.getPlayer(), targetBlock, firstBlockMaterial, this)) {
                 continue;
+            }
 
-            if (!BukkitUtils.breakBlock(e.getPlayer(), targetBlock, e.getItem(), this, editSession, null))
+            if (!BukkitUtils.breakBlock(e.getPlayer(), targetBlock, e.getItem(), this, editSession, null)) {
                 break;
+            }
 
             toolUsages++;
         }
@@ -54,13 +60,15 @@ public class WPillarTool extends WTool implements PillarTool {
         PillarWandUseEvent pillarWandUseEvent = new PillarWandUseEvent(e.getPlayer(), this, editSession.getAffectedBlocks());
         Bukkit.getPluginManager().callEvent(pillarWandUseEvent);
 
-        if (pillarWandUseEvent.isCancelled())
+        if (pillarWandUseEvent.isCancelled()) {
             return true;
+        }
 
         editSession.apply();
 
-        if (toolUsages > 0)
+        if (toolUsages > 0) {
             reduceDurablility(e.getPlayer(), usingDurability ? toolUsages : 1, e.getItem());
+        }
 
         return true;
     }
@@ -69,10 +77,11 @@ public class WPillarTool extends WTool implements PillarTool {
         Location loc = block.getLocation().clone();
         boolean isSameBlock = true;
 
-        //Find max block
         if (max) {
+            //Find max block
             while (isSameBlock) {
                 loc.add(0, 1, 0);
+
                 if (loc.getBlockY() > block.getWorld().getMaxHeight()) {
                     isSameBlock = false;
                 } else {
@@ -80,12 +89,11 @@ public class WPillarTool extends WTool implements PillarTool {
                     isSameBlock = canBreakBlock(block, blockMaterial.getType(), blockMaterial.getData());
                 }
             }
-        }
-
-        //Find min block
-        else {
+        } else {
+            //Find min block
             while (isSameBlock) {
                 loc = loc.subtract(0, 1, 0);
+
                 if (loc.getBlockY() < MIN_WORLD_HEIGHT) {
                     isSameBlock = false;
                 } else {

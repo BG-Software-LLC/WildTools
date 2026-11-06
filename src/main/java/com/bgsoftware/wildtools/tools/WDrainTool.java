@@ -30,17 +30,19 @@ public class WDrainTool extends WTool implements DrainTool {
 
     @Override
     public boolean onBlockInteract(PlayerInteractEvent e) {
-        return handleUse(e.getPlayer(), e.getItem(), e.getPlayer().getLocation().getBlock());
+        handleUse(e.getPlayer(), e.getItem(), e.getPlayer().getLocation().getBlock());
+        return true;
     }
 
     @Override
     public boolean onAirInteract(PlayerInteractEvent e) {
-        return handleUse(e.getPlayer(), e.getItem(), e.getPlayer().getLocation().getBlock());
+        handleUse(e.getPlayer(), e.getItem(), e.getPlayer().getLocation().getBlock());
+        return true;
     }
 
-    private boolean handleUse(Player player, ItemStack usedItem, Block block) {
-        Location max = block.getLocation().clone().add(radius, radius, radius),
-                min = block.getLocation().clone().subtract(radius, radius, radius);
+    private void handleUse(Player player, ItemStack usedItem, Block block) {
+        Location max = block.getLocation().clone().add(radius, radius, radius);
+        Location min = block.getLocation().clone().subtract(radius, radius, radius);
 
         World world = block.getWorld();
 
@@ -53,18 +55,21 @@ public class WDrainTool extends WTool implements DrainTool {
         for (int x = min.getBlockX(); x <= max.getBlockX(); x++) {
             for (int z = min.getBlockZ(); z <= max.getBlockZ(); z++) {
                 for (int y = max.getBlockY(); y >= min.getBlockY(); y--) {
-                    if (usingDurability && toolUsages >= toolDurability)
+                    if (usingDurability && toolUsages >= toolDurability) {
                         break outerLoop;
+                    }
 
                     Block targetBlock = world.getBlockAt(x, y, z);
 
                     if (targetBlock.getType() != Material.ICE || !BukkitUtils.canBreakBlock(player, targetBlock, this) ||
-                            !BukkitUtils.hasBreakAccess(targetBlock, player))
+                            !BukkitUtils.hasBreakAccess(targetBlock, player)) {
                         continue;
+                    }
 
                     boolean result = editSession.setAir(targetBlock.getLocation());
-                    if (result)
+                    if (result) {
                         toolUsages++;
+                    }
                 }
             }
         }
@@ -72,15 +77,15 @@ public class WDrainTool extends WTool implements DrainTool {
         DrainWandUseEvent drainWandUseEvent = new DrainWandUseEvent(player, this, editSession.getAffectedBlocks());
         Bukkit.getPluginManager().callEvent(drainWandUseEvent);
 
-        if (drainWandUseEvent.isCancelled())
-            return true;
+        if (drainWandUseEvent.isCancelled()) {
+            return;
+        }
 
         editSession.apply();
 
-        if (toolUsages > 0)
+        if (toolUsages > 0) {
             reduceDurablility(player, usingDurability ? toolUsages : 1, usedItem);
-
-        return true;
+        }
     }
 
 }

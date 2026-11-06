@@ -17,7 +17,7 @@ public class SellWandLogger {
 
     @SuppressWarnings("all")
     public static void setLogsFile(String logsFilePath){
-        if(logsFilePath.isEmpty()){
+        if (logsFilePath.isEmpty()) {
             enabled = false;
             return;
         }
@@ -27,7 +27,7 @@ public class SellWandLogger {
         FileHandler fileHandler;
 
         try {
-            if(!file.exists()){
+            if (!file.exists()) {
                 file.getParentFile().mkdirs();
                 file.createNewFile();
             }
@@ -44,11 +44,13 @@ public class SellWandLogger {
     }
 
     public static void log(String line){
-        if(enabled)
+        if (enabled) {
             LOGGER.info(line);
+        }
     }
 
-    public static void close(){
+    public static void close() {
+
     }
 
     private static class LogsFormatter extends Formatter{

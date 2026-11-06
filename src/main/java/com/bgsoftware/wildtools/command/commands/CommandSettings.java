@@ -6,6 +6,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import com.bgsoftware.wildtools.WildToolsPlugin;
 
+import java.util.Collections;
 import java.util.List;
 
 public class CommandSettings implements ICommand {
@@ -42,7 +43,7 @@ public class CommandSettings implements ICommand {
 
     @Override
     public void run(WildToolsPlugin plugin, CommandSender sender, String[] args) {
-        if(!(sender instanceof Player)){
+        if (!(sender instanceof Player)) {
             sender.sendMessage(ChatColor.RED + "Only players can perform this command.");
             return;
         }
@@ -54,6 +55,7 @@ public class CommandSettings implements ICommand {
 
     @Override
     public List<String> tabComplete(WildToolsPlugin plugin, CommandSender sender, String[] args) {
-        return null;
+        return Collections.emptyList();
     }
+
 }

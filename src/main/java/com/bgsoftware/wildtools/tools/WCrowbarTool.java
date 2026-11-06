@@ -14,7 +14,7 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 public class WCrowbarTool extends WTool implements CrowbarTool {
@@ -28,21 +28,23 @@ public class WCrowbarTool extends WTool implements CrowbarTool {
 
     @Override
     public List<String> getCommandsOnUse() {
-        return commandsOnUse;
+        return this.commandsOnUse;
     }
 
     @Override
     public boolean onBlockInteract(PlayerInteractEvent e) {
-        if (!Materials.isSpawner(e.getClickedBlock().getType()))
+        if (!Materials.isSpawner(e.getClickedBlock().getType())) {
             return false;
+        }
 
         if (!BukkitUtils.canBreakBlock(e.getPlayer(), e.getClickedBlock(), this) ||
-                !BukkitUtils.hasBreakAccess(e.getClickedBlock(), e.getPlayer()))
+                !BukkitUtils.hasBreakAccess(e.getClickedBlock(), e.getPlayer())) {
             return true;
+        }
 
         CreatureSpawner creatureSpawner = (CreatureSpawner) e.getClickedBlock().getState();
 
-        List<ItemStack> itemsToDrop = new ArrayList<>();
+        List<ItemStack> itemsToDrop = new LinkedList<>();
 
         plugin.getProviders().getBlockDrops(itemsToDrop, e.getPlayer(), e.getClickedBlock(), true);
 
@@ -58,22 +60,26 @@ public class WCrowbarTool extends WTool implements CrowbarTool {
         WorldEditSession editSession = new WorldEditSession(e.getClickedBlock().getWorld());
 
         try {
-            if (!BukkitUtils.breakBlock(e.getPlayer(), e.getClickedBlock(), e.getItem(), this, editSession, itemStack -> null))
+            if (!BukkitUtils.breakBlock(e.getPlayer(), e.getClickedBlock(), e.getItem(), this, editSession, itemStack -> null)) {
                 return true;
+            }
         } finally {
-            if (addedSilktouch)
+            if (addedSilktouch) {
                 e.getItem().removeEnchantment(Enchantment.SILK_TOUCH);
+            }
         }
 
         CrowbarWandUseEvent crowbarWandUseEvent = new CrowbarWandUseEvent(e.getPlayer(), this, e.getClickedBlock());
         Bukkit.getPluginManager().callEvent(crowbarWandUseEvent);
 
-        if (crowbarWandUseEvent.isCancelled())
+        if (crowbarWandUseEvent.isCancelled()) {
             return true;
+        }
 
         if (commandsOnUse.isEmpty()) {
             if (!itemsToDrop.isEmpty()) {
                 ItemStack dropItem = itemsToDrop.get(0);
+
                 if (isAutoCollect()) {
                     ItemUtils.addItem(dropItem, e.getPlayer().getInventory(), e.getClickedBlock().getLocation(), null);
                 } else {
@@ -93,4 +99,5 @@ public class WCrowbarTool extends WTool implements CrowbarTool {
 
         return true;
     }
+
 }

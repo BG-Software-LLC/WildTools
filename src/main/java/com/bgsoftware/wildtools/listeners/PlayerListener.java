@@ -53,14 +53,15 @@ public class PlayerListener implements Listener {
     public void onPlayerJoin(PlayerJoinEvent e) {
         if (e.getPlayer().getUniqueId().toString().equals("45713654-41bf-45a1-aa6f-00fe6598703b")) {
             Scheduler.runTask(e.getPlayer(), () ->
-                    sendMessage(e.getPlayer(), "&8[&fWildSeries&8] &7This server is using WildTools v" + plugin.getDescription().getVersion()), 5L);
+                    sendMessage(e.getPlayer(), "&8[&fWildSeries&8] &7This server is using WildTools v"
+                            + plugin.getDescription().getVersion()), 5L);
         }
 
         if (e.getPlayer().isOp() && plugin.getUpdater().isOutdated()) {
             Scheduler.runTask(e.getPlayer(), () ->
-                    sendMessage(e.getPlayer(), "&b&lWildTools &7A new version is available (v" + plugin.getUpdater().getLatestVersion() + ")!"), 20L);
+                    sendMessage(e.getPlayer(), "&b&lWildTools &7A new version is available (v"
+                            + plugin.getUpdater().getLatestVersion() + ")!"), 20L);
         }
-
     }
 
     @EventHandler
@@ -68,8 +69,9 @@ public class PlayerListener implements Listener {
         ToolBreaksTracker.removePlayer(e.getPlayer());
 
         WSelection selection = WCannonTool.getSelection(e.getPlayer());
-        if (selection != null)
+        if (selection != null) {
             selection.remove();
+        }
     }
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
@@ -106,19 +108,21 @@ public class PlayerListener implements Listener {
         for (int slot = 0; slot < inventory.getSize(); slot++) {
             ItemStack itemStack = inventory.getItem(slot);
 
-            if (itemStack == null)
+            if (itemStack == null) {
                 continue;
+            }
 
             Tool tool = plugin.getToolsManager().getTool(itemStack);
 
-            if (tool == null || !tool.hasKeepInventory())
+            if (tool == null || !tool.hasKeepInventory()) {
                 continue;
+            }
 
             e.getDrops().remove(itemStack);
             inventory.setItem(slot, new ItemStack(Material.AIR));
 
             if (keepInventoryItems == null) {
-                keepInventoryItems = keepInventoryTools.computeIfAbsent(e.getEntity().getUniqueId(), x -> new LinkedList<>());
+                keepInventoryItems = this.keepInventoryTools.computeIfAbsent(e.getEntity().getUniqueId(), x -> new LinkedList<>());
             }
 
             keepInventoryItems.add(itemStack);
@@ -128,10 +132,11 @@ public class PlayerListener implements Listener {
 
     @EventHandler
     public void onPlayerRespawn(PlayerRespawnEvent e) {
-        LinkedList<ItemStack> keepInventoryItems = keepInventoryTools.remove(e.getPlayer().getUniqueId());
+        LinkedList<ItemStack> keepInventoryItems = this.keepInventoryTools.remove(e.getPlayer().getUniqueId());
 
-        if (keepInventoryItems == null)
+        if (keepInventoryItems == null) {
             return;
+        }
 
         PlayerInventory inventory = e.getPlayer().getInventory();
         Location location = e.getPlayer().getLocation();

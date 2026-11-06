@@ -42,27 +42,29 @@ public class EventsHandler {
 
     public void callBreakEvent(BlockBreakEvent blockBreakEvent, boolean claimingCheck) {
         if (claimingCheck) {
-            callMethods(claimingPluginsBreakMethods, blockBreakEvent);
+            callMethods(this.claimingPluginsBreakMethods, blockBreakEvent);
             return;
         }
 
-        callMethods(globalNotifiedPluginsBreakMethods, blockBreakEvent);
+        callMethods(this.globalNotifiedPluginsBreakMethods, blockBreakEvent);
 
         ToolItemStack toolItemStack = ToolItemStack.of(plugin.getNMSAdapter().getItemInHand(blockBreakEvent.getPlayer()));
         Tool tool = toolItemStack.getTool();
-        List<RegisteredListener> getOtherPluginsMethods = notifiedPluginsBreakMethodsTools.get(tool);
-        if (getOtherPluginsMethods != null)
+        List<RegisteredListener> getOtherPluginsMethods = this.notifiedPluginsBreakMethodsTools.get(tool);
+        if (getOtherPluginsMethods != null) {
             callMethods(getOtherPluginsMethods, blockBreakEvent);
+        }
     }
 
     public void callPlaceEvent(BlockPlaceEvent blockPlaceEvent) {
-        callMethods(claimingPluginsPlaceMethods, blockPlaceEvent);
+        callMethods(this.claimingPluginsPlaceMethods, blockPlaceEvent);
     }
 
     public void callInteractEvent(PlayerInteractEvent playerInteractEvent) {
-        callMethods(claimingPluginsInteractMethods, playerInteractEvent);
+        callMethods(this.claimingPluginsInteractMethods, playerInteractEvent);
     }
 
+    @SuppressWarnings("all")
     private static void setEventExecutors(HandlerList handlerList, EventPriority maxPriority,
                                           Collection<String> whitelistedPlugins,
                                           List<RegisteredListener> cachedEventExecutors) {
@@ -88,13 +90,13 @@ public class EventsHandler {
         // We want to initialize some well-known plugins for claims.
         claimingPlugins.addAll(PRE_DEFINED_CLAIMING_PLUGINS);
 
-        setEventExecutors(BlockBreakEvent.getHandlerList(), EventPriority.NORMAL, claimingPlugins, claimingPluginsBreakMethods);
-        setEventExecutors(BlockPlaceEvent.getHandlerList(), EventPriority.NORMAL, claimingPlugins, claimingPluginsPlaceMethods);
-        setEventExecutors(PlayerInteractEvent.getHandlerList(), EventPriority.NORMAL, claimingPlugins, claimingPluginsInteractMethods);
+        setEventExecutors(BlockBreakEvent.getHandlerList(), EventPriority.NORMAL, claimingPlugins, this.claimingPluginsBreakMethods);
+        setEventExecutors(BlockPlaceEvent.getHandlerList(), EventPriority.NORMAL, claimingPlugins, this.claimingPluginsPlaceMethods);
+        setEventExecutors(PlayerInteractEvent.getHandlerList(), EventPriority.NORMAL, claimingPlugins, this.claimingPluginsInteractMethods);
     }
 
     public void loadNotifiedPlugins(List<String> otherPlugins) {
-        loadNotifiedPluginListeners0(otherPlugins, globalNotifiedPluginsBreakMethods);
+        loadNotifiedPluginListeners0(otherPlugins, this.globalNotifiedPluginsBreakMethods);
         loadNotifiedForTools();
     }
 
@@ -102,11 +104,12 @@ public class EventsHandler {
         plugin.getToolsManager().getTools().stream()
                 .filter(tool -> !tool.getNotifiedPlugins().isEmpty())
                 .forEach(tool -> {
-                    List<RegisteredListener> notifiedPlugins = notifiedPluginsBreakMethodsTools
+                    List<RegisteredListener> notifiedPlugins = this.notifiedPluginsBreakMethodsTools
                             .computeIfAbsent(tool, t -> new LinkedList<>());
                     loadNotifiedPluginListeners0(tool.getNotifiedPlugins(), notifiedPlugins);
-                    if (notifiedPlugins.isEmpty())
-                        notifiedPluginsBreakMethodsTools.remove(tool);
+                    if (notifiedPlugins.isEmpty()) {
+                        this.notifiedPluginsBreakMethodsTools.remove(tool);
+                    }
                 });
     }
 

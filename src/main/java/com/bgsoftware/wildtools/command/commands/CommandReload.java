@@ -9,7 +9,7 @@ import com.bgsoftware.wildtools.handlers.ToolsHandler;
 import com.bgsoftware.wildtools.scheduler.Scheduler;
 import org.bukkit.command.CommandSender;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class CommandReload implements ICommand {
@@ -61,7 +61,7 @@ public class CommandReload implements ICommand {
 
     @Override
     public List<String> tabComplete(WildToolsPlugin plugin, CommandSender sender, String[] args) {
-        return new ArrayList<>();
+        return Collections.emptyList();
     }
 
 }

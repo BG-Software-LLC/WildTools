@@ -17,12 +17,14 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
+import java.util.LinkedList;
 import java.util.List;
 
 public class EditorHandler {
 
-    private WildToolsPlugin plugin;
+    private final WildToolsPlugin plugin;
     private ItemStack[] settingsEditor;
 
     public CommentedConfiguration config;
@@ -37,6 +39,7 @@ public class EditorHandler {
         try {
             this.config.syncWithConfig(file, plugin.getResource("config.yml"), "tools");
         } catch (IOException error) {
+            //noinspection all
             error.printStackTrace();
             return;
         }
@@ -48,6 +51,7 @@ public class EditorHandler {
         try {
             config.save(new File(plugin.getDataFolder(), "config.yml"));
         } catch (IOException error) {
+            //noinspection all
             error.printStackTrace();
             return;
         }
@@ -59,6 +63,7 @@ public class EditorHandler {
         try {
             config.load(new File(plugin.getDataFolder(), "config.yml"));
         } catch (Exception ex) {
+            //noinspection all
             ex.printStackTrace();
         }
     }
@@ -115,7 +120,7 @@ public class EditorHandler {
         editor.setItem(47, new ItemBuilder(Material.NAME_TAG)
                 .withName("&bTool Name").withLore("&7Name: " + getFromConfig(toolName, "name", String.class, "")).build());
         editor.setItem(48, new ItemBuilder(Materials.MAP)
-                .withName("&bTool Lore").withLore("&7Lore:", getFromConfig(toolName, "lore", List.class, new ArrayList<>())).build());
+                .withName("&bTool Lore").withLore("&7Lore:", getFromConfig(toolName, "lore", List.class, Collections.emptyList())).build());
 
         editor.setItem(10, new ItemBuilder(Materials.CLOCK)
                 .withName("&bTool Cooldown").withLore("&7Cooldown: " + getFromConfig(toolName, "cooldown", Integer.class, 0)).build());
@@ -125,7 +130,7 @@ public class EditorHandler {
                 .withName("&bTool Keep-Inventory").withLore("&7Keep-Inventory: " + getFromConfig(toolName, "keep-inventory", Boolean.class, false)).build());
         editor.setItem(13, new ItemBuilder(Material.QUARTZ_BLOCK)
                 .withName("&bTool Whitelisted Blocks").withLore("&7Whitelisted Blocks: ",
-                        getFromConfig(toolName, "whitelisted-blocks", List.class, new ArrayList<>())).build());
+                        getFromConfig(toolName, "whitelisted-blocks", List.class, Collections.emptyList())).build());
         editor.setItem(14, new ItemBuilder(Material.HOPPER)
                 .withName("&bTool Auto-Collect").withLore("&7Auto-Collect: " + getFromConfig(toolName, "auto-collect", Boolean.class, false)).build());
         editor.setItem(15, new ItemBuilder(Material.ANVIL)
@@ -134,7 +139,7 @@ public class EditorHandler {
                 .withName("&bTool Enchants").withLore("&7Enchantments:", getEnchants(toolName)).build());
         editor.setItem(19, new ItemBuilder(Material.QUARTZ)
                 .withName("&bTool Whitelisted Drops").withLore("&7Whitelisted Drops: ",
-                        getFromConfig(toolName, "whitelisted-drops", List.class, new ArrayList<>())).build());
+                        getFromConfig(toolName, "whitelisted-drops", List.class, Collections.emptyList())).build());
         editor.setItem(20, new ItemBuilder(Material.ENCHANTED_BOOK)
                 .withName("&bTool Silktouch").withLore("&7Silktouch: " + getFromConfig(toolName, "silk-touch", Boolean.class, false)).build());
         editor.setItem(21, new ItemBuilder(Materials.REDSTONE_TORCH)
@@ -143,7 +148,7 @@ public class EditorHandler {
                 .withName("&bOmni Tool").withLore("&7Omni Tool: " + getFromConfig(toolName, "omni-tool", Boolean.class, false)).build());
         editor.setItem(23, new ItemBuilder(Material.COAL_BLOCK)
                 .withName("&bTool Blacklisted Blocks").withLore("&7Blacklisted Blocks: ",
-                        getFromConfig(toolName, "blacklisted-blocks", List.class, new ArrayList<>())).build());
+                        getFromConfig(toolName, "blacklisted-blocks", List.class, Collections.emptyList())).build());
         editor.setItem(24, new ItemBuilder(Material.ARROW)
                 .withName("&bTool Only-Same-Type").withLore("&7Only-Same-Type: " + getFromConfig(toolName, "only-same-type", Boolean.class, false)).build());
         editor.setItem(25, new ItemBuilder(Material.NETHER_STAR)
@@ -152,7 +157,7 @@ public class EditorHandler {
                 .withName("&bTool Spigot Unbreakable").withLore("&7Spigot Unbreakable: " + getFromConfig(toolName, "spigot-unbreakable", Boolean.class, false)).build());
         editor.setItem(29, new ItemBuilder(Material.COAL)
                 .withName("&bTool Blacklisted Drops").withLore("&7Blacklisted Drops: ",
-                        getFromConfig(toolName, "blacklisted-drops", List.class, new ArrayList<>())).build());
+                        getFromConfig(toolName, "blacklisted-drops", List.class, Collections.emptyList())).build());
         editor.setItem(30, new ItemBuilder(Material.SUGAR)
                 .withName("&bTool Instant-Break").withLore("&7Instant-Break: " + getFromConfig(toolName, "instant-break", Boolean.class, false)).build());
         editor.setItem(31, new ItemBuilder(Materials.EXPERIENCE_BOTTLE.toBukkitType())
@@ -188,7 +193,7 @@ public class EditorHandler {
                     .withName("&bTool TNT-Amount").withLore("&7TNT-Amount: " + getFromConfig(toolName, "tnt-amount", Integer.class, 0)).build());
         } else if (toolMode == ToolMode.CRAFTING) {
             editor.setItem(50, new ItemBuilder(Materials.CRAFTING_TABLE)
-                    .withName("&bTool Recipes").withLore("&7Recipes: ", getFromConfig(toolName, "craftings", List.class, new ArrayList<>())).build());
+                    .withName("&bTool Recipes").withLore("&7Recipes: ", getFromConfig(toolName, "craftings", List.class, Collections.emptyList())).build());
         } else if (toolMode == ToolMode.SELL) {
             editor.setItem(50, new ItemBuilder(Material.GOLD_INGOT)
                     .withName("&bTool Multiplier").withLore("&7Multiplier: " + getFromConfig(toolName, "multiplier", Double.class, 1.0)).build());
@@ -260,7 +265,7 @@ public class EditorHandler {
     }
 
     private List<String> getEnchants(String toolName) {
-        List<String> list = new ArrayList<>();
+        List<String> list = new LinkedList<>();
 
         if (config.contains("tools." + toolName + ".enchants")) {
             for (String enchantment : config.getStringList("tools." + toolName + ".enchants")) {

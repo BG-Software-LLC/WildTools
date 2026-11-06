@@ -23,16 +23,16 @@ public class WCuboidTool extends WTool implements CuboidTool {
     }
 
     public int getBreakLevel() {
-        return breakLevel;
+        return this.breakLevel;
     }
 
     @Override
     public boolean onBlockBreak(BlockBreakEvent e) {
         ItemStack inHand = e.getPlayer().getItemInHand();
-        int radius = breakLevel / 2;
+        int radius = this.breakLevel / 2;
 
-        Location max = e.getBlock().getLocation().add(radius, radius, radius),
-                min = e.getBlock().getLocation().subtract(radius, radius, radius);
+        Location max = e.getBlock().getLocation().add(radius, radius, radius);
+        Location min = e.getBlock().getLocation().subtract(radius, radius, radius);
 
         BlockMaterial firstBlockMaterial = BlockMaterial.of(e.getBlock());
 
@@ -45,17 +45,20 @@ public class WCuboidTool extends WTool implements CuboidTool {
         for (int y = max.getBlockY(); y >= min.getBlockY(); y--) {
             for (int x = min.getBlockX(); x <= max.getBlockX(); x++) {
                 for (int z = min.getBlockZ(); z <= max.getBlockZ(); z++) {
-                    if (usingDurability && toolUsages >= toolDurability)
+                    if (usingDurability && toolUsages >= toolDurability) {
                         break outerLoop;
+                    }
 
                     Block targetBlock = e.getPlayer().getWorld().getBlockAt(x, y, z);
 
                     if (targetBlock.getType() == Material.AIR ||
-                            !BukkitUtils.canBreakBlock(e.getPlayer(), targetBlock, firstBlockMaterial, this))
+                            !BukkitUtils.canBreakBlock(e.getPlayer(), targetBlock, firstBlockMaterial, this)) {
                         continue;
+                    }
 
-                    if (BukkitUtils.breakBlock(e.getPlayer(), targetBlock, inHand, this, editSession, null))
+                    if (BukkitUtils.breakBlock(e.getPlayer(), targetBlock, inHand, this, editSession, null)) {
                         toolUsages++;
+                    }
                 }
             }
         }
@@ -63,14 +66,17 @@ public class WCuboidTool extends WTool implements CuboidTool {
         CuboidWandUseEvent cuboidWandUseEvent = new CuboidWandUseEvent(e.getPlayer(), this, editSession.getAffectedBlocks());
         Bukkit.getPluginManager().callEvent(cuboidWandUseEvent);
 
-        if (cuboidWandUseEvent.isCancelled())
+        if (cuboidWandUseEvent.isCancelled()) {
             return true;
+        }
 
         editSession.apply();
 
-        if (toolUsages > 0)
+        if (toolUsages > 0) {
             reduceDurablility(e.getPlayer(), usingDurability ? toolUsages : 1, inHand);
+        }
 
         return true;
     }
+
 }

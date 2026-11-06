@@ -7,9 +7,7 @@ import org.bukkit.block.CreatureSpawner;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 
 public class DropsProvider_SilkSpawners_Timbru5 implements DropsProvider {
