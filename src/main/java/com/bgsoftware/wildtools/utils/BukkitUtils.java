@@ -60,7 +60,11 @@ public class BukkitUtils {
         return !blockBreakEvent.isCancelled();
     }
 
-    public static boolean canInteractBlock(Player player, Block block, ItemStack usedItem) {
+    public static boolean canInteractBlock(Player player, Block block, Tool tool) {
+        return !tool.isOnlyInsideClaim() || plugin.getProviders().isInsideClaim(player, block.getLocation());
+    }
+
+    public static boolean hasInteractAccess(Player player, Block block, ItemStack usedItem) {
         PlayerInteractEvent playerInteractEvent =
                 new PlayerInteractEvent(player, Action.RIGHT_CLICK_BLOCK, usedItem, block, BlockFace.SELF);
         plugin.getEvents().callInteractEvent(playerInteractEvent);
