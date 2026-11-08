@@ -21,6 +21,7 @@ import com.bgsoftware.wildtools.listeners.BlocksListener;
 import com.bgsoftware.wildtools.listeners.CraftingListener;
 import com.bgsoftware.wildtools.listeners.EditorListener;
 import com.bgsoftware.wildtools.listeners.PlayerListener;
+import com.bgsoftware.wildtools.listeners.PluginListener;
 import com.bgsoftware.wildtools.nms.NMSAdapter;
 import com.bgsoftware.wildtools.nms.NMSWorld;
 import com.bgsoftware.wildtools.utils.items.OmniToolHelper;
@@ -57,6 +58,9 @@ public class WildToolsPlugin extends JavaPlugin implements WildTools {
         shouldEnable = loadNMSAdapter();
 
         EventsSimulation.init();
+
+        toolsManager = new ToolsHandler(this);
+        loadAPI();
     }
 
     @Override
@@ -82,6 +86,7 @@ public class WildToolsPlugin extends JavaPlugin implements WildTools {
         getServer().getPluginManager().registerEvents(new BlocksListener(this), this);
         getServer().getPluginManager().registerEvents(new CraftingListener(this), this);
         getServer().getPluginManager().registerEvents(new PlayerListener(this), this);
+        getServer().getPluginManager().registerEvents(new PluginListener(this), this);
         getServer().getPluginManager().registerEvents(new EditorListener(this), this);
 
         CommandsHandler commandsHandler = new CommandsHandler(this);
@@ -89,12 +94,10 @@ public class WildToolsPlugin extends JavaPlugin implements WildTools {
         getCommand("tools").setTabCompleter(commandsHandler);
 
         providersHandler = new ProvidersHandler(this);
-        toolsManager = new ToolsHandler(this);
         eventsHandler = new EventsHandler();
 
         DataHandler.loadData();
         Locale.reload();
-        loadAPI();
 
         editorHandler = new EditorHandler(this);
         recipesHandler = new RecipesHandler(this);

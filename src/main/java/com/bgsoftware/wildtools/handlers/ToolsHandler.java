@@ -2,6 +2,9 @@ package com.bgsoftware.wildtools.handlers;
 
 import com.bgsoftware.wildtools.api.objects.tools.CrowbarTool;
 import com.bgsoftware.wildtools.api.objects.tools.MagnetTool;
+import com.bgsoftware.wildtools.api.factory.ToolBehaviorFactory;
+import com.bgsoftware.wildtools.tools.WCustomTool;
+import com.google.common.base.Preconditions;
 import com.bgsoftware.wildtools.tools.WBuilderTool;
 import com.bgsoftware.wildtools.tools.WCannonTool;
 import com.bgsoftware.wildtools.tools.WCraftingTool;
@@ -15,9 +18,11 @@ import com.bgsoftware.wildtools.tools.WPillarTool;
 import com.bgsoftware.wildtools.tools.WSellTool;
 import com.bgsoftware.wildtools.tools.WSortTool;
 import com.bgsoftware.wildtools.utils.items.ToolItemStack;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.Plugin;
 
 import com.bgsoftware.wildtools.WildToolsPlugin;
 import com.bgsoftware.wildtools.api.handlers.ToolsManager;
@@ -56,6 +61,8 @@ public class ToolsHandler implements ToolsManager {
 
     private final Map<String, Tool> toolsByName = new HashMap<>();
     private final List<Tool> tools = new ArrayList<>();
+    private final Map<ToolMode, ToolBehaviorFactory> toolFactories = new HashMap<>();
+    private final Map<ToolMode, Plugin> toolOwners = new HashMap<>();
 
     public ToolsHandler(WildToolsPlugin plugin){
         this.plugin = plugin;
@@ -83,7 +90,7 @@ public class ToolsHandler implements ToolsManager {
 
     @Override
     public DrainTool getDrainTool(ItemStack itemStack) {
-        return getTool(itemStack, ToolMode.CUBOID, DrainTool.class);
+        return getTool(itemStack, ToolMode.DRAIN, DrainTool.class);
     }
 
     @Override
@@ -149,6 +156,48 @@ public class ToolsHandler implements ToolsManager {
 
     public void clearTools(){
         tools.clear();
+        toolsByName.values().removeIf(tool -> tool instanceof WCustomTool);
+    }
+
+    @Override
+    public ToolMode registerToolMode(Plugin owner, String name, ToolBehaviorFactory factory) {
+        checkRegistrationThread();
+        Preconditions.checkState(this.plugin.getEvents() == null, "Tool modes must be registered during onLoad.");
+        Preconditions.checkNotNull(owner, "owner parameter cannot be null.");
+        Preconditions.checkNotNull(factory, "factory parameter cannot be null.");
+
+        ToolMode toolMode = ToolMode.register(name);
+        this.toolFactories.put(toolMode, factory);
+        this.toolOwners.put(toolMode, owner);
+        return toolMode;
+    }
+
+    @Override
+    public void unregisterToolMode(Plugin owner, ToolMode toolMode) {
+        checkRegistrationThread();
+        Preconditions.checkNotNull(owner, "owner parameter cannot be null.");
+        Preconditions.checkNotNull(toolMode, "toolMode parameter cannot be null.");
+        Preconditions.checkState(this.toolOwners.get(toolMode) == owner, "Tool mode is not registered by this plugin.");
+
+        this.toolFactories.remove(toolMode);
+        this.toolOwners.remove(toolMode);
+        this.tools.removeIf(tool -> tool.getToolMode() == toolMode);
+        this.toolsByName.values().removeIf(tool -> tool.getToolMode() == toolMode);
+        ToolMode.unregister(toolMode);
+        if (this.plugin.getEvents() != null)
+            this.plugin.getEvents().loadNotifiedForTools();
+    }
+
+    public void unregisterToolModes(Plugin owner) {
+        for (ToolMode toolMode : new ArrayList<>(this.toolOwners.keySet())) {
+            if (this.toolOwners.get(toolMode) == owner)
+                unregisterToolMode(owner, toolMode);
+        }
+    }
+
+    public WCustomTool createCustomTool(Material type, String name, ToolMode toolMode) {
+        Plugin owner = this.toolOwners.get(toolMode);
+        return owner == null ? null : new WCustomTool(type, name, toolMode, owner, this.toolFactories.get(toolMode));
     }
 
     @Override
@@ -192,6 +241,11 @@ public class ToolsHandler implements ToolsManager {
             tool = new WSortTool(type, name);
         }else throw new IllegalArgumentException("Couldn't find tool class " + toolClass.getName());
 
+        registerTool(tool);
+        return toolClass.cast(tool);
+    }
+
+    public void registerTool(Tool tool) {
         if(toolsByName.containsKey(tool.getName().toLowerCase()))
             tools.remove(toolsByName.get(tool.getName().toLowerCase()));
 
@@ -199,8 +253,16 @@ public class ToolsHandler implements ToolsManager {
         toolsByName.put(tool.getName().toLowerCase(), tool);
 
         tools.sort(toolComparator);
+    }
 
-        return toolClass.cast(tool);
+    public void unregisterTool(Tool tool) {
+        tools.remove(tool);
+        toolsByName.remove(tool.getName().toLowerCase(), tool);
+    }
+
+    private void checkRegistrationThread() {
+        Preconditions.checkState(Bukkit.isPrimaryThread(),
+                "Tool modes must be registered on the server thread.");
     }
 
     @Override

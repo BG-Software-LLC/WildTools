@@ -1,6 +1,8 @@
 package com.bgsoftware.wildtools.api.handlers;
 
 import com.bgsoftware.wildtools.api.objects.Selection;
+import com.bgsoftware.wildtools.api.objects.ToolMode;
+import com.bgsoftware.wildtools.api.factory.ToolBehaviorFactory;
 import com.bgsoftware.wildtools.api.objects.tools.BuilderTool;
 import com.bgsoftware.wildtools.api.objects.tools.CannonTool;
 import com.bgsoftware.wildtools.api.objects.tools.CraftingTool;
@@ -14,6 +16,7 @@ import com.bgsoftware.wildtools.api.objects.tools.Tool;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.Plugin;
 
 import com.bgsoftware.wildtools.api.objects.tools.IceTool;
 import com.bgsoftware.wildtools.api.objects.tools.SellTool;
@@ -131,6 +134,10 @@ public interface ToolsManager {
      * @return If exists, the price. Otherwise, -1.
      */
     double getPrice(Player player, ItemStack itemStack);
+
+    ToolMode registerToolMode(Plugin owner, String name, ToolBehaviorFactory factory);
+
+    void unregisterToolMode(Plugin owner, ToolMode mode);
 
     /**
      * Register a new tool.

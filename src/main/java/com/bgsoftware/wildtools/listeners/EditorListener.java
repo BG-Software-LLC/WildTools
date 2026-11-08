@@ -99,7 +99,7 @@ public class EditorListener implements Listener {
                     player.openInventory(plugin.getEditor().getToolsEditor());
                     break;
                 case 40:
-                    Scheduler.runTaskAsync(() -> {
+                    Scheduler.runTask(() -> {
                         plugin.getEditor().saveConfiguration();
                         player.sendMessage("" + ChatColor.AQUA + ChatColor.BOLD + "WildTools " + ChatColor.GRAY + "Saved configuration successfully.");
                     });
@@ -133,7 +133,7 @@ public class EditorListener implements Listener {
             e.setCancelled(true);
 
             String toolName = toolTypes.get(player.getUniqueId());
-            ToolMode toolMode = ToolMode.valueOf(plugin.getEditor().config.getString("tools." + toolName + ".tool-mode"));
+            ToolMode toolMode = ToolMode.getByName(plugin.getEditor().config.getString("tools." + toolName + ".tool-mode"));
 
             switch (e.getRawSlot()){
                 case 10:
@@ -310,15 +310,14 @@ public class EditorListener implements Listener {
                     }
                     return;
                 }else{
-                    try{
-                        ToolMode toolMode = ToolMode.valueOf(e.getMessage().toUpperCase());
-                        plugin.getEditor().createTool(toolValues.get(e.getPlayer().getUniqueId()), toolMode);
-                        toolTypes.put(e.getPlayer().getUniqueId(), toolValues.get(e.getPlayer().getUniqueId()));
-                        Scheduler.runTask(() -> toolTypes.remove(e.getPlayer().getName()), 1L);
-                    }catch(IllegalArgumentException ex){
+                    ToolMode toolMode = ToolMode.getByName(e.getMessage());
+                    if(toolMode == null){
                         e.getPlayer().sendMessage(ChatColor.RED + "Please enter a valid tool mode.");
                         return;
                     }
+                    plugin.getEditor().createTool(toolValues.get(e.getPlayer().getUniqueId()), toolMode);
+                    toolTypes.put(e.getPlayer().getUniqueId(), toolValues.get(e.getPlayer().getUniqueId()));
+                    Scheduler.runTask(() -> toolTypes.remove(e.getPlayer().getName()), 1L);
                 }
             } else if(Arrays.asList(listValues).contains(toolValue)){
                 if(toolValue.equals("prices-list"))

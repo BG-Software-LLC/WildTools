@@ -2,6 +2,7 @@ package com.bgsoftware.wildtools.handlers;
 
 import com.bgsoftware.wildtools.WildToolsPlugin;
 import com.bgsoftware.wildtools.api.objects.tools.Tool;
+import com.bgsoftware.wildtools.tools.WCustomTool;
 import com.bgsoftware.wildtools.utils.items.ToolItemStack;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventException;
@@ -99,6 +100,8 @@ public class EventsHandler {
     }
 
     public void loadNotifiedForTools() {
+        notifiedPluginsBreakMethodsTools.keySet().removeIf(tool ->
+                tool instanceof WCustomTool && !plugin.getToolsManager().getTools().contains(tool));
         plugin.getToolsManager().getTools().stream()
                 .filter(tool -> !tool.getNotifiedPlugins().isEmpty())
                 .forEach(tool -> {

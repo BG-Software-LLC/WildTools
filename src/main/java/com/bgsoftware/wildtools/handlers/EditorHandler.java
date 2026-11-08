@@ -163,7 +163,7 @@ public class EditorHandler {
         editor.setItem(33, new ItemStack(Material.AIR));
         editor.setItem(34, new ItemStack(Material.AIR));
 
-        ToolMode toolMode = ToolMode.valueOf(getFromConfig(toolName, "tool-mode", String.class, ""));
+        ToolMode toolMode = ToolMode.getByName(getFromConfig(toolName, "tool-mode", String.class, ""));
 
         if (toolMode == ToolMode.BUILDER) {
             editor.setItem(50, new ItemBuilder(Material.FEATHER)
@@ -201,27 +201,20 @@ public class EditorHandler {
         config.set("tools." + toolName + ".type", "STICK");
         config.set("tools." + toolName + ".tool-mode", toolMode.name());
 
-        switch (toolMode) {
-            case BUILDER:
-                config.set("tools." + toolName + ".length", 1);
-                break;
-            case CUBOID:
-                config.set("tools." + toolName + ".break-level", 1);
-                break;
-            case HARVESTER:
-                config.set("tools." + toolName + ".radius", 1);
-                config.set("tools." + toolName + ".farmland-radius", 1);
-                config.set("tools." + toolName + ".active-action", "RIGHT_CLICK");
-                break;
-            case ICE:
-                config.set("tools." + toolName + ".radius", 1);
-                break;
-            case CANNON:
-                config.set("tools." + toolName + ".tnt-amount", 1);
-                break;
-            case CRAFTING:
-                config.set("tools." + toolName + ".craftings", Arrays.asList("TNT", "DIAMOND"));
-                break;
+        if (toolMode == ToolMode.BUILDER) {
+            config.set("tools." + toolName + ".length", 1);
+        } else if (toolMode == ToolMode.CUBOID) {
+            config.set("tools." + toolName + ".break-level", 1);
+        } else if (toolMode == ToolMode.HARVESTER) {
+            config.set("tools." + toolName + ".radius", 1);
+            config.set("tools." + toolName + ".farmland-radius", 1);
+            config.set("tools." + toolName + ".active-action", "RIGHT_CLICK");
+        } else if (toolMode == ToolMode.ICE) {
+            config.set("tools." + toolName + ".radius", 1);
+        } else if (toolMode == ToolMode.CANNON) {
+            config.set("tools." + toolName + ".tnt-amount", 1);
+        } else if (toolMode == ToolMode.CRAFTING) {
+            config.set("tools." + toolName + ".craftings", Arrays.asList("TNT", "DIAMOND"));
         }
     }
 
